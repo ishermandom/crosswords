@@ -4,7 +4,9 @@
 """Ollama client wrapper using the OpenAI-compatible HTTP API."""
 
 import enum
+from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Protocol
 
 import openai
 from openai.types.chat import ChatCompletionMessageParam
@@ -20,6 +22,20 @@ class GenerationError(Exception):
   """Raised when the model returns output that cannot be used as a clue."""
 
 
+@dataclass(frozen=True)
+class ChatResult:
+  """Return value of a ChatClient.chat call."""
+
+  reply: str
+  messages: Sequence[Message]
+
+
+class ChatClient(Protocol):
+  """Structural protocol for any chat model client."""
+
+  def chat(self, messages: Sequence[Message]) -> ChatResult: ...
+
+
 class Model(enum.StrEnum):
   """Candidate models available in the local Ollama install."""
 
@@ -30,14 +46,6 @@ class Model(enum.StrEnum):
   QWEN3_1B7 = 'qwen3:1.7b'  # fast smoke-test; low quality
   QWEN3_4B = 'qwen3:4b'  # smoke-test; balanced quality vs. speed
   QWEN3_8B = 'qwen3:8b'  # smoke-test; balanced quality vs. speed
-
-
-@dataclass(frozen=True)
-class ChatResult:
-  """Return value of OllamaClient.chat."""
-
-  reply: str
-  messages: tuple[Message, ...]
 
 
 class OllamaClient:
@@ -53,10 +61,10 @@ class OllamaClient:
     self._model = model
     self._client = openai.OpenAI(base_url=base_url, api_key='ollama')
 
-  def chat(self, messages: tuple[Message, ...]) -> ChatResult:
-    """Send a conversation and return the reply and updated messages tuple.
+  def chat(self, messages: Sequence[Message]) -> ChatResult:
+    """Send a conversation and return the reply and updated messages list.
 
-    The returned messages tuple is the input extended with the assistant's
+    The returned messages list is the input extended with the assistant's
     reply, ready for the next turn if continuing the conversation.
 
     Raises openai.APIConnectionError if the Ollama server is unreachable.
@@ -72,7 +80,7 @@ class OllamaClient:
       raise GenerationError(
         f'Model {self._model!r} returned no text content. Last message: {last}'
       )
-    updated: tuple[Message, ...] = messages + (
-      {'role': 'assistant', 'content': content},
+    return ChatResult(
+      reply=content,
+      messages=[*messages, {'role': 'assistant', 'content': content}],
     )
-    return ChatResult(reply=content, messages=updated)

@@ -9,7 +9,9 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
-from clue_gen.client import GenerationError, Message, OllamaClient
+from collections.abc import Sequence
+
+from clue_gen.client import ChatClient, GenerationError, Message
 from clue_gen.prompt import Difficulty, brainstorm_messages, validation_messages
 
 _log = logging.getLogger(__name__)
@@ -26,7 +28,7 @@ class ClueResult:
 def generate_clue(
   word: str,
   difficulty: Difficulty,
-  client: OllamaClient,
+  client: ChatClient,
 ) -> ClueResult:
   """Run the two-stage pipeline for a single word.
 
@@ -37,7 +39,7 @@ def generate_clue(
   passes validation (first candidate is used as fallback).
   """
   # Stage 1: brainstorm, then extract candidates as a structured list.
-  messages: tuple[Message, ...] = brainstorm_messages(word, difficulty)
+  messages: Sequence[Message] = brainstorm_messages(word, difficulty)
   messages = client.chat(messages).messages
 
   # TODO: Phase 3 — replace with multi-turn brainstorm sequence.
@@ -48,7 +50,7 @@ def generate_clue(
       'with no other text. Example: ["Clue one", "Clue two"]'
     ),
   }
-  extract_reply = client.chat(messages + (extract_turn,)).reply
+  extract_reply = client.chat([*messages, extract_turn]).reply
   candidates = _extract_json_list(extract_reply)
 
   # Stage 2: validate each candidate with a blind solver (independent call).

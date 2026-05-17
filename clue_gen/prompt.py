@@ -7,6 +7,7 @@ Prompt content is placeholder — actual prompt design is Phase 3.
 """
 
 import enum
+from collections.abc import Sequence
 
 from clue_gen.client import Message
 
@@ -34,14 +35,14 @@ _DIFFICULTY_DESCRIPTIONS: dict[Difficulty, str] = {
 
 def brainstorm_messages(
   word: str, difficulty: Difficulty
-) -> tuple[Message, ...]:
+) -> Sequence[Message]:
   """Build the opening brainstorm turn for a given answer word.
 
-  Returns a single-message tuple; the caller may append further turns to
+  Returns a single-message list; the caller may append further turns to
   continue the conversation. Prompt content is a placeholder for Phase 3.
   """
   desc = _DIFFICULTY_DESCRIPTIONS[difficulty]
-  return (
+  return [
     {
       'role': 'user',
       'content': (
@@ -52,10 +53,10 @@ def brainstorm_messages(
         'element, and trivia. Produce three to five distinct candidate clues.'
       ),
     },
-  )
+  ]
 
 
-def validation_messages(clue: str, answer_length: int) -> tuple[Message, ...]:
+def validation_messages(clue: str, answer_length: int) -> Sequence[Message]:
   """Build the opening validation turn for a single candidate clue.
 
   Presents only what a real solver would see: the clue and the answer length.
@@ -65,7 +66,7 @@ def validation_messages(clue: str, answer_length: int) -> tuple[Message, ...]:
   Phase 3.
   """
   blanks = '_' * answer_length
-  return (
+  return [
     {
       'role': 'user',
       'content': (
@@ -82,4 +83,4 @@ def validation_messages(clue: str, answer_length: int) -> tuple[Message, ...]:
         '{"valid": false, "issues": ["reason 1", "reason 2"]}'
       ),
     },
-  )
+  ]
