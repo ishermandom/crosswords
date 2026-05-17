@@ -37,6 +37,9 @@ dev = [
 # history of surprising behavior.
 [tool.pytest.ini_options]
 testpaths = ["clue_gen/tests"]
+markers = [
+  "wip: mark a test as work-in-progress; skipped when run from hooks",
+]
 
 [build-system]
 requires = ["hatchling"]
