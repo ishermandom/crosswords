@@ -13,10 +13,13 @@ from clue_gen.client import ChatResult, Message
 class FakeChatClient:
   """Scripted stand-in for any ChatClient.
 
+  Always use as a context manager — `__exit__` asserts that all scripted
+  replies were consumed, catching tests that script more calls than the code
+  actually makes.
+
   Replies are consumed front-to-back; each call pops the next reply and
   appends the messages argument to calls. Raises AssertionError if called
-  more times than scripted replies, or (when used as a context manager) if
-  the test exits without consuming all scripted replies.
+  more times than scripted.
 
   Typical usage:
 
