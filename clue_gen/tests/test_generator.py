@@ -13,23 +13,24 @@ from clue_gen.prompt import Difficulty
 from clue_gen.tests.fake_client import FakeChatClient
 
 
+def _replies(
+    brainstorm: str = 'brainstorm reply',
+    extract: str = '["A clue for alpha"]',
+    validate: str = '{"valid": true}',
+) -> list[str]:
+  """Default scripted replies for a single-candidate generate_clue call."""
+  return [brainstorm, extract, validate]
+
+
 # --- Call sequence: brainstorm → extract → validate ---
 
 def test_makes_exactly_three_calls_for_single_candidate():
-  with FakeChatClient([
-    'brainstorm reply',
-    '["A clue for alpha"]',
-    '{"valid": true, "clue": "A clue for alpha", "answer": "ALPHA"}',
-  ]) as fake:
+  with FakeChatClient(_replies()) as fake:
     generate_clue('ALPHA', Difficulty.MON, fake)
   assert len(fake.calls) == 3
 
 def test_brainstorm_call_includes_answer_word():
-  with FakeChatClient([
-    'brainstorm reply',
-    '["A clue for alpha"]',
-    '{"valid": true, "clue": "A clue for alpha", "answer": "ALPHA"}',
-  ]) as fake:
+  with FakeChatClient(_replies()) as fake:
     generate_clue('ALPHA', Difficulty.MON, fake)
   # calls[0] is the messages list passed to the brainstorm call.
   assert 'ALPHA' in fake.calls[0][-1]['content']
@@ -37,11 +38,7 @@ def test_brainstorm_call_includes_answer_word():
 def test_extract_call_appends_to_brainstorm_context():
   # The extract turn continues the brainstorm conversation, so the messages
   # list passed to call 2 should include the brainstorm assistant reply.
-  with FakeChatClient([
-    'brainstorm reply',
-    '["A clue for alpha"]',
-    '{"valid": true, "clue": "A clue for alpha", "answer": "ALPHA"}',
-  ]) as fake:
+  with FakeChatClient(_replies()) as fake:
     generate_clue('ALPHA', Difficulty.MON, fake)
   # calls[1] is the messages list passed to the extract call.
   contents = [m['content'] for m in fake.calls[1]]
@@ -50,11 +47,7 @@ def test_extract_call_appends_to_brainstorm_context():
 def test_validation_call_uses_fresh_context():
   # Validation is an independent call — it must not contain the brainstorm
   # reply, because the validator solves blind with only the clue and length.
-  with FakeChatClient([
-    'brainstorm reply',
-    '["A clue for alpha"]',
-    '{"valid": true, "clue": "A clue for alpha", "answer": "ALPHA"}',
-  ]) as fake:
+  with FakeChatClient(_replies()) as fake:
     generate_clue('ALPHA', Difficulty.MON, fake)
   # calls[2] is the messages list passed to the validation call.
   contents = [m['content'] for m in fake.calls[2]]
@@ -63,11 +56,7 @@ def test_validation_call_uses_fresh_context():
 def test_validation_call_excludes_answer_word():
   # The validator must solve blind — the answer word must not appear in the
   # validation prompt.
-  with FakeChatClient([
-    'brainstorm reply',
-    '["Greek letter, first"]',
-    '{"valid": true, "clue": "Greek letter, first", "answer": "ALPHA"}',
-  ]) as fake:
+  with FakeChatClient(_replies()) as fake:
     generate_clue('ALPHA', Difficulty.MON, fake)
   # calls[2][0] is the single user message in the validation call.
   assert 'ALPHA' not in fake.calls[2][0]['content']
@@ -77,39 +66,37 @@ def test_validation_call_excludes_answer_word():
 
 def test_uses_validator_clue_field_not_raw_candidate():
   # When the validator accepts and rewrites the clue, the rewrite wins.
-  with FakeChatClient([
-    'brainstorm reply',
-    '["Raw candidate clue"]',
-    '{"valid": true, "clue": "Lightly edited clue", "answer": "ALPHA"}',
-  ]) as fake:
+  with FakeChatClient(_replies(
+    extract='["Raw candidate clue"]',
+    validate='{"valid": true, "clue": "Lightly edited clue", "answer": "ALPHA"}',
+  )) as fake:
     result = generate_clue('ALPHA', Difficulty.MON, fake)
   assert result == ClueResult(word='ALPHA', clues=['Lightly edited clue'])
 
 def test_uses_raw_candidate_when_validator_omits_clue_field():
-  with FakeChatClient([
-    'brainstorm reply',
-    '["Raw candidate clue"]',
-    '{"valid": true, "answer": "ALPHA"}',
-  ]) as fake:
+  with FakeChatClient(_replies(
+    extract='["Raw candidate clue"]',
+    validate='{"valid": true, "answer": "ALPHA"}',
+  )) as fake:
     result = generate_clue('ALPHA', Difficulty.MON, fake)
   assert result.clues == ['Raw candidate clue']
 
 def test_accepts_when_validator_solves_to_different_word():
   # A wrong solved answer is a quality warning, not a rejection — the clue is
   # still returned.
-  with FakeChatClient([
-    'brainstorm reply',
-    '["Greek letter, first"]',
-    '{"valid": true, "clue": "Greek letter, first", "answer": "BETA"}',
-  ]) as fake:
+  with FakeChatClient(_replies(
+    extract='["Greek letter, first"]',
+    validate='{"valid": true, "clue": "Greek letter, first", "answer": "BETA"}',
+  )) as fake:
     result = generate_clue('ALPHA', Difficulty.MON, fake)
   assert result.clues == ['Greek letter, first']
 
 def test_skips_rejected_candidate_and_accepts_next():
   with FakeChatClient([
-    'brainstorm reply',
-    '["Candidate A", "Candidate B"]',
-    '{"valid": false, "issues": ["ambiguous"]}',
+    *_replies(
+      extract='["Candidate A", "Candidate B"]',
+      validate='{"valid": false, "issues": ["ambiguous"]}',
+    ),
     '{"valid": true, "clue": "Candidate B", "answer": "BRAVO"}',
   ]) as fake:
     result = generate_clue('BRAVO', Difficulty.MON, fake)
@@ -117,9 +104,10 @@ def test_skips_rejected_candidate_and_accepts_next():
 
 def test_falls_back_to_first_candidate_when_all_rejected():
   with FakeChatClient([
-    'brainstorm reply',
-    '["Candidate A", "Candidate B"]',
-    '{"valid": false, "issues": ["ambiguous"]}',
+    *_replies(
+      extract='["Candidate A", "Candidate B"]',
+      validate='{"valid": false, "issues": ["ambiguous"]}',
+    ),
     '{"valid": false, "issues": ["too hard"]}',
   ]) as fake:
     result = generate_clue('BRAVO', Difficulty.MON, fake)
@@ -128,11 +116,10 @@ def test_falls_back_to_first_candidate_when_all_rejected():
 def test_falls_back_when_validation_json_malformed():
   # A GenerationError during validation is treated as a skip — the candidate
   # is not confirmed or rejected; fallback applies.
-  with FakeChatClient([
-    'brainstorm reply',
-    '["Raw candidate clue"]',
-    'not valid json',
-  ]) as fake:
+  with FakeChatClient(_replies(
+    extract='["Raw candidate clue"]',
+    validate='not valid json',
+  )) as fake:
     result = generate_clue('ALPHA', Difficulty.MON, fake)
   assert result.clues == ['Raw candidate clue']
 
@@ -151,11 +138,7 @@ def test_answer_length_strips_spaces_for_multi_word():
   # 'BLUE JAYS' → 8 letters (space excluded). Validation prompt must use 8,
   # not 9. Verified indirectly: a response with a correct-length answer is
   # accepted without error.
-  with FakeChatClient([
-    'brainstorm reply',
-    '["Baseball team from Toronto"]',
-    '{"valid": true, "clue": "Baseball team from Toronto", "answer": "BLUEJAYS"}',
-  ]) as fake:
+  with FakeChatClient(_replies(extract='["Baseball team from Toronto"]')) as fake:
     result = generate_clue('BLUE JAYS', Difficulty.MON, fake)
   assert result.clues == ['Baseball team from Toronto']
 
@@ -165,21 +148,13 @@ def test_answer_length_strips_spaces_for_multi_word():
 def test_extract_tolerates_fenced_json_array():
   # Models often wrap JSON output in ```json … ``` fences.
   fenced = '```json\n["Fenced clue"]\n```'
-  with FakeChatClient([
-    'brainstorm reply',
-    fenced,
-    '{"valid": true, "clue": "Fenced clue", "answer": "ALPHA"}',
-  ]) as fake:
+  with FakeChatClient(_replies(extract=fenced)) as fake:
     result = generate_clue('ALPHA', Difficulty.MON, fake)
   assert result.clues == ['Fenced clue']
 
 def test_validation_tolerates_fenced_json_object():
   fenced = '```\n{"valid": true, "clue": "Fenced clue", "answer": "ALPHA"}\n```'
-  with FakeChatClient([
-    'brainstorm reply',
-    '["Fenced clue"]',
-    fenced,
-  ]) as fake:
+  with FakeChatClient(_replies(validate=fenced)) as fake:
     result = generate_clue('ALPHA', Difficulty.MON, fake)
   assert result.clues == ['Fenced clue']
 
