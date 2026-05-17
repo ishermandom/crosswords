@@ -160,6 +160,30 @@ def test_answer_length_strips_spaces_for_multi_word():
   assert result.clues == ['Baseball team from Toronto']
 
 
+# --- Markdown fence stripping ---
+
+def test_extract_tolerates_fenced_json_array():
+  # Models often wrap JSON output in ```json … ``` fences.
+  fenced = '```json\n["Fenced clue"]\n```'
+  with FakeChatClient([
+    'brainstorm reply',
+    fenced,
+    '{"valid": true, "clue": "Fenced clue", "answer": "ALPHA"}',
+  ]) as fake:
+    result = generate_clue('ALPHA', Difficulty.MON, fake)
+  assert result.clues == ['Fenced clue']
+
+def test_validation_tolerates_fenced_json_object():
+  fenced = '```\n{"valid": true, "clue": "Fenced clue", "answer": "ALPHA"}\n```'
+  with FakeChatClient([
+    'brainstorm reply',
+    '["Fenced clue"]',
+    fenced,
+  ]) as fake:
+    result = generate_clue('ALPHA', Difficulty.MON, fake)
+  assert result.clues == ['Fenced clue']
+
+
 # Possible future coverage, if it ever seems worth the effort:
 # - GenerationError propagation from brainstorm/extract calls. Would need
 #   exception injection — a raises_on: dict[int, Exception] parameter on

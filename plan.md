@@ -4,7 +4,7 @@ _Scope: how the tool is built — technology choices, project structure, and
 phased tasks. Read `spec.md` first for goals, requirements, and open
 questions._
 
-Status key: `[ ]` not started · `[~]` in progress · `[x]` done
+Status key: `[ ]` not started · `[~]` in progress · `[x]` done · `[-]` dropped
 
 ---
 
@@ -153,15 +153,21 @@ constrained generation (`num_ctx=512`, `num_predict=30`, `temperature=0`).
       comments, inline comments, uppercasing, missing file
 - [x] Unit tests for `prompt`: correct difficulty descriptions, answer length
       encoding in validation prompt, word absent from validation prompt
-- [ ] Unit tests for `generate_clue` via a fake `OllamaClient`: verify the
+- [x] Unit tests for `generate_clue` via a fake `OllamaClient`: verify the
       brainstorm → extract → validate call sequence and that `ClueResult` is
       assembled correctly; JSON extraction helpers (`_strip_fences`,
       `_extract_json_list`, `_extract_json_object`) are exercised here via
       the public API rather than tested directly
-- [ ] Add an optional `options` dict parameter to `OllamaClient` (or
+- [-] Add an optional `options` dict parameter to `OllamaClient` (or
       `chat()`), passed as `extra_body` to the completions call; integration
-      tests use this to set `num_ctx=512`, `num_predict=30`, `temperature=0`
-      so the smoke-test model finishes quickly without truncating real clues
+      tests would use this to set `num_ctx=512`, `num_predict=30`,
+      `temperature=0`. Dropped: the manual smoke test covers the same ground;
+      an automated integration test requires Ollama to be running and can't
+      run in CI. Note on the parameters: `num_predict` caps output tokens
+      (the main speed lever, but 30 is too short for real clues);
+      `num_ctx=512` shrinks the KV cache slightly; `temperature=0` gives
+      determinism with no speed effect. Revisit if deterministic smoke runs
+      become worth the plumbing.
 
 ## Cleanup
 

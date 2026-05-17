@@ -12,7 +12,7 @@ from typing import NoReturn
 
 import openai
 
-from clue_gen.client import GenerationError, Model, OllamaClient
+from clue_gen.client import ChatClient, GenerationError, Model, OllamaClient
 from clue_gen.generator import ClueResult, generate_clue
 from clue_gen.prompt import Difficulty
 from clue_gen.word_parser import load_words_file
@@ -70,7 +70,7 @@ def _load_words(path: str) -> list[str]:
 def _generate_clues(
   words: list[str],
   difficulty: Difficulty,
-  client: OllamaClient,
+  client: ChatClient,
 ) -> list[ClueResult]:
   """Run the generation pipeline for each word, exiting on hard errors."""
   results = []
