@@ -1,0 +1,39 @@
+# Copyright 2026 Ilya Sherman (ishermandom@)
+# SPDX-License-Identifier: MIT
+
+[project]
+name = "clue-gen"
+version = "0.1.0"
+requires-python = ">=3.11"
+
+# openai is a runtime dep: it's the HTTP client we use to talk to Ollama's
+# OpenAI-compatible API. >=1.0 because that release replaced the old module-
+# level API (openai.ChatCompletion.create) with the openai.OpenAI() client
+# class that we rely on.
+dependencies = [
+  "openai>=1.0",
+]
+
+[project.scripts]
+clue-gen = "clue_gen.cli:main"
+
+# ruff and mypy are dev-only: they're never imported at runtime, so keeping
+# them out of [project.dependencies] avoids inflating the install footprint
+# for anyone who just wants to run the tool. Install with:
+#   pip install -e ".[dev]"
+# Version floors here are "recent stable release" — no specific feature
+# dependency, just avoiding ancient versions with known rough edges.
+[project.optional-dependencies]
+dev = [
+  "mypy>=1.0",
+  "ruff>=0.4",
+]
+
+# hatchling is a lightweight PEP 517 build backend (the thing pip invokes to
+# build a wheel or sdist). It needs zero config for a flat layout like ours —
+# it discovers packages automatically from the project root. The alternative
+# is setuptools, which works but requires more boilerplate and has a longer
+# history of surprising behavior.
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

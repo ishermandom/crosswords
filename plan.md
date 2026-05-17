@@ -1,0 +1,164 @@
+# Acrostic Clue Generator — Implementation Plan
+
+_Scope: how the tool is built — technology choices, project structure, and
+phased tasks. Read `spec.md` first for goals, requirements, and open
+questions._
+
+Status key: `[ ]` not started · `[~]` in progress · `[x]` done
+
+---
+
+## Technology choices
+
+- **LLM**: `gemma4:31b` (dense) and `gemma4:26b` (MoE) via Ollama
+  (locally hosted; OpenAI-compatible API at `http://localhost:11434/v1`);
+  model will be selected after evaluating clue quality from both
+- **LLM client**: `openai` Python package pointed at the local endpoint; no
+  API key required
+- **Language**: Python with flat layout (`clue_gen/` at project root)
+- **Linting / types**: `ruff`, `mypy`
+
+### Ollama installation
+
+Installed system-wide via Homebrew (`brew install ollama` run as
+`ishermandom`). Binary lands at `/opt/homebrew/bin/ollama`.
+
+Model weights are shared between accounts at `/Users/Shared/ollama/models`,
+set via `OLLAMA_MODELS=/Users/Shared/ollama/models` in each account's shell
+config. This avoids duplicating the ~16 GB model download.
+
+**The Ollama server must always be started manually** (`ollama serve`).
+Never use `brew services start ollama` or any other autolaunch mechanism —
+the server should only run during active development sessions.
+
+### One-time environment setup
+
+```bash
+# Run as ishermandom (requires admin)
+brew install ollama
+
+# Create shared model directory; leave world-readable (no ACLs needed —
+# /Users/Shared/ is a shared space and these are the only two accounts)
+mkdir -p /Users/Shared/ollama/models
+
+# In ishermandom's ~/.zprofile (claude-sandbox connects via HTTP, not CLI):
+export OLLAMA_MODELS=/Users/Shared/ollama/models
+
+# In claude-sandbox's ~/.zprofile (not set up automatically for non-Homebrew
+# users; needed to reach the ollama binary):
+export PATH="/opt/homebrew/bin:$PATH"
+
+# Start the server, then pull both candidate models (~38 GB total)
+ollama serve &
+ollama pull gemma4:31b && ollama pull gemma4:26b
+```
+
+---
+
+## Phase 1 — Environment and project skeleton
+
+**Goal**: Runnable project structure with dependencies pinned; Ollama
+reachable from Python.
+
+- [x] `ishermandom`: `brew install ollama`
+- [x] Create `/Users/Shared/ollama/models`; world-readable, no ACLs needed
+- [x] `ishermandom`: add `OLLAMA_MODELS=/Users/Shared/ollama/models` to
+      `~/.zprofile`
+- [x] `claude-sandbox`: `/opt/homebrew/bin` already in PATH
+- [x] Start Ollama server manually (`ollama serve`) and pull both candidate
+      models (`gemma4:31b` and `gemma4:26b`) sequentially (~38 GB total)
+- [x] Create Python project: `pyproject.toml` with flat layout and a
+      `clue_gen` package
+- [x] Pin dependencies: `openai`, `ruff`, `mypy`
+- [x] Smoke-test Ollama connection: send a minimal prompt, confirm a
+      response comes back
+
+## Phase 2 — Core clue generation
+
+**Goal**: End-to-end working tool that reads a word list and emits JSON
+clues.
+
+### Prompt sequence architecture
+
+Each clue word is processed by a **two-stage pipeline**:
+
+1. **Brainstorm conversation** — a multi-turn dialogue in a single shared
+   context. The model is asked to think through angles, associations, and
+   candidate clue styles before committing. Implemented as a `messages` list
+   that grows with each assistant reply and follow-up user turn.
+
+2. **Validation call** — an independent API call with a fresh context.
+   Receives the generated clue(s) and evaluates them against three criteria:
+   solvable (the answer is genuinely reachable from the clue), correct
+   difficulty (matches the target NYT day), and sufficiently compelling. The
+   validator may accept, flag, or reject each clue.
+
+The specific turns (what each message says) are deferred to Phase 3 prompt
+tuning. Phase 2 builds the infrastructure: `OllamaClient.chat()` accepts and
+returns a full `messages` list; the per-word generation function orchestrates
+the two stages with placeholder prompts.
+
+**Output shape** (resolved): `clues` is always a flat list of strings — one
+entry when `--candidates 1`, N entries when `--candidates N`.
+
+### Tasks
+
+- [x] Implement CLI entry point with `--words FILE` and `--difficulty` flags
+- [x] Parse the word list file (one word/phrase per line, strip blanks and
+      comments)
+- [x] Extend `OllamaClient` with a `chat(messages)` method that accepts and
+      returns a full messages list (enabling multi-turn conversations)
+- [x] Implement per-word generation: brainstorm conversation followed by
+      independent validation call; placeholder prompts for now
+- [x] Parse validation response as JSON; assemble and write final JSON array
+      to stdout
+- [x] Basic error handling: missing file, Ollama not reachable, malformed
+      JSON response
+
+## Phase 3 — Candidates, prompt design, and refinement
+
+**Goal**: `--candidates N` support and prompt quality tuning based on real
+output.
+
+- [x] Add `--model` flag so the caller can select the Ollama model at
+      runtime; pull `qwen2.5:0.5b` (398 MB) for rapid smoke testing where
+      output quality doesn't matter — it's ~30× faster than the prod models
+- [ ] Add `--candidates N` flag (default 1)
+- [ ] Design brainstorm turns: encode difficulty (NYT day description), style
+      mix (definitions, wordplay, fill-in-the-blank, light cryptic, trivia)
+- [ ] Design validation turn: instructs the model to evaluate each clue
+      against solvability, difficulty calibration, and compelling quality;
+      return structured verdict per clue
+- [ ] Handle validation rejection: decide retry behaviour and implement
+- [ ] Evaluate clue quality across difficulty levels; iterate on prompt
+      engineering
+- [ ] Any additional flags or output options that surface during Phase 2
+      testing
+
+## Tooling
+
+- [ ] Add a `mypy` `PostToolUse` hook (if not already present in global
+      `settings.json`) so type errors surface immediately after every edit
+
+## Testing
+
+**Goal**: Confidence that parsing, prompt construction, and pipeline logic are
+correct independently of the model.
+
+Two-layer strategy: unit tests mock at the HTTP or Python level (no Ollama
+needed); integration smoke tests use real Ollama + `qwen2.5:0.5b` with
+constrained generation (`num_ctx=512`, `num_predict=30`, `temperature=0`).
+
+- [ ] Unit tests for `word_parser.load_words`: blank lines, full-line
+      comments, inline comments, uppercasing, missing file
+- [ ] Unit tests for `prompt`: correct difficulty descriptions, answer length
+      encoding in validation prompt, word absent from validation prompt
+- [ ] Unit tests for `generator` JSON extraction helpers: valid input, markdown
+      fences, wrong type, malformed JSON
+- [ ] Add an optional `options` dict parameter to `OllamaClient` (or
+      `chat()`), passed as `extra_body` to the completions call; integration
+      tests use this to set `num_ctx=512`, `num_predict=30`, `temperature=0`
+      so the smoke-test model finishes quickly without truncating real clues
+- [ ] Integration test with a mock `OllamaClient`: verify the brainstorm →
+      extract → validate call sequence and that `ClueResult` is assembled
+      correctly
