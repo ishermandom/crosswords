@@ -15,7 +15,7 @@ import openai
 from clue_gen.client import GenerationError, Model, OllamaClient
 from clue_gen.generator import ClueResult, generate_clue
 from clue_gen.prompt import Difficulty
-from clue_gen.word_parser import load_words
+from clue_gen.word_parser import load_words_file
 
 _log = logging.getLogger(__name__)
 
@@ -59,7 +59,7 @@ def _parse_args() -> argparse.Namespace:
 def _load_words(path: str) -> list[str]:
   """Load words from path, exiting on missing file or empty list."""
   try:
-    words = load_words(path)
+    words = load_words_file(path)
   except FileNotFoundError:
     _log_fatal('file not found: %s', path)
   if not words:

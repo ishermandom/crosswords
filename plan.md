@@ -137,8 +137,8 @@ output.
 
 ## Tooling
 
-- [ ] Add a `mypy` `PostToolUse` hook (if not already present in global
-      `settings.json`) so type errors surface immediately after every edit
+- [x] Add a `mypy` Stop hook to global `settings.json` so type errors surface
+      at the end of every turn; ruff and prettier moved to Stop as well
 
 ## Testing
 
@@ -149,16 +149,24 @@ Two-layer strategy: unit tests mock at the HTTP or Python level (no Ollama
 needed); integration smoke tests use real Ollama + `qwen2.5:0.5b` with
 constrained generation (`num_ctx=512`, `num_predict=30`, `temperature=0`).
 
-- [ ] Unit tests for `word_parser.load_words`: blank lines, full-line
+- [x] Unit tests for `word_parser.load_words`: blank lines, full-line
       comments, inline comments, uppercasing, missing file
-- [ ] Unit tests for `prompt`: correct difficulty descriptions, answer length
+- [x] Unit tests for `prompt`: correct difficulty descriptions, answer length
       encoding in validation prompt, word absent from validation prompt
-- [ ] Unit tests for `generator` JSON extraction helpers: valid input, markdown
-      fences, wrong type, malformed JSON
+- [ ] Unit tests for `generate_clue` via a fake `OllamaClient`: verify the
+      brainstorm → extract → validate call sequence and that `ClueResult` is
+      assembled correctly; JSON extraction helpers (`_strip_fences`,
+      `_extract_json_list`, `_extract_json_object`) are exercised here via
+      the public API rather than tested directly
 - [ ] Add an optional `options` dict parameter to `OllamaClient` (or
       `chat()`), passed as `extra_body` to the completions call; integration
       tests use this to set `num_ctx=512`, `num_predict=30`, `temperature=0`
       so the smoke-test model finishes quickly without truncating real clues
-- [ ] Integration test with a mock `OllamaClient`: verify the brainstorm →
-      extract → validate call sequence and that `ClueResult` is assembled
-      correctly
+
+## Cleanup
+
+Once Phase 3 is complete and the tool is stable, consolidate all clue
+generator artifacts under `clue_gen/`:
+
+- [ ] Move `spec.md` → `clue_gen/spec.md`
+- [ ] Move `plan.md` → `clue_gen/plan.md`

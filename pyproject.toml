@@ -26,6 +26,7 @@ clue-gen = "clue_gen.cli:main"
 [project.optional-dependencies]
 dev = [
   "mypy>=1.0",
+  "pytest>=8.0",
   "ruff>=0.4",
 ]
 
@@ -34,6 +35,9 @@ dev = [
 # it discovers packages automatically from the project root. The alternative
 # is setuptools, which works but requires more boilerplate and has a longer
 # history of surprising behavior.
+[tool.pytest.ini_options]
+testpaths = ["clue_gen/tests"]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
