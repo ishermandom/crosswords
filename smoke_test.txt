@@ -1,0 +1,24 @@
+# Smoke test word list for clue-gen.
+# Sections move from straightforward to difficult.
+
+# --- Straightforward cases ---
+# Common words with clear definitions and multiple cluing angles.
+OCEAN
+PIANO
+RIVER
+DANCE
+APPLE
+
+# --- Challenging cases ---
+# These words test the generator's ability to go beyond the obvious.
+# NEPHEW: gendered kinship term with no common idioms; easy to over-rely
+#   on a bare definition.
+# SOUTHWARD: directional compound; few wordplay angles.
+# EIGHTEEN: a number whose most obvious clue (voting age) is overused;
+#   finding a fresh angle requires creativity.
+# NEWARK: proper noun with multiple referents (cities in NJ, DE, UK;
+#   major airport); ambiguity makes the clue harder to make fair.
+NEPHEW
+SOUTHWARD
+EIGHTEEN
+NEWARK
