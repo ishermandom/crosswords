@@ -123,12 +123,15 @@ output.
 - [x] Add `--model` flag so the caller can select the Ollama model at
       runtime; pull `qwen2.5:0.5b` (398 MB) for rapid smoke testing where
       output quality doesn't matter — it's ~30× faster than the prod models
-- [ ] Add `--candidates N` flag (default 1)
-- [ ] Design brainstorm turns: encode difficulty (NYT day description), style
-      mix (definitions, wordplay, fill-in-the-blank, light cryptic, trivia)
-- [ ] Design validation turn: instructs the model to evaluate each clue
+- [ ] Research and write a guide: effective prompt engineering for locally
+      running LLMs (instruction following, JSON output, context limits,
+      differences from hosted models, etc.)
+- [ ] Design validation prompt: instructs the model to evaluate each clue
       against solvability, difficulty calibration, and compelling quality;
       return structured verdict per clue
+- [ ] Design brainstorm turns: encode difficulty (NYT day description), style
+      mix (definitions, wordplay, fill-in-the-blank, light cryptic, trivia)
+- [ ] Add `--candidates N` flag (default 1)
 - [ ] Handle validation rejection: decide retry behaviour and implement
 - [ ] Evaluate clue quality across difficulty levels; iterate on prompt
       engineering
