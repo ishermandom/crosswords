@@ -53,6 +53,11 @@ def _parse_args() -> argparse.Namespace:
     metavar='{gemma4:31b,gemma4:26b,qwen2.5:0.5b}',
     help='Ollama model to use (default: gemma4:26b).',
   )
+  parser.add_argument(
+    '--verbose',
+    action='store_true',
+    help='Enable DEBUG logging (per-call timing and token counts).',
+  )
   return parser.parse_args()
 
 
@@ -90,10 +95,12 @@ def _generate_clues(
 
 def main() -> None:
   """Entry point: parse args, generate clues, and print JSON to stdout."""
-  logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
-  # httpx (used internally by the openai package) logs every request at INFO.
-  logging.getLogger('httpx').setLevel(logging.WARNING)
   args = _parse_args()
+  log_level = logging.DEBUG if args.verbose else logging.INFO
+  logging.basicConfig(level=log_level, format='%(levelname)s %(name)s: %(message)s')
+  # Suppress per-request noise from the HTTP stack.
+  for _noisy in ('httpx', 'httpcore', 'openai._base_client'):
+    logging.getLogger(_noisy).setLevel(logging.WARNING)
   words = _load_words(args.words)
   results = _generate_clues(words, args.difficulty, OllamaClient(args.model))
   print(json.dumps([dataclasses.asdict(r) for r in results], indent=2))

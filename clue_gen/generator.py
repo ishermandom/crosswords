@@ -6,6 +6,7 @@
 import json
 import logging
 import re
+import time
 from dataclasses import dataclass
 from typing import Any
 
@@ -38,9 +39,14 @@ def generate_clue(
   Warns if the validator solves a clue to the wrong answer, or if no candidate
   passes validation (first candidate is used as fallback).
   """
+  t_word = time.perf_counter()
+
   # Stage 1: brainstorm, then extract candidates as a structured list.
+  _log.info('[%s] brainstorm start', word)
   messages: Sequence[Message] = brainstorm_messages(word, difficulty)
   messages = client.chat(messages).messages
+  _log.info('[%s] brainstorm done (%.1fs)', word, time.perf_counter() - t_word)
+  _log.debug('[%s] brainstorm reply:\n%s', word, messages[-1]['content'])
 
   # TODO: Phase 3 — replace with multi-turn brainstorm sequence.
   extract_turn: Message = {
@@ -50,14 +56,25 @@ def generate_clue(
       'with no other text. Example: ["Clue one", "Clue two"]'
     ),
   }
+  t_extract = time.perf_counter()
+  _log.info('[%s] extract start', word)
   extract_reply = client.chat([*messages, extract_turn]).reply
+  _log.debug('[%s] extract reply:\n%s', word, extract_reply)
   candidates = _extract_json_list(extract_reply)
+  _log.info(
+    '[%s] extract done (%.1fs): %d candidate(s)',
+    word,
+    time.perf_counter() - t_extract,
+    len(candidates),
+  )
 
   # Stage 2: validate each candidate with a blind solver (independent call).
   answer_length = len(word.replace(' ', ''))
-  for clue in candidates:
+  for i, clue in enumerate(candidates):
+    _log.info('[%s] validate candidate %d/%d', word, i + 1, len(candidates))
     try:
       val_result = client.chat(validation_messages(clue, answer_length))
+      _log.debug('[%s] validation reply:\n%s', word, val_result.reply)
       parsed = _extract_json_object(val_result.reply)
     except GenerationError as e:
       # Validation is a quality signal, not a correctness gate — a malformed
@@ -86,11 +103,15 @@ def generate_clue(
       # logged so prompt quality issues are visible, but not fatal since the
       # clue may still be usable.
       _log.warning('validator solved clue for %r as %r', word, solved)
+    elapsed = time.perf_counter() - t_word
+    _log.info('[%s] done (%.1fs total)', word, elapsed)
     return ClueResult(word=word, clues=[parsed.get('clue', clue)])
 
   if not candidates:
     raise GenerationError(f'no candidates extracted for {word!r}')
   _log.warning('no valid clue found for %r; using first candidate', word)
+  elapsed = time.perf_counter() - t_word
+  _log.info('[%s] done with fallback (%.1fs total)', word, elapsed)
   return ClueResult(word=word, clues=[candidates[0]])
 
 

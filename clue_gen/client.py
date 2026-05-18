@@ -4,12 +4,16 @@
 """Ollama client wrapper using the OpenAI-compatible HTTP API."""
 
 import enum
+import logging
+import time
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Protocol
 
 import openai
 from openai.types.chat import ChatCompletionMessageParam
+
+_log = logging.getLogger(__name__)
 
 # Ollama exposes an OpenAI-compatible endpoint at this address.
 _OLLAMA_BASE_URL = 'http://localhost:11434/v1'
@@ -38,20 +42,61 @@ class ChatClient(Protocol):
 
 @dataclass(frozen=True)
 class ModelOptions:
-  """Ollama generation parameters; defaults tuned for creative generation.
+  """Ollama generation parameters.
 
-  All three fields are passed via extra_body so they reach Ollama's native
-  options layer rather than the OpenAI-compatibility shim.
+  Top-level OpenAI params (temperature, max_tokens, frequency_penalty) are
+  passed directly to chat.completions.create(). Ollama-specific params
+  (num_ctx, keep_alive, top_k, top_p, repeat_penalty, num_gpu) go inside
+  extra_body['options']. think is a top-level extra_body field that disables
+  chain-of-thought on Qwen3/Qwen3.5 reasoning variants.
   """
 
+  # --- OpenAI top-level params ---
+  # 0.7 for creative brainstorm generation; Phase 3 may lower this to
+  # 0.1–0.2 for the deterministic validation call.
+  temperature: float = 0.7
+  # None = uncapped. Set low during debugging to bound output length.
+  max_tokens: int | None = None
+  # Mild penalty reduces rambling without affecting clue quality much.
+  frequency_penalty: float = 0.0
+
+  # --- Ollama options ---
   # Ollama's built-in default is 2048 and it truncates silently — set
   # explicitly so long brainstorm conversations don't lose early context.
   num_ctx: int = 8192
-  # ~0.7 for creative generation (brainstorm); lower (0.1–0.2) for
-  # deterministic scoring (validation).
-  temperature: float = 0.7
-  # Outperforms top_p for local models, especially at higher temperatures.
-  min_p: float = 0.05
+  # How long Ollama keeps the model loaded after the last request.
+  keep_alive: str = '5m'
+  # min_p=0.05 was the original sampler here; it reportedly outperforms
+  # top_p for local models at higher temperatures. Switched to top_k/top_p
+  # to match Ollama's conventional defaults — revisit if clue quality suffers.
+  top_k: int = 40
+  top_p: float = 0.9
+  # Reduces token repetition within a response (1.0 = off).
+  repeat_penalty: float = 1.0
+  # -1 = use all available GPU layers.
+  num_gpu: int = -1
+
+  # --- Thinking mode ---
+  # 'none' disables chain-of-thought on Qwen3/Qwen3.5 reasoning variants via
+  # the OpenAI-compatible endpoint. Other values: 'low', 'medium', 'high'.
+  # TODO: allow callers to configure this per model or per call.
+  reasoning_effort: str = 'none'
+
+
+# Tuned for fast iteration: small context window, capped output, low
+# temperature, model kept resident for 30 minutes between calls.
+DEBUG_OPTIONS = ModelOptions(
+  temperature=0.2,
+  max_tokens=512,
+  frequency_penalty=0.2,
+  num_ctx=2048,
+  keep_alive='30m',
+  top_k=40,
+  top_p=0.9,
+  repeat_penalty=1.1,
+  num_gpu=-1,
+  reasoning_effort='none',
+)
 
 
 class Model(enum.StrEnum):
@@ -75,7 +120,8 @@ class OllamaClient:
     self,
     model: Model = Model.GEMMA4_26B,
     base_url: str = _OLLAMA_BASE_URL,
-    options: ModelOptions = ModelOptions(),
+    # TODO: switch to ModelOptions() once prompt tuning is complete.
+    options: ModelOptions = DEBUG_OPTIONS,
   ) -> None:
     # api_key must be non-empty to satisfy the openai client's validation,
     # but Ollama ignores its value.
@@ -92,17 +138,45 @@ class OllamaClient:
     Raises openai.APIConnectionError if the Ollama server is unreachable.
     Raises ValueError if the model returns no text content.
     """
+    t0 = time.perf_counter()
+    extra_kw: dict[str, object] = {}
+    if self._options.max_tokens is not None:
+      extra_kw['max_tokens'] = self._options.max_tokens
     response = self._client.chat.completions.create(
       model=self._model,
       messages=messages,
+      temperature=self._options.temperature,
+      frequency_penalty=self._options.frequency_penalty,
+      reasoning_effort=self._options.reasoning_effort,
       extra_body={
         'options': {
           'num_ctx': self._options.num_ctx,
-          'temperature': self._options.temperature,
-          'min_p': self._options.min_p,
-        }
+          'keep_alive': self._options.keep_alive,
+          'top_k': self._options.top_k,
+          'top_p': self._options.top_p,
+          'repeat_penalty': self._options.repeat_penalty,
+          'num_gpu': self._options.num_gpu,
+        },
       },
+      **extra_kw,
     )
+    elapsed = time.perf_counter() - t0
+
+    usage = response.usage
+    if usage:
+      prompt_tok = usage.prompt_tokens
+      completion_tok = usage.completion_tokens
+      tok_per_sec = completion_tok / elapsed if elapsed > 0 else 0
+      _log.debug(
+        'chat %.1fs | prompt=%d completion=%d | %.1f tok/s',
+        elapsed,
+        prompt_tok,
+        completion_tok,
+        tok_per_sec,
+      )
+    else:
+      _log.debug('chat %.1fs (no usage data)', elapsed)
+
     content = response.choices[0].message.content if response.choices else None
     if not content:
       last = repr(messages[-1]) if messages else '<no messages>'
