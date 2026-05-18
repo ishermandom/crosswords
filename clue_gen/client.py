@@ -36,6 +36,24 @@ class ChatClient(Protocol):
   def chat(self, messages: Sequence[Message]) -> ChatResult: ...
 
 
+@dataclass(frozen=True)
+class ModelOptions:
+  """Ollama generation parameters; defaults tuned for creative generation.
+
+  All three fields are passed via extra_body so they reach Ollama's native
+  options layer rather than the OpenAI-compatibility shim.
+  """
+
+  # Ollama's built-in default is 2048 and it truncates silently — set
+  # explicitly so long brainstorm conversations don't lose early context.
+  num_ctx: int = 8192
+  # ~0.7 for creative generation (brainstorm); lower (0.1–0.2) for
+  # deterministic scoring (validation).
+  temperature: float = 0.7
+  # Outperforms top_p for local models, especially at higher temperatures.
+  min_p: float = 0.05
+
+
 class Model(enum.StrEnum):
   """Candidate models available in the local Ollama install."""
 
@@ -46,6 +64,8 @@ class Model(enum.StrEnum):
   QWEN3_1B7 = 'qwen3:1.7b'  # fast smoke-test; low quality
   QWEN3_4B = 'qwen3:4b'  # smoke-test; balanced quality vs. speed
   QWEN3_8B = 'qwen3:8b'  # smoke-test; balanced quality vs. speed
+  QWEN35_0B8 = 'qwen3.5:0.8b'  # fast smoke-test; low quality
+  QWEN35_2B = 'qwen3.5:2b'  # default smoke-test model; good quality/speed tradeoff
 
 
 class OllamaClient:
@@ -55,10 +75,12 @@ class OllamaClient:
     self,
     model: Model = Model.GEMMA4_26B,
     base_url: str = _OLLAMA_BASE_URL,
+    options: ModelOptions = ModelOptions(),
   ) -> None:
     # api_key must be non-empty to satisfy the openai client's validation,
     # but Ollama ignores its value.
     self._model = model
+    self._options = options
     self._client = openai.OpenAI(base_url=base_url, api_key='ollama')
 
   def chat(self, messages: Sequence[Message]) -> ChatResult:
@@ -73,6 +95,13 @@ class OllamaClient:
     response = self._client.chat.completions.create(
       model=self._model,
       messages=messages,
+      extra_body={
+        'options': {
+          'num_ctx': self._options.num_ctx,
+          'temperature': self._options.temperature,
+          'min_p': self._options.min_p,
+        }
+      },
     )
     content = response.choices[0].message.content if response.choices else None
     if not content:

@@ -123,9 +123,20 @@ output.
 - [x] Add `--model` flag so the caller can select the Ollama model at
       runtime; pull `qwen2.5:0.5b` (398 MB) for rapid smoke testing where
       output quality doesn't matter — it's ~30× faster than the prod models
-- [ ] Research and write a guide: effective prompt engineering for locally
+- [x] Research and write a guide: effective prompt engineering for locally
       running LLMs (instruction following, JSON output, context limits,
       differences from hosted models, etc.)
+- [ ] Benchmark inference speed: measure end-to-end latency per word and
+      tokens/sec for each candidate model; compare against Ollama's expected
+      throughput for that model size on this hardware. If actual performance
+      falls short, investigate and address the gap — likely causes include
+      context size inflating KV-cache memory, the model falling back from GPU
+      to CPU, or sampler settings. Goal: know whether the tool is fast enough
+      for interactive use before investing in prompt tuning.
+- [ ] Decide whether brainstorm and validation calls need separate
+      `ModelOptions` (brainstorm: temperature ~0.7; validation:
+      temperature ~0.1–0.2); if so, expose per-call overrides on
+      `OllamaClient.chat()`
 - [ ] Design validation prompt: instructs the model to evaluate each clue
       against solvability, difficulty calibration, and compelling quality;
       return structured verdict per clue
