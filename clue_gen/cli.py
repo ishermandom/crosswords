@@ -97,10 +97,12 @@ def main() -> None:
   """Entry point: parse args, generate clues, and print JSON to stdout."""
   args = _parse_args()
   log_level = logging.DEBUG if args.verbose else logging.INFO
-  logging.basicConfig(level=log_level, format='%(levelname)s %(name)s: %(message)s')
+  logging.basicConfig(
+    level=log_level, format='%(levelname)s %(name)s: %(message)s'
+  )
   # Suppress per-request noise from the HTTP stack.
-  for _noisy in ('httpx', 'httpcore', 'openai._base_client'):
-    logging.getLogger(_noisy).setLevel(logging.WARNING)
+  for logger_name in ('httpx', 'httpcore', 'openai._base_client'):
+    logging.getLogger(logger_name).setLevel(logging.WARNING)
   words = _load_words(args.words)
   results = _generate_clues(words, args.difficulty, OllamaClient(args.model))
   print(json.dumps([dataclasses.asdict(r) for r in results], indent=2))

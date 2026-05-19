@@ -19,16 +19,18 @@ class _ConnectionErrorClient:
   """Stub ChatClient that always raises APIConnectionError on chat()."""
 
   def chat(self, messages: Sequence[Message]) -> ChatResult:
-    raise openai.APIConnectionError(message='connection refused', request=MagicMock())
+    raise openai.APIConnectionError(
+      message='connection refused', request=MagicMock()
+    )
 
 
-def test_exits_on_api_connection_error():
+def test_exits_on_api_connection_error() -> None:
   with pytest.raises(SystemExit) as exception_info:
     _generate_clues(['ALPHA'], Difficulty.MON, _ConnectionErrorClient())
   assert exception_info.value.code == 1
 
 
-def test_exits_on_generation_error():
+def test_exits_on_generation_error() -> None:
   # An empty candidate list causes generate_clue to raise GenerationError,
   # which _generate_clues catches and exits on.
   with FakeChatClient(['brainstorm reply', '[]']) as fake:

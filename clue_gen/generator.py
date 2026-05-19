@@ -7,10 +7,8 @@ import json
 import logging
 import re
 import time
-from dataclasses import dataclass
-from typing import Any
-
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 from clue_gen.client import ChatClient, GenerationError, Message
 from clue_gen.prompt import Difficulty, brainstorm_messages, validation_messages
@@ -105,7 +103,11 @@ def generate_clue(
       _log.warning('validator solved clue for %r as %r', word, solved)
     elapsed = time.perf_counter() - t_word
     _log.info('[%s] done (%.1fs total)', word, elapsed)
-    return ClueResult(word=word, clues=[parsed.get('clue', clue)])
+    raw_clue = parsed.get('clue')
+    return ClueResult(
+      word=word,
+      clues=[raw_clue if isinstance(raw_clue, str) else clue],
+    )
 
   if not candidates:
     raise GenerationError(f'no candidates extracted for {word!r}')
@@ -139,7 +141,10 @@ def _extract_json_list(text: str) -> list[str]:
   return parsed
 
 
-def _extract_json_object(text: str) -> dict[str, Any]:
+def _extract_json_object(text: str) -> dict[str, object]:
+  # object rather than Any: forces explicit type narrowing at each use site.
+  # TODO: replace with a TypedDict once the validator response schema
+  # stabilizes in Phase 3 — that would eliminate all the isinstance checks.
   """Extract a JSON object from model output, tolerating markdown fences."""
   text = _strip_fences(text).strip()
   try:

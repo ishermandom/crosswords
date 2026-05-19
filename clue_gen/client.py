@@ -8,7 +8,7 @@ import logging
 import time
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Literal, Protocol
 
 import openai
 from openai.types.chat import ChatCompletionMessageParam
@@ -80,7 +80,9 @@ class ModelOptions:
   # 'none' disables chain-of-thought on Qwen3/Qwen3.5 reasoning variants via
   # the OpenAI-compatible endpoint. Other values: 'low', 'medium', 'high'.
   # TODO: allow callers to configure this per model or per call.
-  reasoning_effort: str = 'none'
+  reasoning_effort: Literal[
+    'none', 'minimal', 'low', 'medium', 'high', 'xhigh'
+  ] = 'none'
 
 
 # Tuned for fast iteration: small context window, capped output, low
@@ -110,7 +112,9 @@ class Model(enum.StrEnum):
   QWEN3_4B = 'qwen3:4b'  # smoke-test; balanced quality vs. speed
   QWEN3_8B = 'qwen3:8b'  # smoke-test; balanced quality vs. speed
   QWEN35_0B8 = 'qwen3.5:0.8b'  # fast smoke-test; low quality
-  QWEN35_2B = 'qwen3.5:2b'  # default smoke-test model; good quality/speed tradeoff
+  QWEN35_2B = (
+    'qwen3.5:2b'  # default smoke-test model; good quality/speed tradeoff
+  )
 
 
 class OllamaClient:
@@ -136,18 +140,16 @@ class OllamaClient:
     reply, ready for the next turn if continuing the conversation.
 
     Raises openai.APIConnectionError if the Ollama server is unreachable.
-    Raises ValueError if the model returns no text content.
+    Raises GenerationError if the model returns no text content.
     """
     t0 = time.perf_counter()
-    extra_kw: dict[str, object] = {}
-    if self._options.max_tokens is not None:
-      extra_kw['max_tokens'] = self._options.max_tokens
     response = self._client.chat.completions.create(
       model=self._model,
       messages=messages,
       temperature=self._options.temperature,
       frequency_penalty=self._options.frequency_penalty,
       reasoning_effort=self._options.reasoning_effort,
+      max_tokens=self._options.max_tokens,
       extra_body={
         'options': {
           'num_ctx': self._options.num_ctx,
@@ -158,7 +160,6 @@ class OllamaClient:
           'num_gpu': self._options.num_gpu,
         },
       },
-      **extra_kw,
     )
     elapsed = time.perf_counter() - t0
 

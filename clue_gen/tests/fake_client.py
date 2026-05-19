@@ -35,8 +35,10 @@ class FakeChatClient:
     """Enables use in a `with` block; `__exit__` validates reply exhaustion."""
     return self
 
-  def __exit__(self, exception_type: object, exception_value: object, traceback: object) -> None:
-    """Assert all scripted replies were consumed, unless an exception is propagating."""
+  def __exit__(
+    self, exception_type: object, exception_value: object, traceback: object
+  ) -> None:
+    """Assert all scripted replies were consumed, unless propagating an error."""
     # Skip the check when a test is already failing to avoid masking the
     # real error with a confusing secondary assertion.
     if not exception_type and self.replies:
