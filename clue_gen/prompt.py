@@ -33,9 +33,7 @@ _DIFFICULTY_DESCRIPTIONS: dict[Difficulty, str] = {
 }
 
 
-def brainstorm_messages(
-  word: str, difficulty: Difficulty
-) -> Sequence[Message]:
+def brainstorm_messages(word: str, difficulty: Difficulty) -> Sequence[Message]:
   """Build the opening brainstorm turn for a given answer word.
 
   Returns a single-message list; the caller may append further turns to
