@@ -220,7 +220,7 @@ def _check_solvability(
     _logger.error('solvability check failed: %s', error)
     print(json.dumps({'error': str(error)}, indent=2), file=output)
     return
-  print(json.dumps(dataclasses.asdict(result), indent=2), file=output)
+  print(json.dumps({'is_solvable': result}, indent=2), file=output)
 
 
 def _run_quality(args: argparse.Namespace) -> None:

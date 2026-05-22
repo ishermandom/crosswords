@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from clue_gen.client import ChatClient
 from clue_gen.prompt import Difficulty
 from clue_gen.quality import QualityResult
-from clue_gen.solvability import DEFAULT_MAX_ANSWER_RANK, SolvabilityResult
+from clue_gen.solvability import DEFAULT_MAX_ANSWER_RANK
 
 
 @dataclass(frozen=True)
@@ -18,7 +18,7 @@ class ValidationResult:
   # True only when both the solvability and quality calls passed.
   is_valid: bool
   # Result of the blind solvability call; None if the call failed unrecoverably.
-  solvability: SolvabilityResult | None
+  solvability: bool | None
   # Result of the answer-aware quality call; None if the call failed unrecoverably.
   quality: QualityResult | None
   # Non-empty when a call failed unrecoverably (parse errors after retries,

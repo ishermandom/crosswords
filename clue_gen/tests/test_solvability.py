@@ -3,71 +3,131 @@
 
 """Tests for the solvability call's structural mechanics."""
 
-# TODO: import the solvability validation function once implemented
+import json
+from collections.abc import Sequence
+
+import pytest
+
+from clue_gen.prompt import Difficulty
+from clue_gen.solvability import validate_solvability
+from clue_gen.tests.fake_client import FakeChatClient
+
+
+def _make_replies(
+  scratchpad: str = 'Thinking through the clue...',
+  guesses: Sequence[str] = ['CRANE'],
+) -> list[str]:
+  """Scripted replies for a validate_solvability call."""
+  return [scratchpad, json.dumps({'guesses': list(guesses)})]
+
+
+def _validate_solvability(
+  fake: FakeChatClient,
+  *,
+  clue: str = 'Celestial body',
+  answer: str = 'CRANE',
+  difficulty: Difficulty = Difficulty.MON,
+  max_answer_rank: int = 10,
+) -> bool:
+  """Calls validate_solvability with defaults for params irrelevant to the test."""
+  return validate_solvability(clue, answer, difficulty, fake, max_answer_rank)
 
 
 # --- Input shape ---
 
-# TODO: test_answer_word_absent_from_solvability_call
-#   Script a fake client and call the solvability function. Assert that the
-#   answer word does not appear in any message sent to the client.
 
-# TODO: test_answer_length_present_in_solvability_call
-#   Assert that the answer's letter count appears in the messages sent to the
-#   client (as a number or written-out form).
+@pytest.mark.xfail(strict=True)
+def test_answer_word_absent_from_solvability_call() -> None:
+  # The solver must be blind — the answer word must not leak into any message.
+  with FakeChatClient(_make_replies(guesses=['MOON', 'STAR', 'SUNS'])) as fake:
+    _validate_solvability(fake, answer='STAR')
+  all_message_text = ' '.join(
+    str(m['content']) for call in fake.calls for m in call
+  )
+  assert 'STAR' not in all_message_text
+
+
+@pytest.mark.xfail(strict=True)
+def test_answer_length_present_in_solvability_call() -> None:
+  # The solver needs the letter count to constrain its guesses — without it,
+  # length filtering would be the only signal, and wrong-length guesses pollute
+  # the raw list. 'STAR' has 4 letters.
+  with FakeChatClient(_make_replies()) as fake:
+    _validate_solvability(fake, answer='STAR')
+  all_message_text = ' '.join(
+    str(m['content']) for call in fake.calls for m in call
+  )
+  assert '4' in all_message_text
 
 
 # --- Multi-turn structure ---
 
-# TODO: test_solvability_makes_two_turns
-#   Assert that exactly two calls are made to the client — the scratchpad
-#   turn and the guess-list turn.
 
-# TODO: test_second_turn_appends_to_first_turn_reply
-#   Assert that the messages passed to the second client call include the
-#   scratchpad reply from the first call, so the model sees its own reasoning
-#   before committing to guesses.
+@pytest.mark.xfail(strict=True)
+def test_solvability_makes_two_turns() -> None:
+  # One call for the scratchpad turn, one for the guess-list turn.
+  with FakeChatClient(_make_replies()) as fake:
+    _validate_solvability(fake)
+  assert len(fake.calls) == 2
+
+
+@pytest.mark.xfail(strict=True)
+def test_second_turn_appends_to_first_turn_reply() -> None:
+  # The model must see its own scratchpad reasoning before committing to guesses.
+  scratchpad = 'Thinking through the clue...'
+  with FakeChatClient(_make_replies(scratchpad=scratchpad)) as fake:
+    _validate_solvability(fake)
+  second_call_text = ' '.join(str(m['content']) for m in fake.calls[1])
+  assert scratchpad in second_call_text
 
 
 # --- Length filtering ---
 
-# TODO: test_guesses_shorter_than_answer_length_excluded_before_rank_check
-#   Script a reply with a mix of correct-length and wrong-length guesses where
-#   the target answer is only reachable within top N after wrong-length guesses
-#   are removed. Assert the result is a pass, not a fail.
 
-# TODO: test_guesses_longer_than_answer_length_excluded_before_rank_check
-#   Same as above but with guesses longer than the answer length polluting the
-#   raw list.
+@pytest.mark.xfail(strict=True)
+def test_guesses_shorter_than_answer_length_excluded_before_rank_check() -> (
+  None
+):
+  # SUN, ORB, RAY are shorter than STAR (4 letters) and rank above it in the
+  # raw list. After filtering to 4-letter words, STAR rises into the top N.
+  guesses = ['SUN', 'ORB', 'RAY', 'STAR']
+  with FakeChatClient(_make_replies(guesses=guesses)) as fake:
+    result = _validate_solvability(fake, answer='STAR')
+  assert result is True
+
+
+@pytest.mark.xfail(strict=True)
+def test_guesses_longer_than_answer_length_excluded_before_rank_check() -> None:
+  # PLANET, COMET are longer than STAR (4 letters) and rank above it in the
+  # raw list. After filtering to 4-letter words, STAR rises into the top N.
+  guesses = ['PLANET', 'COMET', 'STAR']
+  with FakeChatClient(_make_replies(guesses=guesses)) as fake:
+    result = _validate_solvability(fake, answer='STAR')
+  assert result is True
 
 
 # --- Pass / fail criterion ---
 
-# TODO: test_pass_when_answer_is_within_top_n_filtered_guesses
-#   Script a reply where the target answer appears at exactly position N in
-#   the length-filtered list. Assert the solvability result is a pass.
 
-# TODO: test_fail_when_answer_is_beyond_top_n_filtered_guesses
-#   Script a reply where the target answer appears at position N+1 in the
-#   length-filtered list. Assert the solvability result is a fail.
-
-# TODO: test_fail_when_answer_absent_from_guesses_entirely
-#   Script a reply that contains no occurrence of the target answer at any
-#   length. Assert the solvability result is a fail.
+@pytest.mark.xfail(strict=True)
+def test_pass_when_answer_is_within_top_n_filtered_guesses() -> None:
+  guesses = ['MOON', 'GLOW', 'STAR']
+  with FakeChatClient(_make_replies(guesses=guesses)) as fake:
+    result = _validate_solvability(fake, answer='STAR')
+  assert result is True
 
 
-# --- Rank recording ---
+@pytest.mark.xfail(strict=True)
+def test_fail_when_answer_is_beyond_top_n_filtered_guesses() -> None:
+  # STAR is at position 3 in a max_answer_rank=2 window — one past the cutoff.
+  guesses = ['MOON', 'GLOW', 'STAR']
+  with FakeChatClient(_make_replies(guesses=guesses)) as fake:
+    result = _validate_solvability(fake, answer='STAR', max_answer_rank=2)
+  assert result is False
 
-# TODO: test_rank_reflects_position_among_length_filtered_guesses
-#   Script a reply with several correct-length guesses mixed with wrong-length
-#   ones. Assert the recorded rank equals the answer's position in the
-#   filtered-only list, ignoring wrong-length entries.
 
-# TODO: test_rank_recorded_on_fail
-#   Script a reply where the answer appears beyond top N after filtering.
-#   Assert the rank is still recorded (i.e. not None or absent), reflecting
-#   its actual position in the filtered list.
-
-# TODO: test_rank_is_none_when_answer_not_in_guesses
-#   Script a reply that does not contain the target answer at all. Assert
-#   the recorded rank is None (or an equivalent sentinel).
+@pytest.mark.xfail(strict=True)
+def test_fail_when_answer_absent_from_guesses_entirely() -> None:
+  with FakeChatClient(_make_replies(guesses=['MOON', 'GLOW'])) as fake:
+    result = _validate_solvability(fake, answer='STAR')
+  assert result is False

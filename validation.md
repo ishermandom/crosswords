@@ -271,7 +271,7 @@ it's confirmed to be in place.
 - [ ] Turn 2 requests significantly more guesses than N (target: 3–4× N)
 - [ ] Programmatic length filtering applied after parsing
 - [ ] Pass criterion: target answer appears in top N length-filtered guesses
-- [ ] Target answer rank recorded regardless of pass/fail
+- [ ] Target answer rank debug-logged regardless of pass/fail
 
 ### Quality call
 
