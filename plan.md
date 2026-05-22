@@ -176,7 +176,8 @@ constrained generation (`num_ctx=512`, `num_predict=30`, `temperature=0`).
       `test_validator.py`, `test_cli.py`):
   - [x] Public API surface: two clients, `max_answer_rank` parameter with
         default; stubs in `solvability.py`, `quality.py`, `validator.py`
-  - [x] Return type data model: frozen dataclasses; `answer_rank: int | None`
+  - [x] Return type data model: `bool` (rank logged for debug; not exposed to
+        callers)
   - [x] Day profile ranges: `DAY_PROFILES` and `QUALITY_FLOOR` in `quality.py`
   - [x] CLI subcommand shape: argparse subparsers (`run`, `generate`,
         `solvability`, `quality`) in `cli.py`

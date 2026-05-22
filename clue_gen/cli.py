@@ -24,7 +24,11 @@ import openai
 from clue_gen.client import ChatClient, GenerationError, Model, OllamaClient
 from clue_gen.generator import ClueResult, generate_clue
 from clue_gen.prompt import Difficulty
-from clue_gen.solvability import DEFAULT_MAX_ANSWER_RANK, validate_solvability
+from clue_gen.solvability import (
+  DEFAULT_MAX_ANSWER_RANK,
+  SolvabilityParseError,
+  validate_solvability,
+)
 from clue_gen.word_parser import load_words
 
 _logger = logging.getLogger(__name__)
@@ -218,6 +222,10 @@ def _check_solvability(
     return
   except GenerationError as error:
     _logger.error('solvability check failed: %s', error)
+    print(json.dumps({'error': str(error)}, indent=2), file=output)
+    return
+  except SolvabilityParseError as error:
+    _logger.error('solvability parse error: %s', error)
     print(json.dumps({'error': str(error)}, indent=2), file=output)
     return
   print(json.dumps({'is_solvable': result}, indent=2), file=output)

@@ -30,6 +30,10 @@ class FakeChatClient:
 
   replies: list[str]
   calls: list[Sequence[Message]] = field(default_factory=list)
+  # TODO: add a parallel `formats` list to record the format arg passed to each
+  #   chat() call, so tests can assert which calls request structured output
+  #   (needed by test_guesses_call_passes_structured_output_format in
+  #   test_solvability.py).
 
   def __enter__(self) -> 'FakeChatClient':
     """Enables use in a `with` block; `__exit__` validates reply exhaustion."""
@@ -46,7 +50,11 @@ class FakeChatClient:
         f'FakeChatClient has {len(self.replies)} unconsumed reply(ies)'
       )
 
-  def chat(self, messages: Sequence[Message]) -> ChatResult:
+  def chat(
+    self,
+    messages: Sequence[Message],
+    format: object | None = None,
+  ) -> ChatResult:
     """Return the next scripted reply, recording the messages argument."""
     self.calls.append(messages)
     if not self.replies:

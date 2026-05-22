@@ -37,7 +37,11 @@ class ChatResult:
 class ChatClient(Protocol):
   """Structural protocol for any chat model client."""
 
-  def chat(self, messages: Sequence[Message]) -> ChatResult: ...
+  def chat(
+    self,
+    messages: Sequence[Message],
+    format: object | None = None,
+  ) -> ChatResult: ...
 
 
 @dataclass(frozen=True)
@@ -115,6 +119,9 @@ class Model(enum.StrEnum):
   QWEN35_2B = (
     'qwen3.5:2b'  # default smoke-test model; good quality/speed tradeoff
   )
+  QWEN35_4B = 'qwen3.5:4b'
+  QWEN35_9B = 'qwen3.5:9b'
+  QWEN35_27B = 'qwen3.5:27b'
 
 
 class OllamaClient:
@@ -133,16 +140,36 @@ class OllamaClient:
     self._options = options
     self._client = openai.OpenAI(base_url=base_url, api_key='ollama')
 
-  def chat(self, messages: Sequence[Message]) -> ChatResult:
+  def chat(
+    self,
+    messages: Sequence[Message],
+    format: object | None = None,
+  ) -> ChatResult:
     """Send a conversation and return the reply and updated messages list.
 
     The returned messages list is the input extended with the assistant's
     reply, ready for the next turn if continuing the conversation.
 
+    format, when provided, is passed to Ollama as extra_body['format'] — either
+    the string 'json' for basic JSON mode, or a JSON schema dict for structured
+    output.
+
     Raises openai.APIConnectionError if the Ollama server is unreachable.
     Raises GenerationError if the model returns no text content.
     """
     t0 = time.perf_counter()
+    extra_body: dict[str, object] = {
+      'options': {
+        'num_ctx': self._options.num_ctx,
+        'keep_alive': self._options.keep_alive,
+        'top_k': self._options.top_k,
+        'top_p': self._options.top_p,
+        'repeat_penalty': self._options.repeat_penalty,
+        'num_gpu': self._options.num_gpu,
+      },
+    }
+    if format is not None:
+      extra_body['format'] = format
     response = self._client.chat.completions.create(
       model=self._model,
       messages=messages,
@@ -150,16 +177,7 @@ class OllamaClient:
       frequency_penalty=self._options.frequency_penalty,
       reasoning_effort=self._options.reasoning_effort,
       max_tokens=self._options.max_tokens,
-      extra_body={
-        'options': {
-          'num_ctx': self._options.num_ctx,
-          'keep_alive': self._options.keep_alive,
-          'top_k': self._options.top_k,
-          'top_p': self._options.top_p,
-          'repeat_penalty': self._options.repeat_penalty,
-          'num_gpu': self._options.num_gpu,
-        },
-      },
+      extra_body=extra_body,
     )
     elapsed = time.perf_counter() - t0
 

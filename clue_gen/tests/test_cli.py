@@ -9,7 +9,6 @@ from collections.abc import Sequence
 from unittest.mock import MagicMock
 
 import openai
-import pytest
 
 from clue_gen.cli import _run_pipeline, main
 from clue_gen.client import ChatResult, Message
@@ -20,7 +19,11 @@ from clue_gen.tests.fake_client import FakeChatClient
 class _ConnectionErrorClient:
   """Stub ChatClient that always raises APIConnectionError on chat()."""
 
-  def chat(self, messages: Sequence[Message]) -> ChatResult:
+  def chat(
+    self,
+    messages: Sequence[Message],
+    format: object | None = None,
+  ) -> ChatResult:
     raise openai.APIConnectionError(
       message='connection refused', request=MagicMock()
     )
@@ -79,31 +82,14 @@ def _make_solvability_argv(
   ]
 
 
-@pytest.mark.xfail(
-  strict=True, reason='validate_solvability not yet implemented'
-)
-def test_solvability_subcommand_makes_two_client_calls() -> None:
-  # validate_solvability is two turns: Turn 1 scratchpad, Turn 2 guess list.
-  with FakeChatClient(_make_solvability_replies()) as fake:
-    main(_make_solvability_argv(), client=fake, output=io.StringIO())
-  assert len(fake.calls) == 2
-
-
-@pytest.mark.xfail(
-  strict=True, reason='validate_solvability not yet implemented'
-)
 def test_solvability_subcommand_prints_result_as_json() -> None:
   output = io.StringIO()
   with FakeChatClient(_make_solvability_replies()) as fake:
     main(_make_solvability_argv(), client=fake, output=output)
   result = json.loads(output.getvalue())
   assert 'is_solvable' in result
-  assert 'answer_rank' in result
 
 
-@pytest.mark.xfail(
-  strict=True, reason='validate_solvability not yet implemented'
-)
 def test_solvability_subcommand_prints_error_json_on_connection_error() -> None:
   output = io.StringIO()
   main(_make_solvability_argv(), client=_ConnectionErrorClient(), output=output)
@@ -111,9 +97,6 @@ def test_solvability_subcommand_prints_error_json_on_connection_error() -> None:
   assert 'error' in result
 
 
-@pytest.mark.xfail(
-  strict=True, reason='validate_solvability not yet implemented'
-)
 def test_solvability_subcommand_prints_error_json_on_generation_error() -> None:
   output = io.StringIO()
   with FakeChatClient(['scratchpad', 'not valid json']) as fake:

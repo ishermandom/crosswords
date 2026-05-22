@@ -3,13 +3,124 @@
 
 """Blind solvability validation call."""
 
-from clue_gen.client import ChatClient
+import json
+import logging
+import re
+from collections.abc import Sequence
+
+from clue_gen.client import ChatClient, Message
 from clue_gen.prompt import Difficulty
+
+_log = logging.getLogger(__name__)
+
+
+class SolvabilityParseError(Exception):
+  """Raised when the guesses reply cannot be parsed as valid JSON."""
+
 
 # Rank threshold for a solvability pass; answer must appear at or above this
 # position in the length-filtered guess list.
 # TODO: calibrate against a golden set; see validation.md — "Open questions".
 DEFAULT_MAX_ANSWER_RANK: int = 10
+
+_SYSTEM_PROMPT = (
+  'You are an experienced NYT crossword solver. '
+  'NYT crossword clues often exploit wordplay, double meanings, and '
+  'deliberate misdirection — the surface reading of a clue is rarely '
+  'the whole story.'
+)
+
+# Style hints calibrate solver persistence without naming the difficulty day.
+# Per validation.md — "Solvability call / Persona and context".
+_STYLE_HINTS: dict[Difficulty, str] = {
+  Difficulty.MON: (
+    'The clue is direct; a single clear interpretation should lead to the '
+    'answer.'
+  ),
+  Difficulty.TUE: (
+    'The clue may have mild misdirection; consider more than one reading.'
+  ),
+  Difficulty.WED: (
+    'The clue likely uses wordplay or misdirection; consider multiple '
+    'interpretations before committing.'
+  ),
+  Difficulty.THU: (
+    'The clue uses wordplay or misdirection; consider multiple '
+    'interpretations before committing.'
+  ),
+  Difficulty.FRI: (
+    'The clue almost certainly uses wordplay or misdirection; explore many '
+    'interpretations before committing.'
+  ),
+  Difficulty.SAT: (
+    'The clue is devious; explore all possible wordplay angles and '
+    'interpretations before committing.'
+  ),
+}
+
+_GUESSES_PROMPT = (
+  'Based on your reasoning above, commit to a ranked list of your best '
+  'guesses, most confident first. Include significantly more guesses than '
+  'you think you need — aim for 30 or more. '
+  'Respond with JSON only, no explanation:\n'
+  '{"guesses": ["WORD", "WORD", ...]}'
+)
+
+# JSON schema passed to Ollama's format parameter for the guesses call.
+# Constrains the model to emit valid {"guesses": [...]} without inline commentary.
+_GUESSES_FORMAT: dict[str, object] = {
+  'type': 'object',
+  'properties': {
+    'guesses': {
+      'type': 'array',
+      'items': {'type': 'string'},
+    },
+  },
+  'required': ['guesses'],
+}
+
+# Matches optional ```json ... ``` or ``` ... ``` fences.
+_FENCE_RE = re.compile(r'```[a-z]*\n?(.*?)\n?```', re.DOTALL)
+
+
+def _build_scratchpad_messages(
+  clue_text: str, answer_length: int, difficulty: Difficulty
+) -> Sequence[Message]:
+  """Build the scratchpad messages for the solvability call."""
+  style_hint = _STYLE_HINTS[difficulty]
+  return [
+    {'role': 'system', 'content': _SYSTEM_PROMPT},
+    {
+      'role': 'user',
+      'content': (
+        f'Clue: {clue_text}\n'
+        f'Answer length: {answer_length} letters\n\n'
+        f'Style hint: {style_hint}\n\n'
+        'Reason through the clue: consider multiple interpretations, '
+        'possible wordplay angles, and candidate answers.'
+      ),
+    },
+  ]
+
+
+def _parse_guesses(reply: str) -> list[str]:
+  """Strip markdown fences and parse the JSON guesses list from the guesses reply.
+
+  Raises SolvabilityParseError if the reply is not valid JSON or is missing the
+  'guesses' key.
+  """
+  text = reply.strip()
+  fence_match = _FENCE_RE.search(text)
+  if fence_match:
+    text = fence_match.group(1).strip()
+  try:
+    data = json.loads(text)
+    return [str(guess) for guess in data['guesses']]
+  except (json.JSONDecodeError, KeyError) as error:
+    _log.error('failed to parse guesses reply: %s\nRaw reply: %s', error, reply)
+    raise SolvabilityParseError(
+      f'failed to parse guesses reply: {error}'
+    ) from error
 
 
 def validate_solvability(
@@ -25,12 +136,48 @@ def validate_solvability(
   would. Returns True if the answer appears within the top max_answer_rank
   length-filtered guesses.
   """
-  # TODO: build multi-turn solvability prompt (system persona + style hint,
-  #   Turn 1 scratchpad, Turn 2 guess list); see validation.md — "Solvability
-  #   call"
-  # TODO: call client.chat() for Turn 1 (scratchpad), then Turn 2 (guesses)
-  # TODO: strip markdown fences; parse guesses list with retry loop on failure
-  # TODO: filter guesses to len(answer) characters
-  # TODO: find answer position in filtered list (1-indexed); return whether
-  #   it is present and at or above max_answer_rank
-  raise NotImplementedError
+  answer_length = len(answer)
+
+  # Scratchpad: model reasons through interpretations and candidates.
+  scratchpad_messages = _build_scratchpad_messages(
+    clue_text, answer_length, difficulty
+  )
+  scratchpad_result = client.chat(scratchpad_messages)
+  _log.debug('Scratchpad:\n%s', scratchpad_result.reply)
+
+  # Guesses: extends the conversation so the model sees its own scratchpad
+  # reasoning before committing to a ranked list.
+  guesses_messages: Sequence[Message] = [
+    *scratchpad_result.messages,
+    {'role': 'user', 'content': _GUESSES_PROMPT},
+  ]
+  guesses_result = client.chat(guesses_messages, format=_GUESSES_FORMAT)
+
+  # TODO: retry loop on JSON parse failure; see validation.md — "Error handling
+  #   and logging".
+  guesses = _parse_guesses(guesses_result.reply)
+
+  # Normalize to uppercase and filter to correct letter count.
+  answer_upper = answer.upper()
+  filtered = [g.upper() for g in guesses if len(g) == answer_length]
+
+  _log.debug(
+    'Raw guesses (%d): %s', len(guesses), ', '.join(g.upper() for g in guesses)
+  )
+  _log.debug(
+    'Length-%d guesses (%d): %s',
+    answer_length,
+    len(filtered),
+    ', '.join(filtered) if filtered else '(none)',
+  )
+
+  try:
+    rank = filtered.index(answer_upper) + 1  # 1-indexed
+  except ValueError:
+    _log.debug('Answer %r absent from filtered guesses', answer_upper)
+    return False
+
+  _log.debug(
+    'Answer %r at rank %d (max %d)', answer_upper, rank, max_answer_rank
+  )
+  return rank <= max_answer_rank
