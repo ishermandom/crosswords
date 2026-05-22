@@ -5,9 +5,7 @@
 
 import io
 
-import pytest
-
-from clue_gen.word_parser import load_words, load_words_file
+from clue_gen.word_parser import load_words
 
 
 def _stream(text: str) -> io.StringIO:
@@ -41,8 +39,3 @@ def test_whitespace_around_word_is_stripped() -> None:
 
 def test_empty_stream_returns_empty_list() -> None:
   assert load_words(_stream('')) == []
-
-
-def test_load_words_file_raises_for_missing_path() -> None:
-  with pytest.raises(FileNotFoundError):
-    load_words_file('/nonexistent/path/words.txt')

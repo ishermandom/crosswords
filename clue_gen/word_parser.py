@@ -18,12 +18,3 @@ def load_words(f: io.TextIOBase) -> list[str]:
     if word:
       words.append(word.upper())
   return words
-
-
-def load_words_file(path: str) -> list[str]:
-  """Open `path` and delegate to `load_words`.
-
-  Raises FileNotFoundError if path doesn't exist.
-  """
-  with open(path, encoding='utf-8') as f:
-    return load_words(f)

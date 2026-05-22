@@ -252,6 +252,57 @@ log; it is not repeated in the structured output.
 
 ---
 
+## Implementation checklist
+
+Properties to verify manually as the prompts are built out. Check each off once
+it's confirmed to be in place.
+
+### Solvability call
+
+- [ ] System prompt establishes an experienced NYT solver persona
+- [ ] System prompt notes that NYT clues exploit wordplay, double meanings, and
+      misdirection
+- [ ] Style hint calibrates solver persistence without naming the difficulty day
+- [ ] Answer word absent from input
+- [ ] Target difficulty day name absent from input
+- [ ] Turn 1 asks the model to reason through interpretations and candidates
+      (scratchpad)
+- [ ] Turn 2 asks the model to commit to a ranked guess list
+- [ ] Turn 2 requests significantly more guesses than N (target: 3–4× N)
+- [ ] Programmatic length filtering applied after parsing
+- [ ] Pass criterion: target answer appears in top N length-filtered guesses
+- [ ] Target answer rank recorded regardless of pass/fail
+
+### Quality call
+
+- [ ] System prompt establishes an experienced NYT editor persona
+- [ ] System prompt describes the target difficulty day concretely (style,
+      solver expectations)
+- [ ] System prompt covers the relevant NYT crossword conventions
+- [ ] Prompt framing is neutral — no implied preferred verdict (sycophancy
+      guard)
+- [ ] Convention compliance evaluated before rubric scales
+- [ ] Convention failure rejects the clue immediately; scales skipped
+- [ ] Tense and number agreement checked
+- [ ] Wordplay indicator (`?`) presence/absence checked
+- [ ] Abbreviation signaling checked
+- [ ] Fill-in-the-blank format (`___`) checked
+- [ ] All six rubric scales scored 1–5 with rationale: angle craft,
+      misdirection, wordplay complexity, reference accessibility, surface
+      coherence, fairness of deception
+- [ ] Fairness of deception defaults to 5 for clues with no misdirection
+- [ ] Scale scores compared against day profile ranges for difficulty
+      calibration
+
+### Combined verdict
+
+- [ ] Final pass requires both calls to pass
+- [ ] Validation failure (network error, parse error after retries) does not
+      abort the pipeline; error logged and attached to clue
+- [ ] Both calls' inputs and outputs logged in human-readable form
+
+---
+
 ## Open questions
 
 **Difficulty context in the solvability call:** Three approaches, each with

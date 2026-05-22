@@ -163,7 +163,7 @@ needed); integration smoke tests use real Ollama + `qwen2.5:0.5b` with
 constrained generation (`num_ctx=512`, `num_predict=30`, `temperature=0`).
 
 - [x] Unit tests for `word_parser.load_words`: blank lines, full-line comments,
-      inline comments, uppercasing, missing file
+      inline comments, uppercasing
 - [x] Unit tests for `prompt`: correct difficulty descriptions, answer length
       encoding in validation prompt, word absent from validation prompt
 - [x] Unit tests for `generate_clue` via a fake `OllamaClient`: verify the
@@ -171,6 +171,17 @@ constrained generation (`num_ctx=512`, `num_predict=30`, `temperature=0`).
       assembled correctly; JSON extraction helpers (`_strip_fences`,
       `_extract_json_list`, `_extract_json_object`) are exercised here via the
       public API rather than tested directly
+- [x] Pre-implementation design decisions required before writing validator unit
+      tests (TODOs already stubbed in `test_solvability.py`, `test_quality.py`,
+      `test_validator.py`, `test_cli.py`):
+  - [x] Public API surface: two clients, `max_answer_rank` parameter with
+        default; stubs in `solvability.py`, `quality.py`, `validator.py`
+  - [x] Return type data model: frozen dataclasses; `answer_rank: int | None`
+  - [x] Day profile ranges: `DAY_PROFILES` and `QUALITY_FLOOR` in `quality.py`
+  - [x] CLI subcommand shape: argparse subparsers (`run`, `generate`,
+        `solvability`, `quality`) in `cli.py`
+- [x] CLI solvability tests written (xfail); awaiting `validate_solvability`
+      implementation to pass
 - [-] Add an optional `options` dict parameter to `OllamaClient` (or `chat()`),
   passed as `extra_body` to the completions call; integration tests would use
   this to set `num_ctx=512`, `num_predict=30`, `temperature=0`. Dropped: the
