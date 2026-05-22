@@ -85,11 +85,11 @@ Each clue word is processed by a **two-stage pipeline**:
    candidate clue styles before committing. Implemented as a `messages` list
    that grows with each assistant reply and follow-up user turn.
 
-2. **Validation call** — an independent API call with a fresh context. Receives
-   the generated clue(s) and evaluates them against three criteria: solvable
-   (the answer is genuinely reachable from the clue), correct difficulty
-   (matches the target NYT day), and sufficiently compelling. The validator may
-   accept, flag, or reject each clue.
+2. **Validation call** — two independent API calls with fresh contexts (see
+   `validation.md` for the full design). A blind solvability call checks whether
+   the answer is guessable from the clue alone; a separate answer-aware quality
+   call evaluates convention compliance and scores the clue on rubric scales
+   calibrated to the target NYT day.
 
 The specific turns (what each message says) are deferred to Phase 3 prompt
 tuning. Phase 2 builds the infrastructure: `OllamaClient.chat()` accepts and
@@ -134,9 +134,12 @@ output.
 - [ ] Decide whether brainstorm and validation calls need separate
       `ModelOptions` (brainstorm: temperature ~0.7; validation: temperature
       ~0.1–0.2); if so, expose per-call overrides on `OllamaClient.chat()`
-- [ ] Design validation prompt: instructs the model to evaluate each clue
-      against solvability, difficulty calibration, and compelling quality;
-      return structured verdict per clue
+- [ ] Consider using different models for generation vs. evaluation: the two
+      calls have different strengths requirements (creative generation vs.
+      structured scoring). One candidate split to try: qwen for brainstorm,
+      gemma4 for validation.
+- [ ] Design validation prompt: two-call architecture documented in
+      `validation.md`; implement prompts to match that spec
 - [ ] Design brainstorm turns: encode difficulty (NYT day description), style
       mix (definitions, wordplay, fill-in-the-blank, light cryptic, trivia)
 - [ ] Add `--candidates N` flag (default 1)
