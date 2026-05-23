@@ -3,10 +3,10 @@
 
 """Word list loading."""
 
-import io
+from typing import TextIO
 
 
-def load_words(f: io.TextIOBase) -> list[str]:
+def load_words(f: TextIO) -> list[str]:
   """Load and normalize answer words from an open text stream.
 
   Strips blank lines, full-line # comments, and inline # comments.

@@ -10,9 +10,8 @@ from unittest.mock import MagicMock
 
 import openai
 
-from clue_gen.cli import _run_pipeline, main
+from clue_gen.cli import main
 from clue_gen.client import ChatResult, Message
-from clue_gen.prompt import Difficulty
 from clue_gen.tests.fake_client import FakeChatClient
 
 
@@ -29,20 +28,22 @@ class _ConnectionErrorClient:
     )
 
 
-def _make_words_input(words: Sequence[str]) -> io.StringIO:
-  """Build an in-memory word list file from a Python list."""
+def _make_words_stream(words: Sequence[str]) -> io.StringIO:
+  """Build an in-memory word-list stream from a Python list."""
   return io.StringIO('\n'.join(words) + '\n')
 
 
-def test_connection_error_skips_word_and_continues() -> None:
+def test_connection_error_prints_error_and_continues() -> None:
   output = io.StringIO()
-  _run_pipeline(
-    _make_words_input(['ALPHA']),
-    Difficulty.MON,
-    _ConnectionErrorClient(),
-    output,
+  main(
+    ['run', '--words', '-'],
+    client=_ConnectionErrorClient(),
+    stdin=_make_words_stream(['ALPHA']),
+    output=output,
+    logs_dir=None,
   )
-  assert json.loads(output.getvalue()) == []
+  result = json.loads(output.getvalue())
+  assert 'error' in result
 
 
 # --- Individual-stage subcommands ---
@@ -85,14 +86,19 @@ def _make_solvability_argv(
 def test_solvability_subcommand_prints_result_as_json() -> None:
   output = io.StringIO()
   with FakeChatClient(_make_solvability_replies()) as fake:
-    main(_make_solvability_argv(), client=fake, output=output)
+    main(_make_solvability_argv(), client=fake, output=output, logs_dir=None)
   result = json.loads(output.getvalue())
   assert 'is_solvable' in result
 
 
 def test_solvability_subcommand_prints_error_json_on_connection_error() -> None:
   output = io.StringIO()
-  main(_make_solvability_argv(), client=_ConnectionErrorClient(), output=output)
+  main(
+    _make_solvability_argv(),
+    client=_ConnectionErrorClient(),
+    output=output,
+    logs_dir=None,
+  )
   result = json.loads(output.getvalue())
   assert 'error' in result
 
@@ -100,7 +106,7 @@ def test_solvability_subcommand_prints_error_json_on_connection_error() -> None:
 def test_solvability_subcommand_prints_error_json_on_generation_error() -> None:
   output = io.StringIO()
   with FakeChatClient(['scratchpad', 'not valid json']) as fake:
-    main(_make_solvability_argv(), client=fake, output=output)
+    main(_make_solvability_argv(), client=fake, output=output, logs_dir=None)
   result = json.loads(output.getvalue())
   assert 'error' in result
 
@@ -114,9 +120,9 @@ def test_solvability_subcommand_prints_error_json_on_generation_error() -> None:
 #   Same pattern as test_solvability_subcommand_exits_on_generation_error.
 
 
-def test_generation_error_skips_word_and_continues() -> None:
-  # ALPHA: empty extract triggers GenerationError — should be skipped.
-  # BETA: valid replies — should appear in results despite ALPHA's failure.
+def test_generation_error_prints_error_and_continues() -> None:
+  # ALPHA: empty extract triggers GenerationError — emits error JSONL.
+  # BETA: valid replies — emits result JSONL despite ALPHA's failure.
   output = io.StringIO()
   with FakeChatClient(
     [
@@ -127,9 +133,15 @@ def test_generation_error_skips_word_and_continues() -> None:
       '{"valid": true}',
     ]
   ) as fake:
-    _run_pipeline(
-      _make_words_input(['ALPHA', 'BETA']), Difficulty.MON, fake, output
+    main(
+      ['run', '--words', '-'],
+      client=fake,
+      stdin=_make_words_stream(['ALPHA', 'BETA']),
+      output=output,
+      logs_dir=None,
     )
-  results = json.loads(output.getvalue())
-  assert len(results) == 1
-  assert results[0]['word'] == 'BETA'
+  lines = [line for line in output.getvalue().splitlines() if line.strip()]
+  results = [json.loads(line) for line in lines]
+  assert len(results) == 2
+  assert 'error' in results[0]
+  assert results[1]['word'] == 'BETA'

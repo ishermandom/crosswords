@@ -3,6 +3,9 @@
 
 """CLI entry point.
 
+Each run writes a timestamped DEBUG log to logs/. Pass --verbose to also show
+DEBUG output on the console (INFO is always shown).
+
 Sample usage:
 
     clue-gen run --words words.txt --difficulty Thu --model gemma4:26b
@@ -17,6 +20,8 @@ import io
 import json
 import logging
 import sys
+from datetime import datetime
+from pathlib import Path
 from typing import NoReturn, TextIO
 
 import openai
@@ -24,6 +29,7 @@ import openai
 from clue_gen.client import ChatClient, GenerationError, Model, OllamaClient
 from clue_gen.generator import ClueResult, generate_clue
 from clue_gen.prompt import Difficulty
+from clue_gen.quality import QualityParseError, validate_quality
 from clue_gen.solvability import (
   DEFAULT_MAX_ANSWER_RANK,
   SolvabilityParseError,
@@ -64,14 +70,45 @@ def _log_fatal(message: str, *args: object) -> NoReturn:
   sys.exit(1)
 
 
-def _configure_logging(verbose: bool) -> None:
-  """Set up root logger and suppress HTTP stack noise."""
-  log_level = logging.DEBUG if verbose else logging.INFO
-  logging.basicConfig(
-    level=log_level, format='%(levelname)s %(name)s: %(message)s'
-  )
+def _open_words_file(path: str) -> io.TextIOWrapper:
+  """Open a word-list file; exit with an error message if not found."""
+  try:
+    return open(path, encoding='utf-8')
+  except FileNotFoundError:
+    _log_fatal('file not found: %s', path)
+
+
+def _configure_logging(verbose: bool, logs_dir: Path | None) -> Path | None:
+  """Set up console and file logging; return the log file path, or None.
+
+  The console handler respects --verbose (DEBUG when set, INFO otherwise).
+  When logs_dir is provided, a file handler always captures DEBUG with
+  timestamps so every run has a complete record regardless of verbosity.
+  Pass logs_dir=None to skip file logging (e.g. in tests).
+  """
+  root = logging.getLogger()
+  root.setLevel(logging.DEBUG)
+
+  console = logging.StreamHandler()
+  console.setLevel(logging.DEBUG if verbose else logging.INFO)
+  console.setFormatter(logging.Formatter('%(levelname)s %(name)s: %(message)s'))
+  root.addHandler(console)
+
+  log_path: Path | None = None
+  if logs_dir is not None:
+    logs_dir.mkdir(exist_ok=True)
+    log_path = logs_dir / f'{datetime.now().strftime("%Y-%m-%dT%H-%M-%S")}.log'
+    file_handler = logging.FileHandler(log_path, encoding='utf-8')
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(
+      logging.Formatter('%(asctime)s %(levelname)s %(name)s: %(message)s')
+    )
+    root.addHandler(file_handler)
+
   for name in ('httpx', 'httpcore', 'openai._base_client'):
     logging.getLogger(name).setLevel(logging.WARNING)
+
+  return log_path
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -82,20 +119,25 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
   parser.add_argument(
     '--verbose',
     action='store_true',
-    help='Enable DEBUG logging (per-call timing, token counts, and call details).',
+    help='Show DEBUG output on the console (file logs always capture DEBUG).',
   )
   subparsers = parser.add_subparsers(dest='subcommand', required=True)
 
-  # --- run: full batch pipeline ---
+  # --- run: full pipeline ---
   run_parser = subparsers.add_parser(
     'run',
-    help='Run the full pipeline (clue generation + validation) on a word list.',
+    help='Run the full pipeline (clue generation + validation).',
   )
-  run_parser.add_argument(
+  run_input = run_parser.add_mutually_exclusive_group(required=True)
+  run_input.add_argument(
+    '--word',
+    metavar='WORD',
+    help='Single answer word; prints one JSON object.',
+  )
+  run_input.add_argument(
     '--words',
-    required=True,
     metavar='FILE',
-    help='Plain-text file with one answer word or phrase per line.',
+    help='Plain-text file with one word per line; streams JSONL. Use - for stdin.',
   )
   _add_difficulty_arg(run_parser)
   _add_model_arg(run_parser)
@@ -103,13 +145,18 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
   # --- generate: clue generation only (no validation) ---
   generate_parser = subparsers.add_parser(
     'generate',
-    help='Generate a clue for a single word without running validation.',
+    help='Generate a clue without running validation.',
   )
-  generate_parser.add_argument(
+  generate_input = generate_parser.add_mutually_exclusive_group(required=True)
+  generate_input.add_argument(
     '--word',
-    required=True,
     metavar='WORD',
-    help='Answer word to generate a clue for.',
+    help='Single answer word; prints one JSON object.',
+  )
+  generate_input.add_argument(
+    '--words',
+    metavar='FILE',
+    help='Plain-text file with one word per line; streams JSONL. Use - for stdin.',
   )
   _add_difficulty_arg(generate_parser)
   _add_model_arg(generate_parser)
@@ -153,49 +200,23 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
   return parser.parse_args(argv)
 
 
-def _run_pipeline(
-  words_input: io.TextIOBase,
+def _generate_one(
+  word: str,
   difficulty: Difficulty,
   client: ChatClient,
-  output: TextIO,
-) -> None:
-  """Run the batch pipeline: read words, generate clues, write JSON."""
-  words = load_words(words_input)
-  if not words:
-    _log_fatal('word list is empty')
-  results = _generate_clues(words, difficulty, client)
-  print(
-    json.dumps([dataclasses.asdict(r) for r in results], indent=2), file=output
-  )
-
-
-def _generate_clues(
-  words: list[str],
-  difficulty: Difficulty,
-  client: ChatClient,
-) -> list[ClueResult]:
-  """Run the generation pipeline for each word, exiting on hard errors."""
-  results = []
-  for word in words:
-    try:
-      result = generate_clue(word, difficulty, client)
-      results.append(result)
-      _logger.info('%s → %s', result.word, result.clues[0])
-    except openai.APIConnectionError:
-      _logger.error(
-        'could not connect to Ollama (skipping %r). Is the server running? Try: ollama serve',
-        word,
-      )
-    except GenerationError as e:
-      _logger.error('error processing %r: %s', word, e)
-  return results
-
-
-def _run_generate(args: argparse.Namespace) -> None:
-  """Generate a clue for a single word and print JSON to stdout."""
-  # TODO: call generate_clue(args.word, args.difficulty, OllamaClient(args.model))
-  # TODO: print JSON result to stdout
-  raise NotImplementedError
+) -> ClueResult | None:
+  """Call generate_clue; log errors and return None on failure."""
+  try:
+    return generate_clue(word, difficulty, client)
+  except openai.APIConnectionError:
+    _logger.error(
+      'could not connect to Ollama (skipping %r). Is the server running? Try: ollama serve',
+      word,
+    )
+    return None
+  except GenerationError as error:
+    _logger.error('error processing %r: %s', word, error)
+    return None
 
 
 def _check_solvability(
@@ -231,40 +252,86 @@ def _check_solvability(
   print(json.dumps({'is_solvable': result}, indent=2), file=output)
 
 
-def _run_quality(args: argparse.Namespace) -> None:
-  """Run the quality evaluation on a single clue and print JSON to stdout."""
-  # TODO: call validate_quality(args.clue, args.answer, args.difficulty,
-  #   OllamaClient(args.model))
-  # TODO: print JSON result to stdout (conventions, scale scores, pass/fail)
-  raise NotImplementedError
+def _run_quality(
+  clue_text: str,
+  answer: str,
+  difficulty: Difficulty,
+  client: ChatClient,
+  output: TextIO,
+) -> None:
+  """Run quality evaluation for one clue and write the JSON result to output."""
+  try:
+    result = validate_quality(clue_text, answer, difficulty, client)
+  except openai.APIConnectionError:
+    _logger.error(
+      'could not connect to Ollama. Is the server running? Try: ollama serve'
+    )
+    print(
+      json.dumps({'error': 'could not connect to Ollama'}, indent=2),
+      file=output,
+    )
+    return
+  except GenerationError as error:
+    _logger.error('quality evaluation failed: %s', error)
+    print(json.dumps({'error': str(error)}, indent=2), file=output)
+    return
+  except QualityParseError as error:
+    _logger.error('quality parse error: %s', error)
+    print(json.dumps({'error': str(error)}, indent=2), file=output)
+    return
+  print(json.dumps(dataclasses.asdict(result), indent=2), file=output)
 
 
 def main(
   argv: list[str] | None = None,
   client: ChatClient | None = None,
+  stdin: TextIO = sys.stdin,
   output: TextIO = sys.stdout,
+  logs_dir: Path | None = Path('logs'),
 ) -> None:
   """Entry point: dispatch to the appropriate subcommand handler."""
   args = _parse_args(argv)
-  _configure_logging(args.verbose)
-  if args.subcommand == 'run':
-    try:
-      with open(args.words, encoding='utf-8') as f:
-        _run_pipeline(
-          f, args.difficulty, client or OllamaClient(args.model), output
+  log_path = _configure_logging(args.verbose, logs_dir)
+  _logger.info('command: %s', ' '.join(sys.argv))
+  if log_path is not None:
+    _logger.info('log: %s', log_path)
+  if model := getattr(args, 'model', None):
+    _logger.info('model: %s', model)
+  effective_client = client or OllamaClient(args.model)
+  if args.subcommand in ('run', 'generate'):
+    if args.word:
+      words: list[str] = [args.word]
+    elif args.words == '-':
+      words = load_words(stdin)
+    else:
+      with _open_words_file(args.words) as f:
+        words = load_words(f)
+      if not words:
+        _log_fatal('word list is empty')
+    for word in words:
+      result = _generate_one(word, args.difficulty, effective_client)
+      if result is None:
+        print(
+          json.dumps({'error': f'failed to generate clue for {word!r}'}),
+          file=output,
         )
-    except FileNotFoundError:
-      _log_fatal('file not found: %s', args.words)
-  elif args.subcommand == 'generate':
-    _run_generate(args)
+      else:
+        _logger.info('%s → %s', result.word, result.clues[0])
+        print(json.dumps(dataclasses.asdict(result)), file=output)
   elif args.subcommand == 'solvability':
     _check_solvability(
       args.clue,
       args.answer,
       args.difficulty,
-      client or OllamaClient(args.model),
+      effective_client,
       args.max_answer_rank,
       output,
     )
   elif args.subcommand == 'quality':
-    _run_quality(args)
+    _run_quality(
+      args.clue,
+      args.answer,
+      args.difficulty,
+      effective_client,
+      output,
+    )
