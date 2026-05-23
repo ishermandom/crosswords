@@ -3,63 +3,236 @@
 
 """Tests for the quality call's structural mechanics."""
 
-# TODO: import the quality validation function once implemented
+import json
+
+import pytest
+
+from clue_gen.prompt import Difficulty
+from clue_gen.quality import QualityParseError, QualityResult, validate_quality
+from clue_gen.tests.fake_client import FakeChatClient
+
+# Scripted scratchpad reply; content is irrelevant to all tests below.
+_SCRATCHPAD = 'Evaluating the clue...'
+
+
+def _make_reply(
+  *,
+  has_tense_agreement: bool = True,
+  has_wordplay_indicator: bool = True,
+  is_abbreviation_signaled: bool = True,
+  uses_fill_format: bool = True,
+  angle_craft: int = 4,
+  misdirection: int = 2,
+  wordplay_complexity: int = 2,
+  reference_accessibility: int = 5,
+  surface_coherence: int = 4,
+  fairness_of_deception: int = 5,
+) -> str:
+  """Scripted JSON reply for a validate_quality call.
+
+  Defaults produce a passing Monday profile: all conventions True, scale
+  scores within Monday ranges (misdirection 1–2, wordplay 1–3,
+  accessibility 4–5) and above the quality floor (≥ 4) for craft scales.
+  """
+  return json.dumps(
+    {
+      'conventions': {
+        'has_tense_agreement': has_tense_agreement,
+        'has_wordplay_indicator': has_wordplay_indicator,
+        'is_abbreviation_signaled': is_abbreviation_signaled,
+        'uses_fill_format': uses_fill_format,
+      },
+      'scales': {
+        'angle_craft': {'score': angle_craft, 'rationale': 'Deliberate angle.'},
+        'misdirection': {
+          'score': misdirection,
+          'rationale': 'Low misdirection.',
+        },
+        'wordplay_complexity': {
+          'score': wordplay_complexity,
+          'rationale': 'Simple wordplay.',
+        },
+        'reference_accessibility': {
+          'score': reference_accessibility,
+          'rationale': 'Universal reference.',
+        },
+        'surface_coherence': {
+          'score': surface_coherence,
+          'rationale': 'Natural phrasing.',
+        },
+        'fairness_of_deception': {
+          'score': fairness_of_deception,
+          'rationale': 'Clean resolution.',
+        },
+      },
+    }
+  )
+
+
+def _validate_quality(
+  fake: FakeChatClient,
+  *,
+  clue: str = 'Long journey',
+  answer: str = 'TREK',
+  difficulty: Difficulty = Difficulty.MON,
+) -> QualityResult:
+  """Calls validate_quality with defaults for params irrelevant to the test."""
+  return validate_quality(clue, answer, difficulty, fake)
 
 
 # --- Input shape ---
 
-# TODO: test_answer_word_present_in_quality_call
-#   Assert the answer word appears in the messages sent to the client.
 
-# TODO: test_difficulty_day_present_in_quality_call
-#   Assert the target difficulty day (e.g. "Monday", "Thursday") appears in
-#   the messages sent to the client.
+def test_answer_word_present_in_quality_call() -> None:
+  with FakeChatClient([_SCRATCHPAD, _make_reply()]) as fake:
+    _validate_quality(fake, answer='TREK')
+  all_message_text = ' '.join(
+    str(m['content']) for call in fake.calls for m in call
+  )
+  assert 'TREK' in all_message_text
 
-# TODO: test_quality_call_uses_fresh_context
-#   Assert none of the messages passed to the quality client call contain
-#   content from outside the quality call itself — no solvability scratchpad
-#   or brainstorm history.
+
+def test_difficulty_day_present_in_quality_call() -> None:
+  with FakeChatClient([_SCRATCHPAD, _make_reply()]) as fake:
+    _validate_quality(fake, difficulty=Difficulty.THU)
+  all_message_text = ' '.join(
+    str(m['content']) for call in fake.calls for m in call
+  )
+  assert 'Thursday' in all_message_text
 
 
 # --- Convention compliance ---
 
-# TODO: test_quality_fails_when_tense_agreement_is_false
-#   Script a quality response with tense_agreement: false and all other
-#   conventions and scales passing. Assert the quality verdict is a fail.
 
-# TODO: test_quality_fails_when_wordplay_indicator_is_false
-#   Script a quality response with wordplay_indicator: false. Assert fail.
+def test_quality_fails_when_tense_agreement_is_false() -> None:
+  with FakeChatClient(
+    [_SCRATCHPAD, _make_reply(has_tense_agreement=False)]
+  ) as fake:
+    result = _validate_quality(fake)
+  assert not result.is_acceptable
 
-# TODO: test_quality_fails_when_abbreviation_not_signaled
-#   Script a quality response with abbreviation_signaled: false. Assert fail.
 
-# TODO: test_quality_fails_when_fill_format_is_false
-#   Script a quality response with fill_format: false. Assert fail.
+def test_quality_fails_when_wordplay_indicator_is_false() -> None:
+  with FakeChatClient(
+    [_SCRATCHPAD, _make_reply(has_wordplay_indicator=False)]
+  ) as fake:
+    result = _validate_quality(fake)
+  assert not result.is_acceptable
 
-# TODO: test_quality_fails_on_any_single_convention_failure
-#   Parameterize (or write four focused tests) to confirm each convention
-#   field independently causes a fail even when all others and all scales pass.
+
+def test_quality_fails_when_abbreviation_not_signaled() -> None:
+  with FakeChatClient(
+    [_SCRATCHPAD, _make_reply(is_abbreviation_signaled=False)]
+  ) as fake:
+    result = _validate_quality(fake)
+  assert not result.is_acceptable
+
+
+def test_quality_fails_when_fill_format_is_false() -> None:
+  with FakeChatClient(
+    [_SCRATCHPAD, _make_reply(uses_fill_format=False)]
+  ) as fake:
+    result = _validate_quality(fake)
+  assert not result.is_acceptable
 
 
 # --- Difficulty calibration ---
 
-# TODO: test_quality_passes_when_all_conventions_pass_and_all_scales_in_range
-#   Script a response where every convention is true and every scale score
-#   falls within the expected range for the given day. Assert a pass.
 
-# TODO: test_quality_fails_when_misdirection_score_out_of_range_for_day
-#   For a Monday clue (expected low misdirection), script a response with a
-#   high misdirection score. Assert a fail.
+def test_quality_passes_when_all_conventions_pass_and_all_scales_in_range() -> (
+  None
+):
+  with FakeChatClient([_SCRATCHPAD, _make_reply()]) as fake:
+    result = _validate_quality(fake)
+  assert result.is_acceptable
 
-# TODO: test_quality_fails_when_wordplay_complexity_score_out_of_range_for_day
-#   Same pattern: supply a score outside the day's expected range for
-#   wordplay complexity. Assert a fail.
 
-# TODO: test_quality_fails_when_reference_accessibility_score_out_of_range
-#   Supply a score outside the day's expected range for reference
-#   accessibility. Assert a fail.
+def test_quality_fails_when_misdirection_score_out_of_range_for_day() -> None:
+  # Monday expects misdirection 1–2; score 4 is too high.
+  with FakeChatClient([_SCRATCHPAD, _make_reply(misdirection=4)]) as fake:
+    result = _validate_quality(fake, difficulty=Difficulty.MON)
+  assert not result.is_acceptable
 
-# TODO: test_craft_and_fairness_are_quality_floors_not_day_axes
-#   Assert that angle_craft and fairness_of_deception scores are evaluated
-#   against a fixed minimum threshold rather than a per-day range, so a
-#   low-craft score fails regardless of which day is targeted.
+
+def test_quality_fails_when_wordplay_complexity_score_out_of_range_for_day() -> (
+  None
+):
+  # Monday expects wordplay complexity 1–3; score 5 is too high.
+  with FakeChatClient(
+    [_SCRATCHPAD, _make_reply(wordplay_complexity=5)]
+  ) as fake:
+    result = _validate_quality(fake, difficulty=Difficulty.MON)
+  assert not result.is_acceptable
+
+
+def test_quality_fails_when_reference_accessibility_score_out_of_range() -> (
+  None
+):
+  # Monday expects reference accessibility 4–5; score 2 is too low.
+  with FakeChatClient(
+    [_SCRATCHPAD, _make_reply(reference_accessibility=2)]
+  ) as fake:
+    result = _validate_quality(fake, difficulty=Difficulty.MON)
+  assert not result.is_acceptable
+
+
+def test_craft_and_fairness_are_quality_floors_not_day_axes() -> None:
+  # Thursday allows high misdirection and low accessibility — all day-axis
+  # scales are in range — but a low angle_craft score (2) still fails because
+  # craft is a day-agnostic quality floor (minimum 4), not a day range.
+  with FakeChatClient(
+    [
+      _SCRATCHPAD,
+      _make_reply(
+        misdirection=5,
+        wordplay_complexity=5,
+        reference_accessibility=3,
+        angle_craft=2,
+      ),
+    ]
+  ) as fake:
+    result = _validate_quality(fake, difficulty=Difficulty.THU)
+  assert not result.is_acceptable
+
+
+# --- Parse error handling ---
+
+
+def test_parse_error_on_malformed_json() -> None:
+  with FakeChatClient([_SCRATCHPAD, 'not valid json']) as fake:
+    with pytest.raises(QualityParseError):
+      _validate_quality(fake)
+
+
+def test_parse_error_when_convention_field_is_not_boolean() -> None:
+  data = json.loads(_make_reply())
+  data['conventions']['has_tense_agreement'] = 'yes'
+  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+    with pytest.raises(QualityParseError, match='has_tense_agreement'):
+      _validate_quality(fake)
+
+
+def test_parse_error_when_scale_score_is_out_of_range() -> None:
+  data = json.loads(_make_reply())
+  data['scales']['angle_craft']['score'] = 6
+  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+    with pytest.raises(QualityParseError, match='angle_craft'):
+      _validate_quality(fake)
+
+
+def test_parse_error_when_scale_score_is_boolean() -> None:
+  # bool is a subclass of int; True would pass isinstance(v, int) without an
+  # explicit bool check. json.dumps(True) → "true" → json.loads → True (bool).
+  data = json.loads(_make_reply())
+  data['scales']['misdirection']['score'] = True
+  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+    with pytest.raises(QualityParseError, match='misdirection'):
+      _validate_quality(fake)
+
+
+def test_parse_error_when_required_field_is_missing() -> None:
+  data = json.loads(_make_reply())
+  del data['conventions']
+  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+    with pytest.raises(QualityParseError, match='conventions'):
+      _validate_quality(fake)

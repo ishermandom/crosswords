@@ -6,6 +6,16 @@
 # TODO: import the top-level validation function once implemented
 
 
+# --- Call isolation ---
+
+# TODO: test_quality_call_uses_fresh_context
+#   Script both the solvability and quality calls. Assert none of the messages
+#   in the quality call contain text from the solvability scratchpad — the
+#   validator must not thread prior call history into the quality context.
+#   (Tested here rather than in test_quality.py because the isolation
+#   guarantee lives at the orchestration level, not inside validate_quality.)
+
+
 # --- Combined verdict ---
 
 # TODO: test_overall_pass_when_both_calls_pass
