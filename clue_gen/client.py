@@ -4,6 +4,7 @@
 """Ollama client wrapper using the OpenAI-compatible HTTP API."""
 
 import enum
+import json
 import logging
 import time
 from collections.abc import Sequence
@@ -89,11 +90,12 @@ class ModelOptions:
   ] = 'none'
 
 
-# Tuned for fast iteration: small context window, capped output, low
-# temperature, model kept resident for 30 minutes between calls.
+# Tuned for fast iteration: small context window, low temperature, model kept
+# resident for 30 minutes between calls.
 DEBUG_OPTIONS = ModelOptions(
   temperature=0.2,
-  max_tokens=512,
+  # TODO: set an explicit cap once typical completion sizes are known from logs.
+  max_tokens=None,
   frequency_penalty=0.2,
   num_ctx=2048,
   keep_alive='30m',
@@ -157,6 +159,11 @@ class OllamaClient:
     Raises openai.APIConnectionError if the Ollama server is unreachable.
     Raises GenerationError if the model returns no text content.
     """
+    _log.debug(
+      'Prompt (%d message(s)):\n%s',
+      len(messages),
+      json.dumps(list(messages), indent=2, default=str),
+    )
     t0 = time.perf_counter()
     extra_body: dict[str, object] = {
       'options': {
@@ -193,6 +200,14 @@ class OllamaClient:
         completion_tok,
         tok_per_sec,
       )
+      if (
+        self._options.max_tokens is not None
+        and completion_tok >= self._options.max_tokens
+      ):
+        _log.warning(
+          'completion hit max_tokens=%d — output may be truncated',
+          self._options.max_tokens,
+        )
     else:
       _log.debug('chat %.1fs (no usage data)', elapsed)
 
