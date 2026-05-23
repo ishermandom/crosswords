@@ -98,6 +98,16 @@ def test_guesses_longer_than_answer_length_excluded_before_rank_check() -> None:
   assert result is True
 
 
+def test_whitespace_stripped_from_guesses_before_length_filter() -> None:
+  # 'ORB ' is 3 letters + a trailing space: without stripping, len('ORB ') == 4
+  # passes the filter and pushes STAR to rank 2, failing a max_answer_rank=1
+  # check. With stripping, ORB is excluded and STAR is rank 1.
+  guesses = ['ORB ', 'STAR']
+  with FakeChatClient(_make_replies(guesses=guesses)) as fake:
+    result = _validate_solvability(fake, answer='STAR', max_answer_rank=1)
+  assert result is True
+
+
 # --- Pass / fail criterion ---
 
 
@@ -171,3 +181,9 @@ def test_fail_when_answer_absent_from_guesses_entirely() -> None:
 # TODO: test_answer_absent_logged_on_fail
 #   Use caplog. Assert a debug message notes the answer word is absent when it
 #   does not appear in the filtered guesses.
+
+# TODO: test_truncation_warning_logged_when_completion_hits_max_tokens
+#   Assert a WARNING is emitted when completion_tokens == max_tokens. This fires
+#   in OllamaClient, not FakeChatClient, so the test requires either a custom
+#   fake that returns usage metadata or a lightweight integration test against a
+#   mocked HTTP layer. Prerequisite: decide the fake strategy.

@@ -5,10 +5,10 @@
 
 import json
 import logging
-import re
 from collections.abc import Sequence
 
 from clue_gen.client import ChatClient, Message
+from clue_gen.parsing import strip_markdown_fences
 from clue_gen.prompt import Difficulty
 
 _log = logging.getLogger(__name__)
@@ -79,9 +79,6 @@ _GUESSES_FORMAT: dict[str, object] = {
   'required': ['guesses'],
 }
 
-# Matches optional ```json ... ``` or ``` ... ``` fences.
-_FENCE_RE = re.compile(r'```[a-z]*\n?(.*?)\n?```', re.DOTALL)
-
 
 def _build_scratchpad_messages(
   clue_text: str, answer_length: int, difficulty: Difficulty
@@ -109,13 +106,10 @@ def _parse_guesses(reply: str) -> list[str]:
   Raises SolvabilityParseError if the reply is not valid JSON or is missing the
   'guesses' key.
   """
-  text = reply.strip()
-  fence_match = _FENCE_RE.search(text)
-  if fence_match:
-    text = fence_match.group(1).strip()
+  text = strip_markdown_fences(reply)
   try:
     data = json.loads(text)
-    return [str(guess) for guess in data['guesses']]
+    return [str(guess).strip() for guess in data['guesses']]
   except (json.JSONDecodeError, KeyError) as error:
     _log.error('failed to parse guesses reply: %s\nRaw reply: %s', error, reply)
     raise SolvabilityParseError(
@@ -161,15 +155,25 @@ def validate_solvability(
   answer_upper = answer.upper()
   filtered = [g.upper() for g in guesses if len(g) == answer_length]
 
-  _log.debug(
-    'Raw guesses (%d): %s', len(guesses), ', '.join(g.upper() for g in guesses)
-  )
-  _log.debug(
-    'Length-%d guesses (%d): %s',
-    answer_length,
-    len(filtered),
-    ', '.join(filtered) if filtered else '(none)',
-  )
+  if guesses:
+    raw_lines = '\n  '.join(
+      f'{i + 1}. {g.upper()}' for i, g in enumerate(guesses)
+    )
+    _log.debug('Raw guesses (%d):\n  %s', len(guesses), raw_lines)
+  else:
+    _log.debug('Raw guesses (0): (none)')
+  if filtered:
+    filtered_lines = '\n  '.join(
+      f'{i + 1}. {g}' for i, g in enumerate(filtered)
+    )
+    _log.debug(
+      'Length-%d guesses (%d):\n  %s',
+      answer_length,
+      len(filtered),
+      filtered_lines,
+    )
+  else:
+    _log.debug('Length-%d guesses (0): (none)', answer_length)
 
   try:
     rank = filtered.index(answer_upper) + 1  # 1-indexed
