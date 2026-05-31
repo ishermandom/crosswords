@@ -12,6 +12,7 @@ import openai
 
 from clue_gen.cli import main
 from clue_gen.client import ChatResult, Message
+from clue_gen.input_parsing import ClueEntry
 from clue_gen.tests.fake_client import FakeChatClient
 
 
@@ -31,6 +32,13 @@ class _ConnectionErrorClient:
 def _make_words_stream(words: Sequence[str]) -> io.StringIO:
   """Build an in-memory word-list stream from a Python list."""
   return io.StringIO('\n'.join(words) + '\n')
+
+
+def _make_clues_stream(entries: Sequence[ClueEntry]) -> io.StringIO:
+  """Build an in-memory clue-entry stream from ClueEntry values."""
+  return io.StringIO(
+    '\n'.join(f'{e.answer} {e.clue_text}' for e in entries) + '\n'
+  )
 
 
 def test_connection_error_prints_error_and_continues() -> None:
@@ -111,13 +119,118 @@ def test_solvability_subcommand_prints_error_json_on_generation_error() -> None:
   assert 'error' in result
 
 
-# TODO: test_quality_subcommand_accepts_clue_answer_and_day
-#   Invoke the `quality` subcommand with a clue string, answer word, and
-#   difficulty day. Assert that a quality call is made (and only that call),
-#   and that convention results and scale scores are printed to stdout.
+# --- Quality subcommand ---
 
-# TODO: test_quality_subcommand_exits_on_parse_failure_after_retries
-#   Same pattern as test_solvability_subcommand_exits_on_generation_error.
+
+def _make_quality_replies() -> list[str]:
+  """Scripted replies for a quality call; scratchpad reply is irrelevant."""
+  return [
+    'scratchpad',
+    json.dumps(
+      {
+        'conventions': {
+          'has_tense_agreement': True,
+          'has_wordplay_indicator': True,
+          'is_abbreviation_signaled': True,
+          'uses_fill_format': False,
+        },
+        'scales': {
+          'angle_craft': {'score': 3, 'rationale': 'ok'},
+          'misdirection': {'score': 4, 'rationale': 'ok'},
+          'wordplay_complexity': {'score': 3, 'rationale': 'ok'},
+          'reference_accessibility': {'score': 4, 'rationale': 'ok'},
+          'surface_coherence': {'score': 4, 'rationale': 'ok'},
+          'fairness_of_deception': {'score': 3, 'rationale': 'ok'},
+        },
+      }
+    ),
+  ]
+
+
+def _make_quality_argv(
+  clue: str = 'Starts a fire?',
+  answer: str = 'MATCH',
+  difficulty: str = 'Wed',
+) -> list[str]:
+  """Build a `quality` subcommand argv; defaults are valid but irrelevant."""
+  return [
+    'quality',
+    '--clue',
+    clue,
+    '--answer',
+    answer,
+    '--difficulty',
+    difficulty,
+  ]
+
+
+def test_quality_subcommand_prints_result_as_json() -> None:
+  output = io.StringIO()
+  with FakeChatClient(_make_quality_replies()) as fake:
+    main(_make_quality_argv(), client=fake, output=output, logs_dir=None)
+  result = json.loads(output.getvalue())
+  assert 'conventions' in result
+  assert 'is_acceptable' in result
+
+
+def test_quality_subcommand_prints_error_json_on_connection_error() -> None:
+  output = io.StringIO()
+  main(
+    _make_quality_argv(),
+    client=_ConnectionErrorClient(),
+    output=output,
+    logs_dir=None,
+  )
+  result = json.loads(output.getvalue())
+  assert 'error' in result
+
+
+# --- Batch mode (--clues) ---
+
+
+def test_solvability_clues_batch_prints_one_result_per_entry() -> None:
+  entries = [
+    ClueEntry(answer='MATCH', clue_text='Starts a fire?'),
+    ClueEntry(answer='LIGHT', clue_text='Turn on?'),
+  ]
+  output = io.StringIO()
+  with FakeChatClient(
+    _make_solvability_replies() + _make_solvability_replies()
+  ) as fake:
+    main(
+      ['solvability', '--clues', '-', '--difficulty', 'Wed'],
+      client=fake,
+      stdin=_make_clues_stream(entries),
+      output=output,
+      logs_dir=None,
+    )
+  lines = [line for line in output.getvalue().splitlines() if line.strip()]
+  assert len(lines) == 2
+  assert all('is_solvable' in json.loads(line) for line in lines)
+
+
+def test_quality_clues_batch_prints_one_result_per_entry() -> None:
+  entries = [
+    ClueEntry(answer='MATCH', clue_text='Starts a fire?'),
+    ClueEntry(answer='LIGHT', clue_text='Turn on?'),
+  ]
+  output = io.StringIO()
+  with FakeChatClient(
+    _make_quality_replies() + _make_quality_replies()
+  ) as fake:
+    main(
+      ['quality', '--clues', '-', '--difficulty', 'Wed'],
+      client=fake,
+      stdin=_make_clues_stream(entries),
+      output=output,
+      logs_dir=None,
+    )
+  lines = [line for line in output.getvalue().splitlines() if line.strip()]
+  assert len(lines) == 2
+  assert all('is_acceptable' in json.loads(line) for line in lines)
+
+
+# --- run subcommand ---
 
 
 def test_generation_error_prints_error_and_continues() -> None:

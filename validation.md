@@ -221,10 +221,10 @@ log; it is not repeated in the structured output.
 ```json
 {
   "conventions": {
-    "tense_agreement": true,
-    "wordplay_indicator": true,
-    "abbreviation_signaled": true,
-    "fill_format": true
+    "has_tense_agreement": true,
+    "has_wordplay_indicator": true,
+    "is_abbreviation_signaled": true,
+    "uses_fill_format": true
   },
   "scales": {
     "angle_craft": { "score": 4, "rationale": "..." },

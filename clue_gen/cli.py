@@ -11,7 +11,9 @@ Sample usage:
     clue-gen run --words words.txt --difficulty Thu --model gemma4:26b
     clue-gen generate --word ALPHA --difficulty Mon --model qwen2.5:0.5b
     clue-gen solvability --clue "Starts a fire?" --answer MATCH --difficulty Wed --model gemma4:26b
+    clue-gen solvability --clues clues.txt --difficulty Wed --model gemma4:26b
     clue-gen quality --clue "Starts a fire?" --answer MATCH --difficulty Wed --model gemma4:26b
+    clue-gen quality --clues clues.txt --difficulty Wed --model gemma4:26b
 """
 
 import argparse
@@ -20,6 +22,7 @@ import io
 import json
 import logging
 import sys
+from collections.abc import Sequence
 from datetime import datetime
 from pathlib import Path
 from typing import NoReturn, TextIO
@@ -28,6 +31,7 @@ import openai
 
 from clue_gen.client import ChatClient, GenerationError, Model, OllamaClient
 from clue_gen.generator import ClueResult, generate_clue
+from clue_gen.input_parsing import ClueEntry, load_clue_entries, load_words
 from clue_gen.prompt import Difficulty
 from clue_gen.quality import QualityParseError, validate_quality
 from clue_gen.solvability import (
@@ -35,7 +39,6 @@ from clue_gen.solvability import (
   SolvabilityParseError,
   validate_solvability,
 )
-from clue_gen.word_parser import load_words
 
 _logger = logging.getLogger(__name__)
 
@@ -64,9 +67,9 @@ def _add_model_arg(parser: argparse.ArgumentParser) -> None:
   )
 
 
-def _log_fatal(message: str, *args: object) -> NoReturn:
+def _log_fatal(message: str) -> NoReturn:
   """Log an error and exit with a failure code."""
-  _logger.error(message, *args)
+  _logger.error(message)
   sys.exit(1)
 
 
@@ -75,11 +78,11 @@ def _open_words_file(path: str) -> io.TextIOWrapper:
   try:
     return open(path, encoding='utf-8')
   except FileNotFoundError:
-    _log_fatal('file not found: %s', path)
+    _log_fatal(f'file not found: {path}')
 
 
-def _configure_logging(verbose: bool, logs_dir: Path | None) -> Path | None:
-  """Set up console and file logging; return the log file path, or None.
+def _configure_logging(verbose: bool, logs_dir: Path | None) -> None:
+  """Set up console and file logging.
 
   The console handler respects --verbose (DEBUG when set, INFO otherwise).
   When logs_dir is provided, a file handler always captures DEBUG with
@@ -94,7 +97,6 @@ def _configure_logging(verbose: bool, logs_dir: Path | None) -> Path | None:
   console.setFormatter(logging.Formatter('%(levelname)s %(name)s: %(message)s'))
   root.addHandler(console)
 
-  log_path: Path | None = None
   if logs_dir is not None:
     logs_dir.mkdir(exist_ok=True)
     log_path = logs_dir / f'{datetime.now().strftime("%Y-%m-%dT%H-%M-%S")}.log'
@@ -104,11 +106,10 @@ def _configure_logging(verbose: bool, logs_dir: Path | None) -> Path | None:
       logging.Formatter('%(asctime)s %(levelname)s %(name)s: %(message)s')
     )
     root.addHandler(file_handler)
+    _logger.info(f'log: {log_path}')
 
   for name in ('httpx', 'httpcore', 'openai._base_client'):
     logging.getLogger(name).setLevel(logging.WARNING)
-
-  return log_path
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -165,14 +166,25 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
   solvability_parser = subparsers.add_parser(
     'solvability', help='Run the blind solvability check on a clue.'
   )
-  solvability_parser.add_argument(
-    '--clue', required=True, metavar='TEXT', help='Clue text to evaluate.'
+  solvability_input = solvability_parser.add_mutually_exclusive_group(
+    required=True
+  )
+  solvability_input.add_argument(
+    '--clues',
+    metavar='FILE',
+    help=(
+      'File with one "ANSWER clue text" entry per line; streams JSONL.'
+      ' Use - for stdin.'
+    ),
+  )
+  solvability_input.add_argument(
+    '--clue', metavar='TEXT', help='Clue text to evaluate.'
   )
   solvability_parser.add_argument(
     '--answer',
-    required=True,
     metavar='WORD',
-    help='Target answer word (used to check guesses; withheld from the model).',
+    help='Target answer word (used to check guesses; withheld from the model).'
+    ' Required with --clue.',
   )
   _add_difficulty_arg(solvability_parser)
   _add_model_arg(solvability_parser)
@@ -188,11 +200,22 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
   quality_parser = subparsers.add_parser(
     'quality', help='Run the answer-aware quality evaluation on a clue.'
   )
-  quality_parser.add_argument(
-    '--clue', required=True, metavar='TEXT', help='Clue text to evaluate.'
+  quality_input = quality_parser.add_mutually_exclusive_group(required=True)
+  quality_input.add_argument(
+    '--clues',
+    metavar='FILE',
+    help=(
+      'File with one "ANSWER clue text" entry per line; streams JSONL.'
+      ' Use - for stdin.'
+    ),
+  )
+  quality_input.add_argument(
+    '--clue', metavar='TEXT', help='Clue text to evaluate.'
   )
   quality_parser.add_argument(
-    '--answer', required=True, metavar='WORD', help='Target answer word.'
+    '--answer',
+    metavar='WORD',
+    help='Target answer word. Required with --clue.',
   )
   _add_difficulty_arg(quality_parser)
   _add_model_arg(quality_parser)
@@ -205,18 +228,49 @@ def _generate_one(
   difficulty: Difficulty,
   client: ChatClient,
 ) -> ClueResult | None:
-  """Call generate_clue; log errors and return None on failure."""
+  """Call generate_clue; log the result and return None on failure."""
   try:
-    return generate_clue(word, difficulty, client)
+    result = generate_clue(word, difficulty, client)
   except openai.APIConnectionError:
     _logger.error(
-      'could not connect to Ollama (skipping %r). Is the server running? Try: ollama serve',
-      word,
+      f'could not connect to Ollama (skipping {word!r}).'
+      ' Is the server running? Try: ollama serve'
     )
     return None
   except GenerationError as error:
-    _logger.error('error processing %r: %s', word, error)
+    _logger.error(f'error processing {word!r}: {error}')
     return None
+  _logger.info(f'{result.word} → {result.clues[0]}')
+  return result
+
+
+def _run_words(
+  words: Sequence[str],
+  difficulty: Difficulty,
+  client: ChatClient,
+  output: TextIO,
+) -> None:
+  """Generate clues for each word and write one JSONL result per word."""
+  for word in words:
+    result = _generate_one(word, difficulty, client)
+    if result is None:
+      print(
+        json.dumps({'error': f'failed to generate clue for {word!r}'}),
+        file=output,
+      )
+    else:
+      print(json.dumps(dataclasses.asdict(result)), file=output)
+
+
+def _load_clue_entries_input(clues: str, stdin: TextIO) -> list[ClueEntry]:
+  """Load clue entries from a file path or from stdin when clues is '-'."""
+  if clues == '-':
+    return load_clue_entries(stdin)
+  try:
+    with open(clues, encoding='utf-8') as f:
+      return load_clue_entries(f)
+  except FileNotFoundError:
+    _log_fatal(f'file not found: {clues}')
 
 
 def _check_solvability(
@@ -227,7 +281,7 @@ def _check_solvability(
   max_answer_rank: int,
   output: TextIO,
 ) -> None:
-  """Run solvability check for one clue and write the JSON result to output."""
+  """Run solvability check for one clue and write a compact JSON result."""
   try:
     result = validate_solvability(
       clue_text, answer, difficulty, client, max_answer_rank
@@ -236,20 +290,17 @@ def _check_solvability(
     _logger.error(
       'could not connect to Ollama. Is the server running? Try: ollama serve'
     )
-    print(
-      json.dumps({'error': 'could not connect to Ollama'}, indent=2),
-      file=output,
-    )
+    print(json.dumps({'error': 'could not connect to Ollama'}), file=output)
     return
   except GenerationError as error:
-    _logger.error('solvability check failed: %s', error)
-    print(json.dumps({'error': str(error)}, indent=2), file=output)
+    _logger.error(f'solvability check failed: {error}')
+    print(json.dumps({'error': str(error)}), file=output)
     return
   except SolvabilityParseError as error:
-    _logger.error('solvability parse error: %s', error)
-    print(json.dumps({'error': str(error)}, indent=2), file=output)
+    _logger.error(f'solvability parse error: {error}')
+    print(json.dumps({'error': str(error)}), file=output)
     return
-  print(json.dumps({'is_solvable': result}, indent=2), file=output)
+  print(json.dumps({'is_solvable': result}), file=output)
 
 
 def _run_quality(
@@ -259,27 +310,24 @@ def _run_quality(
   client: ChatClient,
   output: TextIO,
 ) -> None:
-  """Run quality evaluation for one clue and write the JSON result to output."""
+  """Run quality evaluation for one clue and write a compact JSON result."""
   try:
     result = validate_quality(clue_text, answer, difficulty, client)
   except openai.APIConnectionError:
     _logger.error(
       'could not connect to Ollama. Is the server running? Try: ollama serve'
     )
-    print(
-      json.dumps({'error': 'could not connect to Ollama'}, indent=2),
-      file=output,
-    )
+    print(json.dumps({'error': 'could not connect to Ollama'}), file=output)
     return
   except GenerationError as error:
-    _logger.error('quality evaluation failed: %s', error)
-    print(json.dumps({'error': str(error)}, indent=2), file=output)
+    _logger.error(f'quality evaluation failed: {error}')
+    print(json.dumps({'error': str(error)}), file=output)
     return
   except QualityParseError as error:
-    _logger.error('quality parse error: %s', error)
-    print(json.dumps({'error': str(error)}, indent=2), file=output)
+    _logger.error(f'quality parse error: {error}')
+    print(json.dumps({'error': str(error)}), file=output)
     return
-  print(json.dumps(dataclasses.asdict(result), indent=2), file=output)
+  print(json.dumps(dataclasses.asdict(result)), file=output)
 
 
 def main(
@@ -291,12 +339,9 @@ def main(
 ) -> None:
   """Entry point: dispatch to the appropriate subcommand handler."""
   args = _parse_args(argv)
-  log_path = _configure_logging(args.verbose, logs_dir)
-  _logger.info('command: %s', ' '.join(sys.argv))
-  if log_path is not None:
-    _logger.info('log: %s', log_path)
-  if model := getattr(args, 'model', None):
-    _logger.info('model: %s', model)
+  _configure_logging(args.verbose, logs_dir)
+  _logger.info(f'command: {" ".join(sys.argv)}')
+  _logger.info(f'model: {args.model}')
   effective_client = client or OllamaClient(args.model)
   if args.subcommand in ('run', 'generate'):
     if args.word:
@@ -308,30 +353,31 @@ def main(
         words = load_words(f)
       if not words:
         _log_fatal('word list is empty')
-    for word in words:
-      result = _generate_one(word, args.difficulty, effective_client)
-      if result is None:
-        print(
-          json.dumps({'error': f'failed to generate clue for {word!r}'}),
-          file=output,
-        )
-      else:
-        _logger.info('%s → %s', result.word, result.clues[0])
-        print(json.dumps(dataclasses.asdict(result)), file=output)
+    _run_words(words, args.difficulty, effective_client, output)
   elif args.subcommand == 'solvability':
-    _check_solvability(
-      args.clue,
-      args.answer,
-      args.difficulty,
-      effective_client,
-      args.max_answer_rank,
-      output,
-    )
+    if args.clues:
+      entries = _load_clue_entries_input(args.clues, stdin)
+    else:
+      if not args.answer:
+        _log_fatal('--clue requires --answer')
+      entries = [ClueEntry(answer=args.answer, clue_text=args.clue)]
+    for entry in entries:
+      _check_solvability(
+        entry.clue_text,
+        entry.answer,
+        args.difficulty,
+        effective_client,
+        args.max_answer_rank,
+        output,
+      )
   elif args.subcommand == 'quality':
-    _run_quality(
-      args.clue,
-      args.answer,
-      args.difficulty,
-      effective_client,
-      output,
-    )
+    if args.clues:
+      entries = _load_clue_entries_input(args.clues, stdin)
+    else:
+      if not args.answer:
+        _log_fatal('--clue requires --answer')
+      entries = [ClueEntry(answer=args.answer, clue_text=args.clue)]
+    for entry in entries:
+      _run_quality(
+        entry.clue_text, entry.answer, args.difficulty, effective_client, output
+      )
