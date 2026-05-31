@@ -385,7 +385,7 @@ def _parse_reply(reply: str) -> dict[str, object]:
   try:
     data = json.loads(text)
   except json.JSONDecodeError as error:
-    _log.error('failed to parse quality reply: %s\nRaw reply: %s', error, reply)
+    _log.error(f'failed to parse quality reply: {error}\nRaw reply: {reply}')
     raise QualityParseError(
       f'failed to parse quality reply: {error}'
     ) from error
@@ -441,7 +441,7 @@ def validate_quality(
     },
   ]
   scratchpad_result = client.chat(scratchpad_messages)
-  _log.debug('Scratchpad:\n%s', scratchpad_result.reply)
+  _log.debug(f'Scratchpad:\n{scratchpad_result.reply}')
 
   output_messages: Sequence[Message] = [
     *scratchpad_result.messages,

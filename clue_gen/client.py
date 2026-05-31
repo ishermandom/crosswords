@@ -141,6 +141,9 @@ class OllamaClient:
     self._model = model
     self._options = options
     self._client = openai.OpenAI(base_url=base_url, api_key='ollama')
+    # Tracks messages logged so far this session to avoid duplicating context
+    # that already appears earlier in the log file.
+    self._logged_messages: list[Message] = []
 
   def chat(
     self,
@@ -159,11 +162,23 @@ class OllamaClient:
     Raises openai.APIConnectionError if the Ollama server is unreachable.
     Raises GenerationError if the model returns no text content.
     """
-    _log.debug(
-      'Prompt (%d message(s)):\n%s',
-      len(messages),
-      json.dumps(list(messages), indent=2, default=str),
-    )
+    # Find the longest prefix already logged, then log only the new tail.
+    prefix_len = 0
+    for message, logged in zip(messages, self._logged_messages):
+      if message == logged:
+        prefix_len += 1
+      else:
+        break
+    new_messages = list(messages)[prefix_len:]
+    messages_json = json.dumps(new_messages, indent=2, default=str)
+    if prefix_len == 0:
+      _log.debug(f'Prompt ({len(messages)} message(s)):\n{messages_json}')
+    else:
+      _log.debug(
+        f'Prompt (+{len(new_messages)} new message(s),'
+        f' {len(messages)} total):\n{messages_json}'
+      )
+    self._logged_messages = list(messages)
     t0 = time.perf_counter()
     extra_body: dict[str, object] = {
       'options': {
@@ -194,22 +209,20 @@ class OllamaClient:
       completion_tok = usage.completion_tokens
       tok_per_sec = completion_tok / elapsed if elapsed > 0 else 0
       _log.debug(
-        'chat %.1fs | prompt=%d completion=%d | %.1f tok/s',
-        elapsed,
-        prompt_tok,
-        completion_tok,
-        tok_per_sec,
+        f'chat {elapsed:.1f}s'
+        f' | prompt={prompt_tok} completion={completion_tok}'
+        f' | {tok_per_sec:.1f} tok/s'
       )
       if (
         self._options.max_tokens is not None
         and completion_tok >= self._options.max_tokens
       ):
         _log.warning(
-          'completion hit max_tokens=%d — output may be truncated',
-          self._options.max_tokens,
+          f'completion hit max_tokens={self._options.max_tokens}'
+          ' — output may be truncated'
         )
     else:
-      _log.debug('chat %.1fs (no usage data)', elapsed)
+      _log.debug(f'chat {elapsed:.1f}s (no usage data)')
 
     content = response.choices[0].message.content if response.choices else None
     if not content:

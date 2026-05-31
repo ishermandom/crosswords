@@ -40,11 +40,11 @@ def generate_clue(
   t_word = time.perf_counter()
 
   # Stage 1: brainstorm, then extract candidates as a structured list.
-  _log.info('[%s] brainstorm start', word)
+  _log.info(f'[{word}] brainstorm start')
   messages: Sequence[Message] = brainstorm_messages(word, difficulty)
   messages = client.chat(messages).messages
-  _log.info('[%s] brainstorm done (%.1fs)', word, time.perf_counter() - t_word)
-  _log.debug('[%s] brainstorm reply:\n%s', word, messages[-1]['content'])
+  _log.info(f'[{word}] brainstorm done ({time.perf_counter() - t_word:.1f}s)')
+  _log.debug(f'[{word}] brainstorm reply:\n{messages[-1]["content"]}')
 
   # TODO: Phase 3 — replace with multi-turn brainstorm sequence.
   extract_turn: Message = {
@@ -55,24 +55,22 @@ def generate_clue(
     ),
   }
   t_extract = time.perf_counter()
-  _log.info('[%s] extract start', word)
+  _log.info(f'[{word}] extract start')
   extract_reply = client.chat([*messages, extract_turn]).reply
-  _log.debug('[%s] extract reply:\n%s', word, extract_reply)
+  _log.debug(f'[{word}] extract reply:\n{extract_reply}')
   candidates = _extract_json_list(extract_reply)
   _log.info(
-    '[%s] extract done (%.1fs): %d candidate(s)',
-    word,
-    time.perf_counter() - t_extract,
-    len(candidates),
+    f'[{word}] extract done ({time.perf_counter() - t_extract:.1f}s):'
+    f' {len(candidates)} candidate(s)'
   )
 
   # Stage 2: validate each candidate with a blind solver (independent call).
   answer_length = len(word.replace(' ', ''))
   for i, clue in enumerate(candidates):
-    _log.info('[%s] validate candidate %d/%d', word, i + 1, len(candidates))
+    _log.info(f'[{word}] validate candidate {i + 1}/{len(candidates)}')
     try:
       val_result = client.chat(validation_messages(clue, answer_length))
-      _log.debug('[%s] validation reply:\n%s', word, val_result.reply)
+      _log.debug(f'[{word}] validation reply:\n{val_result.reply}')
       parsed = _extract_json_object(val_result.reply)
     except GenerationError as e:
       # Validation is a quality signal, not a correctness gate — a malformed
@@ -80,7 +78,7 @@ def generate_clue(
       # itself is wrong. Skip and try the next candidate; the fallback below
       # handles the case where all are skipped.
       _log.warning(
-        'validation unparseable for %r: %s; skipping candidate', word, e
+        f'validation unparseable for {word!r}: {e}; skipping candidate'
       )
       continue
     if not parsed.get('valid'):
@@ -90,9 +88,8 @@ def generate_clue(
       # Same reasoning as the GenerationError case above: a schema violation
       # in the validator's response is the validator's failure, not the clue's.
       _log.warning(
-        'validator returned non-string answer for %r: %r; skipping candidate',
-        word,
-        raw_answer,
+        f'validator returned non-string answer for {word!r}:'
+        f' {raw_answer!r}; skipping candidate'
       )
       continue
     solved = raw_answer.upper().replace(' ', '')
@@ -100,9 +97,9 @@ def generate_clue(
       # The validator accepted the clue but solved it to a different word —
       # logged so prompt quality issues are visible, but not fatal since the
       # clue may still be usable.
-      _log.warning('validator solved clue for %r as %r', word, solved)
+      _log.warning(f'validator solved clue for {word!r} as {solved!r}')
     elapsed = time.perf_counter() - t_word
-    _log.info('[%s] done (%.1fs total)', word, elapsed)
+    _log.info(f'[{word}] done ({elapsed:.1f}s total)')
     raw_clue = parsed.get('clue')
     return ClueResult(
       word=word,
@@ -111,9 +108,9 @@ def generate_clue(
 
   if not candidates:
     raise GenerationError(f'no candidates extracted for {word!r}')
-  _log.warning('no valid clue found for %r; using first candidate', word)
+  _log.warning(f'no valid clue found for {word!r}; using first candidate')
   elapsed = time.perf_counter() - t_word
-  _log.info('[%s] done with fallback (%.1fs total)', word, elapsed)
+  _log.info(f'[{word}] done with fallback ({elapsed:.1f}s total)')
   return ClueResult(word=word, clues=[candidates[0]])
 
 

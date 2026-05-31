@@ -111,7 +111,7 @@ def _parse_guesses(reply: str) -> list[str]:
     data = json.loads(text)
     return [str(guess).strip() for guess in data['guesses']]
   except (json.JSONDecodeError, KeyError) as error:
-    _log.error('failed to parse guesses reply: %s\nRaw reply: %s', error, reply)
+    _log.error(f'failed to parse guesses reply: {error}\nRaw reply: {reply}')
     raise SolvabilityParseError(
       f'failed to parse guesses reply: {error}'
     ) from error
@@ -137,7 +137,7 @@ def validate_solvability(
     clue_text, answer_length, difficulty
   )
   scratchpad_result = client.chat(scratchpad_messages)
-  _log.debug('Scratchpad:\n%s', scratchpad_result.reply)
+  _log.debug(f'Scratchpad:\n{scratchpad_result.reply}')
 
   # Guesses: extends the conversation so the model sees its own scratchpad
   # reasoning before committing to a ranked list.
@@ -159,7 +159,7 @@ def validate_solvability(
     raw_lines = '\n  '.join(
       f'{i + 1}. {g.upper()}' for i, g in enumerate(guesses)
     )
-    _log.debug('Raw guesses (%d):\n  %s', len(guesses), raw_lines)
+    _log.debug(f'Raw guesses ({len(guesses)}):\n  {raw_lines}')
   else:
     _log.debug('Raw guesses (0): (none)')
   if filtered:
@@ -167,21 +167,16 @@ def validate_solvability(
       f'{i + 1}. {g}' for i, g in enumerate(filtered)
     )
     _log.debug(
-      'Length-%d guesses (%d):\n  %s',
-      answer_length,
-      len(filtered),
-      filtered_lines,
+      f'Length-{answer_length} guesses ({len(filtered)}):\n  {filtered_lines}'
     )
   else:
-    _log.debug('Length-%d guesses (0): (none)', answer_length)
+    _log.debug(f'Length-{answer_length} guesses (0): (none)')
 
   try:
     rank = filtered.index(answer_upper) + 1  # 1-indexed
   except ValueError:
-    _log.debug('Answer %r absent from filtered guesses', answer_upper)
+    _log.debug(f'Answer {answer_upper!r} absent from filtered guesses')
     return False
 
-  _log.debug(
-    'Answer %r at rank %d (max %d)', answer_upper, rank, max_answer_rank
-  )
+  _log.debug(f'Answer {answer_upper!r} at rank {rank} (max {max_answer_rank})')
   return rank <= max_answer_rank
