@@ -44,7 +44,7 @@ def generate_clue(
   messages: Sequence[Message] = brainstorm_messages(word, difficulty)
   messages = client.chat(messages).messages
   _log.info(f'[{word}] brainstorm done ({time.perf_counter() - t_word:.1f}s)')
-  _log.debug(f'[{word}] brainstorm reply:\n{messages[-1]["content"]}')
+  _log.debug(f'[{word}] brainstorm reply:\n{messages[-1]["content"]}\n')
 
   # TODO: Phase 3 — replace with multi-turn brainstorm sequence.
   extract_turn: Message = {
@@ -57,7 +57,7 @@ def generate_clue(
   t_extract = time.perf_counter()
   _log.info(f'[{word}] extract start')
   extract_reply = client.chat([*messages, extract_turn]).reply
-  _log.debug(f'[{word}] extract reply:\n{extract_reply}')
+  _log.debug(f'[{word}] extract reply:\n{extract_reply}\n')
   candidates = _extract_json_list(extract_reply)
   _log.info(
     f'[{word}] extract done ({time.perf_counter() - t_extract:.1f}s):'
@@ -70,7 +70,7 @@ def generate_clue(
     _log.info(f'[{word}] validate candidate {i + 1}/{len(candidates)}')
     try:
       val_result = client.chat(validation_messages(clue, answer_length))
-      _log.debug(f'[{word}] validation reply:\n{val_result.reply}')
+      _log.debug(f'[{word}] validation reply:\n{val_result.reply}\n')
       parsed = _extract_json_object(val_result.reply)
     except GenerationError as e:
       # Validation is a quality signal, not a correctness gate — a malformed

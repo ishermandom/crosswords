@@ -7,6 +7,8 @@ import json
 import logging
 from collections.abc import Sequence
 
+from openai.types.shared_params import ResponseFormatJSONSchema
+
 from clue_gen.client import ChatClient, Message
 from clue_gen.parsing import strip_markdown_fences
 from clue_gen.prompt import Difficulty
@@ -66,8 +68,7 @@ _GUESSES_PROMPT = (
   '{"guesses": ["WORD", "WORD", ...]}'
 )
 
-# JSON schema passed to Ollama's format parameter for the guesses call.
-# Constrains the model to emit valid {"guesses": [...]} without inline commentary.
+# JSON schema for the guesses structured output call.
 _GUESSES_FORMAT: dict[str, object] = {
   'type': 'object',
   'properties': {
@@ -137,7 +138,7 @@ def validate_solvability(
     clue_text, answer_length, difficulty
   )
   scratchpad_result = client.chat(scratchpad_messages)
-  _log.debug(f'Scratchpad:\n{scratchpad_result.reply}')
+  _log.debug(f'Scratchpad:\n{scratchpad_result.reply}\n')
 
   # Guesses: extends the conversation so the model sees its own scratchpad
   # reasoning before committing to a ranked list.
@@ -145,7 +146,17 @@ def validate_solvability(
     *scratchpad_result.messages,
     {'role': 'user', 'content': _GUESSES_PROMPT},
   ]
-  guesses_result = client.chat(guesses_messages, format=_GUESSES_FORMAT)
+  guesses_result = client.chat(
+    guesses_messages,
+    response_format=ResponseFormatJSONSchema(
+      type='json_schema',
+      json_schema={
+        'name': 'guesses',
+        'strict': True,
+        'schema': _GUESSES_FORMAT,
+      },
+    ),
+  )
 
   # TODO: retry loop on JSON parse failure; see validation.md — "Error handling
   #   and logging".

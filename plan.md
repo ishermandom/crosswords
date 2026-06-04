@@ -54,7 +54,7 @@ ollama pull gemma4:31b && ollama pull gemma4:26b
 
 ---
 
-## Phase 1 — Environment and project skeleton
+## Phase 1 — Environment and project skeleton ✓
 
 **Goal**: Runnable project structure with dependencies pinned; Ollama reachable
 from Python.
@@ -72,7 +72,7 @@ from Python.
 - [x] Smoke-test Ollama connection: send a minimal prompt, confirm a response
       comes back
 
-## Phase 2 — Core clue generation
+## Phase 2 — Core clue generation ✓
 
 **Goal**: End-to-end working tool that reads a word list and emits JSON clues.
 
@@ -138,7 +138,13 @@ output.
       calls have different strengths requirements (creative generation vs.
       structured scoring). One candidate split to try: qwen for brainstorm,
       gemma4 for validation.
-- [ ] Design validation prompt: two-call architecture documented in
+  - Note: qwen3.5 family does not support structured output (response_format /
+    schema enforcement) when thinking is disabled (`think=false` /
+    `reasoning_effort='none'`). The grammar mask is never applied because Ollama
+    defers it until the end-of-thinking token, which never arrives. gemma4
+    enforces schemas correctly. Tracked upstream:
+    https://github.com/ollama/ollama/issues/14645
+- [x] Design validation prompt: two-call architecture documented in
       `validation.md`; implement prompts to match that spec
 - [ ] Design brainstorm turns: encode difficulty (NYT day description), style
       mix (definitions, wordplay, fill-in-the-blank, light cryptic, trivia)
@@ -148,12 +154,12 @@ output.
       engineering
 - [ ] Any additional flags or output options that surface during Phase 2 testing
 
-## Tooling
+## Tooling ✓
 
 - [x] Add a `mypy` Stop hook to global `settings.json` so type errors surface at
       the end of every turn; ruff and prettier moved to Stop as well
 
-## Testing
+## Testing ✓
 
 **Goal**: Confidence that parsing, prompt construction, and pipeline logic are
 correct independently of the model.

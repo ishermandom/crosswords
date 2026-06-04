@@ -8,6 +8,8 @@ import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from openai.types.shared_params import ResponseFormatJSONSchema
+
 from clue_gen.client import ChatClient, Message
 from clue_gen.parsing import strip_markdown_fences
 from clue_gen.prompt import Difficulty
@@ -230,8 +232,35 @@ _SCRATCHPAD_PROMPT = (
 _STRUCTURED_OUTPUT_PROMPT = (
   'Based on your reasoning above, provide your final evaluation. '
   'Respond with JSON only, no explanation:\n'
-  '{"conventions": {...}, "scales": {...}}'
+  '{\n'
+  '  "conventions": {\n'
+  '    "has_tense_agreement": false,\n'
+  '    "has_wordplay_indicator": false,\n'
+  '    "is_abbreviation_signaled": false,\n'
+  '    "uses_fill_format": false\n'
+  '  },\n'
+  '  "scales": {\n'
+  '    "angle_craft": {"score": 3, "rationale": "..."},\n'
+  '    "misdirection": {"score": 3, "rationale": "..."},\n'
+  '    "wordplay_complexity": {"score": 3, "rationale": "..."},\n'
+  '    "reference_accessibility": {"score": 3, "rationale": "..."},\n'
+  '    "surface_coherence": {"score": 3, "rationale": "..."},\n'
+  '    "fairness_of_deception": {"score": 3, "rationale": "..."}\n'
+  '  }\n'
+  '}'
 )
+
+# Ollama's grammar converter does not reliably support $ref/$defs — it can
+# silently fall back to unconstrained output. Inline the scale schema instead.
+_SCALE_SCHEMA: dict[str, object] = {
+  'type': 'object',
+  'properties': {
+    'score': {'type': 'integer', 'minimum': 1, 'maximum': 5},
+    'rationale': {'type': 'string'},
+  },
+  'required': ['score', 'rationale'],
+  'additionalProperties': False,
+}
 
 # JSON schema for structured quality output.
 _QUALITY_FORMAT: dict[str, object] = {
@@ -251,16 +280,17 @@ _QUALITY_FORMAT: dict[str, object] = {
         'is_abbreviation_signaled',
         'uses_fill_format',
       ],
+      'additionalProperties': False,
     },
     'scales': {
       'type': 'object',
       'properties': {
-        'angle_craft': {'$ref': '#/$defs/scale'},
-        'misdirection': {'$ref': '#/$defs/scale'},
-        'wordplay_complexity': {'$ref': '#/$defs/scale'},
-        'reference_accessibility': {'$ref': '#/$defs/scale'},
-        'surface_coherence': {'$ref': '#/$defs/scale'},
-        'fairness_of_deception': {'$ref': '#/$defs/scale'},
+        'angle_craft': _SCALE_SCHEMA,
+        'misdirection': _SCALE_SCHEMA,
+        'wordplay_complexity': _SCALE_SCHEMA,
+        'reference_accessibility': _SCALE_SCHEMA,
+        'surface_coherence': _SCALE_SCHEMA,
+        'fairness_of_deception': _SCALE_SCHEMA,
       },
       'required': [
         'angle_craft',
@@ -270,19 +300,11 @@ _QUALITY_FORMAT: dict[str, object] = {
         'surface_coherence',
         'fairness_of_deception',
       ],
+      'additionalProperties': False,
     },
   },
   'required': ['conventions', 'scales'],
-  '$defs': {
-    'scale': {
-      'type': 'object',
-      'properties': {
-        'score': {'type': 'integer', 'minimum': 1, 'maximum': 5},
-        'rationale': {'type': 'string'},
-      },
-      'required': ['score', 'rationale'],
-    },
-  },
+  'additionalProperties': False,
 }
 
 
@@ -441,7 +463,7 @@ def validate_quality(
     },
   ]
   scratchpad_result = client.chat(scratchpad_messages)
-  _log.debug(f'Scratchpad:\n{scratchpad_result.reply}')
+  _log.debug(f'Scratchpad:\n{scratchpad_result.reply}\n')
 
   output_messages: Sequence[Message] = [
     *scratchpad_result.messages,
@@ -449,9 +471,20 @@ def validate_quality(
   ]
   # TODO: retry loop on JSON parse failure; see validation.md — "Error
   #   handling and logging".
-  output_result = client.chat(output_messages, format=_QUALITY_FORMAT)
+  output_result = client.chat(
+    output_messages,
+    response_format=ResponseFormatJSONSchema(
+      type='json_schema',
+      json_schema={
+        'name': 'quality',
+        'strict': True,
+        'schema': _QUALITY_FORMAT,
+      },
+    ),
+  )
 
   data = _parse_reply(output_result.reply)
+  _log.debug(f'Structured output:\n{json.dumps(data, indent=2)}\n')
   conventions = _parse_conventions(data)
   if not conventions.is_compliant:
     return QualityResult(

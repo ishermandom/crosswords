@@ -3,6 +3,7 @@
 
 """Ollama client wrapper using the OpenAI-compatible HTTP API."""
 
+import dataclasses
 import enum
 import json
 import logging
@@ -13,6 +14,7 @@ from typing import Literal, Protocol
 
 import openai
 from openai.types.chat import ChatCompletionMessageParam
+from openai.types.shared_params import ResponseFormatJSONSchema
 
 _log = logging.getLogger(__name__)
 
@@ -41,7 +43,7 @@ class ChatClient(Protocol):
   def chat(
     self,
     messages: Sequence[Message],
-    format: object | None = None,
+    response_format: ResponseFormatJSONSchema | None = None,
   ) -> ChatResult: ...
 
 
@@ -84,10 +86,11 @@ class ModelOptions:
   # --- Thinking mode ---
   # 'none' disables chain-of-thought on Qwen3/Qwen3.5 reasoning variants via
   # the OpenAI-compatible endpoint. Other values: 'low', 'medium', 'high'.
+  # WARNING: 'none' breaks response_format schema enforcement on qwen3.5 —
+  # Ollama defers the grammar mask until the end-of-thinking token, which never
+  # arrives. gemma4 is unaffected. https://github.com/ollama/ollama/issues/14645
   # TODO: allow callers to configure this per model or per call.
-  reasoning_effort: Literal[
-    'none', 'minimal', 'low', 'medium', 'high', 'xhigh'
-  ] = 'none'
+  reasoning_effort: Literal['none', 'low', 'medium', 'high'] = 'none'
 
 
 # Tuned for fast iteration: small context window, low temperature, model kept
@@ -124,6 +127,7 @@ class Model(enum.StrEnum):
   QWEN35_4B = 'qwen3.5:4b'
   QWEN35_9B = 'qwen3.5:9b'
   QWEN35_27B = 'qwen3.5:27b'
+  QWEN35_35B_A3B = 'qwen3.5:35b-a3b'
 
 
 class OllamaClient:
@@ -139,6 +143,10 @@ class OllamaClient:
     # api_key must be non-empty to satisfy the openai client's validation,
     # but Ollama ignores its value.
     self._model = model
+    # qwen3.5 breaks schema enforcement with reasoning_effort='none' — upgrade
+    # to 'low' so the grammar mask fires. https://github.com/ollama/ollama/issues/14645
+    if options.reasoning_effort == 'none' and str(model).startswith('qwen3.5:'):
+      options = dataclasses.replace(options, reasoning_effort='low')
     self._options = options
     self._client = openai.OpenAI(base_url=base_url, api_key='ollama')
     # Tracks messages logged so far this session to avoid duplicating context
@@ -148,16 +156,14 @@ class OllamaClient:
   def chat(
     self,
     messages: Sequence[Message],
-    format: object | None = None,
+    response_format: ResponseFormatJSONSchema | None = None,
   ) -> ChatResult:
     """Send a conversation and return the reply and updated messages list.
 
     The returned messages list is the input extended with the assistant's
     reply, ready for the next turn if continuing the conversation.
 
-    format, when provided, is passed to Ollama as extra_body['format'] — either
-    the string 'json' for basic JSON mode, or a JSON schema dict for structured
-    output.
+    response_format constrains the reply to the given JSON schema.
 
     Raises openai.APIConnectionError if the Ollama server is unreachable.
     Raises GenerationError if the model returns no text content.
@@ -172,11 +178,11 @@ class OllamaClient:
     new_messages = list(messages)[prefix_len:]
     messages_json = json.dumps(new_messages, indent=2, default=str)
     if prefix_len == 0:
-      _log.debug(f'Prompt ({len(messages)} message(s)):\n{messages_json}')
+      _log.debug(f'Prompt ({len(messages)} message(s)):\n{messages_json}\n')
     else:
       _log.debug(
         f'Prompt (+{len(new_messages)} new message(s),'
-        f' {len(messages)} total):\n{messages_json}'
+        f' {len(messages)} total):\n{messages_json}\n'
       )
     self._logged_messages = list(messages)
     t0 = time.perf_counter()
@@ -190,8 +196,6 @@ class OllamaClient:
         'num_gpu': self._options.num_gpu,
       },
     }
-    if format is not None:
-      extra_body['format'] = format
     response = self._client.chat.completions.create(
       model=self._model,
       messages=messages,
@@ -199,6 +203,7 @@ class OllamaClient:
       frequency_penalty=self._options.frequency_penalty,
       reasoning_effort=self._options.reasoning_effort,
       max_tokens=self._options.max_tokens,
+      response_format=response_format or openai.omit,
       extra_body=extra_body,
     )
     elapsed = time.perf_counter() - t0

@@ -81,8 +81,8 @@ def _open_words_file(path: str) -> io.TextIOWrapper:
     _log_fatal(f'file not found: {path}')
 
 
-def _configure_logging(verbose: bool, logs_dir: Path | None) -> None:
-  """Set up console and file logging.
+def _configure_logging(verbose: bool, logs_dir: Path | None) -> Path | None:
+  """Set up console and file logging; return the log file path if created.
 
   The console handler respects --verbose (DEBUG when set, INFO otherwise).
   When logs_dir is provided, a file handler always captures DEBUG with
@@ -97,6 +97,7 @@ def _configure_logging(verbose: bool, logs_dir: Path | None) -> None:
   console.setFormatter(logging.Formatter('%(levelname)s %(name)s: %(message)s'))
   root.addHandler(console)
 
+  log_path: Path | None = None
   if logs_dir is not None:
     logs_dir.mkdir(exist_ok=True)
     log_path = logs_dir / f'{datetime.now().strftime("%Y-%m-%dT%H-%M-%S")}.log'
@@ -106,10 +107,11 @@ def _configure_logging(verbose: bool, logs_dir: Path | None) -> None:
       logging.Formatter('%(asctime)s %(levelname)s %(name)s: %(message)s')
     )
     root.addHandler(file_handler)
-    _logger.info(f'log: {log_path}')
 
   for name in ('httpx', 'httpcore', 'openai._base_client'):
     logging.getLogger(name).setLevel(logging.WARNING)
+
+  return log_path
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -339,9 +341,11 @@ def main(
 ) -> None:
   """Entry point: dispatch to the appropriate subcommand handler."""
   args = _parse_args(argv)
-  _configure_logging(args.verbose, logs_dir)
+  log_path = _configure_logging(args.verbose, logs_dir)
   _logger.info(f'command: {" ".join(sys.argv)}')
   _logger.info(f'model: {args.model}')
+  if log_path:
+    _logger.info(f'log: {log_path}')
   effective_client = client or OllamaClient(args.model)
   if args.subcommand in ('run', 'generate'):
     if args.word:
