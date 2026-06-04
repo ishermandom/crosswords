@@ -194,6 +194,42 @@ def test_validation_tolerates_fenced_json_object() -> None:
   assert result.clues == ['Fenced clue']
 
 
+# --- Multi-turn brainstorm (xfail — not yet implemented) ---
+
+
+def _brainstorm_replies(
+  extract: str = '{"clues": ["A clue for alpha"]}',
+) -> list[str]:
+  """Scripted replies for the 7-turn brainstorm stage."""
+  # 6 free-text turns + 1 structured extract turn.
+  return ['brainstorm reply'] * 6 + [extract]
+
+
+@pytest.mark.xfail(strict=True)
+def test_brainstorm_stage_makes_seven_calls() -> None:
+  with FakeChatClient(_brainstorm_replies()) as fake:
+    generate_clue('ALPHA', Difficulty.MON, fake)
+  assert len(fake.calls) == 7
+
+
+@pytest.mark.xfail(strict=True)
+def test_brainstorm_turns_accumulate_message_history() -> None:
+  with FakeChatClient(_brainstorm_replies()) as fake:
+    generate_clue('ALPHA', Difficulty.MON, fake)
+  for i in range(1, len(fake.calls)):
+    # Each turn appends the prior assistant reply and the next user turn (+2).
+    assert len(fake.calls[i]) == len(fake.calls[i - 1]) + 2
+
+
+@pytest.mark.xfail(strict=True)
+def test_extract_turn_uses_response_format() -> None:
+  with FakeChatClient(_brainstorm_replies()) as fake:
+    generate_clue('ALPHA', Difficulty.MON, fake)
+  # calls[6] is Turn 7 (the extract); structured output must be requested so
+  # the model reliably produces the {"clues": [...]} schema.
+  assert fake.response_formats[6] is not None
+
+
 # Possible future coverage, if it ever seems worth the effort:
 # - GenerationError propagation from brainstorm/extract calls. Would need
 #   exception injection — a raises_on: dict[int, Exception] parameter on

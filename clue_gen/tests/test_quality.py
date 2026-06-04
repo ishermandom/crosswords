@@ -15,6 +15,70 @@ from clue_gen.tests.fake_client import FakeChatClient
 _SCRATCHPAD = 'Evaluating the clue...'
 
 
+# TODO: once the quality schema update lands, merge _make_updated_reply into
+# _make_reply (drop _make_reply and rename _make_updated_reply).
+def _make_updated_reply(
+  *,
+  has_tense_agreement: bool = True,
+  has_wordplay_indicator: bool = True,
+  is_abbreviation_signaled: bool = True,
+  uses_fill_format: bool = True,
+  has_genuine_alternatives: bool = True,
+  angle_craft: int = 4,
+  misdirection: int = 2,
+  elasticity: int = 2,
+  reference_accessibility: int = 5,
+  surface_coherence: int = 4,
+  fairness_of_deception: int = 5,
+  cross_check_payoff: int = 3,
+) -> str:
+  """Scripted JSON reply for the updated quality schema.
+
+  Uses the new field names: `elasticity` (renamed from `wordplay_complexity`),
+  `cross_check_payoff` (new scale), and `has_genuine_alternatives` (new
+  convention). The `cross_check_payoff` default of 3 is provisional; update
+  once day-range profiles for this scale are finalised.
+  """
+  return json.dumps(
+    {
+      'conventions': {
+        'has_tense_agreement': has_tense_agreement,
+        'has_wordplay_indicator': has_wordplay_indicator,
+        'is_abbreviation_signaled': is_abbreviation_signaled,
+        'uses_fill_format': uses_fill_format,
+        'has_genuine_alternatives': has_genuine_alternatives,
+      },
+      'scales': {
+        'angle_craft': {'score': angle_craft, 'rationale': 'Deliberate angle.'},
+        'misdirection': {
+          'score': misdirection,
+          'rationale': 'Low misdirection.',
+        },
+        'elasticity': {
+          'score': elasticity,
+          'rationale': 'Supports reinterpretation.',
+        },
+        'reference_accessibility': {
+          'score': reference_accessibility,
+          'rationale': 'Universal reference.',
+        },
+        'surface_coherence': {
+          'score': surface_coherence,
+          'rationale': 'Natural phrasing.',
+        },
+        'fairness_of_deception': {
+          'score': fairness_of_deception,
+          'rationale': 'Clean resolution.',
+        },
+        'cross_check_payoff': {
+          'score': cross_check_payoff,
+          'rationale': 'Moderate ambiguity for crosses.',
+        },
+      },
+    }
+  )
+
+
 def _make_reply(
   *,
   has_tense_agreement: bool = True,
@@ -235,4 +299,59 @@ def test_parse_error_when_required_field_is_missing() -> None:
   del data['conventions']
   with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
     with pytest.raises(QualityParseError, match='conventions'):
+      _validate_quality(fake)
+
+
+# --- has_genuine_alternatives convention (xfail — not yet implemented) ---
+
+
+@pytest.mark.xfail(strict=True)
+def test_quality_fails_when_has_genuine_alternatives_is_false() -> None:
+  with FakeChatClient(
+    [_SCRATCHPAD, _make_updated_reply(has_genuine_alternatives=False)]
+  ) as fake:
+    result = _validate_quality(fake)
+  assert not result.is_acceptable
+
+
+@pytest.mark.xfail(strict=True)
+def test_parse_error_when_has_genuine_alternatives_is_not_boolean() -> None:
+  data = json.loads(_make_updated_reply())
+  data['conventions']['has_genuine_alternatives'] = 'yes'
+  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+    with pytest.raises(QualityParseError, match='has_genuine_alternatives'):
+      _validate_quality(fake)
+
+
+# --- elasticity (renamed from wordplay_complexity; xfail — not yet implemented) ---
+
+
+@pytest.mark.xfail(strict=True)
+def test_parse_error_when_old_wordplay_complexity_field_used() -> None:
+  # After the rename, the old field name is unknown and should raise a parse
+  # error rather than silently succeeding with missing data.
+  data = json.loads(_make_reply())  # still uses wordplay_complexity
+  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+    with pytest.raises(QualityParseError, match='elasticity'):
+      _validate_quality(fake)
+
+
+# --- cross_check_payoff scale (xfail — not yet implemented) ---
+
+
+@pytest.mark.xfail(strict=True)
+def test_parse_error_when_cross_check_payoff_is_missing() -> None:
+  data = json.loads(_make_updated_reply())
+  del data['scales']['cross_check_payoff']
+  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+    with pytest.raises(QualityParseError, match='cross_check_payoff'):
+      _validate_quality(fake)
+
+
+@pytest.mark.xfail(strict=True)
+def test_parse_error_when_cross_check_payoff_score_is_out_of_range() -> None:
+  data = json.loads(_make_updated_reply())
+  data['scales']['cross_check_payoff']['score'] = 6
+  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+    with pytest.raises(QualityParseError, match='cross_check_payoff'):
       _validate_quality(fake)

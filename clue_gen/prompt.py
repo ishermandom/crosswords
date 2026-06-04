@@ -33,6 +33,27 @@ _DIFFICULTY_DESCRIPTIONS: dict[Difficulty, str] = {
 }
 
 
+def brainstorm_system_prompt(difficulty: Difficulty) -> str:
+  """Build the system prompt for the multi-turn brainstorm conversation.
+
+  Encodes the NYT constructor persona, the goal of elegant ambiguity resolving
+  through crosses, and per-day difficulty constraints (Mon: direct definitions
+  acceptable; Sat: misdirection required, no direct definitions).
+  """
+  raise NotImplementedError
+
+
+def brainstorm_turns(word: str, difficulty: Difficulty) -> Sequence[str]:
+  """Return the 7 user-turn strings for the multi-turn brainstorm sequence.
+
+  Each string is one user message in the accumulated conversation. The caller
+  is responsible for appending assistant replies and building the messages list.
+  Turn order: answer analysis → mechanism brainstorm → mechanism filter →
+  clue drafting → solver simulation → refinement/diversity → extract.
+  """
+  raise NotImplementedError
+
+
 def brainstorm_messages(word: str, difficulty: Difficulty) -> Sequence[Message]:
   """Build the opening brainstorm turn for a given answer word.
 

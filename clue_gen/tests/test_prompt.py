@@ -3,7 +3,15 @@
 
 """Tests for clue_gen.prompt."""
 
-from clue_gen.prompt import Difficulty, brainstorm_messages, validation_messages
+import pytest
+
+from clue_gen.prompt import (
+  Difficulty,
+  brainstorm_messages,
+  brainstorm_system_prompt,
+  brainstorm_turns,
+  validation_messages,
+)
 
 # --- brainstorm_messages ---
 # TODO: Phase 3 redesigns the brainstorm prompt and may introduce a
@@ -74,3 +82,71 @@ def test_validation_blank_placeholder_matches_answer_length() -> None:
   content = msgs[0]['content']
   assert isinstance(content, str)
   assert '_______' in content
+
+
+# --- brainstorm_system_prompt ---
+
+
+@pytest.mark.xfail(strict=True)
+def test_brainstorm_system_prompt_differs_by_difficulty() -> None:
+  assert brainstorm_system_prompt(Difficulty.MON) != brainstorm_system_prompt(
+    Difficulty.SAT
+  )
+
+
+@pytest.mark.xfail(strict=True)
+def test_brainstorm_system_prompt_sat_requires_misdirection() -> None:
+  prompt = brainstorm_system_prompt(Difficulty.SAT)
+  assert 'misdirection' in prompt.lower()
+
+
+@pytest.mark.xfail(strict=True)
+def test_brainstorm_system_prompt_mon_allows_direct_definitions() -> None:
+  prompt = brainstorm_system_prompt(Difficulty.MON)
+  assert 'direct' in prompt.lower()
+
+
+# --- brainstorm_turns ---
+
+
+@pytest.mark.xfail(strict=True)
+def test_brainstorm_turns_returns_seven_turns() -> None:
+  # Seven turns = one per cognitive phase (analysis → mechanisms → filter →
+  # drafting → solver sim → refinement → extract).
+  turns = brainstorm_turns('CRANE', Difficulty.MON)
+  assert len(turns) == 7
+
+
+@pytest.mark.xfail(strict=True)
+def test_brainstorm_turns_first_turn_contains_answer_word() -> None:
+  turns = brainstorm_turns('CRANE', Difficulty.MON)
+  # Turn 1 is answer analysis — the word must be present for the model to
+  # analyze its morphology and near-miss alternatives.
+  assert 'CRANE' in turns[0]
+
+
+@pytest.mark.xfail(strict=True)
+def test_brainstorm_turns_mechanism_turn_forbids_clue_writing() -> None:
+  turns = brainstorm_turns('CRANE', Difficulty.MON)
+  # Turn 2 generates mechanisms only. The explicit prohibition is the primary
+  # mitigation for the LLM failure mode of converging on one mechanism and
+  # producing variations of it instead of exploring broadly.
+  content = turns[1].lower()
+  assert 'do not' in content or "don't" in content
+
+
+@pytest.mark.xfail(strict=True)
+def test_brainstorm_turns_solver_sim_turn_asks_for_real_alternatives() -> None:
+  turns = brainstorm_turns('CRANE', Difficulty.MON)
+  # Turn 5 is the Bullshit Rating check: it must ask the model to verify that
+  # the alternative answers a solver would consider are real words or phrases.
+  content = turns[4].lower()
+  assert 'real' in content or 'actual' in content
+
+
+@pytest.mark.xfail(strict=True)
+def test_brainstorm_turns_extract_turn_references_clues_schema() -> None:
+  turns = brainstorm_turns('CRANE', Difficulty.MON)
+  # Turn 7 is the structured-output extract; it must name the {"clues": [...]}
+  # schema so the model produces output the generator can parse.
+  assert '"clues"' in turns[6]
