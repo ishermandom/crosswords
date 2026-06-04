@@ -16,6 +16,11 @@ from clue_gen.prompt import Difficulty
 _log = logging.getLogger(__name__)
 
 
+def _section(label: str) -> str:
+  """Format a dashes section header for log output (60 chars total)."""
+  return f'\n--- {label} {"-" * max(0, 55 - len(label))}'
+
+
 class SolvabilityParseError(Exception):
   """Raised when the guesses reply cannot be parsed as valid JSON."""
 
@@ -138,7 +143,7 @@ def validate_solvability(
     clue_text, answer_length, difficulty
   )
   scratchpad_result = client.chat(scratchpad_messages)
-  _log.debug(f'Scratchpad:\n{scratchpad_result.reply}\n')
+  _log.debug(f'{_section("scratchpad")}\n\n{scratchpad_result.reply}\n')
 
   # Guesses: extends the conversation so the model sees its own scratchpad
   # reasoning before committing to a ranked list.

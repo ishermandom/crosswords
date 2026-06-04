@@ -5,7 +5,6 @@
 
 import dataclasses
 import enum
-import json
 import logging
 import time
 from collections.abc import Sequence
@@ -17,6 +16,36 @@ from openai.types.chat import ChatCompletionMessageParam
 from openai.types.shared_params import ResponseFormatJSONSchema
 
 _log = logging.getLogger(__name__)
+
+
+def _section(label: str) -> str:
+  """Format a dashes section header for log output (60 chars total)."""
+  return f'\n--- {label} {"-" * max(0, 55 - len(label))}'
+
+
+def _format_messages(
+  messages: Sequence[Message], *, stub_assistant: bool
+) -> str:
+  """Format messages as labeled plain-text blocks for log output.
+
+  When stub_assistant is True, assistant messages are replaced with a
+  character-count stub — used for incremental prompt logs where the
+  assistant's reply was already written to the log by the caller.
+  """
+  blocks = []
+  for message in messages:
+    if not isinstance(message, dict):
+      # Unexpected message type — log unformatted so no output is lost.
+      blocks.append(str(message))
+      continue
+    role = str(message.get('role', 'unknown'))
+    content = str(message.get('content') or '')
+    if stub_assistant and role == 'assistant':
+      blocks.append(f'[{role}]\n<{len(content)} chars — see above>')
+    else:
+      blocks.append(f'[{role}]\n{content}')
+  return '\n\n'.join(blocks)
+
 
 # Ollama exposes an OpenAI-compatible endpoint at this address.
 _OLLAMA_BASE_URL = 'http://localhost:11434/v1'
@@ -176,14 +205,13 @@ class OllamaClient:
       else:
         break
     new_messages = list(messages)[prefix_len:]
-    messages_json = json.dumps(new_messages, indent=2, default=str)
+    stub = prefix_len > 0
+    formatted = _format_messages(new_messages, stub_assistant=stub)
     if prefix_len == 0:
-      _log.debug(f'Prompt ({len(messages)} message(s)):\n{messages_json}\n')
+      label = f'prompt ({len(messages)} messages)'
     else:
-      _log.debug(
-        f'Prompt (+{len(new_messages)} new message(s),'
-        f' {len(messages)} total):\n{messages_json}\n'
-      )
+      label = f'prompt (+{len(new_messages)} new, {len(messages)} total)'
+    _log.debug(f'{_section(label)}\n\n{formatted}\n')
     self._logged_messages = list(messages)
     t0 = time.perf_counter()
     extra_body: dict[str, object] = {
