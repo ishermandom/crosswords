@@ -246,6 +246,12 @@ def _generate_one(
   return result
 
 
+def _print_result(data: object, output: TextIO) -> None:
+  """Print data as JSON; pretty-printed when output is a TTY."""
+  indent = 2 if getattr(output, 'isatty', lambda: False)() else None
+  print(json.dumps(data, indent=indent), file=output)
+
+
 def _run_words(
   words: Sequence[str],
   difficulty: Difficulty,
@@ -256,12 +262,9 @@ def _run_words(
   for word in words:
     result = _generate_one(word, difficulty, client)
     if result is None:
-      print(
-        json.dumps({'error': f'failed to generate clue for {word!r}'}),
-        file=output,
-      )
+      _print_result({'error': f'failed to generate clue for {word!r}'}, output)
     else:
-      print(json.dumps(dataclasses.asdict(result)), file=output)
+      _print_result(dataclasses.asdict(result), output)
 
 
 def _load_clue_entries_input(clues: str, stdin: TextIO) -> list[ClueEntry]:
@@ -292,17 +295,17 @@ def _check_solvability(
     _logger.error(
       'could not connect to Ollama. Is the server running? Try: ollama serve'
     )
-    print(json.dumps({'error': 'could not connect to Ollama'}), file=output)
+    _print_result({'error': 'could not connect to Ollama'}, output)
     return
   except GenerationError as error:
     _logger.error(f'solvability check failed: {error}')
-    print(json.dumps({'error': str(error)}), file=output)
+    _print_result({'error': str(error)}, output)
     return
   except SolvabilityParseError as error:
     _logger.error(f'solvability parse error: {error}')
-    print(json.dumps({'error': str(error)}), file=output)
+    _print_result({'error': str(error)}, output)
     return
-  print(json.dumps({'is_solvable': result}), file=output)
+  _print_result({'is_solvable': result}, output)
 
 
 def _run_quality(
@@ -319,17 +322,17 @@ def _run_quality(
     _logger.error(
       'could not connect to Ollama. Is the server running? Try: ollama serve'
     )
-    print(json.dumps({'error': 'could not connect to Ollama'}), file=output)
+    _print_result({'error': 'could not connect to Ollama'}, output)
     return
   except GenerationError as error:
     _logger.error(f'quality evaluation failed: {error}')
-    print(json.dumps({'error': str(error)}), file=output)
+    _print_result({'error': str(error)}, output)
     return
   except QualityParseError as error:
     _logger.error(f'quality parse error: {error}')
-    print(json.dumps({'error': str(error)}), file=output)
+    _print_result({'error': str(error)}, output)
     return
-  print(json.dumps(dataclasses.asdict(result)), file=output)
+  _print_result(dataclasses.asdict(result), output)
 
 
 def main(
