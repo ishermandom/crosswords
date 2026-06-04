@@ -17,6 +17,11 @@ from clue_gen.prompt import Difficulty
 _log = logging.getLogger(__name__)
 
 
+def _section(label: str) -> str:
+  """Format a dashes section header for log output (60 chars total)."""
+  return f'\n--- {label} {"-" * max(0, 55 - len(label))}'
+
+
 class QualityParseError(Exception):
   """Raised when the quality reply cannot be parsed as valid JSON."""
 
@@ -33,6 +38,8 @@ class ConventionResult:
   is_abbreviation_signaled: bool
   # Fill-in-the-blank blanks rendered as ___.
   uses_fill_format: bool
+  # Clue's supposed alternatives are real words/phrases a solver would consider.
+  has_genuine_alternatives: bool
 
   @property
   def is_compliant(self) -> bool:
@@ -42,6 +49,7 @@ class ConventionResult:
       and self.has_wordplay_indicator
       and self.is_abbreviation_signaled
       and self.uses_fill_format
+      and self.has_genuine_alternatives
     )
 
 
@@ -63,8 +71,9 @@ class RubricScores:
   angle_craft: ScoreWithRationale
   # Strength of misdirection; 1 = points directly at answer, 5 = strong feint.
   misdirection: ScoreWithRationale
-  # Linguistic mechanism complexity; 1 = none, 5 = multi-layer wordplay.
-  wordplay_complexity: ScoreWithRationale
+  # Supports multiple coherent interpretations; 1 = single obvious meaning,
+  # 5 = rich reinterpretation space.
+  elasticity: ScoreWithRationale
   # Breadth of knowledge required; 1 = niche/specialist, 5 = universal.
   reference_accessibility: ScoreWithRationale
   # Polish of the surface reading; 1 = tortured syntax, 5 = natural phrase.
@@ -72,6 +81,9 @@ class RubricScores:
   # Cleanliness of the connection once seen; 1 = ambiguous trick, 5 = elegant.
   # Defaults to 5 for clues with no misdirection.
   fairness_of_deception: ScoreWithRationale
+  # Degree of genuine ambiguity left for crosses to resolve; 1 = clue already
+  # determines the answer, 5 = several plausible fills collapse to one.
+  cross_check_payoff: ScoreWithRationale
 
 
 @dataclass(frozen=True)
@@ -108,7 +120,7 @@ class DayProfile:
   """
 
   misdirection: ScoreRange
-  wordplay_complexity: ScoreRange
+  elasticity: ScoreRange
   reference_accessibility: ScoreRange
 
 
@@ -123,32 +135,32 @@ QUALITY_FLOOR: int = 4
 DAY_PROFILES: dict[Difficulty, DayProfile] = {
   Difficulty.MON: DayProfile(
     misdirection=ScoreRange(1, 2),
-    wordplay_complexity=ScoreRange(1, 3),
+    elasticity=ScoreRange(1, 3),
     reference_accessibility=ScoreRange(4, 5),
   ),
   Difficulty.TUE: DayProfile(
     misdirection=ScoreRange(1, 3),
-    wordplay_complexity=ScoreRange(1, 3),
+    elasticity=ScoreRange(1, 3),
     reference_accessibility=ScoreRange(4, 5),
   ),
   Difficulty.WED: DayProfile(
     misdirection=ScoreRange(3, 3),
-    wordplay_complexity=ScoreRange(3, 3),
+    elasticity=ScoreRange(3, 3),
     reference_accessibility=ScoreRange(3, 5),
   ),
   Difficulty.THU: DayProfile(
     misdirection=ScoreRange(4, 5),
-    wordplay_complexity=ScoreRange(4, 5),
+    elasticity=ScoreRange(4, 5),
     reference_accessibility=ScoreRange(3, 3),
   ),
   Difficulty.FRI: DayProfile(
     misdirection=ScoreRange(4, 5),
-    wordplay_complexity=ScoreRange(4, 5),
+    elasticity=ScoreRange(4, 5),
     reference_accessibility=ScoreRange(3, 3),
   ),
   Difficulty.SAT: DayProfile(
     misdirection=ScoreRange(4, 5),
-    wordplay_complexity=ScoreRange(4, 5),
+    elasticity=ScoreRange(4, 5),
     reference_accessibility=ScoreRange(1, 3),
   ),
 }
@@ -207,21 +219,26 @@ Conventions (binary pass/fail):
 - Abbreviation signaling: any abbreviation in the answer must be signaled in
   the clue (e.g. "Abbr.", "briefly", or an abbreviated word in the clue)
 - Fill-in-the-blank format: blanks must be rendered as ___
+- Genuine alternatives: the alternative answers a solver would consider must be
+  real words or phrases, not invented by the clue
 
 Rubric scales (score each 1–5 with a brief rationale):
 - angle_craft: deliberateness of the chosen angle (1 = obvious default/trivial
   antonym, 5 = unexpected and considered)
 - misdirection: strength of surface misdirection (1 = points directly at the
   answer, 5 = strong deliberate feint)
-- wordplay_complexity: linguistic mechanism complexity (1 = none, 5 = multi-
-  layer wordplay)
+- elasticity: supports multiple coherent interpretations (1 = single obvious
+  meaning, 5 = rich reinterpretation space)
 - reference_accessibility: breadth of required knowledge (1 = niche/specialist,
   5 = universal)
 - surface_coherence: polish of the surface reading (1 = tortured syntax,
   5 = natural, idiomatic phrase)
 - fairness_of_deception: cleanliness of the connection once seen (1 = ambiguity
   that doesn't resolve, 5 = elegant and unambiguous). Score 5 by default for
-  clues with no misdirection.\
+  clues with no misdirection.
+- cross_check_payoff: degree of genuine ambiguity left for crosses to resolve
+  (1 = clue already determines the answer, 5 = several plausible fills collapse
+  to one)\
 """
 
 _SCRATCHPAD_PROMPT = (
@@ -237,15 +254,17 @@ _STRUCTURED_OUTPUT_PROMPT = (
   '    "has_tense_agreement": false,\n'
   '    "has_wordplay_indicator": false,\n'
   '    "is_abbreviation_signaled": false,\n'
-  '    "uses_fill_format": false\n'
+  '    "uses_fill_format": false,\n'
+  '    "has_genuine_alternatives": false\n'
   '  },\n'
   '  "scales": {\n'
   '    "angle_craft": {"score": 3, "rationale": "..."},\n'
   '    "misdirection": {"score": 3, "rationale": "..."},\n'
-  '    "wordplay_complexity": {"score": 3, "rationale": "..."},\n'
+  '    "elasticity": {"score": 3, "rationale": "..."},\n'
   '    "reference_accessibility": {"score": 3, "rationale": "..."},\n'
   '    "surface_coherence": {"score": 3, "rationale": "..."},\n'
-  '    "fairness_of_deception": {"score": 3, "rationale": "..."}\n'
+  '    "fairness_of_deception": {"score": 3, "rationale": "..."},\n'
+  '    "cross_check_payoff": {"score": 3, "rationale": "..."}\n'
   '  }\n'
   '}'
 )
@@ -273,12 +292,14 @@ _QUALITY_FORMAT: dict[str, object] = {
         'has_wordplay_indicator': {'type': 'boolean'},
         'is_abbreviation_signaled': {'type': 'boolean'},
         'uses_fill_format': {'type': 'boolean'},
+        'has_genuine_alternatives': {'type': 'boolean'},
       },
       'required': [
         'has_tense_agreement',
         'has_wordplay_indicator',
         'is_abbreviation_signaled',
         'uses_fill_format',
+        'has_genuine_alternatives',
       ],
       'additionalProperties': False,
     },
@@ -287,18 +308,20 @@ _QUALITY_FORMAT: dict[str, object] = {
       'properties': {
         'angle_craft': _SCALE_SCHEMA,
         'misdirection': _SCALE_SCHEMA,
-        'wordplay_complexity': _SCALE_SCHEMA,
+        'elasticity': _SCALE_SCHEMA,
         'reference_accessibility': _SCALE_SCHEMA,
         'surface_coherence': _SCALE_SCHEMA,
         'fairness_of_deception': _SCALE_SCHEMA,
+        'cross_check_payoff': _SCALE_SCHEMA,
       },
       'required': [
         'angle_craft',
         'misdirection',
-        'wordplay_complexity',
+        'elasticity',
         'reference_accessibility',
         'surface_coherence',
         'fairness_of_deception',
+        'cross_check_payoff',
       ],
       'additionalProperties': False,
     },
@@ -370,6 +393,7 @@ def _parse_conventions(data: dict[str, object]) -> ConventionResult:
     has_wordplay_indicator=_require_bool(conv, 'has_wordplay_indicator'),
     is_abbreviation_signaled=_require_bool(conv, 'is_abbreviation_signaled'),
     uses_fill_format=_require_bool(conv, 'uses_fill_format'),
+    has_genuine_alternatives=_require_bool(conv, 'has_genuine_alternatives'),
   )
 
 
@@ -391,10 +415,11 @@ def _parse_rubric(data: dict[str, object]) -> RubricScores:
   return RubricScores(
     angle_craft=_parse_scale(scales, 'angle_craft'),
     misdirection=_parse_scale(scales, 'misdirection'),
-    wordplay_complexity=_parse_scale(scales, 'wordplay_complexity'),
+    elasticity=_parse_scale(scales, 'elasticity'),
     reference_accessibility=_parse_scale(scales, 'reference_accessibility'),
     surface_coherence=_parse_scale(scales, 'surface_coherence'),
     fairness_of_deception=_parse_scale(scales, 'fairness_of_deception'),
+    cross_check_payoff=_parse_scale(scales, 'cross_check_payoff'),
   )
 
 
@@ -428,7 +453,7 @@ def _scores_match_day(rubric: RubricScores, difficulty: Difficulty) -> bool:
   profile = DAY_PROFILES[difficulty]
   return (
     _in_range(rubric.misdirection.score, profile.misdirection)
-    and _in_range(rubric.wordplay_complexity.score, profile.wordplay_complexity)
+    and _in_range(rubric.elasticity.score, profile.elasticity)
     and _in_range(
       rubric.reference_accessibility.score, profile.reference_accessibility
     )
@@ -463,7 +488,7 @@ def validate_quality(
     },
   ]
   scratchpad_result = client.chat(scratchpad_messages)
-  _log.debug(f'Scratchpad:\n{scratchpad_result.reply}\n')
+  _log.debug(f'{_section("scratchpad")}\n\n{scratchpad_result.reply}\n')
 
   output_messages: Sequence[Message] = [
     *scratchpad_result.messages,
@@ -484,7 +509,9 @@ def validate_quality(
   )
 
   data = _parse_reply(output_result.reply)
-  _log.debug(f'Structured output:\n{json.dumps(data, indent=2)}\n')
+  _log.debug(
+    f'{_section("structured output")}\n\n{json.dumps(data, indent=2)}\n'
+  )
   conventions = _parse_conventions(data)
   if not conventions.is_compliant:
     return QualityResult(

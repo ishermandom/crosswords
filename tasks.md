@@ -78,25 +78,7 @@ Seven model calls, each targeting one cognitive mode:
 ### Tasks
 
 - [x] **Resolve: Turn 5 results → extract flow**
-  - Decision: extract all candidates (option a) — validation sorts.
-  - Rationale: fresh-context validation is more reliable than in-context Turn 5
-    judgment (context dilution by turn 7); no candidates are lost to Turn 5
-    noise; the extract schema stays a flat `{"clues": [...]}` list. The Bullshit
-    Rating failure mode (fake alternatives) is covered once
-    `conventions.has_genuine_alternatives` lands in the quality schema — that
-    field makes quality validation the authoritative backstop for this check.
-  - Dependency: the quality schema update task must land before or alongside the
-    brainstorm implementation; without `has_genuine_alternatives`, fake-
-    ambiguity clues can pass validation undetected.
-
-- [x] **Write tests for brainstorm prompt sequence** (TDD — tests before
-      implementation)
-  - `test_prompt.py`: stubs for `brainstorm_system_prompt` and
-    `brainstorm_turns` added to `prompt.py`; 8 xfail tests cover turn content,
-    difficulty calibration, and extract schema
-  - `test_generator.py`: 3 xfail tests cover 7-call count, message accumulation,
-    and `response_format` on the extract call; `FakeChatClient.response_formats`
-    field added to support the last assertion
+- [x] **Write tests for brainstorm prompt sequence**
 
 - [ ] **Implement multi-turn brainstorm in `prompt.py`**
   - Interface decision: `brainstorm_turns(word, difficulty) -> Sequence[str]`
@@ -117,27 +99,9 @@ Seven model calls, each targeting one cognitive mode:
     calls in tests
   - Remove the `TODO: Phase 3` comment when done
 
-- [ ] **Update quality schema** (separate from brainstorm work; can be done in
-      parallel)
-  - In `clue_gen/quality.py`:
-    - Rename `scales.wordplay_complexity` → `scales.elasticity`; update
-      description to "supports multiple coherent interpretations, not just
-      complexity" (background rewards LS/EL, not raw complexity)
-    - Add `scales.cross_check_payoff` (1–5 + rationale): does the clue leave
-      meaningful ambiguity for crosses to resolve, or does it already determine
-      the answer?
-    - Add `conventions.has_genuine_alternatives` (boolean): the Bullshit Rating
-      — "the clue suggests plausible alternative answers that are real words or
-      phrases a solver would actually consider"
-  - Update `_QUALITY_FORMAT` JSON schema, `_STRUCTURED_OUTPUT_PROMPT` example,
-    `_SYSTEM_PROMPT_TEMPLATE` descriptions, and parsing code
-  - Update `clue_gen/tests/test_quality.py` to cover new fields
-
-- [x] **Write tests for updated quality schema** (TDD — before schema changes)
-  - `_make_updated_reply` helper added to `test_quality.py` with new field names
-  - 5 xfail tests cover: `has_genuine_alternatives=False` fails; parse errors
-    for non-boolean `has_genuine_alternatives`, old `wordplay_complexity` field
-    name, missing `cross_check_payoff`, and out-of-range `cross_check_payoff`
+- [x] **Update quality schema** — `elasticity` (renamed), `has_genuine_alternatives`,
+      `cross_check_payoff`; day-range profiles for `cross_check_payoff` deferred
+- [x] **Write tests for updated quality schema**
 
 - [ ] **Decide `cross_check_payoff` day-range profiles and add calibration
       tests**
@@ -149,7 +113,7 @@ Seven model calls, each targeting one cognitive mode:
   - Once decided: add ranges to `DAY_PROFILES` in `quality.py`, add
     corresponding xfail tests to `test_quality.py` (before updating
     `_scores_match_day`), and update the `cross_check_payoff` default in
-    `_make_updated_reply`
+    `_make_reply`
 
 - [ ] **Support multiple candidates output** (`--candidates N`)
   - Several other tasks assume a pool of candidates flows through Stage 2 to

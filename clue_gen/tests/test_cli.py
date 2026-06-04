@@ -133,14 +133,16 @@ def _make_quality_replies() -> list[str]:
           'has_wordplay_indicator': True,
           'is_abbreviation_signaled': True,
           'uses_fill_format': False,
+          'has_genuine_alternatives': True,
         },
         'scales': {
           'angle_craft': {'score': 3, 'rationale': 'ok'},
           'misdirection': {'score': 4, 'rationale': 'ok'},
-          'wordplay_complexity': {'score': 3, 'rationale': 'ok'},
+          'elasticity': {'score': 3, 'rationale': 'ok'},
           'reference_accessibility': {'score': 4, 'rationale': 'ok'},
           'surface_coherence': {'score': 4, 'rationale': 'ok'},
           'fairness_of_deception': {'score': 3, 'rationale': 'ok'},
+          'cross_check_payoff': {'score': 3, 'rationale': 'ok'},
         },
       }
     ),
