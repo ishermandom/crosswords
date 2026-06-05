@@ -14,7 +14,12 @@ DAY="${DAY:-Wednesday — mid-week difficulty. Deliberate misdirection or wordpl
 
 echo "=== $(date) MODEL=$MODEL CLUE=$CLUE ANSWER=$ANSWER ==="
 
-SYSTEM_PROMPT="You are an experienced NYT crossword editor evaluating a submitted clue.
+SYSTEM_PROMPT="You are an experienced NYT crossword editor reviewing clues for
+publication. Your role is quality gatekeeping: catch errors before they reach
+solvers. The submission comes from a well-intentioned but inexperienced
+constructor — expect mistakes, and apply each standard rigorously. A clue passes
+only when it genuinely satisfies the requirement, not when a justification can
+be found for it.
 
 Target day: ${DAY}"
 
@@ -25,13 +30,18 @@ then give a verdict: PASS or FAIL.
 
 1. Tense and number agreement: the clue's grammatical form must agree with the
    answer (plural answer → plural clue surface; verb answer → matching tense).
-2. Wordplay indicator: a ? suffix is required when no reasonable surface
-   reading leads to the answer — the solver can only arrive via wordplay, a pun,
-   or a non-obvious secondary meaning. It is forbidden when any reasonable
-   surface reading already gives the answer, even if extra meanings exist. A ?
-   that only hints at secondary meanings not needed to reach the answer is
-   unearned. What counts as "reasonable" scales with difficulty: harder days
-   expect more lateral readings, so ? appears less often on Friday/Saturday.
+2. Wordplay indicator: reason from the clue to the answer, not the other way
+   around. Imagine a solver seeing this clue for the first time, with no
+   knowledge of the answer. Ask: does the clue's surface reading hand them the
+   answer directly, or must they make a lateral leap to get there? A ? suffix is
+   required when no reasonable surface reading leads to the answer — the solver
+   can only arrive via wordplay, a pun, or a non-obvious secondary meaning. It
+   is forbidden when any reasonable surface reading already gives the answer.
+   The answer having multiple meanings is irrelevant; the only question is
+   whether the clue's surface requires lateral thinking to reach it. A ? that
+   only hints at secondary meanings not needed to reach the answer is unearned.
+   What counts as "reasonable" scales with difficulty: harder days expect more
+   lateral readings, so ? appears less often on Friday/Saturday.
 3. Abbreviation signaling: any abbreviation in the answer must be signaled in
    the clue (e.g. "Abbr.", "briefly", or an abbreviated word in the clue). If
    the answer is not an abbreviation, this passes automatically.
@@ -72,6 +82,14 @@ response=$(curl -s http://localhost:11434/v1/chat/completions \
 
 elapsed=$(( $(date +%s) - start ))
 
-# jq -r: raw string output — strips outer JSON quotes from the reply text
-echo "$response" | jq -r '.choices[0].message.content'
+reasoning=$(echo "$response" | jq -r '.choices[0].message.reasoning // empty')
+content=$(echo "$response" | jq -r '.choices[0].message.content')
+
+if [ -n "$reasoning" ]; then
+  echo "--- reasoning ---"
+  echo "$reasoning"
+  echo ""
+fi
+echo "--- response ---"
+echo "$content"
 echo "(${elapsed}s)"

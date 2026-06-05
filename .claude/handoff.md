@@ -2,6 +2,120 @@
 
 ---
 
+## 2026-06-05 — Convention 2 prompt engineering
+
+**Accomplished**
+
+- Restructured `quality.py` system/user prompt split: all convention and rubric
+  definitions moved into their respective user turns (recency bias; system
+  prompt now just persona + day)
+- Enabled thinking mode by default in `OllamaClient` (`reasoning_effort=None`);
+  added reasoning trace logging with estimated token count
+- Added `GEMMA4_26B_MLX`, `QWEN36_27B_MLX`, `QWEN36_35B_MLX` to `Model` enum
+- Created `test_conventions.sh`: isolated multi-convention curl probe with
+  header logging, timing, and reasoning output
+- Overhauled `test_wordplay.sh`: updated to gatekeeper persona, C1 reframe,
+  solver simulation framing, few-shot examples, safe `jq --arg` construction,
+  reasoning output, and timing
+- Iterated through a sequence of prompt improvements for the `?` convention,
+  validated in curl scripts: gatekeeper persona → C1 reframe ("answer having
+  multiple meanings is irrelevant") → solver simulation framing ("reason from
+  clue to answer, not the other way around") → few-shot examples
+- Updated `tasks.md` with 6 new tasks; updated `prompting.md` with 4 new
+  generalizable findings from this session
+
+**Decisions**
+
+- **Gatekeeper persona over evaluator persona**: default "evaluator" framing
+  produces approval-seeking behavior; "quality gatekeeping: catch errors" +
+  "well-intentioned but inexperienced constructor" removes the implicit prior
+  that the submission is probably correct
+- **C1 reframe over C2**: "the answer having multiple meanings is irrelevant"
+  replaced "even if extra meanings exist" — reframes as a positive test rather
+  than arguing against a misreading
+- **Few-shot examples as primary intervention**: pattern-matching against
+  concrete examples (CLOCK, NEEDLE, TEAMSTER, SNAIL) proved more reliable than
+  refining abstract rules; the model directly compared the test case against the
+  examples rather than reasoning from first principles
+- **Convention 2 deserves its own turn**: validated structurally — it dominates
+  attention when co-evaluated with conventions 1/3/4/5, which are largely
+  vacuous passes. Isolated evaluation produces tighter, faster reasoning. Not
+  yet implemented in `quality.py`.
+- **Prompt improvements not yet ported**: all changes validated in curl scripts
+  only; `quality.py` still has old prompts. Deliberate — iterate in scripts
+  first, port when stable.
+
+**Files modified**
+
+- `clue_gen/client.py` — thinking mode default, reasoning trace logging, new
+  Model enum entries
+- `clue_gen/quality.py` — system/user prompt restructure (definitions in user
+  turns); committed as `6cfe241` (earlier in prior session context)
+- `test_conventions.sh` — new file; gatekeeper persona, C1 reframe, solver
+  simulation framing, reasoning output, timing
+- `test_wordplay.sh` — full overhaul (see above)
+- `tasks.md` — 6 new tasks, existing few-shot task updated to `[~]`
+- `prompting.md` — 4 new sections in Validation design + Multi-turn design
+
+**Next steps**
+
+1. Overhaul iteration scripts (first in task list): auto-timestamped log files,
+   prompt written to log, consider Python rewrite for ergonomics
+2. Validate `?` evaluation in both directions with updated `test_wordplay.sh`
+   (TEAMSTER and SNAIL as earned-? test cases)
+3. Port prompt improvements to `quality.py` once validation is complete
+4. Separate convention 2 into its own evaluation turn in `validate_quality`
+
+**Avoid**
+
+- **Adding a procedural stop condition alone**: "once you find a direct reading,
+  stop" — we considered this (option B) but the model's problem is deeper than
+  missing a stop rule; it keeps deliberating past correct conclusions. Persona
+  - examples addressed the root cause more reliably.
+- **Refining the rule text in isolation**: multiple rounds of rewording "even if
+  extra meanings exist" / "not when a justification can be found" produced
+  diminishing returns. Examples proved more effective.
+- **Using "Focuses on the road?" → FORD as a test case**: requires brand
+  knowledge (Ford makes a model called the Focus) that the model doesn't
+  reliably have. The model falsely FAILs it. Tracked in escape-hatch task.
+
+**Reflection**
+
+_Token efficiency_:
+
+- **Large log file reads**: `2026-06-04T22-35-12.log` (~38KB, ~9,500 tokens) was
+  read in full. The relevant content was the convention 2 reasoning and final
+  verdict — perhaps 20% of the file. The cause: no grep/offset was used to
+  locate the relevant section first. Mechanism: use
+  `grep -n "conventions scratchpad\|wordplay" <log>` to find line numbers, then
+  read a targeted range.
+- **Research subagent**: returned ~42K tokens of content for the few-shot
+  examples task, most of which was source citation detail not needed for the
+  prompt. Cause: the prompt didn't cap response length or specify "just the
+  examples and reasoning, no sourcing detail." Mechanism: add "under 300 words,
+  examples and reasoning only" to research prompts when the output feeds
+  directly into prompt text.
+
+_Attention efficiency_:
+
+- **Extended whack-a-mole on convention 2 wording**: four rounds of prompt
+  iteration (original → "even if extra meanings exist" removal → gatekeeper →
+  solver simulation → examples) happened sequentially with a model run between
+  each. The final intervention (examples) was available as an option early (it
+  was `[?]` in tasks.md). We could have reached it faster by testing examples
+  alongside the other changes rather than treating them as a later phase.
+  Diagnosis: existing task list wasn't consulted as a source of candidate
+  interventions mid-iteration. Mechanism: at the start of a prompt-iteration
+  session, review pending tasks for related interventions and plan the test
+  sequence rather than improvising.
+- **FORD test case**: running "Focuses on the road?" → FORD consumed a full
+  model run (~108s) and produced a false FAIL for a non-obvious reason. The risk
+  was flagged before the test ("requires brand knowledge") but the test was run
+  anyway. Mechanism: when a test case has a known risk factor, resolve it
+  (confirm model knows the pivot) or pick a safer case before running.
+
+---
+
 ## 2026-05-22 — Solvability implementation
 
 **Accomplished**

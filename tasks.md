@@ -105,13 +105,88 @@ Seven model calls, each targeting one cognitive mode:
       `cross_check_payoff` deferred
 - [x] **Write tests for updated quality schema**
 
-- [?] **Add few-shot examples to the quality conventions scratchpad prompt**
-  - One earned `?`, one unearned `?`, each with the correct reasoning and
-    verdict spelled out — gives the model a template to pattern-match against
-    rather than reasoning from first principles every time
-  - Candidate clues to use as examples TBD; pick ones that are clear-cut and
-    illustrate the failure mode (surface reading obviously leads to answer → `?`
-    unearned)
+- [ ] **Overhaul iteration scripts for automatic logging**
+  - Currently requires manual log-file wrangling (`tee -a`, switching files when
+    prompts change). Pain points: no record of which prompt produced which
+    output; log files accumulate mixed results.
+  - Changes:
+    - Auto-generate a timestamped log file per run (no manual `tee`)
+    - Write the full prompt to the log before the model response, so output is
+      self-contained and attributable
+    - Consider rewriting in Python if that's more ergonomic (e.g. easier
+      multiline strings, structured output). Keep scripts outside `clue_gen/` —
+      this is prototyping code, not production.
+
+- [ ] **Update `quality.py` prompts from curl script iterations**
+  - Several prompt improvements were developed and validated in
+    `test_wordplay.sh` and `test_conventions.sh` but not yet ported to
+    `quality.py`:
+    - Gatekeeper persona: "quality gatekeeping: catch errors before they reach
+      solvers… well-intentioned but inexperienced constructor — expect mistakes…
+      passes only when it genuinely satisfies the requirement, not when a
+      justification can be found for it"
+    - C1 reframe: "The answer having multiple meanings is irrelevant; the only
+      question is whether the clue's surface requires lateral thinking to reach
+      it" (replaces "even if extra meanings exist")
+    - Solver simulation framing: "Reason from the clue to the answer, not the
+      other way around. Imagine a solver seeing this clue for the first time…"
+    - Few-shot examples for the `?` convention (see task below)
+
+- [ ] **Separate convention 2 (`?` indicator) into its own evaluation turn**
+  - Convention 2 requires genuine interpretive judgment; conventions 1, 3, 4, 5
+    are largely mechanical (often vacuous passes). When evaluated together,
+    convention 2 dominates the model's attention and produces worse reasoning
+    than when evaluated in isolation.
+  - Validated in curl script runs: isolated convention 2 produces tighter,
+    faster, more reliable reasoning.
+  - Implementation: split `_CONVENTIONS_SCRATCHPAD_PROMPT` into two turns — one
+    for convention 2 alone, one for the remaining four. Update
+    `validate_quality` to drive the extra turn and combine results.
+
+- [~] **Add few-shot examples to the quality conventions scratchpad prompt**
+  {#few-shot-examples}
+  - Examples developed and validated in `test_wordplay.sh`:
+    - Earned: "Semi professional?" → TEAMSTER; "Perpetual homebody?" → SNAIL
+    - Unearned: "Keeps time?" → CLOCK; "Points the way?" → COMPASS; "Draws
+      blood?" → NEEDLE
+  - Not yet ported to `quality.py`
+  - Open question: model evaluates `?` by trying to find the wordplay path — if
+    it can't identify the mechanism (e.g. brand knowledge required), it
+    incorrectly concludes the `?` is unearned. May need escape-hatch handling
+    (see escape-hatch task below).
+
+- [ ] **Add escape hatch for unidentifiable wordplay** {#escape-hatch}
+  - When the model cannot identify the wordplay mechanism, it currently
+    concludes the `?` is unearned — a false FAIL. It should instead flag
+    uncertainty explicitly.
+  - Prompt change: "If you cannot identify any wordplay path, note that
+    explicitly rather than concluding the `?` is unearned."
+  - Open question: what does this mean for structured output? Options: add a
+    confidence field, use a nullable boolean, or treat explicit uncertainty as a
+    PASS with a flag. Decide before porting to `quality.py`.
+  - Observed failure case: "Focuses on the road?" → FORD. The model tried
+    river-crossing, car-and-road association, acrostic, and hidden-word
+    constructions, but never arrived at the key pivot: Ford makes a model called
+    the Focus. Correctly concluded FAIL for the wrong reason (knowledge gap, not
+    bad clue). Use this as a test case when implementing the escape hatch.
+  - Depends on #few-shot-examples
+
+- [ ] **Validate `?` evaluation in both directions**
+  - All curl testing so far has used a clue that should FAIL (unearned `?`).
+    Need to verify the model also correctly:
+    - PASSes clues with a legitimate earned `?` (e.g. "Semi professional?" →
+      TEAMSTER, "Perpetual homebody?" → SNAIL)
+    - FAILs clues that are missing a `?` when one is required
+  - Use `test_wordplay.sh` with `CLUE` and `ANSWER` overrides.
+  - Rationale: examples in the prompt are calibrated around unearned-`?`
+    detection; the earned direction may be over-triggered toward FAIL.
+
+- [ ] **Add few-shot examples for all other evaluations**
+  - The `?` convention now has examples; the rubric dimensions and other
+    conventions (tense, abbreviation, fill-blank, genuine alternatives) do not.
+  - Approach: identify the failure modes for each evaluation that are most
+    likely given LLM-generated clues, then construct targeted examples as done
+    for `?`.
 
 - [ ] **Decide `cross_check_payoff` day-range profiles and add calibration
       tests**

@@ -50,7 +50,12 @@ constraint that matters immediately before the turn that must comply with it.
 **Few-shot examples.** 2–5 input/output examples formatted as real conversation
 turns improve format compliance and style alignment. Counterintuitively,
 few-shot _hurts_ reasoning models (o3, o1) by over-constraining their internal
-reasoning path — but for gemma4, it's a useful tool.
+reasoning path — but for gemma4, it's a useful tool. For nuanced judgment calls
+where the model would otherwise rationalize around abstract rules, examples are
+especially effective: the model pattern-matches against them rather than
+reasoning from first principles. When you observe a model repeatedly finding
+clever justifications to avoid a verdict, adding a counterexample that matches
+the failure pattern is often more reliable than refining the rule text.
 
 ---
 
@@ -91,6 +96,13 @@ answer in the same turn. Separation of concerns improves output quality.
 original instructions. Mitigate by restating key constraints at each turn rather
 than relying on the system prompt to persist.
 
+**Attention imbalance across co-evaluated criteria.** When a single turn
+evaluates multiple criteria of unequal difficulty, the harder criterion tends to
+dominate — the model loops back to it repeatedly while giving superficial
+treatment to the others. If one criterion requires genuine interpretive judgment
+and the rest are largely mechanical, separate them into distinct turns. This is
+an application of the one-cognitive-mode-per-turn principle.
+
 **Context budget.** Token history grows with each turn. Models attend poorly to
 the middle of long contexts (lost-in-the-middle effect) — put the most important
 instructions at the very beginning and very end. Set `num_ctx` explicitly in API
@@ -121,6 +133,38 @@ considerations (state dilution, one cognitive mode per turn) apply here too.
 **Sycophancy.** Models suppress their own judgment when the prompt implies a
 preferred answer. Evaluation criteria in the validation prompt should be neutral
 — no hints about what the "correct" verdict is.
+
+**Approval bias in evaluation personas.** Evaluation roles default to a
+collaborative, approval-seeking disposition: the model searches for
+justifications that make the submission acceptable rather than applying criteria
+rigorously. For gatekeeping tasks, counteract this explicitly: (a) frame the
+mandate as catching errors, not finding merit; (b) characterize the submitter as
+inexperienced, so FAIL verdicts feel expected rather than surprising; (c) state
+the evaluative standard in terms of necessity rather than possibility — "passes
+only when it genuinely satisfies the requirement, not when a justification can
+be found for it." Without (c), the model asks "is there a justification for
+this?" rather than "does this meet the criterion?" — and it will find a
+justification for almost anything.
+
+**Answer contamination.** When evaluation input includes both the thing being
+evaluated and the expected result, the model tends to reason from the known
+result back to the input rather than evaluating the input on its own terms. The
+fix is explicit perspective framing that names the contamination directly:
+"Reason from the clue to the answer, not the other way around. Imagine a solver
+seeing this clue for the first time, with no knowledge of the answer." The
+general principle applies any time the evaluation input includes information the
+evaluating perspective should not have: explicitly instruct the model to adopt
+the perspective of someone without that information.
+
+**Evaluation quality is bounded by domain knowledge.** When evaluation requires
+identifying a specific mechanism — finding the wordplay path in a clue,
+recognizing a cultural reference, validating a formula — the model can only
+evaluate correctly if it knows the relevant facts. If it cannot find the path,
+it may conclude the path doesn't exist rather than flagging uncertainty. Two
+mitigations: add an explicit escape hatch ("if you cannot identify the
+mechanism, note that explicitly rather than concluding it doesn't exist"); and
+note that for LLM-generated content specifically, the evaluator and generator
+share the same knowledge base, which limits this gap in practice.
 
 ---
 
