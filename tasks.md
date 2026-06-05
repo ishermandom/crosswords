@@ -125,6 +125,35 @@ Seven model calls, each targeting one cognitive mode:
     `_scores_match_day`), and update the `cross_check_payoff` default in
     `_make_reply`
 
+- [ ] **Evaluate thinking mode performance and decide on a long-term strategy**
+  - Thinking mode is currently enabled by default (`reasoning_effort=None` in
+    `ModelOptions`). It reliably produces correct convention reasoning but adds
+    significant latency (~107s/turn for gemma4:26b vs ~25s without thinking).
+  - Questions to resolve: is the latency acceptable for batch use? Should
+    thinking be selective (conventions turn only, not rubric or structured
+    output)? Would few-shot examples recover correct convention reasoning
+    without thinking mode, making the performance cost avoidable?
+  - Depends on `[?]` **Add few-shot examples** — try few-shot first; if it works
+    reliably without thinking, thinking mode may not be needed.
+
+- [ ] **Fix convention transcription failure in structured output turn**
+  - The structured output JSON returns `false` for conventions that the
+    scratchpad correctly reasoned as PASS (observed: `is_abbreviation_signaled`
+    and `uses_fill_format` both `false` despite explicit PASS verdicts).
+  - Hypothesis: the JSON template in `_STRUCTURED_OUTPUT_PROMPT` shows all
+    convention fields as `false`, acting as a gravitational prior that overrides
+    weak PASS signals during transcription.
+  - Options to consider:
+    - (a) Make the transcription step explicit: add instruction "Encode each
+      PASS verdict as `true` and each FAIL as `false`" to the structured output
+      prompt
+    - (b) Change the template placeholder values to avoid a `false` prior (e.g.
+      use `true`, or omit placeholder values entirely)
+    - (c) Combination of (a) and (b)
+  - Note: rubric scores transcribe correctly because the scratchpad's explicit
+    numbers (e.g. 3, 5) clearly override the placeholder `3` — the boolean case
+    is weaker because `false` in the template is a valid final value.
+
 - [ ] **Support multiple candidates output** (`--candidates N`)
   - Several other tasks assume a pool of candidates flows through Stage 2 to
     produce multiple outputs; this task makes that end-to-end

@@ -113,13 +113,13 @@ class ModelOptions:
   num_gpu: int = -1
 
   # --- Thinking mode ---
-  # 'none' disables chain-of-thought on Qwen3/Qwen3.5 reasoning variants via
-  # the OpenAI-compatible endpoint. Other values: 'low', 'medium', 'high'.
+  # None omits the field, letting each model use its own default (thinking
+  # enabled for gemma4 and Qwen3/Qwen3.5). 'none' disables chain-of-thought;
+  # other values: 'low', 'medium', 'high'.
   # WARNING: 'none' breaks response_format schema enforcement on qwen3.5 —
   # Ollama defers the grammar mask until the end-of-thinking token, which never
   # arrives. gemma4 is unaffected. https://github.com/ollama/ollama/issues/14645
-  # TODO: allow callers to configure this per model or per call.
-  reasoning_effort: Literal['none', 'low', 'medium', 'high'] = 'none'
+  reasoning_effort: Literal['none', 'low', 'medium', 'high'] | None = None
 
 
 # Tuned for fast iteration: small context window, low temperature, model kept
@@ -135,7 +135,7 @@ DEBUG_OPTIONS = ModelOptions(
   top_p=0.9,
   repeat_penalty=1.1,
   num_gpu=-1,
-  reasoning_effort='none',
+  reasoning_effort=None,
 )
 
 
@@ -144,6 +144,7 @@ class Model(enum.StrEnum):
 
   GEMMA4_31B = 'gemma4:31b'  # dense model; slightly larger
   GEMMA4_26B = 'gemma4:26b'  # mixture-of-experts; more likely to fit in RAM
+  GEMMA4_26B_MLX = 'gemma4:26b-mlx'  # MLX-optimised build for Apple Silicon
   QWEN25_0B5 = 'qwen2.5:0.5b'  # 398 MB; fast smoke-test model
   QWEN3_0B6 = 'qwen3:0.6b'  # fast smoke-test; low quality
   QWEN3_1B7 = 'qwen3:1.7b'  # fast smoke-test; low quality
@@ -157,6 +158,8 @@ class Model(enum.StrEnum):
   QWEN35_9B = 'qwen3.5:9b'
   QWEN35_27B = 'qwen3.5:27b'
   QWEN35_35B_A3B = 'qwen3.5:35b-a3b'
+  QWEN36_27B_MLX = 'qwen3.6:27b-mlx'  # MLX-optimised build for Apple Silicon
+  QWEN36_35B_MLX = 'qwen3.6:35b-mlx'  # MLX-optimised build for Apple Silicon
 
 
 class OllamaClient:
@@ -229,7 +232,7 @@ class OllamaClient:
       messages=messages,
       temperature=self._options.temperature,
       frequency_penalty=self._options.frequency_penalty,
-      reasoning_effort=self._options.reasoning_effort,
+      reasoning_effort=self._options.reasoning_effort or openai.omit,
       max_tokens=self._options.max_tokens,
       response_format=response_format or openai.omit,
       extra_body=extra_body,
@@ -258,6 +261,19 @@ class OllamaClient:
       _log.debug(f'chat {elapsed:.1f}s (no usage data)')
 
     content = response.choices[0].message.content if response.choices else None
+    reasoning = (
+      (response.choices[0].message.model_extra or {}).get('reasoning')
+      if response.choices
+      else None
+    )
+    if reasoning:
+      # Token count is estimated (~4 chars/token); Ollama does not report
+      # reasoning and content tokens separately in the usage object.
+      estimated_tokens = len(reasoning) // 4
+      _log.debug(
+        f'{_section(f"reasoning (~{estimated_tokens} tokens)")}'
+        f'\n\n{reasoning}\n'
+      )
     if not content:
       last = repr(messages[-1]) if messages else '<no messages>'
       raise GenerationError(
