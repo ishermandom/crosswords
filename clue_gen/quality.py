@@ -206,28 +206,35 @@ _DAY_DESCRIPTIONS: dict[Difficulty, str] = {
 _SYSTEM_PROMPT_TEMPLATE = """\
 You are an experienced NYT crossword editor evaluating a submitted clue.
 
-Target day: {day_description}
+Target day: {day_description}\
+"""
 
-Evaluate whether this clue meets these criteria. Do not express a preference
-for a particular verdict.
+_CONVENTIONS_SCRATCHPAD_PROMPT = """\
+Evaluate each convention below. For each, reason step by step, then state PASS
+or FAIL on its own line.
 
-Conventions (binary pass/fail):
-- Tense and number agreement: the clue's grammatical form must agree with the
-  answer (plural answer → plural clue surface; verb answer → matching tense)
-- Wordplay indicator: a ? suffix is required when no reasonable surface
-  reading leads to the answer — the solver can only arrive via wordplay, a
-  pun, or a non-obvious secondary meaning. It is forbidden when any reasonable
-  surface reading already gives the answer, even if extra meanings exist. A ?
-  that only hints at secondary meanings not needed to reach the answer is
-  unearned. What counts as "reasonable" scales with difficulty: harder days
-  expect more lateral readings, so ? appears less often on Friday/Saturday.
-- Abbreviation signaling: any abbreviation in the answer must be signaled in
-  the clue (e.g. "Abbr.", "briefly", or an abbreviated word in the clue)
-- Fill-in-the-blank format: blanks must be rendered as ___
-- Genuine alternatives: the alternative answers a solver would consider must be
-  real words or phrases, not invented by the clue
+1. Tense and number agreement: the clue's grammatical form must agree with the
+   answer (plural answer → plural clue surface; verb answer → matching tense).
+2. Wordplay indicator: a ? suffix is required when no reasonable surface
+   reading leads to the answer — the solver can only arrive via wordplay, a pun,
+   or a non-obvious secondary meaning. It is forbidden when any reasonable
+   surface reading already gives the answer, even if extra meanings exist. A ?
+   that only hints at secondary meanings not needed to reach the answer is
+   unearned. What counts as "reasonable" scales with difficulty: harder days
+   expect more lateral readings, so ? appears less often on Friday/Saturday.
+3. Abbreviation signaling: any abbreviation in the answer must be signaled in
+   the clue (e.g. "Abbr.", "briefly", or an abbreviated word in the clue). If
+   the answer is not an abbreviation, this passes automatically.
+4. Fill-in-the-blank format: blanks must be rendered as ___. If the clue has
+   no fill blank, this passes automatically.
+5. Genuine alternatives: the alternative answers a solver would consider must
+   be real words or phrases, not invented by the clue.\
+"""
 
-Rubric scales (score each 1–5 with a brief rationale):
+_RUBRIC_SCRATCHPAD_PROMPT = """\
+Score each rubric dimension below. For each, reason step by step with evidence
+from the clue text, then give a score from 1–5.
+
 - angle_craft: deliberateness of the chosen angle (1 = obvious default/trivial
   antonym, 5 = unexpected and considered)
 - misdirection: strength of surface misdirection (1 = points directly at the
@@ -245,16 +252,6 @@ Rubric scales (score each 1–5 with a brief rationale):
   (1 = clue already determines the answer, 5 = several plausible fills collapse
   to one)\
 """
-
-_CONVENTIONS_SCRATCHPAD_PROMPT = (
-  'Evaluate each binary convention for this clue. For each, reason through '
-  'it and state PASS or FAIL before moving to the next.'
-)
-
-_RUBRIC_SCRATCHPAD_PROMPT = (
-  'Now score each rubric dimension. For each, reason through it with '
-  'evidence from the clue text and give a score from 1–5.'
-)
 
 _STRUCTURED_OUTPUT_PROMPT = (
   'Based on your reasoning above, provide your final evaluation. '
@@ -482,10 +479,11 @@ def validate_quality(
   """Run the answer-aware quality call and return a structured result.
 
   Uses a three-turn structure: a focused conventions scratchpad, a rubric
-  scratchpad, then a constrained structured-output turn. Splitting the
-  reasoning keeps each scratchpad focused on one task. A convention failure
-  returns immediately with rubric=None; if conventions pass, scores the clue
-  on rubric scales and checks them against the expected day profile.
+  scratchpad, then a constrained structured-output turn. Convention definitions
+  are carried in the conventions turn and rubric definitions in the rubric turn,
+  keeping each turn self-contained. A convention failure returns immediately
+  with rubric=None; if conventions pass, scores the clue on rubric scales and
+  checks them against the expected day profile.
   """
   system_prompt = _SYSTEM_PROMPT_TEMPLATE.format(
     day_description=_DAY_DESCRIPTIONS[difficulty]
