@@ -214,8 +214,13 @@ for a particular verdict.
 Conventions (binary pass/fail):
 - Tense and number agreement: the clue's grammatical form must agree with the
   answer (plural answer → plural clue surface; verb answer → matching tense)
-- Wordplay indicator: a ? suffix is required when the clue uses misdirection
-  or wordplay; it must not appear on a straight definition clue
+- Wordplay indicator: a ? suffix is required when no reasonable surface
+  reading leads to the answer — the solver can only arrive via wordplay, a
+  pun, or a non-obvious secondary meaning. It is forbidden when any reasonable
+  surface reading already gives the answer, even if extra meanings exist. A ?
+  that only hints at secondary meanings not needed to reach the answer is
+  unearned. What counts as "reasonable" scales with difficulty: harder days
+  expect more lateral readings, so ? appears less often on Friday/Saturday.
 - Abbreviation signaling: any abbreviation in the answer must be signaled in
   the clue (e.g. "Abbr.", "briefly", or an abbreviated word in the clue)
 - Fill-in-the-blank format: blanks must be rendered as ___
@@ -241,9 +246,14 @@ Rubric scales (score each 1–5 with a brief rationale):
   to one)\
 """
 
-_SCRATCHPAD_PROMPT = (
-  'Reason through your evaluation: assess each convention and work through '
-  'each rubric dimension with evidence from the clue text.'
+_CONVENTIONS_SCRATCHPAD_PROMPT = (
+  'Evaluate each binary convention for this clue. For each, reason through '
+  'it and state PASS or FAIL before moving to the next.'
+)
+
+_RUBRIC_SCRATCHPAD_PROMPT = (
+  'Now score each rubric dimension. For each, reason through it with '
+  'evidence from the clue text and give a score from 1–5.'
 )
 
 _STRUCTURED_OUTPUT_PROMPT = (
@@ -471,27 +481,39 @@ def validate_quality(
 ) -> QualityResult:
   """Run the answer-aware quality call and return a structured result.
 
-  Uses a two-turn structure: a free-form scratchpad turn for reasoning, then a
-  constrained structured-output turn. Evaluates convention compliance first; a
-  convention failure returns immediately with rubric=None. If conventions pass,
-  scores the clue on six rubric scales and checks them against the expected day
-  profile.
+  Uses a three-turn structure: a focused conventions scratchpad, a rubric
+  scratchpad, then a constrained structured-output turn. Splitting the
+  reasoning keeps each scratchpad focused on one task. A convention failure
+  returns immediately with rubric=None; if conventions pass, scores the clue
+  on rubric scales and checks them against the expected day profile.
   """
   system_prompt = _SYSTEM_PROMPT_TEMPLATE.format(
     day_description=_DAY_DESCRIPTIONS[difficulty]
   )
-  scratchpad_messages: Sequence[Message] = [
+  conventions_messages: Sequence[Message] = [
     {'role': 'system', 'content': system_prompt},
     {
       'role': 'user',
-      'content': f'Clue: {clue_text}\nAnswer: {answer}\n\n{_SCRATCHPAD_PROMPT}',
+      'content': (
+        f'Clue: {clue_text}\nAnswer: {answer}\n\n'
+        + _CONVENTIONS_SCRATCHPAD_PROMPT
+      ),
     },
   ]
-  scratchpad_result = client.chat(scratchpad_messages)
-  _log.debug(f'{_section("scratchpad")}\n\n{scratchpad_result.reply}\n')
+  conventions_result = client.chat(conventions_messages)
+  _log.debug(
+    f'{_section("conventions scratchpad")}\n\n{conventions_result.reply}\n'
+  )
+
+  rubric_messages: Sequence[Message] = [
+    *conventions_result.messages,
+    {'role': 'user', 'content': _RUBRIC_SCRATCHPAD_PROMPT},
+  ]
+  rubric_result = client.chat(rubric_messages)
+  _log.debug(f'{_section("rubric scratchpad")}\n\n{rubric_result.reply}\n')
 
   output_messages: Sequence[Message] = [
-    *scratchpad_result.messages,
+    *rubric_result.messages,
     {'role': 'user', 'content': _STRUCTURED_OUTPUT_PROMPT},
   ]
   # TODO: retry loop on JSON parse failure; see validation.md — "Error

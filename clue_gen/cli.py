@@ -3,8 +3,9 @@
 
 """CLI entry point.
 
-Each run writes a timestamped DEBUG log to logs/. Pass --verbose to also show
-DEBUG output on the console (INFO is always shown).
+Each run writes a timestamped DEBUG log to logs/ that captures all model
+calls and the final result. Pass --verbose to also show DEBUG output on the
+console (INFO is always shown).
 
 Sample usage:
 
@@ -41,6 +42,12 @@ from clue_gen.solvability import (
 )
 
 _logger = logging.getLogger(__name__)
+_result_logger = logging.getLogger('clue_gen.result_output')
+
+
+def _section(label: str) -> str:
+  """Format a dashes section header for log output (60 chars total)."""
+  return f'\n--- {label} {"-" * max(0, 55 - len(label))}'
 
 
 def _add_difficulty_arg(parser: argparse.ArgumentParser) -> None:
@@ -107,6 +114,12 @@ def _configure_logging(verbose: bool, logs_dir: Path | None) -> Path | None:
       logging.Formatter('%(asctime)s %(levelname)s %(name)s: %(message)s')
     )
     root.addHandler(file_handler)
+    # Wire _result_logger to the file handler only (no propagation) so that
+    # _print_result output is captured in the log without appearing twice on
+    # the terminal.
+    _result_logger.propagate = False
+    _result_logger.setLevel(logging.DEBUG)
+    _result_logger.addHandler(file_handler)
 
   for name in ('httpx', 'httpcore', 'openai._base_client'):
     logging.getLogger(name).setLevel(logging.WARNING)
@@ -247,9 +260,19 @@ def _generate_one(
 
 
 def _print_result(data: object, output: TextIO) -> None:
-  """Print data as JSON; pretty-printed when output is a TTY."""
+  """The sole print path in the CLI — all stdout output must route here.
+
+  Logs a section header via _logger (console + file in verbose mode), then
+  prints to output, then logs the body via _result_logger (file only).
+  This captures the full output in the log without duplicating it on the
+  console.
+  """
+  _logger.debug(_section('result'))
   indent = 2 if getattr(output, 'isatty', lambda: False)() else None
   print(json.dumps(data, indent=indent), file=output)
+  # The log is always for human review and never routed as tool input, so always
+  # pretty-print.
+  _result_logger.debug(f'\n{json.dumps(data, indent=2)}\n')
 
 
 def _run_words(

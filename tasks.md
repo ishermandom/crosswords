@@ -1,6 +1,7 @@
 # Pending tasks
 
-Status key: `[ ]` not started · `[~]` in progress · `[x]` done · `[-]` dropped
+Status key: `[ ]` not started · `[~]` in progress · `[x]` done · `[-]` dropped ·
+`[?]` uncertain/speculative
 
 ---
 
@@ -99,9 +100,18 @@ Seven model calls, each targeting one cognitive mode:
     calls in tests
   - Remove the `TODO: Phase 3` comment when done
 
-- [x] **Update quality schema** — `elasticity` (renamed), `has_genuine_alternatives`,
-      `cross_check_payoff`; day-range profiles for `cross_check_payoff` deferred
+- [x] **Update quality schema** — `elasticity` (renamed),
+      `has_genuine_alternatives`, `cross_check_payoff`; day-range profiles for
+      `cross_check_payoff` deferred
 - [x] **Write tests for updated quality schema**
+
+- [?] **Add few-shot examples to the quality conventions scratchpad prompt**
+  - One earned `?`, one unearned `?`, each with the correct reasoning and
+    verdict spelled out — gives the model a template to pattern-match against
+    rather than reasoning from first principles every time
+  - Candidate clues to use as examples TBD; pick ones that are clear-cut and
+    illustrate the failure mode (surface reading obviously leads to answer → `?`
+    unearned)
 
 - [ ] **Decide `cross_check_payoff` day-range profiles and add calibration
       tests**

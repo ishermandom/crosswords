@@ -123,8 +123,9 @@ def test_solvability_subcommand_prints_error_json_on_generation_error() -> None:
 
 
 def _make_quality_replies() -> list[str]:
-  """Scripted replies for a quality call; scratchpad reply is irrelevant."""
+  """Scripted replies for a quality call; scratchpad replies are irrelevant."""
   return [
+    'scratchpad',
     'scratchpad',
     json.dumps(
       {

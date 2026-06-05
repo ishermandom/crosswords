@@ -11,7 +11,7 @@ from clue_gen.prompt import Difficulty
 from clue_gen.quality import QualityParseError, QualityResult, validate_quality
 from clue_gen.tests.fake_client import FakeChatClient
 
-# Scripted scratchpad reply; content is irrelevant to all tests below.
+# Scripted reply for both scratchpad turns; content is irrelevant to all tests.
 _SCRATCHPAD = 'Evaluating the clue...'
 
 
@@ -93,7 +93,7 @@ def _validate_quality(
 
 
 def test_answer_word_present_in_quality_call() -> None:
-  with FakeChatClient([_SCRATCHPAD, _make_reply()]) as fake:
+  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, _make_reply()]) as fake:
     _validate_quality(fake, answer='TREK')
   all_message_text = ' '.join(
     str(m['content']) for call in fake.calls for m in call
@@ -102,7 +102,7 @@ def test_answer_word_present_in_quality_call() -> None:
 
 
 def test_difficulty_day_present_in_quality_call() -> None:
-  with FakeChatClient([_SCRATCHPAD, _make_reply()]) as fake:
+  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, _make_reply()]) as fake:
     _validate_quality(fake, difficulty=Difficulty.THU)
   all_message_text = ' '.join(
     str(m['content']) for call in fake.calls for m in call
@@ -110,12 +110,28 @@ def test_difficulty_day_present_in_quality_call() -> None:
   assert 'Thursday' in all_message_text
 
 
+def test_conventions_reply_is_in_rubric_call_context() -> None:
+  conventions_reply = 'conventions scratchpad output'
+  with FakeChatClient([conventions_reply, _SCRATCHPAD, _make_reply()]) as fake:
+    _validate_quality(fake)
+  rubric_call_text = ' '.join(str(m['content']) for m in fake.calls[1])
+  assert conventions_reply in rubric_call_text
+
+
+def test_rubric_reply_is_in_output_call_context() -> None:
+  rubric_reply = 'rubric scratchpad output'
+  with FakeChatClient([_SCRATCHPAD, rubric_reply, _make_reply()]) as fake:
+    _validate_quality(fake)
+  output_call_text = ' '.join(str(m['content']) for m in fake.calls[2])
+  assert rubric_reply in output_call_text
+
+
 # --- Convention compliance ---
 
 
 def test_quality_fails_when_tense_agreement_is_false() -> None:
   with FakeChatClient(
-    [_SCRATCHPAD, _make_reply(has_tense_agreement=False)]
+    [_SCRATCHPAD, _SCRATCHPAD, _make_reply(has_tense_agreement=False)]
   ) as fake:
     result = _validate_quality(fake)
   assert not result.is_acceptable
@@ -123,7 +139,7 @@ def test_quality_fails_when_tense_agreement_is_false() -> None:
 
 def test_quality_fails_when_wordplay_indicator_is_false() -> None:
   with FakeChatClient(
-    [_SCRATCHPAD, _make_reply(has_wordplay_indicator=False)]
+    [_SCRATCHPAD, _SCRATCHPAD, _make_reply(has_wordplay_indicator=False)]
   ) as fake:
     result = _validate_quality(fake)
   assert not result.is_acceptable
@@ -131,7 +147,7 @@ def test_quality_fails_when_wordplay_indicator_is_false() -> None:
 
 def test_quality_fails_when_abbreviation_not_signaled() -> None:
   with FakeChatClient(
-    [_SCRATCHPAD, _make_reply(is_abbreviation_signaled=False)]
+    [_SCRATCHPAD, _SCRATCHPAD, _make_reply(is_abbreviation_signaled=False)]
   ) as fake:
     result = _validate_quality(fake)
   assert not result.is_acceptable
@@ -139,7 +155,7 @@ def test_quality_fails_when_abbreviation_not_signaled() -> None:
 
 def test_quality_fails_when_fill_format_is_false() -> None:
   with FakeChatClient(
-    [_SCRATCHPAD, _make_reply(uses_fill_format=False)]
+    [_SCRATCHPAD, _SCRATCHPAD, _make_reply(uses_fill_format=False)]
   ) as fake:
     result = _validate_quality(fake)
   assert not result.is_acceptable
@@ -151,21 +167,25 @@ def test_quality_fails_when_fill_format_is_false() -> None:
 def test_quality_passes_when_all_conventions_pass_and_all_scales_in_range() -> (
   None
 ):
-  with FakeChatClient([_SCRATCHPAD, _make_reply()]) as fake:
+  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, _make_reply()]) as fake:
     result = _validate_quality(fake)
   assert result.is_acceptable
 
 
 def test_quality_fails_when_misdirection_score_out_of_range_for_day() -> None:
   # Monday expects misdirection 1–2; score 4 is too high.
-  with FakeChatClient([_SCRATCHPAD, _make_reply(misdirection=4)]) as fake:
+  with FakeChatClient(
+    [_SCRATCHPAD, _SCRATCHPAD, _make_reply(misdirection=4)]
+  ) as fake:
     result = _validate_quality(fake, difficulty=Difficulty.MON)
   assert not result.is_acceptable
 
 
 def test_quality_fails_when_elasticity_score_out_of_range_for_day() -> None:
   # Monday expects elasticity 1–3; score 5 is too high.
-  with FakeChatClient([_SCRATCHPAD, _make_reply(elasticity=5)]) as fake:
+  with FakeChatClient(
+    [_SCRATCHPAD, _SCRATCHPAD, _make_reply(elasticity=5)]
+  ) as fake:
     result = _validate_quality(fake, difficulty=Difficulty.MON)
   assert not result.is_acceptable
 
@@ -175,7 +195,7 @@ def test_quality_fails_when_reference_accessibility_score_out_of_range() -> (
 ):
   # Monday expects reference accessibility 4–5; score 2 is too low.
   with FakeChatClient(
-    [_SCRATCHPAD, _make_reply(reference_accessibility=2)]
+    [_SCRATCHPAD, _SCRATCHPAD, _make_reply(reference_accessibility=2)]
   ) as fake:
     result = _validate_quality(fake, difficulty=Difficulty.MON)
   assert not result.is_acceptable
@@ -187,6 +207,7 @@ def test_craft_and_fairness_are_quality_floors_not_day_axes() -> None:
   # craft is a day-agnostic quality floor (minimum 4), not a day range.
   with FakeChatClient(
     [
+      _SCRATCHPAD,
       _SCRATCHPAD,
       _make_reply(
         misdirection=5,
@@ -204,7 +225,7 @@ def test_craft_and_fairness_are_quality_floors_not_day_axes() -> None:
 
 
 def test_parse_error_on_malformed_json() -> None:
-  with FakeChatClient([_SCRATCHPAD, 'not valid json']) as fake:
+  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, 'not valid json']) as fake:
     with pytest.raises(QualityParseError):
       _validate_quality(fake)
 
@@ -212,7 +233,7 @@ def test_parse_error_on_malformed_json() -> None:
 def test_parse_error_when_convention_field_is_not_boolean() -> None:
   data = json.loads(_make_reply())
   data['conventions']['has_tense_agreement'] = 'yes'
-  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
     with pytest.raises(QualityParseError, match='has_tense_agreement'):
       _validate_quality(fake)
 
@@ -220,7 +241,7 @@ def test_parse_error_when_convention_field_is_not_boolean() -> None:
 def test_parse_error_when_scale_score_is_out_of_range() -> None:
   data = json.loads(_make_reply())
   data['scales']['angle_craft']['score'] = 6
-  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
     with pytest.raises(QualityParseError, match='angle_craft'):
       _validate_quality(fake)
 
@@ -230,7 +251,7 @@ def test_parse_error_when_scale_score_is_boolean() -> None:
   # explicit bool check. json.dumps(True) → "true" → json.loads → True (bool).
   data = json.loads(_make_reply())
   data['scales']['misdirection']['score'] = True
-  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
     with pytest.raises(QualityParseError, match='misdirection'):
       _validate_quality(fake)
 
@@ -238,7 +259,7 @@ def test_parse_error_when_scale_score_is_boolean() -> None:
 def test_parse_error_when_required_field_is_missing() -> None:
   data = json.loads(_make_reply())
   del data['conventions']
-  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
     with pytest.raises(QualityParseError, match='conventions'):
       _validate_quality(fake)
 
@@ -248,7 +269,7 @@ def test_parse_error_when_required_field_is_missing() -> None:
 
 def test_quality_fails_when_has_genuine_alternatives_is_false() -> None:
   with FakeChatClient(
-    [_SCRATCHPAD, _make_reply(has_genuine_alternatives=False)]
+    [_SCRATCHPAD, _SCRATCHPAD, _make_reply(has_genuine_alternatives=False)]
   ) as fake:
     result = _validate_quality(fake)
   assert not result.is_acceptable
@@ -257,7 +278,7 @@ def test_quality_fails_when_has_genuine_alternatives_is_false() -> None:
 def test_parse_error_when_has_genuine_alternatives_is_not_boolean() -> None:
   data = json.loads(_make_reply())
   data['conventions']['has_genuine_alternatives'] = 'yes'
-  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
     with pytest.raises(QualityParseError, match='has_genuine_alternatives'):
       _validate_quality(fake)
 
@@ -271,7 +292,7 @@ def test_parse_error_when_old_wordplay_complexity_field_used() -> None:
   data = json.loads(_make_reply())
   # Simulate a response using the old field name.
   data['scales']['wordplay_complexity'] = data['scales'].pop('elasticity')
-  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
     with pytest.raises(QualityParseError, match='elasticity'):
       _validate_quality(fake)
 
@@ -282,7 +303,7 @@ def test_parse_error_when_old_wordplay_complexity_field_used() -> None:
 def test_parse_error_when_cross_check_payoff_is_missing() -> None:
   data = json.loads(_make_reply())
   del data['scales']['cross_check_payoff']
-  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
     with pytest.raises(QualityParseError, match='cross_check_payoff'):
       _validate_quality(fake)
 
@@ -290,6 +311,6 @@ def test_parse_error_when_cross_check_payoff_is_missing() -> None:
 def test_parse_error_when_cross_check_payoff_score_is_out_of_range() -> None:
   data = json.loads(_make_reply())
   data['scales']['cross_check_payoff']['score'] = 6
-  with FakeChatClient([_SCRATCHPAD, json.dumps(data)]) as fake:
+  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
     with pytest.raises(QualityParseError, match='cross_check_payoff'):
       _validate_quality(fake)
