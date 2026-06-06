@@ -78,9 +78,6 @@ Seven model calls, each targeting one cognitive mode:
 
 ### Tasks
 
-- [x] **Resolve: Turn 5 results → extract flow**
-- [x] **Write tests for brainstorm prompt sequence**
-
 - [ ] **Implement multi-turn brainstorm in `prompt.py`**
   - Interface decision: `brainstorm_turns(word, difficulty) -> Sequence[str]`
     returns the 7 user-turn strings; generator owns message accumulation. Keeps
@@ -100,22 +97,48 @@ Seven model calls, each targeting one cognitive mode:
     calls in tests
   - Remove the `TODO: Phase 3` comment when done
 
-- [x] **Update quality schema** — `elasticity` (renamed),
-      `has_genuine_alternatives`, `cross_check_payoff`; day-range profiles for
-      `cross_check_payoff` deferred
-- [x] **Write tests for updated quality schema**
+- [x] **Split probe into shared harness and per-task scripts**
+  - `scripts/probe.py` currently mixes harness logic (CLI, logging, HTTP) with
+    prompt content. As more probes are added (brainstorm turns, other quality
+    dimensions), this becomes unwieldy.
+  - Split into: a shared harness module (CLI skeleton, tee logging, Ollama call)
+    and small per-task scripts that supply their own prompt strings and invoke
+    the harness. Each per-task script is self-contained and readable on its own.
 
-- [ ] **Overhaul iteration scripts for automatic logging**
-  - Currently requires manual log-file wrangling (`tee -a`, switching files when
-    prompts change). Pain points: no record of which prompt produced which
-    output; log files accumulate mixed results.
-  - Changes:
-    - Auto-generate a timestamped log file per run (no manual `tee`)
-    - Write the full prompt to the log before the model response, so output is
-      self-contained and attributable
-    - Consider rewriting in Python if that's more ergonomic (e.g. easier
-      multiline strings, structured output). Keep scripts outside `clue_gen/` —
-      this is prototyping code, not production.
+- [ ] **Explore other quick wins for fast iteration**
+  - After splitting the probe, survey what else would make prompt iteration
+    faster or lower-friction before diving into the quality task queue.
+
+- [x] **Switch probe harness to Ollama native API + add timing section**
+  - [x] Step 1 — diagnostic: confirmed `usage.model_extra: {}` via OpenAI-
+        compatible endpoint; per-phase durations not available that way.
+  - [x] Step 2 — switched `harness.py` from openai SDK to `httpx.post` against
+        `http://localhost:11434/api/chat`. Reasoning field is
+        `message.thinking`. Schema passed as `format:` top-level key.
+  - [x] Step 3 — added `--- timing ---` section: load ms, prefill tok/s,
+        generation tok/s, ~reasoning/~content split (char-ratio estimate),
+        overhead ms, wall s.
+
+- [ ] **Investigate dense model attention across multiple conventions**
+  - Observed: `gemma4:31b-mlx` (dense, not MoE) keeps reasoning tight and
+    attention focused even when evaluating all five conventions in a single turn
+    — the failure mode that motivated separating convention 2 may not apply to
+    this model.
+  - Questions to resolve: does the dense model consistently outperform the MoE
+    model on multi-convention focus? Is the gap large enough to change model
+    selection for the conventions turn? Does this make the "Separate convention
+    2" task unnecessary for dense models?
+  - Use `scripts/probe_conventions.py` to compare side-by-side.
+
+- [ ] **Explore token-reduction prompting**
+  - Question: can we prompt the model to produce shorter responses without
+    regressing reasoning quality? Shorter outputs reduce latency and make logs
+    easier to scan.
+  - Directions to try: explicit length instructions ("be concise"), structured
+    verdict-first format (verdict before reasoning, not after), chain-of-thought
+    compression prompts.
+  - Measure: output token count and elapsed time vs. correctness on known test
+    cases.
 
 - [ ] **Update `quality.py` prompts from curl script iterations**
   - Several prompt improvements were developed and validated in
@@ -142,6 +165,9 @@ Seven model calls, each targeting one cognitive mode:
   - Implementation: split `_CONVENTIONS_SCRATCHPAD_PROMPT` into two turns — one
     for convention 2 alone, one for the remaining four. Update
     `validate_quality` to drive the extra turn and combine results.
+  - Note: the dense model investigation may change this conclusion — if
+    `gemma4:31b-mlx` handles multi-convention focus reliably, separation may
+    only be needed for MoE models. Revisit after that task.
 
 - [~] **Add few-shot examples to the quality conventions scratchpad prompt**
   {#few-shot-examples}
@@ -177,9 +203,20 @@ Seven model calls, each targeting one cognitive mode:
     - PASSes clues with a legitimate earned `?` (e.g. "Semi professional?" →
       TEAMSTER, "Perpetual homebody?" → SNAIL)
     - FAILs clues that are missing a `?` when one is required
-  - Use `test_wordplay.sh` with `CLUE` and `ANSWER` overrides.
+  - Use `scripts/probe_wordplay.py` with `--clue` and `--answer` overrides.
   - Rationale: examples in the prompt are calibrated around unearned-`?`
     detection; the earned direction may be over-triggered toward FAIL.
+
+- [?] **Consider including a clue-to-answer explanation in generator output**
+  - The brainstorm extract turn could include a brief explanation of how each
+    clue maps to its answer — useful for tricky clues where the validation step
+    would otherwise have to independently discover the lateral leap.
+  - Open question: the explanation may also bias validation toward over-trust
+    (accepting a clue because the explanation sounds plausible rather than
+    because the wordplay is genuinely sound). Not an obvious improvement.
+  - If pursued: add an optional `explanation` field to the extract schema;
+    thread it through to `validate_quality` as additional context; measure
+    whether pass rates improve or degrade on known-bad clues.
 
 - [ ] **Add few-shot examples for all other evaluations**
   - The `?` convention now has examples; the rubric dimensions and other
@@ -276,3 +313,19 @@ Seven model calls, each targeting one cognitive mode:
     checks whether the answer appears in the model's guess list, which is a
     Python-level comparison. The gap is that the model may fail to generate the
     correct answer as a guess at all because it misjudged the length constraint.
+
+---
+
+## Findings
+
+Empirical observations that should survive task cleanup.
+
+- **Ollama `format` key adds real overhead on MLX models.** Passing a JSON
+  schema as the native `format` key roughly doubles wall time (~50% overhead in
+  observed runs), even though the MLX backend doesn't enforce the grammar
+  constraint (known bug: https://github.com/ollama/ollama/issues/16563). The
+  grammar engine runs on the CPU host side; its time lands in `total_duration`
+  but not in any of the bucketed fields (`load_duration`,
+  `prompt_eval_duration`, `eval_duration`), so it appears as unexplained
+  overhead in the timing section. Omit the `format` key when targeting MLX
+  models.
