@@ -8,9 +8,9 @@ focused attention — the thinking trace serves as the reasoning scratchpad.
 Compare latency and correctness against the multi-turn production pipeline.
 
 Usage:
-  python scripts/probe_quality_single.py
-  python scripts/probe_quality_single.py --clue "Keeps time?" --answer CLOCK
-  python scripts/probe_quality_single.py --model gemma4:31b-mlx --day fri
+  python prototyping/probe_quality_single.py
+  python prototyping/probe_quality_single.py --clue "Keeps time?" --answer CLOCK
+  python prototyping/probe_quality_single.py --model gemma4:31b-mlx
 """
 
 import pathlib
@@ -19,15 +19,13 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from lib import harness
 
-_SYSTEM_PROMPT_TEMPLATE = """\
+_SYSTEM_PROMPT = """\
 You are an experienced NYT crossword editor reviewing clues for publication.
 Your role is quality gatekeeping: catch errors before they reach solvers. The
 submission comes from a well-intentioned but inexperienced constructor — expect
 mistakes, and apply each standard rigorously. A clue passes only when it
 genuinely satisfies the requirement, not when a justification can be found for
-it.
-
-Target day: {day}"""
+it."""
 
 _USER_PROMPT = """\
 Respond with JSON only:
@@ -132,6 +130,7 @@ Decision policy:
 if __name__ == '__main__':
   harness.run(
     'quality-single',
-    _SYSTEM_PROMPT_TEMPLATE,
+    _SYSTEM_PROMPT,
     _USER_PROMPT,
+    temperature=1.0,
   )

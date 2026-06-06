@@ -8,9 +8,9 @@ distraction of the other four conventions. Compare against probe_conventions.py
 to see whether multi-convention context affects reasoning quality.
 
 Usage:
-  python scripts/probe_wordplay.py
-  python scripts/probe_wordplay.py --clue "Keeps time?" --answer CLOCK
-  python scripts/probe_wordplay.py --day fri --model qwen3.5:9b
+  python prototyping/probe_wordplay.py
+  python prototyping/probe_wordplay.py --clue "Keeps time?" --answer CLOCK
+  python prototyping/probe_wordplay.py --model qwen3.5:9b
 """
 
 import pathlib
@@ -19,15 +19,13 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from lib import harness
 
-_SYSTEM_PROMPT_TEMPLATE = """\
+_SYSTEM_PROMPT = """\
 You are an experienced NYT crossword editor reviewing clues for publication.
 Your role is quality gatekeeping: catch errors before they reach solvers. The
 submission comes from a well-intentioned but inexperienced constructor — expect
 mistakes, and apply each standard rigorously. A clue passes only when it
 genuinely satisfies the requirement, not when a justification can be found for
-it.
-
-Target day: {day}"""
+it."""
 
 _USER_PROMPT = """\
 Evaluate the wordplay indicator convention for this clue. Reason step by step,
@@ -66,4 +64,4 @@ Unearned (? forbidden):
   common use. The surface delivers directly. ? is unearned."""
 
 if __name__ == '__main__':
-  harness.run('wordplay', _SYSTEM_PROMPT_TEMPLATE, _USER_PROMPT)
+  harness.run('wordplay', _SYSTEM_PROMPT, _USER_PROMPT)

@@ -78,6 +78,56 @@ Seven model calls, each targeting one cognitive mode:
 
 ### Tasks
 
+- [x] **Add project-local Claude config allowing edits to `tasks.md` and
+      `prototyping/` without per-edit approval**
+  - Note: `tasks.md` and all probe scripts under `prototyping/` are
+    development-only files; auto-approving edits there removes friction without
+    expanding the blast radius on production code.
+
+- [x] **Rename `scripts/` to `prototyping/`**
+  - Rationale: `scripts/` is ambiguous; `prototyping/` signals that these files
+    are experimental iteration vehicles, not production utilities.
+  - Update any imports, `sys.path.insert` calls, and doc references.
+
+- [x] **Drop `--day` flag from the probe harness**
+  - Day-of-week calibration is a production concern handled by Python's
+    `_scores_match_day`; it does not affect any current probe prompts.
+  - Remove `--day` from `parse_args()`, remove `day_label`/`day_description`
+    from `ProbeArgs`, and remove `_DAY_DESCRIPTIONS` from `harness.py`.
+  - Update any probe scripts that reference `args.day_description`.
+
+- [x] **Redesign `probe_quality_multi.py`: dependency-ordered, per-turn
+      thinking** {#probe-quality-multi}
+  - **Turn order** (11 turns) reflects evaluation dependencies:
+    1. `tense_agreement` — mechanical, no deps
+    2. `abbreviation_signaled` — mechanical, no deps
+    3. `fill_format` — mechanical, no deps
+    4. `genuine_alternatives` — mostly independent
+    5. `wordplay_indicator` — foundational; carries lateral-thinking calibration
+    6. `surface_coherence` — after clue mechanism understood
+    7. `angle_craft` — after clue mechanism understood; day-independent quality
+       floor
+    8. `misdirection` — depends on `wordplay_indicator`
+    9. `fairness_of_deception` — depends on `misdirection`
+    10. `elasticity` — depends on understanding clue interpretations
+    11. `reference_accessibility` — measures intrinsic knowledge breadth; no day
+        context needed (day-fit is Python-side)
+  - `cross_check_payoff` dropped — quantifies genuine alternatives without
+    adding a distinct signal; see dropped calibration task below.
+  - **Thinking mode**: `think=True` for `wordplay_indicator`, `misdirection`,
+    `fairness_of_deception`; `think=False` for all others.
+  - **Reply format**: system prompt defines the format once — verdicts with a
+    brief reason (≤10 words). Convention turns end with
+    `Output: PASS: <reason> or FAIL: <reason>`; rubric turns end with
+    `Output: <score>: <reason>`. Rubric scores are 1–5; decimals allowed (e.g.
+    4.5). Per-turn examples removed (were causing the model to copy them
+    verbatim).
+  - **Lateral-thinking calibration**: `wordplay_indicator` (turn 5) hardcodes a
+    mid-week expectation inline. No day injection on any other turn.
+  - **Signposting**: section headers embedded in first turn of each group.
+  - **Temperature**: TBD — revisit after the calibrate-sampling-temperature
+    task.
+
 - [ ] **Implement multi-turn brainstorm in `prompt.py`**
   - Interface decision: `brainstorm_turns(word, difficulty) -> Sequence[str]`
     returns the 7 user-turn strings; generator owns message accumulation. Keeps
@@ -98,9 +148,9 @@ Seven model calls, each targeting one cognitive mode:
   - Remove the `TODO: Phase 3` comment when done
 
 - [x] **Split probe into shared harness and per-task scripts**
-  - `scripts/probe.py` currently mixes harness logic (CLI, logging, HTTP) with
-    prompt content. As more probes are added (brainstorm turns, other quality
-    dimensions), this becomes unwieldy.
+  - `prototyping/probe.py` currently mixes harness logic (CLI, logging, HTTP)
+    with prompt content. As more probes are added (brainstorm turns, other
+    quality dimensions), this becomes unwieldy.
   - Split into: a shared harness module (CLI skeleton, tee logging, Ollama call)
     and small per-task scripts that supply their own prompt strings and invoke
     the harness. Each per-task script is self-contained and readable on its own.
@@ -128,7 +178,18 @@ Seven model calls, each targeting one cognitive mode:
     model on multi-convention focus? Is the gap large enough to change model
     selection for the conventions turn? Does this make the "Separate convention
     2" task unnecessary for dense models?
-  - Use `scripts/probe_conventions.py` to compare side-by-side.
+  - Use `prototyping/probe_conventions.py` to compare side-by-side.
+
+- [ ] **Calibrate sampling temperature**
+  - Harness default is 0.2; Gemma4's native default is 1.0. Research suggests
+    thinking models need ≥ 0.6 to avoid repetition loops — too-low temperature
+    may be causing the double-reasoning pass.
+  - Hypothesis: 0.6–0.7 balances coherence with enough randomness to break the
+    repetition pattern, without the variance of 1.0 on an evaluation task.
+  - Evaluate: run probe_quality_single at 0.2, 0.6, 0.7, and 1.0; compare
+    reasoning token count (proxy for doubling), output correctness, and wall
+    time. Pick the lowest temperature that eliminates doubling.
+  - Update harness default and production client once a value is chosen.
 
 - [ ] **Explore token-reduction prompting**
   - Question: can we prompt the model to produce shorter responses without
@@ -203,7 +264,7 @@ Seven model calls, each targeting one cognitive mode:
     - PASSes clues with a legitimate earned `?` (e.g. "Semi professional?" →
       TEAMSTER, "Perpetual homebody?" → SNAIL)
     - FAILs clues that are missing a `?` when one is required
-  - Use `scripts/probe_wordplay.py` with `--clue` and `--answer` overrides.
+  - Use `prototyping/probe_wordplay.py` with `--clue` and `--answer` overrides.
   - Rationale: examples in the prompt are calibrated around unearned-`?`
     detection; the earned direction may be over-triggered toward FAIL.
 
@@ -225,17 +286,12 @@ Seven model calls, each targeting one cognitive mode:
     likely given LLM-generated clues, then construct targeted examples as done
     for `?`.
 
-- [ ] **Decide `cross_check_payoff` day-range profiles and add calibration
-      tests**
-  - Day-range tests for `cross_check_payoff` were deferred from the schema test
-    task — the acceptable score bounds per day are not yet decided
-  - Mon: low CP likely acceptable (clue can be fairly direct); Sat: high CP
-    expected (clue should leave genuine ambiguity for crosses) — exact bounds
-    TBD
-  - Once decided: add ranges to `DAY_PROFILES` in `quality.py`, add
-    corresponding xfail tests to `test_quality.py` (before updating
-    `_scores_match_day`), and update the `cross_check_payoff` default in
-    `_make_reply`
+- [-] **Decide `cross_check_payoff` day-range profiles and add calibration
+  tests**
+  - Dropped: `cross_check_payoff` is a quantification of genuine alternatives
+    and doesn't add a distinct signal beyond elasticity + the genuine
+    alternatives convention. Remove from `quality.py` rubric when porting prompt
+    improvements.
 
 - [ ] **Evaluate thinking mode performance and decide on a long-term strategy**
   - Thinking mode is currently enabled by default (`reasoning_effort=None` in
@@ -313,6 +369,22 @@ Seven model calls, each targeting one cognitive mode:
     checks whether the answer appears in the model's guess list, which is a
     Python-level comparison. The gap is that the model may fail to generate the
     correct answer as a guess at all because it misjudged the length constraint.
+
+- [~] **Investigate generation slowdown after heavy think=True turns**
+  - Observed: after `think=True` turns with large reasoning traces (270+ tok),
+    subsequent generation drops to 0.2–0.3 tok/s (15–25× slower), while prefill
+    recovers to normal speeds immediately. Wall is 64% over norm across a full
+    11-turn run.
+  - Prefill/gen asymmetry rules out thermal throttling. Working hypothesis:
+    memory compression. Activity Monitor shows yellow memory pressure during
+    runs. The 31b-mlx model is near the edge of comfortable capacity; the OS
+    compressor hits weight pages after heavy generation, and sequential
+    token-by-token generation is far more sensitive to decompression latency
+    than batch prefill.
+  - In progress: exploring with system at minimal memory load to isolate the
+    model's footprint from other processes.
+  - If confirmed, the 26b model is the pragmatic fix; 31b is viable only on a
+    lightly loaded system.
 
 ---
 
