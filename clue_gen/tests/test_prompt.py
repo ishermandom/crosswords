@@ -87,7 +87,8 @@ def test_validation_blank_placeholder_matches_answer_length() -> None:
 # --- brainstorm_system_prompt ---
 
 
-@pytest.mark.xfail(strict=True)
+# TODO: Tighten these assertions once day descriptions are calibrated against
+# real clue examples — the current descriptions are initial estimates.
 def test_brainstorm_system_prompt_differs_by_difficulty() -> None:
   assert brainstorm_system_prompt(Difficulty.MON) != brainstorm_system_prompt(
     Difficulty.SAT
@@ -100,7 +101,6 @@ def test_brainstorm_system_prompt_sat_requires_misdirection() -> None:
   assert 'misdirection' in prompt.lower()
 
 
-@pytest.mark.xfail(strict=True)
 def test_brainstorm_system_prompt_mon_allows_direct_definitions() -> None:
   prompt = brainstorm_system_prompt(Difficulty.MON)
   assert 'direct' in prompt.lower()

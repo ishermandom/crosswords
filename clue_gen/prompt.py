@@ -23,24 +23,59 @@ class Difficulty(enum.StrEnum):
   SAT = 'Sat'
 
 
-_DIFFICULTY_DESCRIPTIONS: dict[Difficulty, str] = {
-  Difficulty.MON: 'immediately gettable; plain definitions',
-  Difficulty.TUE: 'slightly tricky; mild misdirection',
-  Difficulty.WED: 'moderate; some wordplay required',
-  Difficulty.THU: 'fair but requires thought; misdirection and wordplay',
-  Difficulty.FRI: 'hard; creative constructions and indirect definitions',
-  Difficulty.SAT: 'maximum difficulty; devious and multi-layered',
+# TODO: Calibrate day descriptions against real clue examples. The key axes
+# are misdirection level, whether the obvious reading should be correct, and
+# what reference breadth is appropriate. Update after prototyping validation.
+_DAY_DESCRIPTIONS: dict[Difficulty, str] = {
+  Difficulty.MON: (
+    'Target: Monday. Write direct, unambiguous clues. The surface reading '
+    'should lead to the answer without lateral thinking. Wordplay is '
+    'acceptable only when the mechanism is immediately apparent.'
+  ),
+  Difficulty.TUE: (
+    'Target: Tuesday. Mild misdirection is welcome — the surface can suggest '
+    'one domain while the answer comes from another, but the connection '
+    'should click quickly for a practiced solver.'
+  ),
+  Difficulty.WED: (
+    'Target: Wednesday. Deliberate misdirection or wordplay is expected. '
+    'The surface should confidently suggest one reading before the answer '
+    'snaps into place. References may be moderately niche.'
+  ),
+  Difficulty.THU: (
+    'Target: Thursday. Strong misdirection is the goal. The surface should '
+    'lead firmly elsewhere before the pivot. Clues reward lateral thinking; '
+    'a novice solver should struggle, an experienced one should enjoy the '
+    'aha. Aim for elegant ambiguity that resolves through crosses — a small '
+    'cloud of plausible answers that collapses to one.'
+  ),
+  Difficulty.FRI: (
+    'Target: Friday. Complex wordplay and creative angles. The surface '
+    'should feel natural while pointing decisively wrong. The obvious answer '
+    'is usually wrong. References can draw on mid-range specialist knowledge. '
+    'Aim for elegant ambiguity that resolves through crosses.'
+  ),
+  Difficulty.SAT: (
+    'Target: Saturday. Maximum difficulty. The surface should be polished '
+    'and natural while misleading as completely as possible. Specialist or '
+    'niche references are fair game. Every angle of wordplay is available. '
+    'The obvious answer is almost always wrong.'
+  ),
 }
+
+_BRAINSTORM_SYSTEM_PROMPT_TEMPLATE = """\
+You are an experienced NYT crossword constructor. You write clues that are \
+fair and rewarding to solve — once the trick is seen, the connection must \
+be clear and unambiguous in hindsight.
+
+{day_description}"""
 
 
 def brainstorm_system_prompt(difficulty: Difficulty) -> str:
-  """Build the system prompt for the multi-turn brainstorm conversation.
-
-  Encodes the NYT constructor persona, the goal of elegant ambiguity resolving
-  through crosses, and per-day difficulty constraints (Mon: direct definitions
-  acceptable; Sat: misdirection required, no direct definitions).
-  """
-  raise NotImplementedError
+  """Build the system prompt for the multi-turn brainstorm conversation."""
+  return _BRAINSTORM_SYSTEM_PROMPT_TEMPLATE.format(
+    day_description=_DAY_DESCRIPTIONS[difficulty]
+  )
 
 
 def brainstorm_turns(word: str, difficulty: Difficulty) -> Sequence[str]:
@@ -60,13 +95,13 @@ def brainstorm_messages(word: str, difficulty: Difficulty) -> Sequence[Message]:
   Returns a single-message list; the caller may append further turns to
   continue the conversation. Prompt content is a placeholder for Phase 3.
   """
-  desc = _DIFFICULTY_DESCRIPTIONS[difficulty]
+  desc = _DAY_DESCRIPTIONS[difficulty]
   return [
     {
       'role': 'user',
       'content': (
         f'Generate crossword clue candidates for the answer word: {word}\n'
-        f'Target difficulty: {difficulty} ({desc})\n\n'
+        f'Target difficulty: {difficulty}\n{desc}\n\n'
         'Consider a variety of styles: straight definition, '
         'fill-in-the-blank, wordplay or double meaning, light cryptic '
         'element, and trivia. Produce three to five distinct candidate clues.'

@@ -5,6 +5,21 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` done · `[-]` droppe
 
 ---
 
+## Housekeeping
+
+**Goal:** Clean up local model storage once QAT models are validated as the
+preferred quantization.
+
+- [ ] **Keep `clue_gen/README.md` references up to date** — add links as good
+      resources are found; remove ones that turn out not to be useful. Be
+      selective: only include sources worth coming back to.
+
+- [ ] **Delete MLX models from Ollama** (`gemma4:26b-mlx`, `gemma4:31b-mlx`)
+      once the QAT variants (`gemma4:26b-qat`) are confirmed stable. MLX models
+      are the fallback if a QAT issue comes up.
+
+---
+
 ## Phase 7 — Brainstorm prompt redesign
 
 **Goal:** Replace the single-turn brainstorm placeholder with a multi-turn
@@ -14,8 +29,10 @@ committing.
 
 ### Background
 
-Two source documents drive this work:
+Three source documents drive this work:
 
+- `clue_gen/README.md` — goals, pipeline overview, and design rationale; the
+  authoritative description of what the tool does and why
 - `background.md` — lessons from ChatGPT experiments; defines the 8-phase
   workflow and quality dimensions (LS, EL, CP, RF, SQ, IN, Bullshit Rating)
 - `prompting.md` — local model guidance; one cognitive mode per turn, state
@@ -200,6 +217,14 @@ Seven model calls, each targeting one cognitive mode:
     compression prompts.
   - Measure: output token count and elapsed time vs. correctness on known test
     cases.
+
+- [ ] **Switch solve-first persona from crossword editor to crossword solver**
+  - The solve-first conversation in `probe_quality_multi.py` currently uses the
+    editor persona ("You are an experienced NYT crossword editor"). The solver
+    role is more natural for this turn — it's asked to work through how a solver
+    reaches the answer, not to evaluate the clue.
+  - Change `_SYSTEM_PROMPT_INTRO` to a solver persona (e.g. "You are an
+    experienced NYT crossword solver.").
 
 - [ ] **Update `quality.py` prompts from curl script iterations**
   - Several prompt improvements were developed and validated in
