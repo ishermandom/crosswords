@@ -3,12 +3,12 @@
 
 """Quality evaluation as one focused turn per convention and rubric item.
 
-Turns are ordered so each evaluation can build on prior ones: mechanical
-conventions first, then the foundational wordplay check, then rubric
-dimensions that depend on it. Thinking mode is enabled selectively — the
-three turns requiring genuine weighing use think=True; the rest use
-think=False with a brief inline trace. All turns produce a verdict and a
-reason in ten words or fewer.
+A solve-first pre-pass (think=True) works through the intended solve path and
+establishes shared context — alternative answers and clue readings — so
+subsequent turns can score rather than discover. Misdirection is scored before
+the wordplay indicator so the indicator can reference the established feint
+strength. Thinking mode is selective: the pre-pass and misdirection use
+think=True; all other turns use think=False.
 
 Compare against probe_quality_single.py to assess whether per-turn focus
 improves accuracy or reduces total latency.
@@ -25,16 +25,18 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from lib import harness
 
-_SYSTEM_PROMPT = """\
-You are an experienced NYT crossword editor reviewing clues for publication.
-Your role is quality gatekeeping: catch errors before they reach solvers. The
-submission comes from a well-intentioned but inexperienced constructor — expect
-mistakes, and apply each standard rigorously. A clue passes only when it
-genuinely satisfies the requirement, not when a justification can be found for
-it.
+_SYSTEM_PROMPT_INTRO = """\
+You are an experienced NYT crossword editor. A well-intentioned but
+inexperienced puzzle constructor has submitted a clue for you to review."""
 
-Use the first interpretation a reasonable solver would reach. Do not revisit a
-judgment once made.
+_SYSTEM_PROMPT_EVALUATION = """\
+Your role is quality gatekeeping: catch errors before they reach solvers.
+Expect mistakes from this constructor, and apply each standard rigorously —
+a clue passes only when it genuinely satisfies the requirement, not when a
+justification can be found for it.
+
+Use the first interpretation a reasonable solver would reach. Do not revisit
+a judgment once made.
 
 After each evaluation, reply with your verdict and a brief reason (ten words
 or fewer):
@@ -43,6 +45,32 @@ Some evaluations are scored as binary PASS/FAIL, others on a 1-5 scale.
 Examples:
   FAIL: plural clue but singular answer
   4.5: direct surface but angle is the obvious default"""
+
+# --- Solve-first pre-pass ---
+
+_TURN_SOLVE_FIRST = """\
+Work through how a solver reaches this answer. Keep your reasoning brief —
+identify the mechanism in a few steps, then commit. Output exactly three
+labeled lines — no markdown, no headers, no bullets:
+
+Solve path: [surface reading] → [what makes the answer click; name any pivot
+  mechanism, or note "straight definition" and describe the angle chosen]
+Alternative answers: [comma-separated real words or phrases a solver would
+  try before landing on the correct answer]
+Clue readings: [semicolon-separated interpretations of the clue surface a
+  solver might hold before the answer is known]
+
+Example 1 (straight definition) — "Long stretch of time" → EON:
+Solve path: surface describes an extended duration → straight definition:
+  an eon is a very long period; angle uses "stretch" as a synonym
+Alternative answers: ERA, AGE, EPOCH
+Clue readings: a very long period; a stretch of geological time
+
+Example 2 (pivot) — "Perpetual homebody?" → SNAIL:
+Solve path: surface suggests someone who never leaves home → pivot: a snail
+  carries its home everywhere, so it is always "home"; double meaning
+Alternative answers: HERMIT, RECLUSE, SHUT-IN
+Clue readings: a person who stays home constantly; a creature in its shell"""
 
 # --- Conventions (turns 1–5) ---
 
@@ -168,23 +196,62 @@ Output: <score>: <reason>"""
 
 if __name__ == '__main__':
   args = harness.parse_args('quality-multi')
-  turns: list[harness.SystemTurn | harness.UserTurn] = [
-    harness.SystemTurn(_SYSTEM_PROMPT),
-    # Conventions: mechanical checks first, foundational wordplay check last.
-    harness.UserTurn(
-      f'Clue: {args.clue}\nAnswer: {args.answer}\n\n{_TURN_TENSE_AGREEMENT}',
-      use_thinking=False,
-    ),
-    harness.UserTurn(_TURN_ABBREVIATION_SIGNALED, use_thinking=False),
-    harness.UserTurn(_TURN_FILL_FORMAT, use_thinking=False),
-    harness.UserTurn(_TURN_GENUINE_ALTERNATIVES, use_thinking=False),
-    harness.UserTurn(_TURN_WORDPLAY_INDICATOR, use_thinking=True),
-    # Rubric: surface and angle first, then misdirection chain, then remainder.
-    harness.UserTurn(_TURN_SURFACE_COHERENCE, use_thinking=False),
-    harness.UserTurn(_TURN_ANGLE_CRAFT, use_thinking=False),
-    harness.UserTurn(_TURN_MISDIRECTION, use_thinking=True),
-    harness.UserTurn(_TURN_FAIRNESS_OF_DECEPTION, use_thinking=True),
-    harness.UserTurn(_TURN_ELASTICITY, use_thinking=False),
-    harness.UserTurn(_TURN_REFERENCE_ACCESSIBILITY, use_thinking=False),
-  ]
-  harness.run_messages('quality-multi', turns, args, temperature=1.0)
+  solve_first_user = (
+    f'Clue: {args.clue}\nAnswer: {args.answer}\n\n{_TURN_SOLVE_FIRST}'
+  )
+
+  # Two conversations rather than one long one. The 31b-mlx model hits a
+  # generation cliff mid-run when KV cache accumulation pushes compressed
+  # memory past a threshold (observed: 8–10 GB compressed, dropping to
+  # 0.2 tok/s after the cliff). Splitting discards the cache between
+  # conversations, keeping each short enough to stay below the wall.
+  # The solve-first output is seeded into conversation 2 as a minimal prior
+  # exchange — the full solve-first prompt stays out of conversation 2's
+  # context, so the split also reduces prefill tokens for evaluation turns.
+  with harness.Session('quality-multi', args, temperature=1.0) as session:
+    # Conversation 1: solver mode only — minimal persona, no evaluation
+    # framing. Keeping this conversation separate prevents the gatekeeping
+    # role and output-format instructions from bleeding into the solve-first
+    # analysis and pushing the model toward premature evaluation.
+    # think=True: discovering the solve path is genuine interpretive work.
+    solve_response = session.run_conversation(
+      [
+        harness.SystemTurn(_SYSTEM_PROMPT_INTRO),
+        harness.UserTurn(solve_first_user, use_thinking=True),
+      ]
+    )
+
+    # Conversation 2: evaluation mode. The solve-first output is seeded as a
+    # prior exchange so the model has full context without re-running the call.
+    session.run_conversation(
+      [
+        harness.SystemTurn(_SYSTEM_PROMPT_EVALUATION),
+        harness.SeedTurn(
+          f'Clue: {args.clue}\nAnswer: {args.answer}\n\n'
+          f'A solver analysis was run on this clue. Use the following as'
+          f' established context for your evaluation:',
+          solve_response or '',
+        ),
+        # think=False: tense, abbreviation, fill format, and genuine alternatives
+        # are mechanical pattern checks — no interpretive weighing required.
+        harness.UserTurn(_TURN_TENSE_AGREEMENT, use_thinking=False),
+        harness.UserTurn(_TURN_ABBREVIATION_SIGNALED, use_thinking=False),
+        harness.UserTurn(_TURN_FILL_FORMAT, use_thinking=False),
+        harness.UserTurn(_TURN_GENUINE_ALTERNATIVES, use_thinking=False),
+        # Misdirection precedes the wordplay indicator: scoring the feint
+        # strength (1–5) is the substantive judgment; the indicator then just
+        # asks whether that feint warrants a ?. think=True here; think=False
+        # for the indicator because it reads off the misdirection score.
+        harness.UserTurn(_TURN_MISDIRECTION, use_thinking=True),
+        harness.UserTurn(_TURN_WORDPLAY_INDICATOR, use_thinking=False),
+        # think=False for the remaining rubric dimensions: surface coherence and
+        # angle craft are stylistic reads with no deep dependency; fairness of
+        # deception and elasticity both have the solve path and misdirection
+        # score in context, so they score without re-deriving the mechanism.
+        harness.UserTurn(_TURN_SURFACE_COHERENCE, use_thinking=False),
+        harness.UserTurn(_TURN_ANGLE_CRAFT, use_thinking=False),
+        harness.UserTurn(_TURN_FAIRNESS_OF_DECEPTION, use_thinking=False),
+        harness.UserTurn(_TURN_ELASTICITY, use_thinking=False),
+        harness.UserTurn(_TURN_REFERENCE_ACCESSIBILITY, use_thinking=False),
+      ]
+    )

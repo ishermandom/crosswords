@@ -370,7 +370,7 @@ Seven model calls, each targeting one cognitive mode:
     Python-level comparison. The gap is that the model may fail to generate the
     correct answer as a guess at all because it misjudged the length constraint.
 
-- [~] **Investigate generation slowdown after heavy think=True turns**
+- [x] **Investigate generation slowdown after heavy think=True turns**
   - Observed: after `think=True` turns with large reasoning traces (270+ tok),
     subsequent generation drops to 0.2–0.3 tok/s (15–25× slower), while prefill
     recovers to normal speeds immediately. Wall is 64% over norm across a full
@@ -381,10 +381,15 @@ Seven model calls, each targeting one cognitive mode:
     compressor hits weight pages after heavy generation, and sequential
     token-by-token generation is far more sensitive to decompression latency
     than batch prefill.
-  - In progress: exploring with system at minimal memory load to isolate the
-    model's footprint from other processes.
-  - If confirmed, the 26b model is the pragmatic fix; 31b is viable only on a
-    lightly loaded system.
+  - The cliff persists even with all nonessential apps closed. Compressed memory
+    hovered at 8–10 GB. This rules out other processes — the model alone
+    triggers it. What accumulates to cause it (KV cache, thinking tokens, output
+    tokens, something else) is still unknown.
+  - **Resolution**: splitting the probe into two conversations eliminates the
+    cliff. The KV cache is discarded between conversations, so the 31b model
+    never accumulates enough state to hit the memory wall. Verified: all 12
+    turns completed at 3–5 tok/s with no drop. The trigger mechanism is still
+    unknown but no longer blocking — keep conversations short as a mitigation.
 
 ---
 

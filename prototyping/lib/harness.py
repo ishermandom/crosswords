@@ -75,6 +75,19 @@ class UserTurn:
   use_thinking: bool = True
 
 
+@dataclasses.dataclass(frozen=True)
+class SeedTurn:
+  """A pre-established user/assistant exchange injected without an LLM call.
+
+  Used to seed a conversation with context from a prior run — e.g., the
+  solve-first analysis established in a separate conversation. Both messages
+  are appended to history and logged, but no request is fired.
+  """
+
+  user_content: str
+  assistant_content: str
+
+
 class _Tee:
   """Write to multiple text streams simultaneously."""
 
@@ -181,6 +194,111 @@ def _timing_section(
   return ''.join(lines)
 
 
+def _run_user_turn(
+  turn: UserTurn,
+  history: list[dict[str, object]],
+  args: ProbeArgs,
+  temperature: float,
+  tee: _Tee,
+  turn_label: str,
+  cumulative_wall_before: float | None,
+  cumulative_norm_wall_before: float | None,
+) -> tuple[str | None, int, float, float]:
+  """Fire one LLM call for a user turn, update history, and log output.
+
+  Args:
+    turn: The user turn to execute.
+    history: Conversation history, mutated in place.
+    args: Resolved CLI arguments (model name, etc.).
+    temperature: Sampling temperature for this call.
+    tee: Log/stdout writer.
+    turn_label: Label suffix for section headers (e.g. ' turn 1' or '').
+    cumulative_wall_before: Running wall total before this turn, or None to
+      omit cumulative stats from the timing section.
+    cumulative_norm_wall_before: Running norm-wall total before this turn.
+
+  Returns:
+    (response_text, gen_tokens, wall_s, norm_wall_s) for the caller to
+    accumulate into running totals.
+  """
+  history.append({'role': 'user', 'content': turn.content})
+  tee.write(f'{_section(f"user{turn_label}")}{turn.content}\n')
+
+  request_body: dict[str, object] = {
+    'model': args.model,
+    'messages': history,
+    'stream': False,
+    'keep_alive': '30m',
+    'think': turn.use_thinking,
+    'options': {
+      'num_ctx': 8192,
+      'temperature': temperature,
+      'frequency_penalty': 0.2,
+      'top_k': 40,
+      'top_p': 0.9,
+      'repeat_penalty': 1.1,
+      'num_gpu': -1,
+    },
+  }
+  if turn.json_schema is not None:
+    request_body['format'] = turn.json_schema
+
+  start = time.perf_counter()
+  http_response = httpx.post(_OLLAMA_CHAT_URL, json=request_body, timeout=600.0)
+  elapsed = time.perf_counter() - start
+  http_response.raise_for_status()
+  data: dict[str, object] = http_response.json()
+
+  raw_message = data.get('message')
+  message: dict[str, object] = (
+    raw_message if isinstance(raw_message, dict) else {}
+  )
+  thinking_raw = message.get('thinking')
+  content_raw = message.get('content')
+  reasoning = thinking_raw if isinstance(thinking_raw, str) else None
+  content = content_raw if isinstance(content_raw, str) else None
+
+  history.append({'role': 'assistant', 'content': content or ''})
+
+  if reasoning:
+    tee.write(f'{_section(f"reasoning{turn_label}")}{reasoning}\n')
+
+  display_content = content or '<no response>'
+  if turn.json_schema is not None and content:
+    try:
+      display_content = json.dumps(json.loads(content), indent=2)
+    except json.JSONDecodeError:
+      pass
+  tee.write(f'{_section(f"response{turn_label}")}{display_content}\n')
+
+  norm_wall = (
+    _as_int(data.get('prompt_eval_count')) / _NORM_PREFILL_TPS
+    + _as_int(data.get('eval_count')) / _NORM_GEN_TPS
+  )
+  cumulative_wall = (
+    (cumulative_wall_before + elapsed)
+    if cumulative_wall_before is not None
+    else None
+  )
+  cumulative_norm_wall = (
+    (cumulative_norm_wall_before + norm_wall)
+    if cumulative_norm_wall_before is not None
+    else None
+  )
+  tee.write(
+    _timing_section(
+      data,
+      reasoning,
+      content,
+      elapsed,
+      label=f'timing{turn_label}',
+      cumulative_wall_seconds=cumulative_wall,
+      cumulative_norm_wall_seconds=cumulative_norm_wall,
+    )
+  )
+  return content, _as_int(data.get('eval_count')), elapsed, norm_wall
+
+
 def parse_args(mode: str) -> ProbeArgs:
   """Parse standard CLI args and return resolved probe arguments."""
   parser = argparse.ArgumentParser(
@@ -199,25 +317,28 @@ def parse_args(mode: str) -> ProbeArgs:
 
 def run_messages(
   mode: str,
-  turns: Sequence[SystemTurn | UserTurn],
+  turns: Sequence[SystemTurn | SeedTurn | UserTurn],
   args: ProbeArgs,
   temperature: float = 0.2,
-) -> None:
-  """Execute a conversation and write the log.
+) -> str | None:
+  """Execute a single conversation and write the log.
 
   Each UserTurn fires one Ollama request; the assistant response is appended
-  to the conversation history before the next turn. Per-turn timing is logged
-  after each assistant response. When there are multiple user turns, a
-  cumulative timing section appears at the end.
+  to the conversation history before the next turn. SeedTurns inject a
+  pre-established exchange into history without firing a request. Per-turn
+  timing is logged after each assistant response. When there are multiple
+  UserTurns, a cumulative timing section appears at the end.
 
   Args:
     mode: Short label for the probe (e.g. 'wordplay'). Used as the log
       filename prefix and printed in the run header.
-    turns: Ordered sequence of SystemTurn and UserTurn values. At least one
-      UserTurn is required.
+    turns: Ordered sequence of turn values. At least one UserTurn is required.
     args: Resolved CLI arguments from parse_args().
     temperature: Sampling temperature. Gemma4's native default is 1.0;
       thinking models generally need >= 0.6 to avoid repetition loops.
+
+  Returns:
+    The last assistant response text, or None if no UserTurn produced output.
   """
   timestamp = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
   log_directory = pathlib.Path('logs/probe')
@@ -239,110 +360,155 @@ def run_messages(
       f' ===\n'
     )
 
-    history: list[dict[str, str]] = []
+    history: list[dict[str, object]] = []
     total_gen_tokens = 0
-    total_wall_seconds = 0.0
-    total_norm_wall_seconds = 0.0
+    total_wall_s = 0.0
+    total_norm_wall_s = 0.0
     user_turn_index = 0
+    last_response: str | None = None
 
     for turn in turns:
       if isinstance(turn, SystemTurn):
         history.append({'role': 'system', 'content': turn.content})
         tee.write(f'{_section("system")}{turn.content}\n')
-        continue
-
-      # UserTurn
-      user_turn_index += 1
-      suffix = f' turn {user_turn_index}' if is_multi_turn else ''
-
-      history.append({'role': 'user', 'content': turn.content})
-      tee.write(f'{_section(f"user{suffix}")}{turn.content}\n')
-      # Prompt is flushed before the request fires, so a crash mid-run
-      # still leaves an attributable record.
-
-      request_body: dict[str, object] = {
-        'model': args.model,
-        'messages': history,
-        'stream': False,
-        'keep_alive': '30m',
-        'think': turn.use_thinking,
-        'options': {
-          'num_ctx': 8192,
-          'temperature': temperature,
-          'frequency_penalty': 0.2,
-          'top_k': 40,
-          'top_p': 0.9,
-          'repeat_penalty': 1.1,
-          'num_gpu': -1,
-        },
-      }
-      if turn.json_schema is not None:
-        request_body['format'] = turn.json_schema
-
-      start = time.perf_counter()
-      http_response = httpx.post(
-        _OLLAMA_CHAT_URL, json=request_body, timeout=600.0
-      )
-      elapsed = time.perf_counter() - start
-      http_response.raise_for_status()
-      data: dict[str, object] = http_response.json()
-
-      raw_message = data.get('message')
-      message: dict[str, object] = (
-        raw_message if isinstance(raw_message, dict) else {}
-      )
-      thinking_raw = message.get('thinking')
-      content_raw = message.get('content')
-      reasoning = thinking_raw if isinstance(thinking_raw, str) else None
-      content = content_raw if isinstance(content_raw, str) else None
-
-      history.append({'role': 'assistant', 'content': content or ''})
-
-      if reasoning:
-        tee.write(f'{_section(f"reasoning{suffix}")}{reasoning}\n')
-
-      display_content = content or '<no response>'
-      if turn.json_schema is not None and content:
-        try:
-          display_content = json.dumps(json.loads(content), indent=2)
-        except json.JSONDecodeError:
-          pass
-      tee.write(f'{_section(f"response{suffix}")}{display_content}\n')
-
-      norm_wall = (
-        _as_int(data.get('prompt_eval_count')) / _NORM_PREFILL_TPS
-        + _as_int(data.get('eval_count')) / _NORM_GEN_TPS
-      )
-      cumulative_wall = (
-        (total_wall_seconds + elapsed) if is_multi_turn else None
-      )
-      cumulative_norm_wall = (
-        (total_norm_wall_seconds + norm_wall) if is_multi_turn else None
-      )
-      tee.write(
-        _timing_section(
-          data,
-          reasoning,
-          content,
-          elapsed,
-          label=f'timing{suffix}',
-          cumulative_wall_seconds=cumulative_wall,
-          cumulative_norm_wall_seconds=cumulative_norm_wall,
+      elif isinstance(turn, SeedTurn):
+        history.append({'role': 'user', 'content': turn.user_content})
+        history.append({'role': 'assistant', 'content': turn.assistant_content})
+        tee.write(f'{_section("seed user")}{turn.user_content}\n')
+        tee.write(f'{_section("seed assistant")}{turn.assistant_content}\n')
+      else:
+        user_turn_index += 1
+        suffix = f' turn {user_turn_index}' if is_multi_turn else ''
+        cum_wall = total_wall_s if is_multi_turn else None
+        cum_norm = total_norm_wall_s if is_multi_turn else None
+        response, gen_tokens, wall_s, norm_wall_s = _run_user_turn(
+          turn, history, args, temperature, tee, suffix, cum_wall, cum_norm
         )
-      )
-
-      total_gen_tokens += _as_int(data.get('eval_count'))
-      total_wall_seconds += elapsed
-      total_norm_wall_seconds += norm_wall
+        last_response = response
+        total_gen_tokens += gen_tokens
+        total_wall_s += wall_s
+        total_norm_wall_s += norm_wall_s
 
     if is_multi_turn:
       tee.write(_section('cumulative timing'))
       tee.write(f'turns:      {user_turn_count}\n')
       tee.write(f'generation: {total_gen_tokens} tok\n')
-      tee.write(f'wall:       {total_wall_seconds:.1f} s\n')
-      tee.write(f'norm wall:  {total_norm_wall_seconds:.1f} s\n')
+      tee.write(f'wall:       {total_wall_s:.1f} s\n')
+      tee.write(f'norm wall:  {total_norm_wall_s:.1f} s\n')
 
   print(f'Log: {log_path}', file=sys.stderr)
+  return last_response
+
+
+class Session:
+  """A probe run spanning multiple conversations with a shared log and timing.
+
+  Each call to run_conversation() fires one independent LLM conversation.
+  All conversations write to the same log file and contribute to combined
+  timing totals. Use as a context manager to ensure the log is closed and
+  cumulative stats are written even if a conversation raises.
+
+  Usage:
+    with harness.Session('quality-multi', args, temperature=1.0) as session:
+        response = session.run_conversation([SystemTurn(...), UserTurn(...)])
+        session.run_conversation([SystemTurn(...), SeedTurn(..., response), ...])
+  """
+
+  def __init__(
+    self, mode: str, args: ProbeArgs, temperature: float = 0.2
+  ) -> None:
+    """Open the log file and write the run header."""
+    timestamp = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
+    log_directory = pathlib.Path('logs/probe')
+    log_directory.mkdir(parents=True, exist_ok=True)
+    log_path = log_directory / f'{mode}_{timestamp}.log'
+    self._log_file = log_path.open('w')
+    self._tee = _Tee(sys.stdout, self._log_file)
+    self._args = args
+    self._temperature = temperature
+    self._conversation_count = 0
+    self._total_user_turns = 0
+    self._total_gen_tokens = 0
+    self._total_wall_s = 0.0
+    self._total_norm_wall_s = 0.0
+    self._tee.write(
+      f'=== {timestamp}'
+      f' mode={mode}'
+      f' model={args.model}'
+      f' temp={temperature}'
+      f' clue={args.clue!r}'
+      f' answer={args.answer}'
+      f' ===\n'
+    )
+    print(f'Log: {log_path}', file=sys.stderr)
+
+  def run_conversation(
+    self,
+    turns: Sequence[SystemTurn | SeedTurn | UserTurn],
+  ) -> str | None:
+    """Run one conversation, log its turns, and return the last response text.
+
+    Conversation history is fresh for each call — conversations are
+    independent. SeedTurns inject prior context without firing a request.
+    Per-turn cumulative timing reflects the running total across all
+    conversations in this session.
+    """
+    self._conversation_count += 1
+    self._tee.write(f'\n=== Conversation {self._conversation_count} ===\n')
+
+    history: list[dict[str, object]] = []
+    user_turn_index = 0
+    last_response: str | None = None
+
+    for turn in turns:
+      if isinstance(turn, SystemTurn):
+        history.append({'role': 'system', 'content': turn.content})
+        self._tee.write(f'{_section("system")}{turn.content}\n')
+      elif isinstance(turn, SeedTurn):
+        history.append({'role': 'user', 'content': turn.user_content})
+        history.append({'role': 'assistant', 'content': turn.assistant_content})
+        self._tee.write(f'{_section("seed user")}{turn.user_content}\n')
+        self._tee.write(
+          f'{_section("seed assistant")}{turn.assistant_content}\n'
+        )
+      else:
+        user_turn_index += 1
+        label = f' turn {user_turn_index}'
+        response, gen_tokens, wall_s, norm_wall_s = _run_user_turn(
+          turn,
+          history,
+          self._args,
+          self._temperature,
+          self._tee,
+          label,
+          self._total_wall_s,
+          self._total_norm_wall_s,
+        )
+        last_response = response
+        self._total_user_turns += 1
+        self._total_gen_tokens += gen_tokens
+        self._total_wall_s += wall_s
+        self._total_norm_wall_s += norm_wall_s
+
+    return last_response
+
+  def close(self) -> None:
+    """Write combined timing stats and close the log."""
+    self._tee.write(_section('cumulative timing'))
+    self._tee.write(f'conversations: {self._conversation_count}\n')
+    self._tee.write(f'turns:         {self._total_user_turns}\n')
+    self._tee.write(f'generation:    {self._total_gen_tokens} tok\n')
+    self._tee.write(f'wall:          {self._total_wall_s:.1f} s\n')
+    self._tee.write(f'norm wall:     {self._total_norm_wall_s:.1f} s\n')
+    self._log_file.close()
+
+  def __enter__(self) -> 'Session':
+    """Return self for use as a context manager."""
+    return self
+
+  def __exit__(self, *_: object) -> None:
+    """Close the session on exit, writing cumulative stats."""
+    self.close()
 
 
 def run(
