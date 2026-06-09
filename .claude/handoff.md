@@ -2,6 +2,63 @@
 
 ---
 
+## 2026-06-09 — First clue_gen_cloud smoke batch (3 words, Fable)
+
+**Accomplished**
+
+- Ran the first real batch through the new `clue_gen_cloud` pipeline: a 3-word
+  smoke test from a clean `out/` (no prior state).
+- Command: `python3 pipeline.py run --batch-size 3 --limit 3 --model
+  claude-fable-5` (run from `clue_gen_cloud/`). Single batch, two `claude -p`
+  calls (GENERATE + VERIFY).
+- Processed the top three words of `words.in` (pre-sorted by value): ZERO, NIL,
+  ONE.
+- Result line: `[batch 1] words=3 (retries=0) clues=12 mech_pass=12/12 verdicts:
+  accept=11 revise=1 reject=0`.
+  - 12/12 clues passed mechanical checks (enumeration, anagram/hidden-string
+    math, leakage, uniqueness).
+  - Judge: 11 accept, 1 revise, 0 reject. 11 clues accepted into the bank
+    (6 American / 5 cryptic; 10 high-confidence, 1 medium).
+  - The lone revise was on NIL (cryptic "Nothing found in manila folder (3)"),
+    so NIL is the 1 word "awaiting retry"; ZERO and ONE are fully settled
+    (`completed_words=2/547`).
+
+- **Accepted clues** (recorded here because `out/accepted.jsonl` is git-excluded):
+  - ZERO — american/medium "Chance of rolling snake eyes with one die";
+    american/hard "Climax of a countdown?";
+    cryptic/medium "Duck found in blaze, roasting (4)";
+    cryptic/medium "Love to set rifle sights (4)"
+  - NIL — american/medium "Goose egg, across the pond";
+    american/hard "Either side of a goalless draw?";
+    cryptic/medium "Zip almost all of the Nile (3)"
+  - ONE — american/medium "Formal alternative to \"you\"";
+    american/hard "Singular figure?";
+    cryptic/medium "Unit of money, in part (3)";
+    cryptic/medium "Individual working with energy (3)"
+
+**Decisions**
+
+- **Default clue counts** (2 American + 2 cryptic per word) and **Fable
+  model** (`claude-fable-5`) for the run, per user direction. Dry-run skipped.
+- **No PR of generated output**: `out/` is gitignored append-only derived
+  state by design, so the clue bank is intentionally not committed.
+
+**Environment notes**
+
+- No `~/.claude/oauth-token` file present; the CLI wrapper fell back to the
+  account's default credentials and the calls succeeded.
+- Repo is a sparse checkout (cone mode); only `clue_gen_cloud` was initially
+  present. Added `.claude` to the sparse set to materialize this handoff.
+
+**Next steps**
+
+- Scale up: a larger `--limit` (or no limit) will pick up the NIL retry plus
+  fresh words from the top of `words.in`.
+- Consider `python3 pipeline.py stats` (incl. the by-batch-size table) once
+  more data accumulates, to calibrate `--batch-size`.
+
+---
+
 ## 2026-06-05 — Convention 2 prompt engineering
 
 **Accomplished**
