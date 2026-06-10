@@ -1,1 +1,3 @@
-out/
+# The generated clue data (out/*.jsonl) is tracked — it is expensive to
+# recompute. Only the transient run log stays untracked.
+out/run.log
