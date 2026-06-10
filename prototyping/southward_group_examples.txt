@@ -1,0 +1,104 @@
+1) Crossword / grid conventions
+
+Leverage how “Down” works in crosswords themselves.
+
+e.g., clues that blur Down (direction in grid) vs geographic south
+
+Why interesting:
+Meta-layer ambiguity; could create a pivot between puzzle terminology and real-world direction.
+
+2) Typography / layout orientation
+
+“Down” vs “below” vs “lower” in page layout or UI.
+
+e.g., something that initially reads as screen/UI positioning
+
+Potential trap:
+Solver thinks visual layout, then shifts to geographic meaning.
+
+3) Sports terminology
+
+“Down” (football), “southpaw” (boxing), “going south” (slang decline)
+
+especially cases where “down” has a non-directional meaning
+
+Why useful:
+Strong initial parse unrelated to geography → pivot
+
+4) Finance / trends
+
+“Going south” = declining
+
+markets, stocks, performance
+
+Potential:
+Start with metaphorical “south” → force literal directional reinterpretation
+
+5) Weather / climate framing
+
+“Down south,” “southern winds,” “cold front moving south”
+
+Twist opportunity:
+Weather language vs literal movement direction
+
+6) Aviation / navigation jargon (non-compass)
+flight paths, headings, runways, ATC phrasing
+
+Why distinct:
+Different mental model than compass (procedural vs geometric)
+
+7) Migration / biology
+birds flying south, seasonal movement
+
+Trap:
+Species names vs direction vs behavior
+
+8) Cultural idioms / slang
+“go south,” “down south,” “head south”
+
+Angle:
+Exploit ambiguity between:
+
+idiomatic meaning (decline / region)
+literal directional meaning
+9) Relative perspective / frame-of-reference shifts
+“down” depends on viewpoint (map vs globe vs person)
+
+Why high ceiling:
+This is more abstract but can produce clean pivots if grounded well
+
+10) Word formation / morphology tricks
+“-ward” suffix vs base word
+contrast with:
+south
+southwards
+downward
+
+Potential:
+Exploit form-based expectations (solver fills SOUTH, needs SOUTHWARD)
+
+Meta-evaluation
+
+Compared to the previous five groups, these are:
+
+Less geography-centric
+More about:
+language use
+metaphor vs literal meaning
+domain shifts (sports, finance, UI, etc.)
+Pushback (important)
+
+A lot of these:
+
+have high creative potential
+but also high failure risk
+
+The danger is:
+
+generating clever ideas that don’t translate into
+a credible solver experience
+
+In particular:
+
+finance / slang / metaphor categories often fail the literal resolution check
+crossword/meta clues risk feeling gimmicky
