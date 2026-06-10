@@ -160,6 +160,29 @@ reads the way dollar billing does (~0.1×). Measure before building.
     in generate.md, editor in verify.md (user decision 2026-06-10); the spec's
     opening is reworded persona-neutral. Carrying the ~700-token task
     instructions uncached costs ~$0.007/call — accepted.
+- [x] Haiku caching validation (quota at 96%, too high for a Fable run): two
+      back-to-back direct `claude -p` GENERATE calls, one word each, with the
+      trimmed flags and `--system-prompt-file CLUE_SPEC.md` — invoked directly,
+      NOT via pipeline.py, so nothing touches the out/ clue bank. Goal: confirm
+      call 2 cache-reads the system-prompt prefix; quota not measured (haiku is
+      not the production model). #haiku-cache-check
+  - Note: interpretation caveat — haiku's minimum cacheable prefix is 4096
+    tokens vs Fable's 2048; if the spec-side prefix lands under 4096, haiku
+    shows write=0/read=0 where Fable would cache. Check call 1's cache_write
+    before concluding anything from call 2's cache_read.
+  - Note: results (2026-06-10, rerun after the quota cutoff) — the two GENERATE
+    calls both showed read=0/write=6783, but follow-up micro-probes pinned the
+    cause on the caveat above, not on the design. Identical back-to-back prompts
+    fully cache-hit (write 6464 → read 6464, cost $0.0088 → $0.0015), proving
+    the prefix is byte-identical across fresh invocations. Differing user turns
+    read 0 with the real spec, but with a 2×-spec padded system prompt read
+    5795/wrote 3558 — so the CLI does place a cache breakpoint at the
+    system-prompt boundary, and the spec-side prefix (~2.9K tokens) is simply
+    under haiku's 4096 minimum.
+  - Note: implication — on Fable (2048 minimum) the ~2.9K spec prefix should
+    cache-read across fresh calls; confirm via cache_read ≈ 2.9K on call 2 of
+    the post-trim 1-word measured run. Haiku clue text went to /tmp only; the
+    out/ clue bank was not touched.
 - [ ] Session-resume (multi-turn) design: likely moot if the system-prompt
       prefix cache-reads across fresh calls (verify on the post-trim measured
       run — cache_read ≈ prefix size on call 2); keep only if the post-trim
