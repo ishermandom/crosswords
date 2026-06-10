@@ -77,7 +77,7 @@ class RunSettings:
   category_note: str
   pace_minutes: float
   call_timeout_seconds: float
-  model: str | None
+  model: str
   dry_run: bool
 
 
@@ -659,9 +659,9 @@ def build_argument_parser() -> argparse.ArgumentParser:
   )
   run_parser.add_argument(
     '--model',
-    default=None,
+    default='claude-fable-5',
     help='Claude model for both LLM calls, passed through to'
-    " `claude --model` (default: the CLI account's default model)",
+    ' `claude --model` (default: %(default)s)',
   )
   run_parser.add_argument(
     '--dry-run',
