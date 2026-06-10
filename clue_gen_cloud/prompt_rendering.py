@@ -3,17 +3,17 @@
 """Assembly of the generation and verification prompts from template files.
 
 All prompt text lives in CLUE_SPEC.md and prompts/*.md — this module only
-substitutes the template variables and concatenates the pieces. No prompt
-wording is defined in code.
+substitutes the template variables. No prompt wording is defined in code.
+
+The spec is NOT part of the rendered prompts: it travels separately as the
+CLI's system prompt (see claude_cli.build_cli_command), where its stable,
+byte-identical prefix is cached across calls. The rendered prompts carry
+only the per-task instructions and the per-batch variables.
 """
 
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-
-# Joins the spec to each task template, mirroring the templates' own
-# horizontal-rule section breaks.
-SPEC_SEPARATOR = '\n\n---\n\n'
 
 NUMBER_WORDS = (
   'zero',
@@ -127,22 +127,20 @@ def build_generation_prompt(
   cryptic_per_word: int,
   category_note: str,
 ) -> str:
-  """The full prompt for one GENERATE call: spec + filled template."""
-  body = (
+  """The user-turn prompt for one GENERATE call (filled template)."""
+  return (
     templates.generation_template.replace(
       '{{CLUE_MIX}}', render_clue_mix(american_per_word, cryptic_per_word)
     )
     .replace('{{CATEGORY_NOTE}}', category_note)
     .replace('{{WORDS}}', '\n'.join(render_word_line(e) for e in entries))
   )
-  return templates.specification + SPEC_SEPARATOR + body
 
 
 def build_verification_prompt(
   templates: PromptTemplates, clue_lines: Sequence[str]
 ) -> str:
-  """The full prompt for one VERIFY call: spec + filled template."""
-  body = templates.verification_template.replace(
+  """The user-turn prompt for one VERIFY call (filled template)."""
+  return templates.verification_template.replace(
     '{{CLUES_JSONL}}', '\n'.join(clue_lines)
   )
-  return templates.specification + SPEC_SEPARATOR + body

@@ -1,9 +1,10 @@
 # CLUE_SPEC.md — Mixed-Style Clue Bank Generation Spec
 
-You are a crossword setter building a clue bank for automatically generated
-acrostic-style puzzles. For each input word, produce SEVERAL original clues: by
-default **2 American-style and 2 cryptic-style** (counts adjustable via the
-batch prompt). Target solvers enjoy both styles mixed in one puzzle.
+This specification defines the standard for a crossword clue bank for
+automatically generated acrostic-style puzzles. Each answer word gets SEVERAL
+original clues: by default **2 American-style and 2 cryptic-style** (counts
+adjustable via the batch prompt). Target solvers enjoy both styles mixed in one
+puzzle.
 
 Global rules:
 

@@ -1,9 +1,9 @@
 # VERIFICATION TASK
 
 You are a crossword editor reviewing machine-generated clues against the
-clue-writing specification (CLUE_SPEC.md) provided above. Mechanical checks
-(letter math, enumeration, schema, answer-leakage) have ALREADY run — do not
-re-litigate those. Your job is the judgment calls a script cannot make.
+clue-writing specification (CLUE_SPEC.md) in your system prompt. Mechanical
+checks (letter math, enumeration, schema, answer-leakage) have ALREADY run — do
+not re-litigate those. Your job is the judgment calls a script cannot make.
 
 For each clue in the input below, evaluate:
 

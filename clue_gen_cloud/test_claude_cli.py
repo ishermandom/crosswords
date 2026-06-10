@@ -1,17 +1,47 @@
 # Copyright 2026 Ilya Sherman (ishermandom@)
 # SPDX-License-Identifier: MIT
-"""Tests for parsing `claude -p --output-format json` envelopes."""
+"""Tests for the `claude -p` command line and response envelope parsing."""
 
 import json
+from pathlib import Path
 
 import pytest
 
 from claude_cli import (
   CallUsage,
   MalformedEnvelope,
+  build_cli_command,
   describe_usage,
   parse_response_envelope,
 )
+
+# --- build_cli_command ---
+
+
+def test_cli_command_includes_prompt_lean_flags() -> None:
+  command = build_cli_command('claude', model=None, system_prompt_file=None)
+
+  assert command[:2] == ['claude', '-p']
+  assert command[command.index('--output-format') + 1] == 'json'
+  assert '--disable-slash-commands' in command
+  # "*" removes all tool definitions from the prompt (~16K tokens).
+  assert command[command.index('--disallowedTools') + 1] == '*'
+  assert '--model' not in command
+  assert '--system-prompt-file' not in command
+
+
+def test_cli_command_passes_model_and_system_prompt_file() -> None:
+  command = build_cli_command(
+    'claude',
+    model='claude-fable-5',
+    system_prompt_file=Path('/project/CLUE_SPEC.md'),
+  )
+
+  assert command[command.index('--model') + 1] == 'claude-fable-5'
+  assert (
+    command[command.index('--system-prompt-file') + 1]
+    == '/project/CLUE_SPEC.md'
+  )
 
 
 def _make_envelope(**overrides: object) -> str:

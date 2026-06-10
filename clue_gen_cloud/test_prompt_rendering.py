@@ -44,10 +44,22 @@ def test_generation_prompt_substitutes_everything() -> None:
     cryptic_per_word=2,
     category_note='watch for digit leaks',
   )
-  assert 'THE SPEC' in prompt
   assert 'ZERO' in prompt and 'NIL' in prompt
   assert 'watch for digit leaks' in prompt
   assert '{{' not in prompt
+
+
+def test_generation_prompt_excludes_the_spec() -> None:
+  # The spec travels as the system prompt (a stable, cacheable prefix),
+  # so the user-turn prompt must not duplicate it.
+  prompt = prompt_rendering.build_generation_prompt(
+    FAKE_TEMPLATES,
+    [WordEntry('ZERO')],
+    american_per_word=2,
+    cryptic_per_word=2,
+    category_note='',
+  )
+  assert 'THE SPEC' not in prompt
 
 
 def test_retry_entry_carries_failure_reasons_on_one_line() -> None:
@@ -64,9 +76,16 @@ def test_verification_prompt_includes_clue_lines() -> None:
   prompt = prompt_rendering.build_verification_prompt(
     FAKE_TEMPLATES, ['{"word": "ZERO"}', '{"word": "NIL"}']
   )
-  assert 'THE SPEC' in prompt
   assert '{"word": "ZERO"}' in prompt
   assert '{{' not in prompt
+
+
+def test_verification_prompt_excludes_the_spec() -> None:
+  # Same contract as generation: the spec rides in the system prompt.
+  prompt = prompt_rendering.build_verification_prompt(
+    FAKE_TEMPLATES, ['{"word": "ZERO"}']
+  )
+  assert 'THE SPEC' not in prompt
 
 
 def test_load_templates_from_project_directory() -> None:

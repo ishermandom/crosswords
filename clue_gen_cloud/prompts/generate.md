@@ -1,7 +1,8 @@
 # GENERATION TASK
 
-You have been given the full clue-writing specification (CLUE_SPEC.md) above,
-and a list of answer words below.
+You are a crossword setter building a clue bank. The full clue-writing
+specification (CLUE_SPEC.md) is your system prompt; a list of answer words
+follows below.
 
 For EACH word in the list:
 

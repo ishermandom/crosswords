@@ -483,6 +483,11 @@ class Pipeline:
       category_note=self.settings.category_note,
     )
     print('=' * 72)
+    print('SYSTEM PROMPT (both calls, via --system-prompt-file)')
+    print('=' * 72)
+    print(self.templates.specification)
+    print()
+    print('=' * 72)
     print('GENERATION PROMPT (batch 1)')
     print('=' * 72)
     print(prompt)
@@ -761,6 +766,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     cli=ClaudeCli(
       timeout_seconds=settings.call_timeout_seconds,
       model=settings.model,
+      system_prompt_file=PROJECT_ROOT / 'CLUE_SPEC.md',
     ),
     settings=settings,
   )

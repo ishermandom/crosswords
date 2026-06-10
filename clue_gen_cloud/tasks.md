@@ -100,16 +100,73 @@ reads the way dollar billing does (~0.1×). Measure before building.
   - Note: `[usage]` lines per call plus a run-total line, in stdout and
     out/run.log; also captures `session_id` and `total_cost_usd` (the latter
     directly encodes the cache discount, useful for the quota comparison).
-- [ ] 1-word instrumented run (`run --limit 1 --batch-size 1`); then quota
+- [x] 1-word instrumented run (`run --limit 1 --batch-size 1`); then quota
       checkpoint. Depends on #usage-instrumentation
   - Rationale: one word is the pessimal input-to-output ratio, so it is the most
     instructive case for caching questions — and the cheapest (~4.5% quota vs
     ~41% for the 12-word slice).
-- [ ] Decide the next caching step from the numbers: session-resume (multi-turn)
+  - Note: batch 5, one retry word, 4/4 clues accepted. Usage — generate:
+    input=2069 output=4782 cache_read=15818 cache_write=13776 ($0.452); verify:
+    input=2069 output=2351 cache_read=15818 cache_write=14991 ($0.346); run
+    total $0.798.
+  - Note: quota 60% → 71%, so ~11% including Claude's report turn — high vs the
+    ~3.4%/word at batch 8, confirming batching remains the dominant quota lever
+    (fixed per-call cost).
+  - Note: findings — the CLI's static prefix (15.8K tokens) cache-hits on both
+    calls already; dollar cost splits ~45% output / ~45% cache writes (the ~14K
+    CLUE_SPEC+template suffix is written at 1.25× every call and never re-read);
+    a session-resume design would turn those writes into 0.1× reads, cutting
+    ~40% of dollar cost. Cost math matches 5-minute-TTL pricing (write 1.25×),
+    so `claude -p` is on the short TTL — relevant to any --pace design.
+- [x] Decide the next caching step from the numbers: session-resume (multi-turn)
       redesign, a larger comparison run, or drop the idea
   - Note: key signals — does the batch's second call show cache reads > 0 (CLI
     system prefix already caching); what share of cost is output (uncacheable);
     does the quota delta look discounted relative to usage-derived cost.
+  - Note: decision (2026-06-10) — probe → trim → session-resume. Probe the
+    preamble composition with cheap haiku micro-calls; implement whichever trims
+    verify (scratch cwd, skills/tools/CLAUDE.md exclusions); then build
+    session-resume against the post-trim numbers. Caveat: the 5-minute cache TTL
+    vs long generate-call durations means session-resume favors small-to-medium
+    batches.
+  - Note: user correction — the slice quota figures (e.g. 3.4%/word at batch 8)
+    already included prefix caching, so batching, trimming, and session-resume
+    are overlapping attacks on the same fixed per-call cost, not additive
+    levers.
+- [x] Preamble probe matrix: haiku micro-calls
+      (`claude -p --model claude-haiku-4-5`) comparing prompt composition across
+      cwd / env / flag variants; record usage per variant #preamble-probes
+  - Note: total prompt tokens (input + cache write + cache read) per variant,
+    prompt "Reply with exactly: OK" — project-default 28,277 · scratch-cwd
+    27,408 · + `--disable-slash-commands` 25,376 · + `--system-prompt <short>`
+    19,304 · + `--disallowedTools "*"` **3,592**. Tool definitions ≈ 15.7K,
+    default system prompt ≈ 6K, skills listing ≈ 2K, project context ≈ 0.9K.
+  - Note: `--bare` is ruled out — it never reads OAuth (API key only), so it
+    would bill the metered API instead of the plan; the targeted flags above
+    keep OAuth/plan billing.
+  - Note: implication — moving the static content (CLUE_SPEC + fixed task
+    instructions) into `--system-prompt` makes the prefix byte-identical across
+    fresh calls, so it should cache-read across invocations (as the default
+    system prompt does today), likely making session-resume unnecessary.
+    Preamble cut ≈ 87%; projected 1-word run cost ~$0.80 → ~$0.45-0.50 (output
+    untouched).
+- [~] Implement the verified trims: scratch cwd, `--disable-slash-commands`,
+  `--disallowedTools "*"`, and `--system-prompt-file CLUE_SPEC.md`; task
+  instructions + variables stay in the user turn. Then a 1-word measured run to
+  confirm cost and quality. Depends on #preamble-probes
+  - Note: design — the system prompt carries ONLY the spec, shared verbatim by
+    both call types so its cache entry is touched on every call (most TTL-robust
+    shape). Personas differ by task and stay in the user-turn templates: setter
+    in generate.md, editor in verify.md (user decision 2026-06-10); the spec's
+    opening is reworded persona-neutral. Carrying the ~700-token task
+    instructions uncached costs ~$0.007/call — accepted.
+- [ ] Session-resume (multi-turn) design: likely moot if the system-prompt
+      prefix cache-reads across fresh calls (verify on the post-trim measured
+      run — cache_read ≈ prefix size on call 2); keep only if the post-trim
+      numbers still show meaningful never-read writes
+  - Note: if implemented, session-resume would additionally cache the per-turn
+    task instructions (~700 tokens/call ≈ $0.007/call) — currently estimated not
+    to be worth the architecture, pending post-trim data.
 
 ---
 

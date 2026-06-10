@@ -9,14 +9,22 @@ surfaces plan rate limits as a distinct exception so the pipeline can
 stop gracefully and rely on resumability.
 
 Calls use `--output-format json` so each response carries token usage
-(including prompt-cache reads and writes) alongside the model text —
-the raw data for deciding whether prompt caching can cut quota cost.
+(including prompt-cache reads and writes) alongside the model text.
+
+The prompt is kept lean and cache-friendly (probe-measured 2026-06-10,
+~28K → ~3.6K tokens of harness preamble): tool definitions and the
+skills listing are excluded (`--disallowedTools "*"`,
+`--disable-slash-commands`), calls run from an empty scratch directory
+so no project context is auto-loaded, and the stable spec text is
+passed as the system prompt (`--system-prompt-file`) where its
+byte-identical prefix is cached across calls.
 """
 
 import json
 import os
 import re
 import subprocess
+import tempfile
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -132,6 +140,33 @@ def describe_usage(label: str, response: CliResponse) -> str:
   )
 
 
+def build_cli_command(
+  executable: str,
+  model: str | None,
+  system_prompt_file: Path | None,
+) -> list[str]:
+  """The argv for one non-interactive, prompt-lean CLI call.
+
+  `--disallowedTools "*"` removes all tool definitions from the prompt
+  and `--disable-slash-commands` removes the skills listing — together
+  the bulk of the harness preamble.
+  """
+  command = [
+    executable,
+    '-p',
+    '--output-format',
+    'json',
+    '--disable-slash-commands',
+    '--disallowedTools',
+    '*',
+  ]
+  if model:
+    command += ['--model', model]
+  if system_prompt_file is not None:
+    command += ['--system-prompt-file', str(system_prompt_file)]
+  return command
+
+
 def _subprocess_environment() -> dict[str, str]:
   """The child environment, with the OAuth token injected if present."""
   environment = dict(os.environ)
@@ -149,21 +184,29 @@ class ClaudeCli:
     self,
     timeout_seconds: float,
     model: str | None = None,
+    system_prompt_file: Path | None = None,
     executable: str = 'claude',
     environment: Mapping[str, str] | None = None,
   ) -> None:
     """Configure the wrapper; environment overrides are for tests.
 
     model is passed through as `claude --model`; None uses the CLI
-    account's configured default.
+    account's configured default. system_prompt_file replaces the CLI's
+    default system prompt — the stable, cacheable home for spec text.
     """
     self.timeout_seconds = timeout_seconds
     self.model = model
+    self.system_prompt_file = system_prompt_file
     self.executable = executable
     self.environment = (
       dict(environment)
       if environment is not None
       else _subprocess_environment()
+    )
+    # Calls run from an empty scratch directory so the CLI auto-loads no
+    # project context (CLAUDE.md chain, auto-memory) into the prompt.
+    self._scratch_directory = tempfile.TemporaryDirectory(
+      prefix='clue-gen-claude-'
     )
 
   def complete(
@@ -179,9 +222,9 @@ class ClaudeCli:
     transport failure worth one retry. Raises RateLimited or
     TransportFailure.
     """
-    command = [self.executable, '-p', '--output-format', 'json']
-    if self.model:
-      command += ['--model', self.model]
+    command = build_cli_command(
+      self.executable, self.model, self.system_prompt_file
+    )
 
     failure_details = []
     for attempt in (1, 2):
@@ -193,6 +236,7 @@ class ClaudeCli:
           text=True,
           timeout=self.timeout_seconds,
           env=self.environment,
+          cwd=self._scratch_directory.name,
         )
       except subprocess.TimeoutExpired:
         failure_details.append(
