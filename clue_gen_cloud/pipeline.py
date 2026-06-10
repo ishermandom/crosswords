@@ -17,7 +17,7 @@ import json
 import sys
 import time
 from collections import Counter, defaultdict
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -27,7 +27,13 @@ from bank_state import (
   VERDICT_REVISE,
   BankState,
 )
-from claude_cli import ClaudeCli, RateLimited, TransportFailure
+from claude_cli import (
+  CallUsage,
+  ClaudeCli,
+  RateLimited,
+  TransportFailure,
+  describe_usage,
+)
 from mechanical_checks import (
   check_word_output,
   clue_style_of,
@@ -196,12 +202,54 @@ class Pipeline:
     self.cli = cli
     self.settings = settings
     self._last_batch_start: float | None = None
+    self._usage_records: list[CallUsage] = []
+    self._cost_records: list[float] = []
+    self._calls_missing_usage = 0
 
   def log(self, message: str) -> None:
     """Print a progress line and append it to out/run.log."""
     print(message, flush=True)
     with open(self.state.out_dir / 'run.log', 'a') as handle:
       handle.write(f'{time.strftime("%F %T")} {message}\n')
+
+  def _complete_logged(
+    self,
+    label: str,
+    prompt: str,
+    is_valid: Callable[[str], bool],
+  ) -> str:
+    """Run one CLI call, log its token usage, and return the text."""
+    response = self.cli.complete(prompt, is_valid=is_valid)
+    self.log(describe_usage(label, response))
+    if response.usage is None:
+      self._calls_missing_usage += 1
+    else:
+      self._usage_records.append(response.usage)
+    if response.cost_usd is not None:
+      self._cost_records.append(response.cost_usd)
+    return response.text
+
+  def _log_usage_summary(self) -> None:
+    """Log run-total token usage across all CLI calls, if any."""
+    call_count = len(self._usage_records) + self._calls_missing_usage
+    if call_count == 0:
+      return
+    missing = (
+      f' ({self._calls_missing_usage} call(s) missing usage)'
+      if self._calls_missing_usage
+      else ''
+    )
+    cost = f' cost=${sum(self._cost_records):.4f}' if self._cost_records else ''
+    self.log(
+      f'[usage] run total over {call_count} call(s):'
+      f' input={sum(u.input_tokens for u in self._usage_records)}'
+      f' output={sum(u.output_tokens for u in self._usage_records)}'
+      f' cache_read='
+      f'{sum(u.cache_read_input_tokens for u in self._usage_records)}'
+      f' cache_write='
+      f'{sum(u.cache_creation_input_tokens for u in self._usage_records)}'
+      f'{cost}{missing}'
+    )
 
   # --- Batch composition ---
 
@@ -246,7 +294,7 @@ class Pipeline:
       cryptic_per_word=self.settings.cryptic_per_word,
       category_note=self.settings.category_note,
     )
-    output = self.cli.complete(prompt, is_valid=is_generation_output)
+    output = self._complete_logged('generate', prompt, is_generation_output)
     objects, unparsed = parse_json_lines(output)
     if unparsed:
       self.state.record_unparsed_output(batch=batch_id, lines=unparsed)
@@ -343,7 +391,7 @@ class Pipeline:
       for word, _, _, _, clue, flags in items
     ]
     prompt = build_verification_prompt(self.templates, lines)
-    output = self.cli.complete(prompt, is_valid=is_verification_output)
+    output = self._complete_logged('verify', prompt, is_verification_output)
     judge_objects, _ = parse_json_lines(output)
 
     judges_by_word: defaultdict[str, list[dict[str, object]]] = defaultdict(
@@ -485,6 +533,8 @@ class Pipeline:
         f'CLI call failed twice — stopping; re-run to resume. Details: {error}'
       )
       return 1
+    finally:
+      self._log_usage_summary()
     return 0
 
 

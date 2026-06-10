@@ -77,6 +77,56 @@ experiment concludes, so the original 20-word slices were cut down).
 
 ---
 
+## Phase 3b — Caching instrumentation and measurement
+
+**Goal:** make per-call token usage visible (input/output/cache split) and
+measure it on the cheapest sufficient run, to decide whether a prompt-caching
+redesign can meaningfully cut quota consumption.
+
+### Background
+
+Theoretical assessment (2026-06-10): `claude -p` applies prompt caching
+automatically with no user control over breakpoints; the CLI's own system
+prompt + tools are byte-identical across back-to-back calls and likely already
+cache-hit; CLUE_SPEC sits inside the user message with variables interleaved, so
+it likely never caches — only a multi-turn session design (`--resume`) could
+cache it. Two unknowns gate any redesign: the input/output split of the fixed
+per-batch cost (output is uncacheable), and whether plan quota discounts cache
+reads the way dollar billing does (~0.1×). Measure before building.
+
+- [x] Add per-call usage capture to the CLI wrapper: `--output-format json`,
+      parse the envelope, log usage (input, output, cache read, cache write) per
+      call and per run #usage-instrumentation
+  - Note: `[usage]` lines per call plus a run-total line, in stdout and
+    out/run.log; also captures `session_id` and `total_cost_usd` (the latter
+    directly encodes the cache discount, useful for the quota comparison).
+- [ ] 1-word instrumented run (`run --limit 1 --batch-size 1`); then quota
+      checkpoint. Depends on #usage-instrumentation
+  - Rationale: one word is the pessimal input-to-output ratio, so it is the most
+    instructive case for caching questions — and the cheapest (~4.5% quota vs
+    ~41% for the 12-word slice).
+- [ ] Decide the next caching step from the numbers: session-resume (multi-turn)
+      redesign, a larger comparison run, or drop the idea
+  - Note: key signals — does the batch's second call show cache reads > 0 (CLI
+    system prefix already caching); what share of cost is output (uncacheable);
+    does the quota delta look discounted relative to usage-derived cost.
+
+---
+
+## Phase 3c — Project README ✓
+
+**Goal:** give the project a front door — goals, pipeline overview, and how to
+run it — so a fresh reader (or session) doesn't need to reverse-engineer
+kickoff.md and the code.
+
+- [x] Write README.md: goals and approach (drawing on kickoff.md), the generate
+      → mech-check → verify flow, why it runs on `claude -p` (plan quota vs API
+      billing), CLI usage and key flags
+  - Note: status tracking stays in tasks.md as the single source of truth; the
+    README links to it rather than duplicating per-phase status.
+
+---
+
 ## Phase 4 — Full run
 
 **Goal:** process the rest of words.in (the kickoff document's somewhat misnamed
@@ -94,6 +144,8 @@ experiment concludes, so the original 20-word slices were cut down).
 - [ ] Retried words regenerate a full clue set even when most clues are already
       accepted (dedup discards the duplicates, but the generation quota is
       spent); consider asking only for replacements for the revised clues
-- [ ] Investigate whether the script can take advantage of prompt caching —
-      the per-call prompts share large static prefixes (templates, spec), so
-      cache hits might significantly cut quota consumption
+- [~] Investigate whether the script can take advantage of prompt caching — the
+  per-call prompts share large static prefixes (templates, spec), so cache hits
+  might significantly cut quota consumption
+  - Note: in progress as Phase 3b — instrumentation first, then a 1-word
+    measured run, then a decision on any redesign.
