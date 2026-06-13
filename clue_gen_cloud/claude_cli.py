@@ -170,9 +170,8 @@ class ClaudeCli:
     model: str | None = None,
     system_prompt_file: Path | None = None,
     executable: str = 'claude',
-    environment: Mapping[str, str] | None = None,
   ) -> None:
-    """Configure the wrapper; environment overrides are for tests.
+    """Configure the wrapper.
 
     model is passed through as `claude --model`; None uses the CLI
     account's configured default. system_prompt_file replaces the CLI's
@@ -182,7 +181,6 @@ class ClaudeCli:
     self.model = model
     self.system_prompt_file = system_prompt_file
     self.executable = executable
-    self.environment = dict(environment) if environment is not None else None
     # Calls run from an empty scratch directory so the CLI auto-loads no
     # project context (CLAUDE.md chain, auto-memory) into the prompt.
     self._scratch_directory = tempfile.TemporaryDirectory(
@@ -215,7 +213,6 @@ class ClaudeCli:
           capture_output=True,
           text=True,
           timeout=self.timeout_seconds,
-          env=self.environment,
           cwd=self._scratch_directory.name,
         )
       except subprocess.TimeoutExpired:
