@@ -21,7 +21,6 @@ byte-identical prefix is cached across calls.
 """
 
 import json
-import os
 import re
 import subprocess
 import tempfile
@@ -33,11 +32,6 @@ from pathlib import Path
 RATE_LIMIT_PATTERN = re.compile(
   r'usage limit|rate limit|limit reached|out of extra usage', re.I
 )
-
-# Long-lived OAuth token minted via `claude setup-token`, used because
-# su-based claude-sandbox sessions cannot unlock the login keychain that
-# the CLI reads credentials from by default.
-OAUTH_TOKEN_PATH = Path.home() / '.claude' / 'oauth-token'
 
 OUTPUT_EXCERPT_LENGTH = 400
 
@@ -167,16 +161,6 @@ def build_cli_command(
   return command
 
 
-def _subprocess_environment() -> dict[str, str]:
-  """The child environment, with the OAuth token injected if present."""
-  environment = dict(os.environ)
-  if OAUTH_TOKEN_PATH.exists():
-    token = OAUTH_TOKEN_PATH.read_text().strip()
-    if token:
-      environment['CLAUDE_CODE_OAUTH_TOKEN'] = token
-  return environment
-
-
 class ClaudeCli:
   """Runs prompts through the `claude` CLI in non-interactive mode."""
 
@@ -198,11 +182,7 @@ class ClaudeCli:
     self.model = model
     self.system_prompt_file = system_prompt_file
     self.executable = executable
-    self.environment = (
-      dict(environment)
-      if environment is not None
-      else _subprocess_environment()
-    )
+    self.environment = dict(environment) if environment is not None else None
     # Calls run from an empty scratch directory so the CLI auto-loads no
     # project context (CLAUDE.md chain, auto-memory) into the prompt.
     self._scratch_directory = tempfile.TemporaryDirectory(
