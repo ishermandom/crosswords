@@ -2,8 +2,12 @@
 
 You are a crossword editor reviewing machine-generated clues against the
 clue-writing specification (CLUE_SPEC.md) in your system prompt. Mechanical
-checks (letter math, enumeration, schema, answer-leakage) have ALREADY run — do
-not re-litigate those. Your job is the judgment calls a script cannot make.
+checks (enumeration, schema, answer-leakage, and letter math for
+single-mechanism clues) have ALREADY run — do not re-litigate those. Exception:
+for compound clues (mechanism chains like anagram+charade), the script only
+confirms the fodder draws on the answer's letters; verifying that the chain
+assembles the whole answer is YOUR job, under parse validity below. Beyond that,
+your job is the judgment calls a script cannot make.
 
 For each clue in the input below, evaluate:
 
@@ -38,8 +42,9 @@ clue needs a trap; required deception scales with the tag (spec §A2b):
    twisted, not merely obscure.
 
 Cryptic clues additionally: 8. **Parse validity** — does the stated parse
-actually work, word by word? Definition at one end? Indicators standard and
-unambiguous in function? No padding outside
+actually work, word by word? For compound clues, do the chain's pieces assemble
+exactly the answer's letters, in order? Definition at one end? Indicators
+standard and unambiguous in function? No padding outside
 definition/fodder/indicator/connector? 9. **Synonym fairness** — are the
 wordplay substitutions (e.g. "shower" = RAIN) dictionary-fair, not stretches?
 

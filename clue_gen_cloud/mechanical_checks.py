@@ -8,6 +8,7 @@ Failures here skip the LLM verify step entirely, so they cost no tokens.
 """
 
 import re
+from collections import Counter
 from collections.abc import Mapping, Set
 from dataclasses import dataclass, field
 from enum import StrEnum
@@ -66,6 +67,37 @@ STEM_SUFFIXES: tuple[str, ...] = (
 
 # Stems shorter than this produce too many false positives to flag.
 MINIMUM_STEM_LENGTH = 4
+
+# Device keywords from spec B2. A mechanism naming one device gets full
+# letter-math checks; a compound chain ("anagram+charade") gets only the
+# checks that hold for a device contributing part of the answer.
+MECHANISM_DEVICES: tuple[str, ...] = (
+  'anagram',
+  'charade',
+  'container',
+  'insertion',
+  'hidden',
+  'reversal',
+  'homophone',
+  'deletion',
+  'double definition',
+  '&lit',
+)
+
+
+def mechanism_devices(mechanism: str) -> frozenset[str]:
+  """The permitted-device keywords a mechanism string names."""
+  lowered = mechanism.lower()
+  return frozenset(d for d in MECHANISM_DEVICES if d in lowered)
+
+
+def is_proper_letter_subset(part: str, whole: str) -> bool:
+  """Whether part's letters form a proper sub-multiset of whole's."""
+  part_counts = Counter(letters_only(part))
+  whole_counts = Counter(letters_only(whole))
+  # Counter subtraction keeps only positive counts, so an empty difference
+  # means containment; != rules out using every letter.
+  return part_counts != whole_counts and not part_counts - whole_counts
 
 
 def letters_only(text: str) -> str:
@@ -229,7 +261,12 @@ def _check_cryptic_fields(
   clue_text: str,
   failures: list[str],
 ) -> None:
-  """Cryptic clues need parse fields, exact letter math, and enumeration."""
+  """Cryptic clues need parse fields, enumeration, and letter math.
+
+  Letter math is mechanism-aware: a pure anagram or hidden clue must
+  account for the whole answer, while a compound chain ("anagram+charade")
+  gets only the checks that hold for a device yielding part of it.
+  """
   for required in ('definition', 'mechanism', 'parse'):
     value = clue.get(required)
     if not isinstance(value, str) or not value.strip():
@@ -243,6 +280,7 @@ def _check_cryptic_fields(
     )
 
   mechanism = str(clue.get('mechanism') or '').lower()
+  devices = mechanism_devices(mechanism)
   fodder = clue.get('anagram_fodder')
   hidden = clue.get('hidden_string')
 
@@ -252,10 +290,19 @@ def _check_cryptic_fields(
     failures.append('hidden mechanism requires hidden_string')
 
   if isinstance(fodder, str):
-    if sorted(letters_only(fodder)) != sorted(letters_only(answer)):
+    if devices == {'anagram'}:
+      # A lone anagram must account for every letter of the answer.
+      if sorted(letters_only(fodder)) != sorted(letters_only(answer)):
+        failures.append(
+          f'anagram fodder {fodder!r} is not an exact letter'
+          f' multiset of the answer'
+        )
+    elif not is_proper_letter_subset(fodder, answer):
+      # In a compound chain the anagram yields only part of the answer, so
+      # the fodder must draw on strictly fewer than all of its letters.
       failures.append(
-        f'anagram fodder {fodder!r} is not an exact letter'
-        f' multiset of the answer'
+        f'anagram fodder {fodder!r} must use a proper subset of the'
+        f" answer's letters in a compound clue"
       )
     if fodder.strip().lower() not in clue_text.lower():
       failures.append(
@@ -265,7 +312,11 @@ def _check_cryptic_fields(
     failures.append(f'anagram_fodder must be a string, got {fodder!r}')
 
   if isinstance(hidden, str):
-    if letters_only(answer) not in letters_only(hidden):
+    # A compound chain hides only part of the answer, and code can't
+    # isolate which part — that letter math is left to the LLM verifier.
+    if devices == {'hidden'} and (
+      letters_only(answer) not in letters_only(hidden)
+    ):
       failures.append(
         f'hidden_string {hidden!r} does not contain the answer'
         f' as a contiguous substring'

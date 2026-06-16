@@ -138,6 +138,57 @@ def test_anagram_mechanism_requires_fodder() -> None:
   assert check('SOUTHWARD', clue).failures
 
 
+def test_compound_anagram_accepts_partial_fodder() -> None:
+  # TIFF* + Y: the fodder anagrams to FIFT, the charade supplies the Y.
+  clue = _make_cryptic(
+    clue='Wild tiff, then unknown — the bull, in darts (5)',
+    definition='the bull, in darts',
+    mechanism='anagram+charade',
+    anagram_fodder='tiff',
+    parse="anagram of TIFF ('wild') + Y ('unknown') = FIFT + Y",
+  )
+  assert check('FIFTY', clue).failures == []
+
+
+def test_compound_anagram_fodder_outside_answer_letters_fails() -> None:
+  # 'taffy' brings an A that FIFTY has no use for.
+  clue = _make_cryptic(
+    clue='Wild taffy, then unknown — the bull, in darts (5)',
+    mechanism='anagram+charade',
+    anagram_fodder='taffy',
+  )
+  assert any('fodder' in f for f in check('FIFTY', clue).failures)
+
+
+def test_compound_anagram_fodder_covering_whole_answer_fails() -> None:
+  # The fodder alone spells the answer, leaving the charade nothing to add.
+  clue = _make_cryptic(
+    clue='Spilled draws thou going down, on most maps (9)',
+    mechanism='anagram+charade',
+    anagram_fodder='draws thou',
+  )
+  assert any('fodder' in f for f in check('SOUTHWARD', clue).failures)
+
+
+def test_compound_anagram_fodder_absent_from_clue_fails() -> None:
+  clue = _make_cryptic(
+    clue='Wild row, then unknown — the bull, in darts (5)',
+    mechanism='anagram+charade',
+    anagram_fodder='tiff',
+  )
+  assert any('fodder' in f for f in check('FIFTY', clue).failures)
+
+
+def test_pure_anagram_rejects_partial_fodder() -> None:
+  # A lone anagram must account for every letter; 'tiff' leaves the Y short.
+  clue = _make_cryptic(
+    clue='Wild tiff — the bull, in darts (5)',
+    mechanism='anagram',
+    anagram_fodder='tiff',
+  )
+  assert any('fodder' in f for f in check('FIFTY', clue).failures)
+
+
 def test_hidden_clue_passes() -> None:
   clue = _make_cryptic(
     clue='Cut some becalmed items (4)',
@@ -168,6 +219,30 @@ def test_hidden_string_absent_from_clue_fails() -> None:
     hidden_string='becalm editor',
   )
   assert any('hidden' in f for f in check('EDIT', clue).failures)
+
+
+def test_compound_hidden_skips_containment_check() -> None:
+  # Hidden yields EDIT, the charade appends OR; the hidden string need not
+  # contain the whole answer, and code can't isolate the hidden part.
+  clue = _make_cryptic(
+    clue='Some becalmed items take gold — boss (6)',
+    definition='boss',
+    mechanism='hidden+charade',
+    anagram_fodder=None,
+    hidden_string='becalmed items',
+    parse="EDIT hidden in 'becalmED ITems' + OR ('gold')",
+  )
+  assert check('EDITOR', clue).failures == []
+
+
+def test_compound_hidden_string_absent_from_clue_fails() -> None:
+  clue = _make_cryptic(
+    clue='Some quiet rooms take gold — boss (6)',
+    mechanism='hidden+charade',
+    anagram_fodder=None,
+    hidden_string='becalmed items',
+  )
+  assert any('hidden' in f for f in check('EDITOR', clue).failures)
 
 
 # --- Answer leakage ---
