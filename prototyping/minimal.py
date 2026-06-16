@@ -1,29 +1,11 @@
-import collections.abc
-
 import httpx
 import openai
 from openai.types.shared_params import ResponseFormatJSONSchema
-
-original_send: collections.abc.Callable[..., httpx.Response] = httpx.Client.send
-
-
-def debug_send(
-  self: httpx.Client,
-  request: httpx.Request,
-  *args: object,
-  **kwargs: object,
-) -> httpx.Response:
-  print('\n=== REQUEST BODY ===')
-  print(request.content.decode())
-  return original_send(self, request, *args, **kwargs)
-
 
 client = openai.OpenAI(
   base_url='http://localhost:11434/v1',
   api_key='ollama',
 )
-
-setattr(httpx.Client, 'send', debug_send)
 
 schema = ResponseFormatJSONSchema(
   type='json_schema',
