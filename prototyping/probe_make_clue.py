@@ -79,12 +79,18 @@ surface can live in sports, finance, fashion, idiom, historical usage, or
 any other territory while the answer draws on a potentially different sense.
 
 Structural device — what kind of wordplay or definitional approach makes
-the connection? Examples: direct definition, fill-in-the-blank, double
-meaning exploiting two senses, part-of-speech switch, indirect definition
-via a related phrase, pun, misdirection via a garden path read, etc.
+the connection? Two broad subcategories to draw from:
 
-These illustrate the kinds of variation to seek, not an exhaustive
-taxonomy — go beyond them freely.
+Definitional: direct definition, fill-in-the-blank, indirect definition
+via a related phrase, synonym, near-synonym, and so on.
+
+Wordplay: double meaning exploiting two senses simultaneously, part-of-
+speech switch disguising the answer's grammatical role, garden-path
+misdirection where the surface leads the solver toward a different sense,
+pun, and so on.
+
+Include several angles from each subcategory — not just variations on
+direct definition. Go beyond both lists freely.
 
 For each angle, give it a name and one or two sentences on how it applies
 to {word}. No clue drafts — this turn is about breadth, not specific
