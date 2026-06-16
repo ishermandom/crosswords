@@ -6,6 +6,19 @@ Each pipeline run consumes shared plan quota, so every run below is followed by
 a checkpoint: ask the user for the observed quota impact before starting the
 next run.
 
+## Auth — keychain migration
+
+**Goal:** confirm the pipeline still authenticates after `claude_cli.py` dropped
+its `CLAUDE_CODE_OAUTH_TOKEN` injection and now relies on the dedicated macOS
+keychain that the login shell unlocks.
+
+- [ ] Live-validate auth after the token-read removal: a tiny call (e.g.
+      `run --limit 1 --batch-size 1`) that authenticates and bills the plan, not
+      the metered API. Only needed if a live run happens for other reasons —
+      fold the check into the next run rather than spending quota on it alone.
+
+---
+
 ## Phase 1 — Model pinning ✓
 
 **Goal:** every pipeline run uses Fable 5 unless explicitly overridden.
@@ -63,10 +76,65 @@ experiment concludes, so the original 20-word slices were cut down).
     slice 1's 95.5% — possible quality dip at batch 8, or noise; the revises
     were all editorial-angle catches, not unsound clues).
   - Note: quota 57% → 84%, so ~27% for 8 words ≈ 3.4%/word — a real per-word
-    efficiency gain over batch 6's ~4.5%/word.
-- [ ] Slice 3: `run --limit 12 --batch-size 12`; then quota checkpoint
-  - Note: needs a fresh quota window (~41% projected at 3.4%/word; 16% remained
-    after slice 2). 12 was the originally planned batch size.
+    efficiency gain over batch 6's ~4.5%/word. Post-trim re-measurement (user
+    decision 2026-06-10): the slice 1–2 figures above predate the prompt trims,
+    so they are not comparable to post-trim runs. Re-measure 3-, 6-, and 12-word
+    batches with the trimmed design, each preceded by a cache prewarm so every
+    batch starts with the spec prefix warm (apples-to-apples): a 1-word run
+    immediately before, skipped if the prefix is already warm (last
+    spec-touching call within the 5-minute TTL).
+
+- [x] Prewarm, then `run --limit 3 --batch-size 3`; quota checkpoint after each
+  - Note: prewarm (batch 8, 1 retry word) — 4/4 mech pass, 3 accept / 1 revise;
+    generate read=0/write=9673, verify read=4014 (spec prefix hit), $0.854.
+  - Note: 3-word run (batch 9) — 12 clues, 12/12 mech pass, 11 accept / 1
+    revise; both calls read=4014 (prewarm worked), total $1.457 with heavy
+    output (23,472 tokens).
+  - Note: quota 70% (after prewarm) → 87%, so ~17% for 3 words ≈ 5.7%/word at
+    batch 3 post-trim. Pre-prewarm baseline not captured, so the prewarm's own
+    cost is folded into the 70% reading.
+- [x] Prewarm, then `run --limit 6 --batch-size 6`; quota checkpoint after each
+  - Note: prewarm (batch 11, 1 retry word) — 4/4 mech pass, 3 accept / 1 revise;
+    quota 3% → 12% (~9%).
+  - Note: 6-word run (batch 12) — 24 clues, 22/24 mech pass, 19 accept / 3
+    revise; both calls cache-read the spec prefix; $2.393, with output (41,692
+    tokens) dominating cost. Quota 13% → 40%, so ~27% ≈ 4.5%/word — identical to
+    the pre-trim batch-6 figure; the trim's savings fade as batch size grows
+    because output, not input preamble, dominates.
+  - Note: both mech failures were checker false positives on compound mechanisms
+    (FIFTY anagram+charade, SIXTY anagram+container) — see the backlog item on
+    fodder checking.
+  - Note: 2-word burn-down run (batch 10, 2026-06-10, warm prefix, quota delta
+    not measured) — 8/8 mech pass, 7 accept / 1 revise, $1.144.
+- [x] Unplanned post-trim batch-8 run (2026-06-11, unwarmed, sized to fit the
+      ~40% left in the quota window; window reset before a reading, so impact is
+      estimated, not measured)
+  - Note: batch 13 — 8 words (4 retries, incl. FIFTY/SIXTY), 32 clues, 32/32
+    mech pass, 31 accept / 1 revise (96.9%, best of any batch; the pre-trim
+    "quality dip at batch 8" worry does not reproduce post-trim). All 8 words
+    completed; bank at 147 accepted, 30/547.
+  - Note: compound-mechanism fix validated end to end — HUNDRED's
+    charade+anagram ("Husband agitated under daughter — a century", H + UNDER\*
+    - D) passed the new sub-multiset check and the verifier accepted its chain
+      letter math; the old checker rejected exactly this shape.
+  - Note: the revise was NINETEEN's double definition (both halves reference the
+    same sense) — a legitimate editorial catch.
+  - Note: usage — generate read=4014/write=6050, output 38,183 ($2.035); verify
+    read=4014/write=11,105, output 12,023 ($0.832); total $2.868. The generate
+    call cache-read the spec prefix despite no prewarm and hours since the last
+    spec-touching call — the cache outlived its nominal 5-minute TTL, so this is
+    not a clean cold data point.
+  - Note: quota ended at 91%; start estimated ~60% (session opened at 52%, then
+    a file-edit turn before the run), so ~31% ≈ 3.9%/word. Token model (quota% ≈
+    0.65 × output Ktok + 0.1 × prompt Ktok) predicted ~35% — directionally
+    right, mild overcount as expected given half the batch was retry words
+    inflating output. Dollar cost alone predicts quota poorly (±20%, biased by
+    the 1.25×/0.1× cache write/read pricing quota doesn't apply).
+- [ ] Slice 3, prewarmed: 1-word prewarm run, then
+      `run --limit 12 --batch-size 12`; quota checkpoint after each
+  - Note: needs a fresh quota window (~41% projected at the pre-trim 3.4%/word —
+    likely less post-trim; 57% remained after the second post-trim 1-word run).
+    12 was the originally planned batch size.
 - [ ] Slice 4: `run --limit 20 --batch-size 20`, ONLY IF slice 3 shows per-word
       quota cost still falling with batch size; if cost per word is roughly
       constant per run, skip this and prefer smaller batches
@@ -77,7 +145,7 @@ experiment concludes, so the original 20-word slices were cut down).
 
 ---
 
-## Phase 3b — Caching instrumentation and measurement
+## Phase 3b — Caching instrumentation and measurement ✓
 
 **Goal:** make per-call token usage visible (input/output/cache split) and
 measure it on the cheapest sufficient run, to decide whether a prompt-caching
@@ -150,16 +218,35 @@ reads the way dollar billing does (~0.1×). Measure before building.
     system prompt does today), likely making session-resume unnecessary.
     Preamble cut ≈ 87%; projected 1-word run cost ~$0.80 → ~$0.45-0.50 (output
     untouched).
-- [~] Implement the verified trims: scratch cwd, `--disable-slash-commands`,
-  `--disallowedTools "*"`, and `--system-prompt-file CLUE_SPEC.md`; task
-  instructions + variables stay in the user turn. Then a 1-word measured run to
-  confirm cost and quality. Depends on #preamble-probes
+- [x] Implement the verified trims: scratch cwd, `--disable-slash-commands`,
+      `--disallowedTools "*"`, and `--system-prompt-file CLUE_SPEC.md`; task
+      instructions + variables stay in the user turn. Then a 1-word measured run
+      to confirm cost and quality. Depends on #preamble-probes
   - Note: design — the system prompt carries ONLY the spec, shared verbatim by
     both call types so its cache entry is touched on every call (most TTL-robust
     shape). Personas differ by task and stay in the user-turn templates: setter
     in generate.md, editor in verify.md (user decision 2026-06-10); the spec's
     opening is reworded persona-neutral. Carrying the ~700-token task
     instructions uncached costs ~$0.007/call — accepted.
+  - Note: measured run (2026-06-10, batch 6, one retry word) — generate:
+    read=0/write=9485 ($0.459); verify: read=4014/write=6548 ($0.275); total
+    $0.735. Verify's 4014-token cache read is the spec-side prefix cache-hitting
+    across fresh Fable invocations — the design works as intended.
+  - Note: quality fine for the sample — 4 clues, 3/4 mech pass, 2 accept / 1
+    revise; bank at 70 accepted, 14/547 words.
+  - Note: quota 25% → 31% including the report turn, vs ~11% for the same shape
+    pre-trim — the trim roughly halved the per-run quota floor, even though
+    dollar cost barely moved ($0.735 vs $0.798; this run produced more output,
+    8149 vs 7133 tokens, and output dominates dollars). Plan quota evidently
+    tracks prompt token volume more than dollar cost — answering Phase 3b's open
+    question about quota discounting.
+  - Note: second measured run (2026-06-10, batch 7, one retry word) — both calls
+    warm: generate read=4014/write=5469 ($0.516), verify read=4014/write=6682
+    ($0.316), total $0.831; 4/4 mech pass, 3 accept / 1 revise; quota 35% → 43%.
+    The warm prefix trims generate's write by ~4K tokens (~$0.05–0.07/call), but
+    output variance dominates: 11,546 total output tokens vs the first run's
+    8,149 swung cost up $0.10 despite the cache gain. Input side is now as tuned
+    as it gets; output noise is the remaining cost driver at 1-word scale.
 - [x] Haiku caching validation (quota at 96%, too high for a Fable run): two
       back-to-back direct `claude -p` GENERATE calls, one word each, with the
       trimmed flags and `--system-prompt-file CLUE_SPEC.md` — invoked directly,
@@ -183,10 +270,16 @@ reads the way dollar billing does (~0.1×). Measure before building.
     cache-read across fresh calls; confirm via cache_read ≈ 2.9K on call 2 of
     the post-trim 1-word measured run. Haiku clue text went to /tmp only; the
     out/ clue bank was not touched.
-- [ ] Session-resume (multi-turn) design: likely moot if the system-prompt
-      prefix cache-reads across fresh calls (verify on the post-trim measured
-      run — cache_read ≈ prefix size on call 2); keep only if the post-trim
-      numbers still show meaningful never-read writes
+- [-] Session-resume (multi-turn) design: likely moot if the system-prompt
+  prefix cache-reads across fresh calls (verify on the post-trim measured run —
+  cache_read ≈ prefix size on call 2); keep only if the post-trim numbers still
+  show meaningful never-read writes
+  - Rationale: dropped (2026-06-10) — the moot condition held: call 2 read the
+    spec prefix (4014 tokens). The remaining never-read writes are per-batch
+    variable content (words, clues) that no design can cache across batches,
+    plus the ~700-token task instructions already judged not worth the
+    architecture; the 5-minute TTL vs multi-minute generate calls further erodes
+    any within-batch gain.
   - Note: if implemented, session-resume would additionally cache the per-turn
     task instructions (~700 tokens/call ≈ $0.007/call) — currently estimated not
     to be worth the architecture, pending post-trim data.
@@ -221,11 +314,23 @@ kickoff.md and the code.
 
 ## Backlog
 
+- [x] Mech checker rejects valid compound mechanisms: it compares anagram fodder
+      against the full answer, so anagram+charade / anagram+container clues
+      always fail (batch 12: FIFTY's TIFF\* + Y, SIXTY's I in STYX\* — both
+      sound). Check fodder against the answer minus the charade/container
+      letters from the parse instead.
+  - Note: fixed (2026-06-11) with mechanism-aware letter math in
+    mechanical_checks.py — pure anagram/hidden clues keep the exact checks;
+    compound chains require fodder to be a proper sub-multiset of the answer's
+    letters (still catches invented letters) and skip hidden-string containment,
+    which the LLM verifier covers. FIFTY/SIXTY will be retried at their next
+    batch.
 - [ ] Retried words regenerate a full clue set even when most clues are already
       accepted (dedup discards the duplicates, but the generation quota is
       spent); consider asking only for replacements for the revised clues
-- [~] Investigate whether the script can take advantage of prompt caching — the
-  per-call prompts share large static prefixes (templates, spec), so cache hits
-  might significantly cut quota consumption
-  - Note: in progress as Phase 3b — instrumentation first, then a 1-word
-    measured run, then a decision on any redesign.
+- [x] Investigate whether the script can take advantage of prompt caching — the
+      per-call prompts share large static prefixes (templates, spec), so cache
+      hits might significantly cut quota consumption
+  - Note: resolved as Phase 3b — the trimmed `--system-prompt-file` design
+    cache-reads the spec prefix across fresh calls and roughly halved the
+    per-run quota floor; session-resume dropped as moot.
