@@ -11,9 +11,9 @@ System prompt uses the quality-gatekeeping persona from probe_quality_single.
 User prompt is the tense-agreement convention check in isolation.
 
 Usage:
-  python prototyping/probe_minimal.py
-  python prototyping/probe_minimal.py --clue "Keeps time?" --answer CLOCK
-  python prototyping/probe_minimal.py --model gemma4:31b-mlx
+  python cluegen/scratch/probe_minimal.py
+  python cluegen/scratch/probe_minimal.py --clue "Keeps time?" --answer CLOCK
+  python cluegen/scratch/probe_minimal.py --model gemma4:31b-mlx
 """
 
 import pathlib

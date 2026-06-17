@@ -10,9 +10,9 @@ prevent the model from anchoring on its first mechanism and producing
 variations on it.
 
 Usage:
-  python prototyping/probe_make_clue.py
-  python prototyping/probe_make_clue.py --answer SNAIL
-  python prototyping/probe_make_clue.py --model gemma4:26b-qat
+  python cluegen/scratch/probe_make_clue.py
+  python cluegen/scratch/probe_make_clue.py --answer SNAIL
+  python cluegen/scratch/probe_make_clue.py --model gemma4:26b-qat
 """
 
 import pathlib

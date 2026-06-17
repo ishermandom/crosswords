@@ -21,8 +21,8 @@ Caveats:
   - Clue/answer CLI args are accepted but unused (harness requirement).
 
 Usage:
-  python prototyping/probe_think_switch.py
-  python prototyping/probe_think_switch.py --model gemma4:31b-mlx
+  python cluegen/scratch/probe_think_switch.py
+  python cluegen/scratch/probe_think_switch.py --model gemma4:31b-mlx
 """
 
 import pathlib

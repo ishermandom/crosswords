@@ -7,9 +7,9 @@ Compare against probe_wordplay.py to see whether multi-convention context
 affects reasoning quality on convention 2 (wordplay indicator).
 
 Usage:
-  python prototyping/probe_conventions.py
-  python prototyping/probe_conventions.py --clue "Keeps time?" --answer CLOCK
-  python prototyping/probe_conventions.py --model gemma4:31b-mlx
+  python cluegen/scratch/probe_conventions.py
+  python cluegen/scratch/probe_conventions.py --clue "Keeps time?" --answer CLOCK
+  python cluegen/scratch/probe_conventions.py --model gemma4:31b-mlx
 """
 
 import pathlib

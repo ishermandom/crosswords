@@ -206,13 +206,13 @@ output on the console.
 
 ## Prototyping
 
-Active prompt development happens in `prototyping/` rather than the production
-codebase. Probe scripts there run individual pipeline turns directly against
-Ollama for fast iteration:
+Active prompt development happens in `cluegen/scratch/` rather than the
+production codebase. Probe scripts there run individual pipeline turns directly
+against Ollama for fast iteration:
 
 ```
-python prototyping/probe_make_clue.py --answer MATCH
-python prototyping/probe_quality_multi.py --clue "Starts a fire?" --answer MATCH
+python cluegen/scratch/probe_make_clue.py --answer MATCH
+python cluegen/scratch/probe_quality_multi.py --clue "Starts a fire?" --answer MATCH
 ```
 
 Findings from probes are incorporated into the production prompts once

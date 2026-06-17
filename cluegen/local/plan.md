@@ -14,7 +14,7 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` done · `[-]` droppe
   selected after evaluating clue quality from both
 - **LLM client**: `openai` Python package pointed at the local endpoint; no API
   key required
-- **Language**: Python with flat layout (`clue_gen/` at project root)
+- **Language**: Python under `cluegen/local/`
 - **Linting / types**: `ruff`, `mypy`
 
 ### Ollama installation
@@ -202,7 +202,7 @@ constrained generation (`num_ctx=512`, `num_predict=30`, `temperature=0`).
 ## Cleanup
 
 Once Phase 3 is complete and the tool is stable, consolidate all clue generator
-artifacts under `clue_gen/`:
+artifacts under `cluegen/local/`:
 
-- [ ] Move `spec.md` → `clue_gen/spec.md`
-- [ ] Move `plan.md` → `clue_gen/plan.md`
+- [x] Move `spec.md` → `cluegen/local/spec.md`
+- [x] Move `plan.md` → `cluegen/local/plan.md`

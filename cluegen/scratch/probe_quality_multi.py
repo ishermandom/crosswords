@@ -14,9 +14,9 @@ Compare against probe_quality_single.py to assess whether per-turn focus
 improves accuracy or reduces total latency.
 
 Usage:
-  python prototyping/probe_quality_multi.py
-  python prototyping/probe_quality_multi.py --clue "Keeps time?" --answer CLOCK
-  python prototyping/probe_quality_multi.py --model gemma4:31b-mlx
+  python cluegen/scratch/probe_quality_multi.py
+  python cluegen/scratch/probe_quality_multi.py --clue "Keeps time?" --answer CLOCK
+  python cluegen/scratch/probe_quality_multi.py --model gemma4:31b-mlx
 """
 
 import pathlib

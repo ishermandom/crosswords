@@ -21,7 +21,7 @@ preferred quantization.
       good resources are found; remove ones that turn out not to be useful. Be
       selective: only include sources worth coming back to.
 
-- [ ] **Sweep tasks.md for stale path references** — many task bodies still
+- [x] **Sweep tasks.md for stale path references** — many task bodies still
       reference old paths (`clue_gen/`, `prototyping/`, `cluegen/local/cluegen/`
       after the namespace restructuring this session).
 
@@ -42,8 +42,8 @@ committing.
 
 Three source documents drive this work:
 
-- `clue_gen/README.md` — goals, pipeline overview, and design rationale; the
-  authoritative description of what the tool does and why
+- `cluegen/local/README.md` — goals, pipeline overview, and design rationale;
+  the authoritative description of what the tool does and why
 - `background.md` — lessons from ChatGPT experiments; defines the 8-phase
   workflow and quality dimensions (LS, EL, CP, RF, SQ, IN, Bullshit Rating)
 - `prompting.md` — local model guidance; one cognitive mode per turn, state
@@ -60,22 +60,22 @@ is for easy weekday clues only.
 
 ### Current code state
 
-- `clue_gen/prompt.py`: `brainstorm_messages(word, difficulty)` returns a
+- `cluegen/local/prompt.py`: `brainstorm_messages(word, difficulty)` returns a
   single-turn placeholder (system + one user message)
-- `clue_gen/generator.py:49`:
+- `cluegen/local/generator.py:49`:
   `TODO: Phase 3 — replace with multi-turn brainstorm sequence`
-- `clue_gen/generator.py` Stage 1: one `client.chat(brainstorm_messages(...))`
-  call, then a second call to extract a `{"clues": [...]}` JSON list of
-  candidates
-- `clue_gen/generator.py` Stage 2 (already implemented — do not break): iterates
-  over extracted candidates; runs `validate_solvability` + `validate_quality` on
-  each; returns the first passing candidate as `ClueResult(clues=[clue])`; falls
-  back to `candidates[0]` if none pass
+- `cluegen/local/generator.py` Stage 1: one
+  `client.chat(brainstorm_messages(...))` call, then a second call to extract a
+  `{"clues": [...]}` JSON list of candidates
+- `cluegen/local/generator.py` Stage 2 (already implemented — do not break):
+  iterates over extracted candidates; runs `validate_solvability` +
+  `validate_quality` on each; returns the first passing candidate as
+  `ClueResult(clues=[clue])`; falls back to `candidates[0]` if none pass
 - Currently `ClueResult.clues` always contains one entry. The `--candidates N`
   flag (pending Phase 3 in `plan.md`) will let callers request N clues. Design
   the extract turn to produce multiple candidates so Stage 2 has a pool to
   filter from.
-- Quality schema lives in `clue_gen/quality.py`: `_QUALITY_FORMAT`,
+- Quality schema lives in `cluegen/local/quality.py`: `_QUALITY_FORMAT`,
   `_SYSTEM_PROMPT_TEMPLATE`, `_STRUCTURED_OUTPUT_PROMPT`
 - Reference: `validation.md` documents the two-call validation architecture
 
@@ -102,7 +102,7 @@ Seven model calls, each targeting one cognitive mode:
    versions of 'Down, on a map'" failure)
 7. **Extract** (Phase 8): schema-enforced `{"clues": ["...", ...]}` JSON list
    via `response_format` (same pattern as `_GUESSES_PROMPT` in
-   `clue_gen/solvability.py`)
+   `cluegen/local/solvability.py`)
 
 ### Tasks
 
@@ -206,7 +206,7 @@ Seven model calls, each targeting one cognitive mode:
     model on multi-convention focus? Is the gap large enough to change model
     selection for the conventions turn? Does this make the "Separate convention
     2" task unnecessary for dense models?
-  - Use `prototyping/probe_conventions.py` to compare side-by-side.
+  - Use `cluegen/scratch/probe_conventions.py` to compare side-by-side.
 
 - [ ] **Calibrate sampling temperature**
   - Harness default is 0.2; Gemma4's native default is 1.0. Research suggests
@@ -300,7 +300,8 @@ Seven model calls, each targeting one cognitive mode:
     - PASSes clues with a legitimate earned `?` (e.g. "Semi professional?" →
       TEAMSTER, "Perpetual homebody?" → SNAIL)
     - FAILs clues that are missing a `?` when one is required
-  - Use `prototyping/probe_wordplay.py` with `--clue` and `--answer` overrides.
+  - Use `cluegen/scratch/probe_wordplay.py` with `--clue` and `--answer`
+    overrides.
   - Rationale: examples in the prompt are calibrated around unearned-`?`
     detection; the earned direction may be over-triggered toward FAIL.
 
@@ -364,7 +365,7 @@ Seven model calls, each targeting one cognitive mode:
   - `ClueResult.clues` currently always has one entry (the first passing
     candidate, or `candidates[0]` as fallback)
   - Changes needed:
-    - Add `--candidates N` flag to `clue_gen/cli.py` (default 1); pass `N`
+    - Add `--candidates N` flag to `cluegen/local/cli.py` (default 1); pass `N`
       through to `generate_clue`
     - Update `generate_clue` in `generator.py`: Stage 2 currently stops at the
       first passing candidate — change to collect up to N passing candidates

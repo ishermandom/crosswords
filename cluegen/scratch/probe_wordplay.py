@@ -8,9 +8,9 @@ distraction of the other four conventions. Compare against probe_conventions.py
 to see whether multi-convention context affects reasoning quality.
 
 Usage:
-  python prototyping/probe_wordplay.py
-  python prototyping/probe_wordplay.py --clue "Keeps time?" --answer CLOCK
-  python prototyping/probe_wordplay.py --model qwen3.5:9b
+  python cluegen/scratch/probe_wordplay.py
+  python cluegen/scratch/probe_wordplay.py --clue "Keeps time?" --answer CLOCK
+  python cluegen/scratch/probe_wordplay.py --model qwen3.5:9b
 """
 
 import pathlib

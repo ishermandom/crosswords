@@ -8,9 +8,9 @@ focused attention — the thinking trace serves as the reasoning scratchpad.
 Compare latency and correctness against the multi-turn production pipeline.
 
 Usage:
-  python prototyping/probe_quality_single.py
-  python prototyping/probe_quality_single.py --clue "Keeps time?" --answer CLOCK
-  python prototyping/probe_quality_single.py --model gemma4:31b-mlx
+  python cluegen/scratch/probe_quality_single.py
+  python cluegen/scratch/probe_quality_single.py --clue "Keeps time?" --answer CLOCK
+  python cluegen/scratch/probe_quality_single.py --model gemma4:31b-mlx
 """
 
 import pathlib
