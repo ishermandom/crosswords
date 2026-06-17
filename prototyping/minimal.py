@@ -1,3 +1,6 @@
+# Copyright 2026 Ilya Sherman (ishermandom@)
+# SPDX-License-Identifier: MIT
+
 import httpx
 import openai
 from openai.types.shared_params import ResponseFormatJSONSchema
