@@ -6,7 +6,8 @@ import json
 from pathlib import Path
 
 import pytest
-from claude_cli import (
+
+from cluegen.cloud.claude_cli import (
   CallUsage,
   MalformedEnvelope,
   build_cli_command,

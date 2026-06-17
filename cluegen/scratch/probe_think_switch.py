@@ -29,7 +29,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from lib import harness
+from cluegen.scratch.lib import harness
 
 # AABBAABB pattern: (use_thinking, question)
 _TURNS: list[tuple[bool, str]] = [

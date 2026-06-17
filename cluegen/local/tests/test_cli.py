@@ -1,7 +1,7 @@
 # Copyright 2026 Ilya Sherman (ishermandom@)
 # SPDX-License-Identifier: MIT
 
-"""Tests for clue_gen.cli pipeline helpers."""
+"""Tests for cluegen.cli pipeline helpers."""
 
 import io
 import json
@@ -10,10 +10,10 @@ from unittest.mock import MagicMock
 
 import openai
 
-from clue_gen.cli import main
-from clue_gen.client import ChatResult, Message
-from clue_gen.input_parsing import ClueEntry
-from clue_gen.tests.fake_client import FakeChatClient
+from cluegen.local.cli import main
+from cluegen.local.client import ChatResult, Message
+from cluegen.local.input_parsing import ClueEntry
+from cluegen.local.tests.fake_client import FakeChatClient
 
 
 class _ConnectionErrorClient:

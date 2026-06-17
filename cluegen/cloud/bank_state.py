@@ -26,7 +26,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import NotRequired, TypedDict
 
-from mechanical_checks import (
+from cluegen.cloud.mechanical_checks import (
   clue_style_of,
   clue_text_of,
   maybe_clue_text,

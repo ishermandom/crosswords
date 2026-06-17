@@ -30,19 +30,24 @@ from typing import NoReturn, TextIO
 
 import openai
 
-from clue_gen.client import ChatClient, GenerationError, Model, OllamaClient
-from clue_gen.generator import ClueResult, generate_clue
-from clue_gen.input_parsing import ClueEntry, load_clue_entries, load_words
-from clue_gen.prompt import Difficulty
-from clue_gen.quality import QualityParseError, validate_quality
-from clue_gen.solvability import (
+from cluegen.local.client import (
+  ChatClient,
+  GenerationError,
+  Model,
+  OllamaClient,
+)
+from cluegen.local.generator import ClueResult, generate_clue
+from cluegen.local.input_parsing import ClueEntry, load_clue_entries, load_words
+from cluegen.local.prompt import Difficulty
+from cluegen.local.quality import QualityParseError, validate_quality
+from cluegen.local.solvability import (
   DEFAULT_MAX_ANSWER_RANK,
   SolvabilityParseError,
   validate_solvability,
 )
 
 _logger = logging.getLogger(__name__)
-_result_logger = logging.getLogger('clue_gen.result_output')
+_result_logger = logging.getLogger('cluegen.result_output')
 
 
 def _section(label: str) -> str:
@@ -363,7 +368,7 @@ def main(
   client: ChatClient | None = None,
   stdin: TextIO = sys.stdin,
   output: TextIO = sys.stdout,
-  logs_dir: Path | None = Path('logs'),
+  logs_dir: Path | None = Path(__file__).parent.parent / 'logs',
 ) -> None:
   """Entry point: dispatch to the appropriate subcommand handler."""
   args = _parse_args(argv)

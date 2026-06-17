@@ -6,7 +6,7 @@
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 
-from clue_gen.client import ChatResult, Message
+from cluegen.local.client import ChatResult, Message
 
 
 @dataclass

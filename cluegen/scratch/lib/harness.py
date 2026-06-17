@@ -419,7 +419,7 @@ class Session:
   ) -> None:
     """Open the log file and write the run header."""
     timestamp = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
-    log_directory = pathlib.Path('logs/probe')
+    log_directory = pathlib.Path(__file__).parent.parent / 'logs'
     log_directory.mkdir(parents=True, exist_ok=True)
     log_path = log_directory / f'{mode}_{timestamp}.log'
     self._log_file = log_path.open('w')

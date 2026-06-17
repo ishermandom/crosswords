@@ -9,7 +9,7 @@ Prompt content is placeholder — actual prompt design is Phase 3.
 import enum
 from collections.abc import Sequence
 
-from clue_gen.client import Message
+from cluegen.local.client import Message
 
 
 class Difficulty(enum.StrEnum):

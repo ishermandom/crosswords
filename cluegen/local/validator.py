@@ -5,10 +5,10 @@
 
 from dataclasses import dataclass
 
-from clue_gen.client import ChatClient
-from clue_gen.prompt import Difficulty
-from clue_gen.quality import QualityResult
-from clue_gen.solvability import DEFAULT_MAX_ANSWER_RANK
+from cluegen.local.client import ChatClient
+from cluegen.local.prompt import Difficulty
+from cluegen.local.quality import QualityResult
+from cluegen.local.solvability import DEFAULT_MAX_ANSWER_RANK
 
 
 @dataclass(frozen=True)

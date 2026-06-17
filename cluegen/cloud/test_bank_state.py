@@ -6,7 +6,8 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import pytest
-from bank_state import BankState
+
+from cluegen.cloud.bank_state import BankState
 
 GOOD_CLUE: dict[str, object] = {
   'style': 'american',

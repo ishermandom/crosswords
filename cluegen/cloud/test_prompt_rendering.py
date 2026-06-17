@@ -4,8 +4,8 @@
 
 from pathlib import Path
 
-import prompt_rendering
-from prompt_rendering import PromptTemplates, WordEntry
+from cluegen.cloud import prompt_rendering
+from cluegen.cloud.prompt_rendering import PromptTemplates, WordEntry
 
 FAKE_TEMPLATES = PromptTemplates(
   specification='THE SPEC',

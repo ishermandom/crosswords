@@ -4,4 +4,5 @@
 marker_args=()
 [ -n "$PYTEST_FROM_HOOK" ] && marker_args=(-m "not wip")
 
-exec python -m pytest -q "${marker_args[@]}" "$(dirname "$0")/cluegen/tests"
+repo_root="$(cd "$(dirname "$0")/../.." && pwd)"
+PYTHONPATH="$repo_root" exec python -m pytest -q "${marker_args[@]}" "$(dirname "$0")"

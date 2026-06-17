@@ -1,11 +1,11 @@
 # Copyright 2026 Ilya Sherman (ishermandom@)
 # SPDX-License-Identifier: MIT
 
-"""Tests for clue_gen.prompt."""
+"""Tests for cluegen.prompt."""
 
 import pytest
 
-from clue_gen.prompt import (
+from cluegen.local.prompt import (
   Difficulty,
   brainstorm_messages,
   brainstorm_system_prompt,

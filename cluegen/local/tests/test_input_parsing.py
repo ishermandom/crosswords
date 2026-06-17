@@ -1,11 +1,11 @@
 # Copyright 2026 Ilya Sherman (ishermandom@)
 # SPDX-License-Identifier: MIT
 
-"""Tests for clue_gen.input_parsing."""
+"""Tests for cluegen.input_parsing."""
 
 import io
 
-from clue_gen.input_parsing import ClueEntry, load_clue_entries, load_words
+from cluegen.local.input_parsing import ClueEntry, load_clue_entries, load_words
 
 
 def _stream(text: str) -> io.StringIO:

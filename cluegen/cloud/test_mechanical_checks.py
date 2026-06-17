@@ -4,7 +4,7 @@
 
 from collections.abc import Set
 
-import mechanical_checks
+from cluegen.cloud import mechanical_checks
 
 
 def _make_american(**overrides: object) -> dict[str, object]:

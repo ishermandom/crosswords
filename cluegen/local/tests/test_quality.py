@@ -7,9 +7,13 @@ import json
 
 import pytest
 
-from clue_gen.prompt import Difficulty
-from clue_gen.quality import QualityParseError, QualityResult, validate_quality
-from clue_gen.tests.fake_client import FakeChatClient
+from cluegen.local.prompt import Difficulty
+from cluegen.local.quality import (
+  QualityParseError,
+  QualityResult,
+  validate_quality,
+)
+from cluegen.local.tests.fake_client import FakeChatClient
 
 # Scripted reply for both scratchpad turns; content is irrelevant to all tests.
 _SCRATCHPAD = 'Evaluating the clue...'

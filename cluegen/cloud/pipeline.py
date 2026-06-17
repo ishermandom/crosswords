@@ -21,20 +21,20 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-from bank_state import (
+from cluegen.cloud.bank_state import (
   VERDICT_ACCEPT,
   VERDICT_REJECT,
   VERDICT_REVISE,
   BankState,
 )
-from claude_cli import (
+from cluegen.cloud.claude_cli import (
   CallUsage,
   ClaudeCli,
   RateLimited,
   TransportFailure,
   describe_usage,
 )
-from mechanical_checks import (
+from cluegen.cloud.mechanical_checks import (
   check_word_output,
   clue_style_of,
   clue_text_of,
@@ -43,7 +43,7 @@ from mechanical_checks import (
   normalize_clue_text,
   stem_soft_flags,
 )
-from prompt_rendering import (
+from cluegen.cloud.prompt_rendering import (
   PromptTemplates,
   WordEntry,
   build_generation_prompt,

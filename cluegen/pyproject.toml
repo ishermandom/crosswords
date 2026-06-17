@@ -1,5 +1,16 @@
 # Copyright 2026 Ilya Sherman (ishermandom@)
 # SPDX-License-Identifier: MIT
+#
+# Why this is a pip package: local/ has a runtime dependency on openai (the
+# HTTP client for Ollama's OpenAI-compatible API), so pip install is the
+# natural way to manage it and wire up the clue-gen CLI entry point. cloud/
+# shells out to claude directly and has no pip dependencies, so it stays as
+# flat scripts.
+#
+# Why pyproject.toml lives at cluegen/ rather than cluegen/local/: the
+# package is published as the cluegen.local namespace, which requires hatchling
+# to remap the local/ source directory to cluegen/local/ when building. That
+# remapping is expressed in [tool.hatch.build.targets.*] below.
 
 [project]
 name = "clue-gen"
@@ -15,7 +26,7 @@ dependencies = [
 ]
 
 [project.scripts]
-clue-gen = "clue_gen.cli:main"
+clue-gen = "cluegen.local.cli:main"
 
 # ruff and mypy are dev-only: they're never imported at runtime, so keeping
 # them out of [project.dependencies] avoids inflating the install footprint
@@ -30,16 +41,24 @@ dev = [
   "ruff>=0.4",
 ]
 
-# hatchling is a lightweight PEP 517 build backend (the thing pip invokes to
-# build a wheel or sdist). It needs zero config for a flat layout like ours —
-# it discovers packages automatically from the project root. The alternative
-# is setuptools, which works but requires more boilerplate and has a longer
-# history of surprising behavior.
 [tool.pytest.ini_options]
-testpaths = ["clue_gen/tests"]
+testpaths = ["local/tests"]
 markers = [
   "wip: mark a test as work-in-progress; skipped when run from hooks",
 ]
+
+# packages names the source directory to include; sources remaps it from
+# local/ to cluegen/local/ in the installed distribution, establishing the
+# cluegen.local namespace. cluegen/ itself is an implicit namespace package
+# (no __init__.py needed).
+[tool.hatch.build.targets.wheel]
+packages = ["local"]
+
+[tool.hatch.build.targets.wheel.sources]
+"local" = "cluegen/local"
+
+[tool.hatch.build.targets.editable]
+mode = "strict"
 
 [build-system]
 requires = ["hatchling"]

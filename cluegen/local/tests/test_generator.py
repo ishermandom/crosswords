@@ -1,17 +1,17 @@
 # Copyright 2026 Ilya Sherman (ishermandom@)
 # SPDX-License-Identifier: MIT
 
-"""Tests for clue_gen.generator.generate_clue via FakeChatClient."""
+"""Tests for cluegen.generator.generate_clue via FakeChatClient."""
 
 # TODO: Many of the test assumptions will be updated as Phase 3 progresses
 # and the LLM interactions evolve.
 
 import pytest
 
-from clue_gen.client import GenerationError
-from clue_gen.generator import ClueResult, generate_clue
-from clue_gen.prompt import Difficulty
-from clue_gen.tests.fake_client import FakeChatClient
+from cluegen.local.client import GenerationError
+from cluegen.local.generator import ClueResult, generate_clue
+from cluegen.local.prompt import Difficulty
+from cluegen.local.tests.fake_client import FakeChatClient
 
 
 def _replies(

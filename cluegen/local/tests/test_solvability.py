@@ -6,9 +6,9 @@
 import json
 from collections.abc import Sequence
 
-from clue_gen.prompt import Difficulty
-from clue_gen.solvability import validate_solvability
-from clue_gen.tests.fake_client import FakeChatClient
+from cluegen.local.prompt import Difficulty
+from cluegen.local.solvability import validate_solvability
+from cluegen.local.tests.fake_client import FakeChatClient
 
 
 def _make_replies(

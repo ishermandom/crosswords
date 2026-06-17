@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-# Copyright 2026 Ilya Sherman (ishermandom@)
-# SPDX-License-Identifier: MIT
-#
-# Root-level test runner. Delegates to each subproject's own run_tests.
-set -e
-"$(dirname "$0")/cluegen/local/run_tests" "$@"

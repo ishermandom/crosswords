@@ -10,8 +10,12 @@ import time
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from clue_gen.client import ChatClient, GenerationError, Message
-from clue_gen.prompt import Difficulty, brainstorm_messages, validation_messages
+from cluegen.local.client import ChatClient, GenerationError, Message
+from cluegen.local.prompt import (
+  Difficulty,
+  brainstorm_messages,
+  validation_messages,
+)
 
 _log = logging.getLogger(__name__)
 

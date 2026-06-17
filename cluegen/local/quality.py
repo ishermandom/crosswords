@@ -10,9 +10,9 @@ from dataclasses import dataclass
 
 from openai.types.shared_params import ResponseFormatJSONSchema
 
-from clue_gen.client import ChatClient, Message
-from clue_gen.parsing import strip_markdown_fences
-from clue_gen.prompt import Difficulty
+from cluegen.local.client import ChatClient, Message
+from cluegen.local.parsing import strip_markdown_fences
+from cluegen.local.prompt import Difficulty
 
 _log = logging.getLogger(__name__)
 
