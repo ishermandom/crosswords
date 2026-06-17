@@ -10,9 +10,18 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` done · `[-]` droppe
 **Goal:** Clean up local model storage once QAT models are validated as the
 preferred quantization.
 
-- [ ] **Keep `clue_gen/README.md` references up to date** — add links as good
-      resources are found; remove ones that turn out not to be useful. Be
-      selective: only include sources worth coming back to.
+- [ ] **Keep `cluegen/local/cluegen/README.md` references up to date** — add
+      links as good resources are found; remove ones that turn out not to be
+      useful. Be selective: only include sources worth coming back to.
+
+- [ ] **Sweep tasks.md for stale `clue_gen/` and `prototyping/` path
+      references** — the repo was reorganized into
+      `cluegen/{local,cloud,scratch}`; many task bodies still reference the old
+      paths.
+
+- [ ] **Evaluate local/cloud symmetry** — `cluegen/local` is a Python package
+      while `cluegen/cloud` is a collection of scripts. Decide whether to bring
+      them to the same structure, and which direction.
 
 - [ ] **Delete MLX models from Ollama** (`gemma4:26b-mlx`, `gemma4:31b-mlx`)
       once the QAT variants (`gemma4:26b-qat`) are confirmed stable. MLX models
