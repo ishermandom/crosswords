@@ -208,6 +208,11 @@ if __name__ == '__main__':
   # The solve-first output is seeded into conversation 2 as a minimal prior
   # exchange — the full solve-first prompt stays out of conversation 2's
   # context, so the split also reduces prefill tokens for evaluation turns.
+  #
+  # temperature=1.0 is provisional — Gemma4's native default, not a calibrated
+  # choice. The "Calibrate sampling temperature" task (cluegen/local/tasks.md)
+  # will settle whether a lower value (0.6–0.7) reduces the double-reasoning
+  # pass without hurting evaluation accuracy.
   with harness.Session('quality-multi', args, temperature=1.0) as session:
     # Conversation 1: solver mode only — minimal persona, no evaluation
     # framing. Keeping this conversation separate prevents the gatekeeping

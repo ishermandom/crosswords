@@ -14,10 +14,6 @@ preferred quantization.
       good resources are found; remove ones that turn out not to be useful. Be
       selective: only include sources worth coming back to.
 
-- [x] **Sweep tasks.md for stale path references** — many task bodies still
-      reference old paths (`clue_gen/`, `prototyping/`, `cluegen/local/cluegen/`
-      after the namespace restructuring this session).
-
 - [ ] **Delete MLX models from Ollama** (`gemma4:26b-mlx`, `gemma4:31b-mlx`)
       once the QAT variants (`gemma4:26b-qat`) are confirmed stable. MLX models
       are the fallback if a QAT issue comes up.
@@ -99,56 +95,6 @@ Seven model calls, each targeting one cognitive mode:
 
 ### Tasks
 
-- [x] **Add project-local Claude config allowing edits to `tasks.md` and
-      `prototyping/` without per-edit approval**
-  - Note: `tasks.md` and all probe scripts under `prototyping/` are
-    development-only files; auto-approving edits there removes friction without
-    expanding the blast radius on production code.
-
-- [x] **Rename `scripts/` to `prototyping/`**
-  - Rationale: `scripts/` is ambiguous; `prototyping/` signals that these files
-    are experimental iteration vehicles, not production utilities.
-  - Update any imports, `sys.path.insert` calls, and doc references.
-
-- [x] **Drop `--day` flag from the probe harness**
-  - Day-of-week calibration is a production concern handled by Python's
-    `_scores_match_day`; it does not affect any current probe prompts.
-  - Remove `--day` from `parse_args()`, remove `day_label`/`day_description`
-    from `ProbeArgs`, and remove `_DAY_DESCRIPTIONS` from `harness.py`.
-  - Update any probe scripts that reference `args.day_description`.
-
-- [x] **Redesign `probe_quality_multi.py`: dependency-ordered, per-turn
-      thinking** {#probe-quality-multi}
-  - **Turn order** (11 turns) reflects evaluation dependencies:
-    1. `tense_agreement` — mechanical, no deps
-    2. `abbreviation_signaled` — mechanical, no deps
-    3. `fill_format` — mechanical, no deps
-    4. `genuine_alternatives` — mostly independent
-    5. `wordplay_indicator` — foundational; carries lateral-thinking calibration
-    6. `surface_coherence` — after clue mechanism understood
-    7. `angle_craft` — after clue mechanism understood; day-independent quality
-       floor
-    8. `misdirection` — depends on `wordplay_indicator`
-    9. `fairness_of_deception` — depends on `misdirection`
-    10. `elasticity` — depends on understanding clue interpretations
-    11. `reference_accessibility` — measures intrinsic knowledge breadth; no day
-        context needed (day-fit is Python-side)
-  - `cross_check_payoff` dropped — quantifies genuine alternatives without
-    adding a distinct signal; see dropped calibration task below.
-  - **Thinking mode**: `think=True` for `wordplay_indicator`, `misdirection`,
-    `fairness_of_deception`; `think=False` for all others.
-  - **Reply format**: system prompt defines the format once — verdicts with a
-    brief reason (≤10 words). Convention turns end with
-    `Output: PASS: <reason> or FAIL: <reason>`; rubric turns end with
-    `Output: <score>: <reason>`. Rubric scores are 1–5; decimals allowed (e.g.
-    4.5). Per-turn examples removed (were causing the model to copy them
-    verbatim).
-  - **Lateral-thinking calibration**: `wordplay_indicator` (turn 5) hardcodes a
-    mid-week expectation inline. No day injection on any other turn.
-  - **Signposting**: section headers embedded in first turn of each group.
-  - **Temperature**: TBD — revisit after the calibrate-sampling-temperature
-    task.
-
 - [ ] **Implement multi-turn brainstorm in `prompt.py`**
   - Interface decision: `brainstorm_turns(word, difficulty) -> Sequence[str]`
     returns the 7 user-turn strings; generator owns message accumulation. Keeps
@@ -168,27 +114,9 @@ Seven model calls, each targeting one cognitive mode:
     calls in tests
   - Remove the `TODO: Phase 3` comment when done
 
-- [x] **Split probe into shared harness and per-task scripts**
-  - `prototyping/probe.py` currently mixes harness logic (CLI, logging, HTTP)
-    with prompt content. As more probes are added (brainstorm turns, other
-    quality dimensions), this becomes unwieldy.
-  - Split into: a shared harness module (CLI skeleton, tee logging, Ollama call)
-    and small per-task scripts that supply their own prompt strings and invoke
-    the harness. Each per-task script is self-contained and readable on its own.
-
 - [ ] **Explore other quick wins for fast iteration**
   - After splitting the probe, survey what else would make prompt iteration
     faster or lower-friction before diving into the quality task queue.
-
-- [x] **Switch probe harness to Ollama native API + add timing section**
-  - [x] Step 1 — diagnostic: confirmed `usage.model_extra: {}` via OpenAI-
-        compatible endpoint; per-phase durations not available that way.
-  - [x] Step 2 — switched `harness.py` from openai SDK to `httpx.post` against
-        `http://localhost:11434/api/chat`. Reasoning field is
-        `message.thinking`. Schema passed as `format:` top-level key.
-  - [x] Step 3 — added `--- timing ---` section: load ms, prefill tok/s,
-        generation tok/s, ~reasoning/~content split (char-ratio estimate),
-        overhead ms, wall s.
 
 - [ ] **Investigate dense model attention across multiple conventions**
   - Observed: `gemma4:31b-mlx` (dense, not MoE) keeps reasoning tight and
@@ -400,27 +328,6 @@ Seven model calls, each targeting one cognitive mode:
     Python-level comparison. The gap is that the model may fail to generate the
     correct answer as a guess at all because it misjudged the length constraint.
 
-- [x] **Investigate generation slowdown after heavy think=True turns**
-  - Observed: after `think=True` turns with large reasoning traces (270+ tok),
-    subsequent generation drops to 0.2–0.3 tok/s (15–25× slower), while prefill
-    recovers to normal speeds immediately. Wall is 64% over norm across a full
-    11-turn run.
-  - Prefill/gen asymmetry rules out thermal throttling. Working hypothesis:
-    memory compression. Activity Monitor shows yellow memory pressure during
-    runs. The 31b-mlx model is near the edge of comfortable capacity; the OS
-    compressor hits weight pages after heavy generation, and sequential
-    token-by-token generation is far more sensitive to decompression latency
-    than batch prefill.
-  - The cliff persists even with all nonessential apps closed. Compressed memory
-    hovered at 8–10 GB. This rules out other processes — the model alone
-    triggers it. What accumulates to cause it (KV cache, thinking tokens, output
-    tokens, something else) is still unknown.
-  - **Resolution**: splitting the probe into two conversations eliminates the
-    cliff. The KV cache is discarded between conversations, so the 31b model
-    never accumulates enough state to hit the memory wall. Verified: all 12
-    turns completed at 3–5 tok/s with no drop. The trigger mechanism is still
-    unknown but no longer blocking — keep conversations short as a mitigation.
-
 ---
 
 ## Findings
@@ -436,3 +343,12 @@ Empirical observations that should survive task cleanup.
   `prompt_eval_duration`, `eval_duration`), so it appears as unexplained
   overhead in the timing section. Omit the `format` key when targeting MLX
   models.
+
+- **Long conversations trigger a generation-speed cliff on `gemma4:31b-mlx`.**
+  After `think=True` turns with large reasoning traces (270+ tok), generation
+  drops to 0.2–0.3 tok/s (15–25× slower) while prefill stays normal — pointing
+  at memory compression rather than thermal throttling (yellow memory pressure,
+  8–10 GB compressed, persists with all other apps closed). What accumulates (KV
+  cache, thinking tokens, output) is unconfirmed. Mitigation: split work into
+  short conversations so the KV cache is discarded before state builds up —
+  verified to eliminate the cliff across a full 12-turn run.
