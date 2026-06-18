@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(cluegen/local/tasks.md)",
+      "Edit(cluegen/scratch/**)",
+      "Skill(deep-research)"
+    ]
+  }
+}

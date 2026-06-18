@@ -10,13 +10,6 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` done · `[-]` droppe
 **Goal:** Clean up local model storage once QAT models are validated as the
 preferred quantization.
 
-- [ ] **Rethink global gitignore exclusion of `.claude/settings.local.json`** —
-      currently `~/.config/git/ignore` excludes it globally, which prevents
-      committing project-local Claude settings. Evaluate whether the exclusion
-      is still warranted (original intent may have been to avoid leaking
-      machine-specific permissions, but this project's settings contain only
-      portable allow-list entries).
-
 - [ ] **Keep `cluegen/local/README.md` references up to date** — add links as
       good resources are found; remove ones that turn out not to be useful. Be
       selective: only include sources worth coming back to.
