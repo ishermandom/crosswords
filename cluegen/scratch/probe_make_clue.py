@@ -97,9 +97,9 @@ to {word}. No clue drafts — this turn is about breadth, not specific
 phrasing. No evaluation of which angles are strongest; that comes next.
 Your output will be read by an LLM — use plain, unformatted text."""
 
-# --- Turns 3–8 (not yet implemented) ---
-# Turn 3: Mechanism filter — shortlist 5–7 + 1–2 rough high-ceiling ideas
-# Turn 4: Clue drafting — 3–5 drafts per mechanism, labeled by type
+# --- Turns 3-8 (not yet implemented) ---
+# Turn 3: Mechanism filter — shortlist 5-7 + 1-2 rough high-ceiling ideas
+# Turn 4: Clue drafting — 3-5 drafts per mechanism, labeled by type
 # Turn 5: Solver simulation + credibility check (Bullshit Rating)
 # Turn 6: Refinement + diversity audit
 # Turn 7: Polish — "?" convention, substitution test, abbreviation signals
@@ -125,7 +125,7 @@ if __name__ == '__main__':
           _TURN_ANGLE_BRAINSTORM.format(word=word),
           use_thinking=True,
         ),
-        # Turns 3–8 will be added here as subsequent UserTurns once their
+        # Turns 3-8 will be added here as subsequent UserTurns once their
         # prompts are developed. All turns share one conversation so each
         # turn's output is in context for the next.
       ]

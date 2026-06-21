@@ -8,11 +8,10 @@ import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from openai.types.shared_params import ResponseFormatJSONSchema
-
 from cluegen.local.client import ChatClient, Message
 from cluegen.local.parsing import strip_markdown_fences
 from cluegen.local.prompt import Difficulty
+from openai.types.shared_params import ResponseFormatJSONSchema
 
 _log = logging.getLogger(__name__)
 
@@ -55,7 +54,7 @@ class ConventionResult:
 
 @dataclass(frozen=True)
 class ScoreWithRationale:
-  """A 1–5 rubric score with the model's stated reasoning."""
+  """A 1-5 rubric score with the model's stated reasoning."""
 
   # Scale score from 1 (low) to 5 (high).
   score: int
@@ -103,7 +102,7 @@ class QualityResult:
 
 @dataclass(frozen=True)
 class ScoreRange:
-  """Inclusive min–max range for a single rubric scale."""
+  """Inclusive min-max range for a single rubric scale."""
 
   # Minimum acceptable score (inclusive).
   min: int
@@ -233,7 +232,7 @@ or FAIL on its own line.
 
 _RUBRIC_SCRATCHPAD_PROMPT = """\
 Score each rubric dimension below. For each, reason step by step with evidence
-from the clue text, then give a score from 1–5.
+from the clue text, then give a score from 1-5.
 
 - angle_craft: deliberateness of the chosen angle (1 = obvious default/trivial
   antonym, 5 = unexpected and considered)
@@ -378,7 +377,7 @@ def _require_str(mapping: dict[str, object], key: str) -> str:
 
 
 def _require_score(mapping: dict[str, object], key: str) -> int:
-  """Extract mapping[key] and assert it is an integer score in 1–5."""
+  """Extract mapping[key] and assert it is an integer score in 1-5."""
   if key not in mapping:
     raise QualityParseError(f'missing required field {key!r}')
   value = mapping[key]
@@ -388,7 +387,7 @@ def _require_score(mapping: dict[str, object], key: str) -> int:
       f'{key!r}: expected integer score, got {type(value).__name__!r}'
     )
   if not 1 <= value <= 5:
-    raise QualityParseError(f'{key!r}: score {value} out of range 1–5')
+    raise QualityParseError(f'{key!r}: score {value} out of range 1-5')
   return value
 
 

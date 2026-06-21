@@ -209,7 +209,7 @@ class Pipeline:
   def log(self, message: str) -> None:
     """Print a progress line and append it to out/run.log."""
     print(message, flush=True)
-    with open(self.state.out_dir / 'run.log', 'a') as handle:
+    with (self.state.out_dir / 'run.log').open('a') as handle:
       handle.write(f'{time.strftime("%F %T")} {message}\n')
 
   def _complete_logged(
@@ -414,7 +414,7 @@ class Pipeline:
       matches = match_verdicts(
         clues, judges_by_word.get(letters_only(word), [])
       )
-      for item, judge in zip(word_items, matches):
+      for item, judge in zip(word_items, matches, strict=True):
         _, _, batch, batch_size, clue, _ = item
         verdict = judge.get('verdict') if judge is not None else None
         reason = judge.get('reason') if judge is not None else None

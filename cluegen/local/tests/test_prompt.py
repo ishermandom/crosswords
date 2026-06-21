@@ -4,7 +4,6 @@
 """Tests for cluegen.prompt."""
 
 import pytest
-
 from cluegen.local.prompt import (
   Difficulty,
   brainstorm_messages,

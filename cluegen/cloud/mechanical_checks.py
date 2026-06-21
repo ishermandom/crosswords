@@ -250,9 +250,10 @@ def _check_american_fields(
 ) -> None:
   """American clues need a trap proportionate to their difficulty."""
   trap = clue.get('trap')
-  if clue.get('difficulty') in (Difficulty.MEDIUM, Difficulty.HARD):
-    if not isinstance(trap, str) or not trap.strip():
-      failures.append('medium/hard American clue must name its trap/ambiguity')
+  if clue.get('difficulty') in (Difficulty.MEDIUM, Difficulty.HARD) and (
+    not isinstance(trap, str) or not trap.strip()
+  ):
+    failures.append('medium/hard American clue must name its trap/ambiguity')
 
 
 def _check_cryptic_fields(

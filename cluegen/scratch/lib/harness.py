@@ -29,6 +29,7 @@ Multi-turn usage:
 """
 
 import argparse
+import contextlib
 import dataclasses
 import datetime
 import json
@@ -265,10 +266,8 @@ def _run_user_turn(
 
   display_content = content or '<no response>'
   if turn.json_schema is not None and content:
-    try:
+    with contextlib.suppress(json.JSONDecodeError):
       display_content = json.dumps(json.loads(content), indent=2)
-    except json.JSONDecodeError:
-      pass
   tee.write(f'{_section(f"response{turn_label}")}{display_content}\n')
 
   norm_wall = (

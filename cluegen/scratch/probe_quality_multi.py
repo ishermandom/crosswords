@@ -72,7 +72,7 @@ Solve path: surface suggests someone who never leaves home → pivot: a snail
 Alternative answers: HERMIT, RECLUSE, SHUT-IN
 Clue readings: a person who stays home constantly; a creature in its shell"""
 
-# --- Conventions (turns 1–5) ---
+# --- Conventions (turns 1-5) ---
 
 _TURN_TENSE_AGREEMENT = """\
 Style convention checks — starting with tense agreement.
@@ -130,7 +130,7 @@ Unearned (? forbidden):
 
 Output: <grade>: <reason> -- where the grade is PASS or FAIL"""
 
-# --- Rubric dimensions (turns 6–11) ---
+# --- Rubric dimensions (turns 6-11) ---
 
 _TURN_SURFACE_COHERENCE = """\
 Rubric dimensions — starting with surface coherence.
@@ -202,7 +202,7 @@ if __name__ == '__main__':
 
   # Two conversations rather than one long one. The 31b-mlx model hits a
   # generation cliff mid-run when KV cache accumulation pushes compressed
-  # memory past a threshold (observed: 8–10 GB compressed, dropping to
+  # memory past a threshold (observed: 8-10 GB compressed, dropping to
   # 0.2 tok/s after the cliff). Splitting discards the cache between
   # conversations, keeping each short enough to stay below the wall.
   # The solve-first output is seeded into conversation 2 as a minimal prior
@@ -211,7 +211,7 @@ if __name__ == '__main__':
   #
   # temperature=1.0 is provisional — Gemma4's native default, not a calibrated
   # choice. The "Calibrate sampling temperature" task (cluegen/local/tasks.md)
-  # will settle whether a lower value (0.6–0.7) reduces the double-reasoning
+  # will settle whether a lower value (0.6-0.7) reduces the double-reasoning
   # pass without hurting evaluation accuracy.
   with harness.Session('quality-multi', args, temperature=1.0) as session:
     # Conversation 1: solver mode only — minimal persona, no evaluation
@@ -244,7 +244,7 @@ if __name__ == '__main__':
         harness.UserTurn(_TURN_FILL_FORMAT, use_thinking=False),
         harness.UserTurn(_TURN_GENUINE_ALTERNATIVES, use_thinking=False),
         # Misdirection precedes the wordplay indicator: scoring the feint
-        # strength (1–5) is the substantive judgment; the indicator then just
+        # strength (1-5) is the substantive judgment; the indicator then just
         # asks whether that feint warrants a ?. think=True here; think=False
         # for the indicator because it reads off the misdirection score.
         harness.UserTurn(_TURN_MISDIRECTION, use_thinking=True),

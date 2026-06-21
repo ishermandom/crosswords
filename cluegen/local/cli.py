@@ -29,7 +29,6 @@ from pathlib import Path
 from typing import NoReturn, TextIO
 
 import openai
-
 from cluegen.local.client import (
   ChatClient,
   GenerationError,
@@ -88,7 +87,7 @@ def _log_fatal(message: str) -> NoReturn:
 def _open_words_file(path: str) -> io.TextIOWrapper:
   """Open a word-list file; exit with an error message if not found."""
   try:
-    return open(path, encoding='utf-8')
+    return Path(path).open(encoding='utf-8')
   except FileNotFoundError:
     _log_fatal(f'file not found: {path}')
 
@@ -300,7 +299,7 @@ def _load_clue_entries_input(clues: str, stdin: TextIO) -> list[ClueEntry]:
   if clues == '-':
     return load_clue_entries(stdin)
   try:
-    with open(clues, encoding='utf-8') as f:
+    with Path(clues).open(encoding='utf-8') as f:
       return load_clue_entries(f)
   except FileNotFoundError:
     _log_fatal(f'file not found: {clues}')

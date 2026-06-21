@@ -7,7 +7,6 @@
 # and the LLM interactions evolve.
 
 import pytest
-
 from cluegen.local.client import GenerationError
 from cluegen.local.generator import ClueResult, generate_clue
 from cluegen.local.prompt import Difficulty
@@ -153,16 +152,20 @@ def test_falls_back_when_validation_json_malformed() -> None:
 
 
 def test_raises_when_extract_returns_empty_list() -> None:
-  with FakeChatClient(['brainstorm reply', '[]']) as fake:
-    with pytest.raises(GenerationError, match='no candidates'):
-      generate_clue('ALPHA', Difficulty.MON, fake)
+  with (
+    FakeChatClient(['brainstorm reply', '[]']) as fake,
+    pytest.raises(GenerationError, match='no candidates'),
+  ):
+    generate_clue('ALPHA', Difficulty.MON, fake)
 
 
 def test_raises_when_extract_json_malformed() -> None:
   # A parse failure in the extract turn is not caught — it propagates.
-  with FakeChatClient(['brainstorm reply', 'not a json array']) as fake:
-    with pytest.raises(GenerationError):
-      generate_clue('ALPHA', Difficulty.MON, fake)
+  with (
+    FakeChatClient(['brainstorm reply', 'not a json array']) as fake,
+    pytest.raises(GenerationError),
+  ):
+    generate_clue('ALPHA', Difficulty.MON, fake)
 
 
 def test_answer_length_strips_spaces_for_multi_word() -> None:

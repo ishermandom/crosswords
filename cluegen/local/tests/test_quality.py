@@ -6,7 +6,6 @@
 import json
 
 import pytest
-
 from cluegen.local.prompt import Difficulty
 from cluegen.local.quality import (
   QualityParseError,
@@ -37,8 +36,8 @@ def _make_reply(
   """Scripted JSON reply for a validate_quality call.
 
   Defaults produce a passing Monday profile: all conventions True, scale
-  scores within Monday ranges (misdirection 1–2, elasticity 1–3,
-  accessibility 4–5) and above the quality floor (≥ 4) for craft scales.
+  scores within Monday ranges (misdirection 1-2, elasticity 1-3,
+  accessibility 4-5) and above the quality floor (≥ 4) for craft scales.
   The `cross_check_payoff` default of 3 is provisional; update once day-range
   profiles for this scale are finalised.
   """
@@ -177,7 +176,7 @@ def test_quality_passes_when_all_conventions_pass_and_all_scales_in_range() -> (
 
 
 def test_quality_fails_when_misdirection_score_out_of_range_for_day() -> None:
-  # Monday expects misdirection 1–2; score 4 is too high.
+  # Monday expects misdirection 1-2; score 4 is too high.
   with FakeChatClient(
     [_SCRATCHPAD, _SCRATCHPAD, _make_reply(misdirection=4)]
   ) as fake:
@@ -186,7 +185,7 @@ def test_quality_fails_when_misdirection_score_out_of_range_for_day() -> None:
 
 
 def test_quality_fails_when_elasticity_score_out_of_range_for_day() -> None:
-  # Monday expects elasticity 1–3; score 5 is too high.
+  # Monday expects elasticity 1-3; score 5 is too high.
   with FakeChatClient(
     [_SCRATCHPAD, _SCRATCHPAD, _make_reply(elasticity=5)]
   ) as fake:
@@ -197,7 +196,7 @@ def test_quality_fails_when_elasticity_score_out_of_range_for_day() -> None:
 def test_quality_fails_when_reference_accessibility_score_out_of_range() -> (
   None
 ):
-  # Monday expects reference accessibility 4–5; score 2 is too low.
+  # Monday expects reference accessibility 4-5; score 2 is too low.
   with FakeChatClient(
     [_SCRATCHPAD, _SCRATCHPAD, _make_reply(reference_accessibility=2)]
   ) as fake:
@@ -229,25 +228,31 @@ def test_craft_and_fairness_are_quality_floors_not_day_axes() -> None:
 
 
 def test_parse_error_on_malformed_json() -> None:
-  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, 'not valid json']) as fake:
-    with pytest.raises(QualityParseError):
-      _validate_quality(fake)
+  with (
+    FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, 'not valid json']) as fake,
+    pytest.raises(QualityParseError),
+  ):
+    _validate_quality(fake)
 
 
 def test_parse_error_when_convention_field_is_not_boolean() -> None:
   data = json.loads(_make_reply())
   data['conventions']['has_tense_agreement'] = 'yes'
-  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
-    with pytest.raises(QualityParseError, match='has_tense_agreement'):
-      _validate_quality(fake)
+  with (
+    FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake,
+    pytest.raises(QualityParseError, match='has_tense_agreement'),
+  ):
+    _validate_quality(fake)
 
 
 def test_parse_error_when_scale_score_is_out_of_range() -> None:
   data = json.loads(_make_reply())
   data['scales']['angle_craft']['score'] = 6
-  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
-    with pytest.raises(QualityParseError, match='angle_craft'):
-      _validate_quality(fake)
+  with (
+    FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake,
+    pytest.raises(QualityParseError, match='angle_craft'),
+  ):
+    _validate_quality(fake)
 
 
 def test_parse_error_when_scale_score_is_boolean() -> None:
@@ -255,17 +260,21 @@ def test_parse_error_when_scale_score_is_boolean() -> None:
   # explicit bool check. json.dumps(True) → "true" → json.loads → True (bool).
   data = json.loads(_make_reply())
   data['scales']['misdirection']['score'] = True
-  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
-    with pytest.raises(QualityParseError, match='misdirection'):
-      _validate_quality(fake)
+  with (
+    FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake,
+    pytest.raises(QualityParseError, match='misdirection'),
+  ):
+    _validate_quality(fake)
 
 
 def test_parse_error_when_required_field_is_missing() -> None:
   data = json.loads(_make_reply())
   del data['conventions']
-  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
-    with pytest.raises(QualityParseError, match='conventions'):
-      _validate_quality(fake)
+  with (
+    FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake,
+    pytest.raises(QualityParseError, match='conventions'),
+  ):
+    _validate_quality(fake)
 
 
 # --- has_genuine_alternatives convention ---
@@ -282,9 +291,11 @@ def test_quality_fails_when_has_genuine_alternatives_is_false() -> None:
 def test_parse_error_when_has_genuine_alternatives_is_not_boolean() -> None:
   data = json.loads(_make_reply())
   data['conventions']['has_genuine_alternatives'] = 'yes'
-  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
-    with pytest.raises(QualityParseError, match='has_genuine_alternatives'):
-      _validate_quality(fake)
+  with (
+    FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake,
+    pytest.raises(QualityParseError, match='has_genuine_alternatives'),
+  ):
+    _validate_quality(fake)
 
 
 # --- elasticity (renamed from wordplay_complexity) ---
@@ -296,9 +307,11 @@ def test_parse_error_when_old_wordplay_complexity_field_used() -> None:
   data = json.loads(_make_reply())
   # Simulate a response using the old field name.
   data['scales']['wordplay_complexity'] = data['scales'].pop('elasticity')
-  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
-    with pytest.raises(QualityParseError, match='elasticity'):
-      _validate_quality(fake)
+  with (
+    FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake,
+    pytest.raises(QualityParseError, match='elasticity'),
+  ):
+    _validate_quality(fake)
 
 
 # --- cross_check_payoff scale ---
@@ -307,14 +320,18 @@ def test_parse_error_when_old_wordplay_complexity_field_used() -> None:
 def test_parse_error_when_cross_check_payoff_is_missing() -> None:
   data = json.loads(_make_reply())
   del data['scales']['cross_check_payoff']
-  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
-    with pytest.raises(QualityParseError, match='cross_check_payoff'):
-      _validate_quality(fake)
+  with (
+    FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake,
+    pytest.raises(QualityParseError, match='cross_check_payoff'),
+  ):
+    _validate_quality(fake)
 
 
 def test_parse_error_when_cross_check_payoff_score_is_out_of_range() -> None:
   data = json.loads(_make_reply())
   data['scales']['cross_check_payoff']['score'] = 6
-  with FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake:
-    with pytest.raises(QualityParseError, match='cross_check_payoff'):
-      _validate_quality(fake)
+  with (
+    FakeChatClient([_SCRATCHPAD, _SCRATCHPAD, json.dumps(data)]) as fake,
+    pytest.raises(QualityParseError, match='cross_check_payoff'),
+  ):
+    _validate_quality(fake)

@@ -9,7 +9,6 @@ from collections.abc import Sequence
 from unittest.mock import MagicMock
 
 import openai
-
 from cluegen.local.cli import main
 from cluegen.local.client import ChatResult, Message
 from cluegen.local.input_parsing import ClueEntry

@@ -93,7 +93,7 @@ blank, this passes automatically.
 has_genuine_alternatives: the alternative answers a solver would consider must
 be real words or phrases, not invented by the clue.
 
-Rubric dimensions (score 1–5):
+Rubric dimensions (score 1-5):
 
 angle_craft: deliberateness of the chosen angle (1 = obvious default/trivial
 antonym, 5 = unexpected and considered)

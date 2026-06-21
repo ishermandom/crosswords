@@ -15,6 +15,9 @@ import openai
 from openai.types.chat import ChatCompletionMessageParam
 from openai.types.shared_params import ResponseFormatJSONSchema
 
+# Alias so callers don't need to import from openai.types.chat directly.
+Message = ChatCompletionMessageParam
+
 _log = logging.getLogger(__name__)
 
 
@@ -49,9 +52,6 @@ def _format_messages(
 
 # Ollama exposes an OpenAI-compatible endpoint at this address.
 _OLLAMA_BASE_URL = 'http://localhost:11434/v1'
-
-# Alias so callers don't need to import from openai.types.chat directly.
-Message = ChatCompletionMessageParam
 
 
 class GenerationError(Exception):
@@ -89,7 +89,7 @@ class ModelOptions:
 
   # --- OpenAI top-level params ---
   # 0.7 for creative brainstorm generation; Phase 3 may lower this to
-  # 0.1–0.2 for the deterministic validation call.
+  # 0.1-0.2 for the deterministic validation call.
   temperature: float = 0.7
   # None = uncapped. Set low during debugging to bound output length.
   max_tokens: int | None = None
@@ -202,7 +202,7 @@ class OllamaClient:
     """
     # Find the longest prefix already logged, then log only the new tail.
     prefix_len = 0
-    for message, logged in zip(messages, self._logged_messages):
+    for message, logged in zip(messages, self._logged_messages, strict=False):
       if message == logged:
         prefix_len += 1
       else:

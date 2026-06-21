@@ -171,7 +171,7 @@ class BankState:
 
   def _append(self, name: str, record: Mapping[str, object]) -> None:
     """Append one record to a state file."""
-    with open(self._path(name), 'a') as handle:
+    with self._path(name).open('a') as handle:
       handle.write(json.dumps(record) + '\n')
 
   def _lines(self, name: str) -> Iterator[str]:
@@ -179,7 +179,7 @@ class BankState:
     path = self._path(name)
     if not path.exists():
       return
-    with open(path) as handle:
+    with path.open() as handle:
       for line in handle:
         if line.strip():
           yield line

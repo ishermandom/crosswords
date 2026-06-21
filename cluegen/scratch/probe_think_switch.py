@@ -35,14 +35,14 @@ from cluegen.scratch.lib import harness
 _TURNS: list[tuple[bool, str]] = [
   (True, 'Is 7 a prime number? Reply Yes or No.'),
   (True, 'Is Antarctica a continent? Reply Yes or No.'),
-  (False, 'What is 3 × 4? Reply with the number only.'),
+  (False, 'What is 3 x 4? Reply with the number only.'),
   (False, 'What color is grass? One word.'),
   (True, 'Is a whale a mammal? Reply Yes or No.'),
   (True, 'Is 1000 greater than 999? Reply Yes or No.'),
   (False, 'What is 100 ÷ 4? Reply with the number only.'),
   (False, 'What is the opposite of wet? One word.'),
   (True, 'Is the sun a star? Reply Yes or No.'),
-  (False, 'What is 8 × 8? Reply with the number only.'),
+  (False, 'What is 8 x 8? Reply with the number only.'),
 ]
 
 if __name__ == '__main__':
