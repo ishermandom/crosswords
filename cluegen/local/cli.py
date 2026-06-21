@@ -29,6 +29,7 @@ from pathlib import Path
 from typing import NoReturn, TextIO
 
 import openai
+
 from cluegen.local.client import (
   ChatClient,
   GenerationError,

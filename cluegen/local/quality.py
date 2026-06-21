@@ -8,10 +8,11 @@ import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from openai.types.shared_params import ResponseFormatJSONSchema
+
 from cluegen.local.client import ChatClient, Message
 from cluegen.local.parsing import strip_markdown_fences
 from cluegen.local.prompt import Difficulty
-from openai.types.shared_params import ResponseFormatJSONSchema
 
 _log = logging.getLogger(__name__)
 

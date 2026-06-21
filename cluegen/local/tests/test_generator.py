@@ -7,6 +7,7 @@
 # and the LLM interactions evolve.
 
 import pytest
+
 from cluegen.local.client import GenerationError
 from cluegen.local.generator import ClueResult, generate_clue
 from cluegen.local.prompt import Difficulty

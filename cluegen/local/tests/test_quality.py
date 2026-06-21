@@ -6,6 +6,7 @@
 import json
 
 import pytest
+
 from cluegen.local.prompt import Difficulty
 from cluegen.local.quality import (
   QualityParseError,
