@@ -22,8 +22,11 @@ import argparse
 import pathlib
 import sys
 
+# Import lib relative to this file, not via the cluegen package: PYTHONPATH
+# carries the main repo root, so the package-qualified import silently loads
+# the main checkout's harness instead of this worktree's.
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from cluegen.scratch.lib import harness
+from lib import harness
 
 _SYSTEM_PROMPT = """\
 You are an expert setter writing American-style (NYT-style) crossword clues
@@ -90,21 +93,40 @@ Pick the 4 or 5 strongest angles for a {difficulty} clue — favor genuine
 traps and lively surfaces over safe, predictable definitions. Draft exactly
 one clue per chosen angle.
 
+Two hard rules when drafting:
+- The clue must define the answer word ITSELF — never a person or thing
+  merely associated with it. ("One who might be called to service" defines
+  a draftee, so it cannot clue DRAFT.)
+- If a sense exists only inside a longer phrase (an idiom fragment — the
+  "easy target" sense lives in SITTING DUCK, not in DUCK), discard the
+  angle unless the clue genuinely works for the answer word alone.
+
 For each draft: the clue text as it would appear in print, then on the next
-line its angle name and the trap it sets. Apply the craft invariants as you
-draft — substitution test, economy, natural surface, honest question mark.
-Plain unformatted text."""
+line its angle name and the trap it sets — the trap is the specific wrong
+answer (a real word or phrase) or wrong reading the surface invites; name
+it concretely. Apply the craft invariants as you draft — economy, natural
+surface, honest question mark. Plain unformatted text."""
+
+_TURN_EDIT = """\
+Now act as your own toughest editor. For EACH draft, perform the
+substitution test — do not merely assert it. Write one natural sentence
+using {word} in the clued sense, then rewrite the sentence with the clue's
+definition in place of {word}. The draft fails if the rewritten sentence
+changes part of speech, tense, number, or referent — or reads unnaturally.
+
+Then check each surviving draft: question-mark honesty (a ? must mark
+genuine wordplay or a stretched definition, never apologize for loose
+phrasing), no answer leakage, and whether the trap survives a re-read.
+
+End with a verdict line per draft: KEEP or CUT, with the one-phrase
+reason. Plain unformatted text."""
 
 _TURN_EXTRACT = """\
-Now act as your own toughest editor. Re-read each draft cold, as a solver
-would. Check: substitution test (clue and answer interchangeable in a
-sentence), tense and number agreement, question-mark honesty, no answer
-leakage, and whether the trap survives a re-read.
-
-Select the single best clue for a {difficulty} target and return it as
+Select the single best KEEP clue for a {difficulty} target and return it as
 JSON: "clue" (exact print text), "difficulty" (your honest calibration,
-which may differ from the target), "trap" (one sentence naming the
-misdirection; null if the clue is straight), "confidence" (honest)."""
+which may differ from the target), "trap" (one sentence naming the specific
+wrong answer or wrong reading the surface invites; null if the clue is
+straight), "confidence" (honest; "low" if no draft survived cleanly)."""
 
 _TURN_SINGLE = """\
 Answer word: {word}
@@ -138,6 +160,12 @@ if __name__ == '__main__':
   parser.add_argument(
     '--single', action='store_true', help='single-turn baseline mode'
   )
+  parser.add_argument(
+    '--fast-angles',
+    action='store_true',
+    help='angle turn without thinking (speed experiment: the angle list is '
+    'already externalized reasoning; internal thinking may be redundant)',
+  )
   cli = parser.parse_args()
   word = cli.answer.upper()
 
@@ -158,12 +186,20 @@ if __name__ == '__main__':
       turns = [
         harness.SystemTurn(_SYSTEM_PROMPT),
         # think=True: angle search benefits from active exploration.
-        harness.UserTurn(_TURN_ANGLES.format(**substitutions)),
+        harness.UserTurn(
+          _TURN_ANGLES.format(**substitutions),
+          use_thinking=not cli.fast_angles,
+        ),
         # think=False: exploration lives in the angle turn; with thinking
         # on, gemma4 can exhaust the window reasoning before emitting any
         # drafts.
         harness.UserTurn(
           _TURN_DRAFTS.format(**substitutions), use_thinking=False
+        ),
+        # Editor turn: the written-out substitution sentences are the
+        # externalized reasoning, so thinking stays off.
+        harness.UserTurn(
+          _TURN_EDIT.format(**substitutions), use_thinking=False
         ),
         # think=False: the reasoning happened in the prior turns; this turn
         # is selection + transcription under the schema.

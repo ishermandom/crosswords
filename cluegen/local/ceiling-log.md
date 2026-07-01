@@ -63,3 +63,41 @@ pipeline's division of labor, where the verify pass catches exactly these.
 (DRAFT/IRIS/TEE hard, MARK/TWELVE medium), then v2 prompts targeting
 ?-honesty, trap articulation, and substitution rigor; separately test
 `think=False` on the angle turn as the dominant speed lever.
+
+---
+
+## 2026-07-01 — v1 baseline (in-session grades) and fast-angles adoption
+
+**What changed:** angle turn now runs think=False by default for iteration
+(`--fast-angles`): 19 s/word vs 272 s, with angle breadth preserved (DUCK
+A/B: same senses found, labels slightly noisier). Probe imports its lib
+relative to the file — PYTHONPATH carries the main repo root, which was
+silently loading the main checkout's harness (and writing logs there).
+
+**Measurements (v1, gemma4:26b-qat, in-session grades vs CLUE_SPEC A):**
+
+| Word (target) | Clue | Grade |
+| --- | --- | --- |
+| IRIS (hard) | Messenger from the clouds? | accept |
+| TEE (hard) | Something to use with a cup? | borderline (trap: TEA fits at 3 letters; "use with" loose) |
+| DUCK (hard) | An easy target? | revise (idiom fragment: SITTING duck) |
+| MARK (medium) | One who is often under scrutiny? | revise (right angle, vague surface) |
+| TWELVE (medium) | Standard in a courtroom? | revise (? apologizes for loose phrasing) |
+| DRAFT (hard) | One who might be called to service? | reject (clues the draftee, not DRAFT) |
+
+≈1.5/6 accept vs the cloud bank's ~90%. Angle discovery is consistently
+strong; the losses are all editorial discipline, in three recurring shapes:
+referent mismatch ("One who…" for a non-person answer), idiom fragments
+(clue works only for a longer phrase containing the answer), and
+substitution tests asserted but never performed. Trap rationales are
+routinely confused or backwards.
+
+**Quota decision:** deferring the first cloud-verify checkpoint until v2
+stabilizes; when it runs, the same capped run will grade both the archived
+v1 outputs and v2's, so the curve's origin is measured by the same judge at
+no extra checkpoint cost.
+
+**Next:** v2 prompts targeting exactly the three failure shapes — a
+referent/idiom-fragment rule in the drafting turn, and an operational
+substitution test in the editor turn (write the sentence, perform the
+substitution, then judge). Structure unchanged for comparability.
