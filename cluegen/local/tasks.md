@@ -23,24 +23,22 @@ preferred quantization.
 ## Local ceiling campaign
 
 **Goal:** Explore the quality ceiling of single American-style clue generation
-in scratch probes, ending in a manual check-in when quality plateaus. Spec,
-yardstick, and autonomy rules: `ceiling.md`. Runs on branch `local-ceiling` in
-its own worktree; progress reports in `ceiling-log.md` on that branch.
+in scratch probes. Spec, yardstick, and autonomy rules: `ceiling.md`. Runs on
+branch `local-ceiling` in its own worktree; progress reports in
+`ceiling-log.md` on that branch. Probe, checkpoint harness, v1–v6 iteration,
+and checkpoint 1 are done — see the log for the curve and the criteria
+re-analysis.
 
-- [ ] Build the scratch generation probe: one American-style clue per call,
-      judged against `CLUE_SPEC.md` Part A; smoke on `qwen3.5:2b`, iterate on
-      `gemma4:26b-qat`
-- [ ] Build the scratch eval harness: mechanical checks (leakage, uniqueness) in
-      pure code, plus a cloud-verify checkpoint runner (renders the cloud verify
-      prompt read-only; capped per `ceiling.md` quota rules)
-- [ ] Measure the baseline: `gemma4:31b-qat` clues over 8–12 words sampled
-      across `words.in` categories (include a few banked numbers for the
-      same-word Fable comparison); cloud-verify checkpoint; record in
-      `ceiling-log.md`
-- [ ] Iterate prompts against local signals; re-validate on 31B; checkpoint each
-      cycle into `ceiling-log.md`
-- [ ] At plateau: compile the quality curve and recommendation in
-      `ceiling-log.md`; manual check-in with the user
+- [ ] Build the quality-first judge prompt (scratch variant of the verify
+      template): evaluates clue text on craft + solver satisfaction, assigns
+      its own difficulty label; generator-label mismatch tracked, non-gating
+- [ ] Iterate under the quality-first criteria, in judged order of promise:
+      honest/self-assigned difficulty labeling; a local revise-retry loop
+      (judge locally, regenerate once with the reason); multi-candidate
+      generation with local filtering
+- [ ] Re-validate the surviving config on `gemma4:31b-qat` over held-out
+      words; then propose checkpoint 2 (user-gated: scope + dollar estimate,
+      launch on go)
 
 ---
 

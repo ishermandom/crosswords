@@ -72,10 +72,21 @@ comparison against Fable output; include a few in every sample. Checkpoint
 samples are sized to fit the quota cap — start at 8–12 words; a full-eval-set
 run needs explicit approval.
 
-The tracked metric is the cloud-verify accept rate (with the verdict mix as
-secondary detail), recorded per iteration in the campaign log. The cloud
-pipeline's own accept rate on the same words (~88–97% per batch) is the
-reference ceiling.
+The primary metric is the **bankable rate under quality-first judging**
+(clarified 2026-07-01: the goal is high-quality, satisfying-for-a-solver clues;
+label accuracy is secondary). The judge evaluates the clue TEXT on the craft
+invariants (accuracy, natural surface, economy) and solver satisfaction
+(liveliness, fair aha when misdirection is present), at the difficulty the judge
+itself assigns — a clue mislabeled by the generator is relabeled, not failed.
+The `?` convention stays a text criterion, since it prints with the clue.
+Generator-label accuracy is tracked as a secondary, non-gating series.
+
+Rationale: the bank's verify prompt enforces quality and label coherence
+together — sound when Fable both writes and labels, but on local output it
+conflates the two. Checkpoint 1 re-analysis (see the campaign log): 13 of 21
+revises were label/metadata-only; quality-adjusted, the flat curve becomes a
+real ordering that matches in-session grading. The cloud pipeline's own accept
+rate on the same words (~88–97% per batch) remains the reference ceiling.
 
 ### Quota rules
 
