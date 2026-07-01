@@ -63,10 +63,14 @@ top layer spends meaningful plan quota.
 
 ### Eval set and metric
 
-The eval word set is drawn from words the cloud bank has already processed
-(accepted clues exist for them), so every checkpoint is a same-word, same-judge
-comparison against Fable output. Checkpoint samples are sized to fit the quota
-cap — start at 8–12 words; a full-eval-set run needs explicit approval.
+Eval words come from the cloud project's own list, `cloud/words.in`, sampled
+across its word categories — numbers and ordinals, words that double as names,
+flower names, polysemous short words, spelled-out letters — not just the number
+words the cloud bank happens to have processed first (user direction
+2026-07-01). Words with accepted cloud clues additionally support a same-word
+comparison against Fable output; include a few in every sample. Checkpoint
+samples are sized to fit the quota cap — start at 8–12 words; a full-eval-set
+run needs explicit approval.
 
 The tracked metric is the cloud-verify accept rate (with the verdict mix as
 secondary detail), recorded per iteration in the campaign log. The cloud

@@ -33,8 +33,10 @@ its own worktree; progress reports in `ceiling-log.md` on that branch.
 - [ ] Build the scratch eval harness: mechanical checks (leakage, uniqueness) in
       pure code, plus a cloud-verify checkpoint runner (renders the cloud verify
       prompt read-only; capped per `ceiling.md` quota rules)
-- [ ] Measure the baseline: `gemma4:31b-qat` clues over 8–12 already-banked
-      words; cloud-verify checkpoint; record in `ceiling-log.md`
+- [ ] Measure the baseline: `gemma4:31b-qat` clues over 8–12 words sampled
+      across `words.in` categories (include a few banked numbers for the
+      same-word Fable comparison); cloud-verify checkpoint; record in
+      `ceiling-log.md`
 - [ ] Iterate prompts against local signals; re-validate on 31B; checkpoint each
       cycle into `ceiling-log.md`
 - [ ] At plateau: compile the quality curve and recommendation in
