@@ -232,7 +232,7 @@ def _run_user_turn(
     'keep_alive': '30m',
     'think': turn.use_thinking,
     'options': {
-      'num_ctx': 8192,
+      'num_ctx': 16384,
       'temperature': temperature,
       'frequency_penalty': 0.2,
       'top_k': 40,

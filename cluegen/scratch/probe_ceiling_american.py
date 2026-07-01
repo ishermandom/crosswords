@@ -159,7 +159,12 @@ if __name__ == '__main__':
         harness.SystemTurn(_SYSTEM_PROMPT),
         # think=True: angle search benefits from active exploration.
         harness.UserTurn(_TURN_ANGLES.format(**substitutions)),
-        harness.UserTurn(_TURN_DRAFTS.format(**substitutions)),
+        # think=False: exploration lives in the angle turn; with thinking
+        # on, gemma4 can exhaust the window reasoning before emitting any
+        # drafts.
+        harness.UserTurn(
+          _TURN_DRAFTS.format(**substitutions), use_thinking=False
+        ),
         # think=False: the reasoning happened in the prior turns; this turn
         # is selection + transcription under the schema.
         harness.UserTurn(
