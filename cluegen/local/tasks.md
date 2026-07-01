@@ -20,6 +20,28 @@ preferred quantization.
 
 ---
 
+## Local ceiling campaign
+
+**Goal:** Explore the quality ceiling of single American-style clue generation
+in scratch probes, ending in a manual check-in when quality plateaus. Spec,
+yardstick, and autonomy rules: `ceiling.md`. Runs on branch `local-ceiling` in
+its own worktree; progress reports in `ceiling-log.md` on that branch.
+
+- [ ] Build the scratch generation probe: one American-style clue per call,
+      judged against `CLUE_SPEC.md` Part A; smoke on `qwen3.5:2b`, iterate on
+      `gemma4:26b-qat`
+- [ ] Build the scratch eval harness: mechanical checks (leakage, uniqueness) in
+      pure code, plus a cloud-verify checkpoint runner (renders the cloud verify
+      prompt read-only; capped per `ceiling.md` quota rules)
+- [ ] Measure the baseline: `gemma4:31b-qat` clues over 8–12 already-banked
+      words; cloud-verify checkpoint; record in `ceiling-log.md`
+- [ ] Iterate prompts against local signals; re-validate on 31B; checkpoint each
+      cycle into `ceiling-log.md`
+- [ ] At plateau: compile the quality curve and recommendation in
+      `ceiling-log.md`; manual check-in with the user
+
+---
+
 ## Phase 7 — Brainstorm prompt redesign
 
 **Goal:** Replace the single-turn brainstorm placeholder with a multi-turn
