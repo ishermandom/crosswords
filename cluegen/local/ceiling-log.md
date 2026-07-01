@@ -273,3 +273,43 @@ probe entirely lacks.
 plateau. The measured ceiling for this architecture on 26B: one bank-grade
 clue per word per ~2 versions tried. Campaign pauses here for the user
 check-in per spec.
+
+---
+
+## 2026-07-01 — Evaluation criteria clarified: quality first, labels second
+
+**User direction:** the goal is high-quality, satisfying-for-a-solver
+clues; accurate difficulty labeling is secondary. The bank judge enforces
+both at once (it could, because Fable labels its own clues well), so
+checkpoint 1's accept rate conflates the two.
+
+**Re-analysis of checkpoint 1** — each "revise" classified by objection
+type. Label/metadata-only = clue text sound, tag or trap description
+wrong (fixable by relabeling at ingestion). Text flaw = inaccuracy,
+broken referent, unnatural surface, or dullness.
+
+| Version | Judge accepts | + label-only revises | Quality-adjusted | Text flaws |
+| --- | --- | --- | --- | --- |
+| v1 | 2 | 1 (IRIS) | 3/6 | DUCK, DRAFT, MARK |
+| v2 | 2 | 3 (DUCK, DRAFT, TEE) | 5/6 | IRIS |
+| v3 | 2 | 2 (DUCK, IRIS) | 4/6 | TWELVE dull, TEE |
+| v4 | 2 | 1 (DUCK) | 3/6 | DRAFT, MARK, TWELVE |
+| v5 | 1 | 4 (DRAFT, IRIS, TWELVE, TEE) | 5/6 | MARK dull |
+| v6 | 0 | 2 (DUCK, MARK) | 2/6 | DRAFT, IRIS, TWELVE, TEE |
+
+**Findings:** (1) Quality-adjusted, the curve is no longer flat — it peaks
+at v2 and v5 (5/6) and bottoms at v6 (2/6), closely matching the
+in-session grade ordering (v2 peak, v6 floor). The user's hypothesis
+holds: in-session grading tracked clue quality; the flat judge curve was
+label errors moving around. (2) The local model's label errors are
+enormous — 13 of 21 revises were label/metadata-only — so relabel-at-
+ingestion recovers roughly half the lost accepts for free. (3) v5's high
+adjusted score carries an asterisk: its clues lean safe; liveliness must
+stay a first-class criterion or "accurate but flat" inflates.
+
+**Criteria going forward (spec updated):** primary metric = bankable rate
+under quality-first judging — the clue TEXT evaluated on craft invariants
+(accuracy, surface, economy) and solver satisfaction (liveliness, fair
+aha), at the difficulty the judge itself assigns. Generator label
+mismatches are tracked as a secondary series, non-gating. The ? convention
+stays a text criterion (it is printed with the clue).
