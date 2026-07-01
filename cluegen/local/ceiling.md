@@ -88,6 +88,16 @@ revises were label/metadata-only; quality-adjusted, the flat curve becomes a
 real ordering that matches in-session grading. The cloud pipeline's own accept
 rate on the same words (~88–97% per batch) remains the reference ceiling.
 
+### Clue bank
+
+Good clues get captured as they are found (user direction 2026-07-01):
+`cluegen/local/clue_bank.jsonl` on the campaign branch, cloud-compatible record
+shape plus a `provenance` field (generator model, prompt version, judge,
+verdict, any judge-directed fix applied). Fable-accepted clues enter verbatim;
+revises whose stated fix is trivial (retag, drop an apologetic `?`) enter with
+the fix applied and noted. Locally-judged clues stay out until the local judge
+clears its calibration bar.
+
 ### Quota rules
 
 - Every `claude -p` run, single call or batch, is user-gated: propose the run —
