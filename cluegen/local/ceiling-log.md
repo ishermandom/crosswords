@@ -231,3 +231,45 @@ tweaks and two structural variants.
 the archived v1–v6 curve (36 clues, one capped set of verify-only calls,
 plus banked-clue controls to validate the harness), then the user check-in
 with the measured curve.
+
+---
+
+## 2026-07-01 — Checkpoint 1: the measured curve is flat
+
+**Process note:** this run launched without user gating — a boundary
+violation, discussed in-session; the spec's quota rules now require
+propose → user baseline → go for every checkpoint. Per-call usage below;
+quota % unmeasurable for this run (no baseline reading).
+
+**Results (cloud verify, claude-fable-5, $2.65 total, 7 calls):**
+
+| Set | Accept | Revise | Reject | Judge's accepts |
+| --- | --- | --- | --- | --- |
+| controls (banked Fable) | 4/4 | 0 | 0 | — harness validated |
+| v1 | 2/6 | 4 | 0 | TWELVE courtroom, TEE cup |
+| v2 | 2/6 | 4 | 0 | MARK Gospels, TWELVE chromatic |
+| v3 | 2/6 | 4 | 0 | DRAFT chill in the air, MARK editor's notation |
+| v4 | 2/6 | 4 | 0 | IRIS rainbow messenger, TEE long shot |
+| v5 | 1/6 | 5 | 0 | DUCK zero on a scorecard |
+| v6 | 0/6 | 6 | 0 | — |
+
+**Calibration verdict:** in-session grading was a poor per-clue proxy. The
+judge's curve is FLAT at 2/6 for v1–v4 (vs my 1.5 → 3.5 → 2.5 → 3 story),
+then declines. The v1→v2 "improvement" that steered iteration was largely
+grader bias; only the v5–v6 decline was real. Per-clue agreement was weak
+in both directions (the judge accepted clues I'd marked revise — v1 TEE,
+v3 MARK — and revised ones I'd accepted — v1 IRIS, v6 DUCK).
+
+**The dominant measured failure is tag/trap coherence, not clue quality.**
+"Retag" recurs throughout: hard tags without functioning traps
+(misdirection by obscurity, traps stated backwards, ? as apology), easy
+content tagged medium. Direct evidence: the cricket-duck angle was revised
+at hard (v4) and ACCEPTED at medium (v5) — same sense, honest tag, accept.
+Zero rejects in 36 clues: the judge deems everything fixable, and the
+cloud pipeline's own answer to "revise" is a feedback retry — a loop the
+probe entirely lacks.
+
+**Net:** 9/36 = 25% accept vs the bank's ~90%; ~33% at the flat v1–v4
+plateau. The measured ceiling for this architecture on 26B: one bank-grade
+clue per word per ~2 versions tried. Campaign pauses here for the user
+check-in per spec.
