@@ -128,3 +128,31 @@ first reading → wrong answer in caps → escape), a no-? rule for straight
 definitions of any sense, and a literal-accuracy check in the editor turn.
 After v3: 26B→31B transfer check on 2–3 words, then the first cloud-verify
 checkpoint over archived v1+v2+v3 outputs in one capped run.
+
+---
+
+## 2026-07-01 — v3: regression with a lesson; 31B transfer check passes
+
+**Measurements (26B, same 6 words, in-session grades):** ≈2.5/6, down from
+v2's ≈3.5/6. Trap articulation fixed (concrete wrong answers in caps across
+the board: DODGE, COLD, SHUTTER); but MARK "An editor's notation" (easy,
+dull) and TWELVE "Number of months in a year" (inert) show the failure:
+the conjunction of v3's discipline rules pushed selection into the timid
+corner. The honest-difficulty rule, meant as calibration, acted as an
+incentive to downshift to safe straight definitions instead of crafting
+livelier target-difficulty clues. Classic multi-objective prompt tension:
+each rule fixed its target; together they over-tightened.
+
+**31B transfer check (DUCK, MARK, v3 prompts):** directionally aligned —
+same angle families, same conservative tilt, marginally cleaner surfaces
+("Avoid a blow" vs 26B's "Avoid the blow!"). No divergent failure modes on
+this sample; 26B stays the iteration model. 31B timing: ~5 tok/s, ~3.5–4.5
+min/word at the fast config. Checkpoint-sizing note: a 10-word 31B batch is
+~45 min of sustained decode on the fanless Air — throttle territory; size
+or split checkpoint runs accordingly.
+
+**Next:** v4 rebalances — keep v3's checks, restore ambition: drafting turn
+gains target-difficulty pressure (medium prefers a less-first sense over
+the primary straight definition; dictionary-flat is a failure at any
+difficulty) and the extract turn selects the KEEP closest to the target,
+preferring the livelier of equals, never defaulting to the safest.

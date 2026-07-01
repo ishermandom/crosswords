@@ -93,6 +93,12 @@ Pick the 4 or 5 strongest angles for a {difficulty} clue — favor genuine
 traps and lively surfaces over safe, predictable definitions. Draft exactly
 one clue per chosen angle.
 
+Draft to the TARGET difficulty — it is a requirement, not a ceiling. For
+medium, prefer a less-first sense or mild misdirection over the primary
+straight definition. For hard, the surface should confidently invite a
+wrong reading. At every difficulty, a dictionary-flat clue is a failure:
+easy means accessible, never inert.
+
 Two hard rules when drafting:
 - The clue must define the answer word ITSELF — never a person or thing
   merely associated with it. ("One who might be called to service" defines
@@ -127,8 +133,9 @@ End with a verdict line per draft: KEEP or CUT, with the one-phrase
 reason. Plain unformatted text."""
 
 _TURN_EXTRACT = """\
-Select the single best KEEP clue for a {difficulty} target and return it as
-JSON with these fields:
+Among the KEEP drafts, select the one closest to the {difficulty} target —
+when two are equally close, take the livelier, more specific one. Never
+default to the safest. Return it as JSON with these fields:
 - "clue": exact print text.
 - "difficulty": your honest calibration, which may differ from the target.
   A straight definition — even of a surprising secondary sense — is medium
