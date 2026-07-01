@@ -105,8 +105,11 @@ reference ceiling.
   being thermal throttling on the fanless Air _and_ slow iteration. Record the
   cost–benefit call in the campaign log before starting one.
 
-**Blocked states:** if the Ollama server is unreachable, log it, report, and end
-the turn — only `ishermandom` can start it (`ollama serve`, manual by policy).
+**Server management:** Claude runs the Ollama server itself as needed —
+`OLLAMA_MODELS=/Users/Shared/ollama/models ~/tmp/ollama serve` from the
+`claude-sandbox` account (user authorization 2026-07-01) — and may bring it up
+and down freely. Pulling models through it remains forbidden, per the ask-first
+rule above.
 
 ## Model tier
 
