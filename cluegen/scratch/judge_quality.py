@@ -63,6 +63,10 @@ Verdicts:
 - "bankable" — publishable as-is at your assigned difficulty.
 - "fixable" — one concrete text flaw; name it.
 - "bad" — fundamentally flawed for this answer.
+
+The costly error is banking a flawed clue — a mediocre entry damages the
+bank; a discarded good clue costs only a retry. When your analysis leaves
+genuine doubt, verdict "fixable", never "bankable".
 """
 
 _FEW_SHOT = """
@@ -245,6 +249,14 @@ if __name__ == '__main__':
             f'local={local["verdict"]:8s}({local["difficulty"]:6s}) '
             f'fable={fable_verdict:7s} adjusted_good={is_good_adjusted}')
 
+  rows = [json.loads(l) for l in out_path.read_text().splitlines()]
+  banked = [r for r in rows if r['local'] == 'bankable']
+  good_total = sum(1 for r in rows if r['quality_adjusted_good'])
+  true_positive = sum(1 for r in banked if r['quality_adjusted_good'])
+  precision = true_positive / len(banked) if banked else 0.0
+  recall = true_positive / good_total if good_total else 0.0
   print(f'\nagreement vs raw accepts:      {agree_raw}/{total}')
   print(f'agreement vs quality-adjusted: {agree_adjusted}/{total}')
+  print(f'bankable precision={precision:.2f} recall={recall:.2f} '
+        f'(banked {len(banked)}, good {good_total})')
   print(f'rows: {out_path}')
