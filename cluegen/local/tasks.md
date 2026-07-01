@@ -24,18 +24,32 @@ preferred quantization.
 
 **Goal:** Explore the quality ceiling of single American-style clue generation
 in scratch probes. Spec, yardstick, and autonomy rules: `ceiling.md`. Runs on
-branch `local-ceiling` in its own worktree; progress reports in
-`ceiling-log.md` on that branch. Probe, checkpoint harness, v1–v6 iteration,
-and checkpoint 1 are done — see the log for the curve and the criteria
-re-analysis.
+branch `local-ceiling` in its own worktree; progress reports in `ceiling-log.md`
+on that branch. Probe, checkpoint harness, v1–v6 iteration, and checkpoint 1 are
+done — see the log for the curve and the criteria re-analysis.
 
-- [ ] Build the quality-first judge prompt (scratch variant of the verify
-      template): evaluates clue text on craft + solver satisfaction, assigns
-      its own difficulty label; generator-label mismatch tracked, non-gating
-- [ ] Iterate under the quality-first criteria, in judged order of promise:
-      honest/self-assigned difficulty labeling; a local revise-retry loop
-      (judge locally, regenerate once with the reason); multi-candidate
-      generation with local filtering
+- [~] **Local judge iteration** — the binding constraint. Harness:
+      `scratch/judge_quality.py`; ground truth: 40 checkpoint-1 clues with
+      Fable verdicts + quality-adjusted classification. Baselines:
+      26B non-thinking 52%, 31B non-thinking 60%, both with dirty controls.
+      Target: ~75–80% agreement vs quality-adjusted, clean controls.
+      Levers, in order:
+  - Scratchpad-then-verdict decomposition (analysis turn, then schema
+    transcription) — validated pattern from the earlier quality work
+  - Few-shot examples anchoring the referent-rule boundary (legitimate
+    metonymy vs genuine mismatch vs idiom fragment), on NON-eval words to
+    avoid leaking the calibration set
+  - Per-clue single calls if batch-of-6 dilutes attention
+  - Thinking-mode variant (~4× latency) if non-thinking stalls
+  - Note: repeated tuning against the same 40 clues risks overfitting the
+    judge prompt to them; fine at prototype stage, flagged for later
+- [ ] **Setter v7 under quality-first criteria**: v2's balance + liveliness
+      pressure; drop difficulty-targeting complexity (the judge relabels;
+      honest tags come free)
+- [ ] **Retry loop** (needs judge ≥ target): local judge verdict + reason →
+      one regeneration; mirrors the cloud pipeline's revise path
+- [ ] **Multi-candidate + filter** (needs judge): best-of-N with local
+      filtering, trading free local compute for accept rate
 - [ ] Re-validate the surviving config on `gemma4:31b-qat` over held-out
       words; then propose checkpoint 2 (user-gated: scope + dollar estimate,
       launch on go)
