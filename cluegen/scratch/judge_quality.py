@@ -65,6 +65,43 @@ Verdicts:
 - "bad" — fundamentally flawed for this answer.
 """
 
+_FEW_SHOT = """
+Calibration examples — where the boundaries sit:
+
+- "Innings in a standard ballgame" -> NINE: bankable (easy). A number is
+  legitimately defined by what it counts; metonymic count clues are fine.
+- "One who delivers your letters" -> MAIL: bad. Defines the mail CARRIER,
+  a person associated with the answer — not the answer itself.
+- "Unwanted gift" -> ELEPHANT: bad. The sense lives only inside the idiom
+  WHITE ELEPHANT; ELEPHANT alone never means an unwanted gift.
+- "You, old-style" -> THOU: bankable (medium). A secondary or archaic
+  sense is fully legitimate — judge the sense the clue uses, not the
+  word's most common sense.
+- "Number of days in a week" -> SEVEN: fixable. Accurate but
+  dictionary-flat — no angle, no life.
+- "A large body of salt water?" -> OCEAN: fixable. Straight definition
+  wearing a question mark; drop the ?.
+- "Bank deposit?" -> SILT: bankable (hard). The ? is earned: "bank"
+  pivots from finance to riverbank.
+"""
+
+_SCRATCHPAD_TEMPLATE = """\
+Before any verdicts: for EACH clue below, write a brief analysis (2-3
+sentences): name the sense of the answer the clue uses; write the
+substitution sentence (a sentence where the clue's text replaces the
+answer); then name any flaws against the criteria, or state that the clue
+is clean. Plain text, one block per clue.
+
+{clues}
+"""
+
+_TRANSCRIBE = """\
+Now transcribe your analyses into verdicts, faithfully: a clue you found
+clean is "bankable"; one concrete text flaw is "fixable"; fundamentally
+flawed is "bad". Do not re-judge — encode what your analysis concluded.
+Return JSON only.
+"""
+
 _USER_TEMPLATE = """\
 Judge each clue below. Return JSON only.
 
@@ -94,31 +131,53 @@ _SCHEMA = {
 }
 
 
-def _judge_group(model: str, entries: list[dict]) -> list[dict]:
+def _chat(model: str, messages: list[dict], schema: dict | None) -> str:
+  body = {
+    'model': model,
+    'messages': messages,
+    'stream': False,
+    'think': False,
+    'keep_alive': '30m',
+    'options': {'num_ctx': 16384, 'temperature': 0.2},
+  }
+  if schema is not None:
+    body['format'] = schema
+  response = httpx.post(_OLLAMA_CHAT_URL, json=body, timeout=600.0)
+  response.raise_for_status()
+  return response.json()['message']['content']
+
+
+def _judge_group(
+  model: str, entries: list[dict], use_scratchpad: bool, use_few_shot: bool
+) -> list[dict]:
   clue_lines = '\n'.join(
     json.dumps({'word': e['word'], 'clue': e['clue']['clue']})
     for e in entries
   )
-  body = {
-    'model': model,
-    'messages': [
-      {'role': 'system', 'content': _SYSTEM},
-      {'role': 'user', 'content': _USER_TEMPLATE.format(clues=clue_lines)},
-    ],
-    'stream': False,
-    'think': False,
-    'format': _SCHEMA,
-    'keep_alive': '30m',
-    'options': {'num_ctx': 16384, 'temperature': 0.2},
-  }
-  response = httpx.post(_OLLAMA_CHAT_URL, json=body, timeout=600.0)
-  response.raise_for_status()
-  return json.loads(response.json()['message']['content'])['verdicts']
+  system = _SYSTEM + (_FEW_SHOT if use_few_shot else '')
+  messages: list[dict] = [{'role': 'system', 'content': system}]
+  if use_scratchpad:
+    messages.append(
+      {'role': 'user',
+       'content': _SCRATCHPAD_TEMPLATE.format(clues=clue_lines)}
+    )
+    analysis = _chat(model, messages, schema=None)
+    messages.append({'role': 'assistant', 'content': analysis})
+    messages.append({'role': 'user', 'content': _TRANSCRIBE})
+  else:
+    messages.append(
+      {'role': 'user', 'content': _USER_TEMPLATE.format(clues=clue_lines)}
+    )
+  return json.loads(_chat(model, messages, schema=_SCHEMA))['verdicts']
 
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument('--model', default='gemma4:26b-qat')
+  parser.add_argument('--scratchpad', action='store_true')
+  parser.add_argument('--fewshot', action='store_true')
+  parser.add_argument('--quiet', action='store_true',
+                      help='print mismatches and totals only')
   cli = parser.parse_args()
 
   groups: dict[str, list[dict]] = {}
@@ -145,7 +204,9 @@ if __name__ == '__main__':
   agree_raw = agree_adjusted = total = 0
 
   for version, entries in groups.items():
-    verdicts = _judge_group(cli.model, entries)
+    verdicts = _judge_group(
+      cli.model, entries, cli.scratchpad, cli.fewshot
+    )
     by_word = {v['word']: v for v in verdicts}
     # Two ZERO controls share a word; match those by order instead.
     if version == 'control':
@@ -178,6 +239,8 @@ if __name__ == '__main__':
       with out_path.open('a') as f:
         f.write(json.dumps(row) + '\n')
       marker = '=' if local_good == is_good_adjusted else '!'
+      if cli.quiet and marker == '=':
+        continue
       print(f'{marker} {version:7s} {e["word"]:7s} '
             f'local={local["verdict"]:8s}({local["difficulty"]:6s}) '
             f'fable={fable_verdict:7s} adjusted_good={is_good_adjusted}')
