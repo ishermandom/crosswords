@@ -107,18 +107,32 @@ Two hard rules when drafting:
   "easy target" sense lives in SITTING DUCK, not in DUCK), discard the
   angle unless the clue genuinely works for the answer word alone.
 
-For each draft: the clue text as it would appear in print, then on the next
-line its angle name and the trap it sets — the trap is the specific wrong
-answer (a real word or phrase) or wrong reading the surface invites; name
-it concretely. Apply the craft invariants as you draft — economy, natural
-surface, honest question mark. Plain unformatted text."""
+Draft 2 or 3 DIFFERENT phrasings of each chosen angle — same idea, genuinely
+different renderings (different surface vocabulary, different rhythm), so
+the first wording that comes to mind is never the only option. For each
+draft: the clue text as it would appear in print, then on the next line its
+angle name and the trap it sets — the trap is the specific wrong answer (a
+real word or phrase) or wrong reading the surface invites; name it
+concretely. Plain unformatted text."""
+
+_TURN_REFINE = """\
+For each angle, pick its strongest phrasing and refine it into the best
+version of itself: tighten the wording (economy — every word earns its
+place), make the surface something a person would actually say or write,
+fix tense and number agreement, and apply the question-mark rule (a ? only
+for genuine wordplay or a stretched definition — a straight definition of
+any sense takes none; remove or add accordingly).
+
+Output one refined clue per angle, each with its angle name and trap.
+Plain unformatted text."""
 
 _TURN_EDIT = """\
-Now act as your own toughest editor. For EACH draft, perform the
-substitution test — do not merely assert it. Write one natural sentence
-using {word} in the clued sense, then rewrite the sentence with the clue's
-definition in place of {word}. The draft fails if the rewritten sentence
-changes part of speech, tense, number, or referent — or reads unnaturally.
+Now act as your own toughest editor, evaluating each REFINED clue. For
+EACH one, perform the substitution test — do not merely assert it. Write
+one natural sentence using {word} in the clued sense, then rewrite the
+sentence with the clue's definition in place of {word}. The clue fails if
+the rewritten sentence changes part of speech, tense, number, or referent —
+or reads unnaturally.
 
 Then check each surviving draft:
 - Literal accuracy: every content word of the clue must be true of the
@@ -220,6 +234,12 @@ if __name__ == '__main__':
         # drafts.
         harness.UserTurn(
           _TURN_DRAFTS.format(**substitutions), use_thinking=False
+        ),
+        # v6: refine (improve best phrasing per angle) precedes evaluation,
+        # so the editor judges polished clues instead of killing angles for
+        # first-draft awkwardness.
+        harness.UserTurn(
+          _TURN_REFINE.format(**substitutions), use_thinking=False
         ),
         # Editor turn: the written-out substitution sentences are the
         # externalized reasoning, so thinking stays off.

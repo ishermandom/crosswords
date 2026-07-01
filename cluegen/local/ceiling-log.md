@@ -179,3 +179,31 @@ check (would a human write this?), and hard-means-twisted-not-obscure as an
 editor check. If v5 ≤ v2, wording iteration has plateaued: run the first
 cloud-verify checkpoint over the archived v1–v5 curve (one capped run) and
 take the plateau assessment to the user check-in.
+
+---
+
+## 2026-07-01 — v5 confirms wording plateau; v6 restores refine architecture
+
+**Measurements (26B, same 6 words, in-session grades):** ≈3/6. TWELVE "A
+standard jury count" (accept — v1's courtroom angle, phrasing fixed), TEE
+"A golfer's starting point?" (accept as medium; hard target undershot);
+IRIS and DUCK borderline; DRAFT and MARK revise (unearned ? on plain
+synonyms — the safe tilt of the seesaw returned).
+
+**Interpretation:** plateau condition met — v3 (≈2.5), v4 (≈2.5–3), v5
+(≈3) all at or below v2 (≈3.5). Wording-level tweaks oscillate on the
+safe-dull ↔ ambitious-awkward axis without climbing.
+
+**Framing correction (user observation):** the original 8-turn design's
+breadth was a creativity-forcing device against anchoring, not
+candidate-pool building. The 4-turn compression kept it at mechanism level
+(angle turn — working: angle variety is the consistent strength) but
+dropped it at phrasing level (one rendering per angle), and the plateau's
+dominant failures are exactly phrasing-level. The KEEP/CUT-only editor
+compounds this: cutting an awkward phrasing kills its angle.
+
+**v6 (user suggestion + breadth restoration):** drafts turn renders 2–3
+phrasings per angle; new refine turn picks the best phrasing per angle and
+improves it; evaluate turn applies the existing checks to refined clues;
+extract unchanged. 5 turns, all non-thinking. This is the original
+draft-broad → refine → evaluate architecture, less aggressively compressed.
