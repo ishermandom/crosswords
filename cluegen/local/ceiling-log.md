@@ -313,3 +313,27 @@ under quality-first judging — the clue TEXT evaluated on craft invariants
 aha), at the difficulty the judge itself assigns. Generator label
 mismatches are tracked as a secondary series, non-gating. The ? convention
 stays a text criterion (it is printed with the clue).
+
+---
+
+## 2026-07-01 — Local judge calibration: 26B non-thinking is near-random
+
+**Measurements:** quality-first judge prompt (`judge_quality.py`), clue
+text only, batched 6/call, think=False, temp 0.2, gemma4:26b-qat, judging
+all 40 checkpoint-1 clues against Fable ground truth. Agreement: 22/40 vs
+raw accepts, 21/40 vs the quality-adjusted classification — coin-flip
+territory. It also misjudged 2 of 4 banked Fable controls (called "You,
+formally" for ONE bad, and a ZERO control fixable).
+
+**Interpretation:** a local judge this noisy cannot drive a retry loop or
+candidate filtering — and under quality-first criteria those loops are the
+main remaining levers, so judge viability is now the binding constraint.
+Two documented levers from the project's earlier quality work: thinking
+mode (correct convention reasoning at ~4× latency) and the dense 31B's
+tighter multi-criteria attention. Testing the 31B judge first — it is the
+quality-of-record model, so success makes it the production judge.
+
+**Next:** same calibration on gemma4:31b-qat (non-thinking, ~10 min); if
+still near-random, try 26B with thinking; if both fail, the local-judge
+lever is expensive and the plateau assessment stands on generation-side
+results alone.
