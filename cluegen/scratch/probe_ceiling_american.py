@@ -127,6 +127,12 @@ Then check each surviving draft:
 - Question-mark honesty: a straight definition of ANY sense of the answer —
   even a surprising secondary sense — takes no ?. The ? marks genuine
   wordplay or a stretched definition, never apologizes for loose phrasing.
+- Surface naturalness: read the clue as prose — would a human actually
+  write this phrase? Cut any draft whose surface is assembled rather than
+  natural, however clever its mechanism.
+- Accessibility at hard: hard means twisted, not obscure. A specialist
+  sense unfamiliar to a general American solver cannot carry a hard clue
+  by itself.
 - No answer leakage; and the trap survives a re-read.
 
 End with a verdict line per draft: KEEP or CUT, with the one-phrase
@@ -134,8 +140,9 @@ reason. Plain unformatted text."""
 
 _TURN_EXTRACT = """\
 Among the KEEP drafts, select the one closest to the {difficulty} target —
-when two are equally close, take the livelier, more specific one. Never
-default to the safest. Return it as JSON with these fields:
+when two are equally close, take the livelier, more specific one. A clue
+must earn ambition with a natural surface; prefer clean-and-true over
+clever-but-strained. Return it as JSON with these fields:
 - "clue": exact print text.
 - "difficulty": your honest calibration, which may differ from the target.
   A straight definition — even of a surprising secondary sense — is medium

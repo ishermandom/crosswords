@@ -156,3 +156,26 @@ gains target-difficulty pressure (medium prefers a less-first sense over
 the primary straight definition; dictionary-flat is a failure at any
 difficulty) and the extract turn selects the KEEP closest to the target,
 preferring the livelier of equals, never defaulting to the safest.
+
+---
+
+## 2026-07-01 — v4: ambition restored, surfaces slipped; seesaw identified
+
+**Measurements (26B, same 6 words, in-session grades):** ≈2.5–3/6. TEE
+"Small support for a long shot?" is the campaign's best clue yet (long-shot
+gambling misdirect, natural surface, earned ?); IRIS "Messenger of the
+rainbow?" accepts. But MARK "Hit to be sought?" and TWELVE "That many
+semitones in an octave" have assembled, inhuman surfaces, and DUCK "A zero
+in cricket?" is obscure-not-twisted at hard for an American solver.
+
+**Interpretation:** v2 ≈3.5/6 remains the peak. v3 and v4 form a seesaw:
+each rule set fixes its target failure and induces the opposite one
+(safe-dull ↔ ambitious-awkward). Wording-level iteration is showing
+plateau behavior around ~3/6 in-session vs the cloud's ~5.4/6.
+
+**Next:** v5 = principled recombination — v2's balance plus only the
+isolated-good components: v3's trap template, a surface-naturalness editor
+check (would a human write this?), and hard-means-twisted-not-obscure as an
+editor check. If v5 ≤ v2, wording iteration has plateaued: run the first
+cloud-verify checkpoint over the archived v1–v5 curve (one capped run) and
+take the plateau assessment to the user check-in.
