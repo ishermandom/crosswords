@@ -337,3 +337,28 @@ quality-of-record model, so success makes it the production judge.
 still near-random, try 26B with thinking; if both fail, the local-judge
 lever is expensive and the plateau assessment stands on generation-side
 results alone.
+
+---
+
+## 2026-07-01 — 31B judge: better, still unusable; judging is the gap
+
+**Measurements:** same calibration on gemma4:31b-qat (non-thinking):
+25/40 vs raw accepts, 24/40 (60%) vs quality-adjusted — up from 26B's
+52%, still coin-flip-adjacent. Failure texture (both models): the same
+referent-accuracy criterion under-applies on some clues (praised the
+sitting-duck idiom fragment as "clever play") and over-applies
+hypercorrectly on others (rejected the Fable-accepted "Standard in a
+courtroom?" for TWELVE, and the banked control "You, formally" for ONE,
+insisting the answer owns only its primary sense). Verdict noise is
+quality-evaluation reasoning error; label noise exists but is non-gating
+by design.
+
+**Strategic picture at this pause:** generation, quality-adjusted, peaks
+at ~5/6 (v2/v5) against the cloud's ~5.4/6 — the local model can WRITE
+near-bank-grade clues. It cannot yet JUDGE them: local judging is the
+binding constraint on every scaling lever (retry loop, best-of-N).
+Untested judge levers, in order of documented promise: few-shot examples
+anchoring the referent rule's boundary (legitimate metonymy vs genuine
+mismatch — the earlier quality work's escape-hatch territory), and
+thinking mode (~4× latency, previously reliable for convention
+reasoning).
