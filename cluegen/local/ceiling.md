@@ -79,10 +79,13 @@ reference ceiling.
 
 ### Quota rules
 
-- Cloud-verify checkpoints run at named milestones only, capped at ~10–15% of a
-  session window each, with per-call usage logged.
-- Exceeding the cap, or any `claude -p` call outside a named checkpoint,
-  requires asking first.
+- Cloud-verify checkpoints are user-gated (clarified 2026-07-01 after Claude
+  launched one autonomously on a looser reading): at the named milestone,
+  propose the run — scope, clue count, cost estimate — and launch only after the
+  user takes a quota baseline and says go. Report-only on completion;
+  bookkeeping after the user's quota reading. Caps stay at ~10–15% of a session
+  window per run, per-call usage logged.
+- Any other `claude -p` call requires asking first.
 - In-session review manages its own cost by sample size and format, per layer 3
   above.
 
