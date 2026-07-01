@@ -101,3 +101,30 @@ no extra checkpoint cost.
 referent/idiom-fragment rule in the drafting turn, and an operational
 substitution test in the editor turn (write the sentence, perform the
 substitution, then judge). Structure unchanged for comparability.
+
+---
+
+## 2026-07-01 — v2: referent rules + performed substitution test
+
+**Measurements (same 6 words/difficulties, in-session grades):** ≈3.5/6
+accept vs v1's ≈1.5/6. MARK "One of the four Gospels" (trap: Luke — 4
+letters, genuinely deadly), TWELVE "Standard chromatic scale count?", DUCK
+"Dip out of sight" all accept; TEE "A small support for a long drive?"
+borderline-accept; DRAFT "A sudden chill from an open window?" revise
+(referent fixed, ? unearned on a straight definition); IRIS "Colorful
+garden visitor?" reject (a planted flower is not a visitor — accuracy).
+
+**Interpretation:** both targeted v1 failure shapes eliminated (referent
+mismatch 3/6 → 0, idiom fragments 2/6 → 0) — the hard rules + performed
+substitution test transfer cleanly on this model. Residual profile: trap
+rationales inverted or confused in 5/6 (the model sets traps it cannot
+describe; the cloud judge checks that the stated trap functions, so this
+directly costs checkpoint accepts); ? discipline still weak on straight
+definitions of secondary senses; one literal-accuracy slip. Difficulty
+self-labels drift high (straight definitions tagged hard).
+
+**Next:** v3 targeting trap articulation (solver-perspective template:
+first reading → wrong answer in caps → escape), a no-? rule for straight
+definitions of any sense, and a literal-accuracy check in the editor turn.
+After v3: 26B→31B transfer check on 2–3 words, then the first cloud-verify
+checkpoint over archived v1+v2+v3 outputs in one capped run.

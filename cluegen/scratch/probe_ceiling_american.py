@@ -114,19 +114,30 @@ using {word} in the clued sense, then rewrite the sentence with the clue's
 definition in place of {word}. The draft fails if the rewritten sentence
 changes part of speech, tense, number, or referent — or reads unnaturally.
 
-Then check each surviving draft: question-mark honesty (a ? must mark
-genuine wordplay or a stretched definition, never apologize for loose
-phrasing), no answer leakage, and whether the trap survives a re-read.
+Then check each surviving draft:
+- Literal accuracy: every content word of the clue must be true of the
+  answer in the clued sense. (A planted flower is not a "visitor"; a clue
+  calling it one fails, however pretty the surface.)
+- Question-mark honesty: a straight definition of ANY sense of the answer —
+  even a surprising secondary sense — takes no ?. The ? marks genuine
+  wordplay or a stretched definition, never apologizes for loose phrasing.
+- No answer leakage; and the trap survives a re-read.
 
 End with a verdict line per draft: KEEP or CUT, with the one-phrase
 reason. Plain unformatted text."""
 
 _TURN_EXTRACT = """\
 Select the single best KEEP clue for a {difficulty} target and return it as
-JSON: "clue" (exact print text), "difficulty" (your honest calibration,
-which may differ from the target), "trap" (one sentence naming the specific
-wrong answer or wrong reading the surface invites; null if the clue is
-straight), "confidence" (honest; "low" if no draft survived cleanly)."""
+JSON with these fields:
+- "clue": exact print text.
+- "difficulty": your honest calibration, which may differ from the target.
+  A straight definition — even of a surprising secondary sense — is medium
+  at most.
+- "trap": one sentence written from the solver's perspective, in this
+  shape: what the surface makes them read first, the specific wrong answer
+  they would try (a real word, in CAPS), and the realization that escapes
+  the trap. Null if the clue is straight.
+- "confidence": honest; "low" if no draft survived cleanly."""
 
 _TURN_SINGLE = """\
 Answer word: {word}
