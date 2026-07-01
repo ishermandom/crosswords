@@ -362,3 +362,25 @@ anchoring the referent rule's boundary (legitimate metonymy vs genuine
 mismatch — the earlier quality work's escape-hatch territory), and
 thinking mode (~4× latency, previously reliable for convention
 reasoning).
+
+---
+
+## 2026-07-01 — J2 + the precision reframe: judges are usable-adjacent
+
+**J2 (26B, scratchpad-then-verdict + few-shot boundary examples):** 24/40
+binary agreement — no better than the 31B baseline, and the scratchpad
+made the judge a nitpicker (good clues demoted to fixable, including a
+banked control) while referent false-accepts still slip through.
+
+**Reframe:** binary agreement was the wrong lens. A pipeline filter needs
+high PRECISION on "bankable" (a false accept pollutes the bank; a false
+fixable only wastes a retry). Through that lens: J1-26B precision 0.68 /
+recall 0.50; J1-31B 0.78 / 0.54; J2-26B 0.75 / 0.58 — meaningfully above
+the 0.65 base rate, and J2 matches the dense model at a quarter the
+compute. Target: precision ≈0.9 at recall ≥0.5 (best-of-N absorbs low
+recall).
+
+**J3 (running):** 31B + scratchpad + few-shot + an asymmetric-cost rule
+("when in doubt, fixable, never bankable") — precision-first
+configuration; attribution ablation deferred until something clears the
+bar.
