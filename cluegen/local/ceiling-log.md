@@ -207,3 +207,27 @@ phrasings per angle; new refine turn picks the best phrasing per angle and
 improves it; evaluate turn applies the existing checks to refined clues;
 extract unchanged. 5 turns, all non-thinking. This is the original
 draft-broad → refine → evaluate architecture, less aggressively compressed.
+
+---
+
+## 2026-07-01 — v6: refine turn regresses; plateau confirmed structurally
+
+**Measurements (26B, same 6 words, in-session grades):** ≈1.5–2/6, worst
+since v1. DUCK "Heads down!" accepts (imperative-for-imperative — refine
+genuinely fixed v3's awkward rendering of this angle). But refinement
+damaged more than it polished: TEE lost its long-shot misdirection ("A
+small, essential support?"), IRIS refined into a factual error ("The
+diameter that controls the light"), DRAFT's referent failure returned.
+
+**Interpretation:** an unconstrained rewrite pass drifts generic on this
+model — rewrites keep the shape and lose the point. Possibly compounded by
+state dilution across the 5-turn conversation. The refine idea may still
+work with hard constraints (e.g. "preserve the trap; change only the
+wording"), but as implemented it subtracts. Curve: v1 ≈1.5 · v2 ≈3.5 · v3
+≈2.5 · v4 ≈2.5–3 · v5 ≈3 · v6 ≈1.5–2 — plateau below v2 across wording
+tweaks and two structural variants.
+
+**Next:** spec's plateau trigger met. First cloud-verify checkpoint over
+the archived v1–v6 curve (36 clues, one capped set of verify-only calls,
+plus banked-clue controls to validate the harness), then the user check-in
+with the measured curve.
