@@ -1065,3 +1065,14 @@ accounts' `~/.zprofile` now export `OLLAMA_MODELS`, so the server
 command is just `~/tmp/ollama serve` — earlier entries' hardcoded
 paths are historical. Docs, plan, and memory updated; spec server
 command no longer embeds the path.
+
+## 2026-07-02 — Homebrew serving path validated
+
+User updated the homebrew ollama install (0.31.1); serving switched from
+`~/tmp/ollama` to `/opt/homebrew/bin/ollama serve` (path via
+`~/.zprofile`). Validated on the pipeline's own code path: gemma4:26b-qat
+returns correct schema-constrained JSON (9.6 s cold). One quirk found:
+qwen3.5:2b silently ignores `format` under this build (chatml runner
+path) — fine as a latency smoke model, useless for structured-output
+validation; use gemma for that. Spec server command updated. Batch 4
+still held pending the user's go.
