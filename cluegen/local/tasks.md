@@ -28,33 +28,23 @@ branch `local-ceiling` in its own worktree; progress reports in `ceiling-log.md`
 on that branch. Probe, checkpoint harness, v1–v6 iteration, and checkpoint 1 are
 done — see the log for the curve and the criteria re-analysis.
 
-- [~] **Local judge iteration** — the binding constraint. Harness:
-  `scratch/judge_quality.py`; ground truth: 40 checkpoint-1 clues with Fable
-  verdicts + quality-adjusted classification. Metric: precision of "bankable"
-  (a false accept pollutes the bank), target ≥0.9. RESOLVED 2026-07-01: the
-  production judge is the cascade — 26B per-clue screen, 31B per-clue confirm
-  — precision 1.00 on the calibration sample (n=6 banked), recall 0.23.
-  Scoreboard and history: ceiling-log.md. Original lever list, kept for
-  reference:
-  - Scratchpad-then-verdict decomposition (analysis turn, then schema
-    transcription) — validated pattern from the earlier quality work
-  - Few-shot examples anchoring the referent-rule boundary (legitimate metonymy
-    vs genuine mismatch vs idiom fragment), on NON-eval words to avoid leaking
-    the calibration set
-  - Per-clue single calls if batch-of-6 dilutes attention
-  - Thinking-mode variant (~4× latency) if non-thinking stalls
+- [x] **Local judge iteration** — RESOLVED 2026-07-01: production judge is the
+      cascade (26B per-clue screen, 31B per-clue confirm), precision 1.00 on the
+      calibration sample. Scoreboard and history: ceiling-log.md.
   - Note: repeated tuning against the same 40 clues risks overfitting the judge
     prompt to them; fine at prototype stage, flagged for later
-- [ ] **Setter v7 under quality-first criteria**: v2's balance + liveliness
-      pressure; drop difficulty-targeting complexity (the judge relabels; honest
-      tags come free)
-- [ ] **Retry loop** (needs judge ≥ target): local judge verdict + reason → one
-      regeneration; mirrors the cloud pipeline's revise path
-- [ ] **Multi-candidate + filter** (needs judge): best-of-N with local
-      filtering, trading free local compute for accept rate
-- [ ] Re-validate the surviving config on `gemma4:31b-qat` over held-out words;
-      then propose checkpoint 2 (user-gated: scope + dollar estimate, launch on
-      go)
+- [x] **End-to-end pipeline** (`scratch/pipeline_local.py`) — setter → cascade →
+      mechanical `?`-tidy → one feedback retry → bank. Setter iterated to v8
+      (liveliness pressure, directive retry). 5/6 fresh words banked over
+      cumulative `--skip-banked` passes; ~23% bank rate per word-run ≈ 7–8 min
+      local compute per banked clue. Details: ceiling-log.md.
+  - [-] Multi-candidate within one setter conversation — superseded: run-level
+    best-of-N (repeated passes at temp 1.0) captures the same recall with no
+    correlated-draft risk
+- [~] **Held-out validation** — pipeline over the 8 reserved words, ≤3 passes;
+  failures must not feed prompt iteration. Then propose checkpoint 2
+  (user-gated: scope + dollar estimate, launch on go): Fable-verify all
+  pipeline-banked clues — the true precision read on the metric of record.
 
 ---
 
