@@ -54,11 +54,17 @@ beats prompted-26B v9 as setter, in confirmed-bankable clues per GPU-minute.
 Spec (decisions, stages, gates): `finetune.md`. Intended to run in its own chat
 thread; the spec is self-contained.
 
-- [ ] Stage 0 — plumbing: smallest Gemma + ~500 pairs; train → fuse → serve →
-      eval loop runs end to end. Model download needs user approval.
-- [ ] Stage 1 — probe: QLoRA gemma4-12B on 5–20k curated xd pairs (answer-split;
-      panel + held-out answers excluded); evaluate via `eval_panel` (bare
-      single-turn and scaffolded); Fable spot-check <$2. Depends on stage 0.
+- [~] Stage 0 — plumbing: `e2b-it-OptiQ-4bit` + ~500 pairs; `mlx_lm.lora` train
+  → `optiq serve --adapter` → eval loop runs end to end. Model selection settled
+  2026-07-02 (see spec). The user personally runs every download and install
+  from a shopping list Claude supplies.
+- [ ] Data design round — source, curation recipe, difficulty conditioning;
+      everything data-side is provisional until this round. Must precede stage-1
+      data prep.
+- [ ] Stage 1 — probe: QLoRA `12B-it-qat-OptiQ-4bit` on 5–20k curated pairs
+      (source: data design round; answer-split; panel + held-out answers
+      excluded); evaluate via `eval_panel` (bare single-turn and scaffolded);
+      Fable spot-check <$2. Depends on stage 0.
 - [ ] Stage 2 — only on stage-1 signal: more data/epochs, DPO from judge labels,
       or 26B tune. Not committed.
 
