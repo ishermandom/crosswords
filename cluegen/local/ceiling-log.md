@@ -563,3 +563,27 @@ run level, judge untouched, precision preserved.
 **Next:** 3 sequential passes over the 6 fresh words with `--skip-banked`;
 measure cumulative coverage and passes-per-bank — the campaign's practical
 throughput number.
+
+## Cumulative passes: 5/6 coverage; throughput measured (2026-07-01)
+
+Three `--skip-banked` passes over the fresh set. Banked: GRANT "Academic
+windfall?" (pass 1, first attempt), GASP "Reaction to a jump scare" (pass 2 —
+the mechanical tidy's first conversion: screen flagged the `?`, tidy stripped
+it, re-judge banked it), AMBER "Prehistoric time capsule?" (pass 2 — the best
+clue the local stack has produced: lively, earned `?`, dead-on).
+
+**Coverage: 5/6 fresh words banked** (DAISY ×2, CHECK, GRANT, GASP, AMBER).
+SCORE is 0-for-6 runs — persistent holdout despite rich polysemy; the setter
+keeps landing on flat film-music/tally definitions. Residual class, not worth
+chasing with prompt surgery.
+
+**Throughput:** 26 word-runs → 6 banks ≈ 23% per run, matching the variance
+estimate. ~4.3 runs per bank × ~1.75 min/word-run ≈ **7–8 min of local compute
+per banked clue** on this hardware. Full 547-word extrapolation ≈ 65–70 h of
+unattended compute — feasible as overnight batches, zero marginal dollar cost.
+
+**Next: held-out validation.** Pipeline over the 8 held-out words (COURT, SUE,
+HAZEL, SECOND, ZED, FORTY, DOZEN, NINETEEN), up to 3 skip-banked passes.
+Discipline: these words validate — their failures must NOT feed prompt
+iteration. Then propose checkpoint 2 (user-gated): Fable-verify all
+pipeline-banked clues, the true precision read on the metric of record.
