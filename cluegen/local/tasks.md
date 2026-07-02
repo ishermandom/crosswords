@@ -26,11 +26,11 @@ preferred quantization.
       it so the storage isn't swallowed forever.
 
 - [ ] **Retire the old Ollama store path** — the store moved to
-      `/Users/Shared/models/ollama` (2026-07-02, shared-storage layout); a
-      compatibility symlink remains at `/Users/Shared/ollama/models`. After the
-      local-ceiling campaign updates its `OLLAMA_MODELS` value (`ceiling.md`,
-      Server management — coordinate with that thread; it owns the branch),
-      delete `/Users/Shared/ollama` entirely.
+      `/Users/Shared/models/gguf` (2026-07-02, shared-storage layout); no
+      compatibility symlink (user is coordinating the cutover with the
+      local-ceiling thread directly). Once `ceiling.md`'s `OLLAMA_MODELS` value
+      (Server management section — that thread owns the branch) points at the
+      new path, delete the now-empty `/Users/Shared/ollama`.
 
 ---
 
