@@ -70,8 +70,28 @@ thread; the spec is self-contained.
 
 - [~] Stage 0 — plumbing: `e2b-it-OptiQ-4bit` + ~500 pairs; `mlx_lm.lora` train
   → `optiq serve --adapter` → eval loop runs end to end. Model selection settled
-  2026-07-02 (see spec). The user personally runs every download and install
-  from a shopping list Claude supplies.
+  2026-07-02 (see spec); E2B checkpoint is in the shared cache
+  (`HF_HUB_CACHE=/Users/Shared/models/mlx`), 12B pull in progress. The user
+  personally runs model/data downloads from a shopping list Claude supplies.
+  Remaining sub-steps, in order:
+  - Add `finetune` optional-dependency group to `cluegen/pyproject.toml`
+    (`mlx-lm`, `mlx-optiq`; 0.31.3 / 0.2.10 current at selection time) and sync
+    into the sandbox venv — Claude-run per the declared-deps carve-out.
+  - Build the ~500-pair stage-0 slice from the session-scratchpad xd copy
+    (`.../scratchpad/xd/clues.tsv`; any clean slice — curation is stage-1
+    scope), answer-split with `eval_panel` panel + held-out words excluded.
+  - Note: training examples must use Gemma's chat turn tags (`<start_of_turn>` /
+    `<end_of_turn>`), and the model is BOS-sensitive — format via the
+    checkpoint's own chat template, verified before training.
+  - A few sanity training steps first: confirms OptiQ-as-base trains under stock
+    `mlx_lm.lora` (expected-routine, undocumented) and yields a tokens/sec
+    anchor before any long run.
+  - Harness client adapter: `optiq serve` speaks an OpenAI-style API; the Ollama
+    endpoint is `_OLLAMA_CHAT_URL` in `scratch/pipeline_local.py` (local-ceiling
+    worktree), consumed by `scratch/eval_panel.py`.
+  - GPU coordination: the local-ceiling thread holds most of GPU/RAM; E2B-scale
+    work fits alongside, but check with the user before anything heavier
+    (scheduling protocol still TBD).
 - [ ] Data design round — source, curation recipe, difficulty conditioning;
       everything data-side is provisional until this round. Must precede stage-1
       data prep.
