@@ -782,3 +782,36 @@ Quota: NO `claude -p` of any size without the user's explicit go; checkpoint
 prompt/log read is deferred to a fresh-eyes session — not blocking. Worktree
 `/Users/Shared/code/crosswords-local-ceiling`, branch `local-ceiling`,
 rebased onto main after each main-side commit; merge only with the user.
+
+## 2026-07-02 — Eval harness built; tier-1 baseline scorecard
+
+Queue item 1 done: `scratch/eval_panel.py` — tier 1 runs a variant over
+the fixed 12-word panel × 3, screen-only, with per-turn token/second
+accounting; tier 2 (31B confirm over screen-passes, `--bank` keeps
+confirmed inventory) is the adoption gate; `--fixer` measures the
+dense-as-fixer conversion rate on a result file's fixables. Prefix replay
+reuses archived setter turns when a variant only changes later prompts —
+paired comparison, less compute, less noise. Validated live on IRIS
+(including replay). Satisfaction taxonomy also landed
+(`local/satisfaction.md`), revised per user: five bases of satisfaction,
+the "aha" is not mandatory — elegance, fair resistance, prize trivia, and
+fun all carry clues on their own.
+
+**Baseline (v8) tier-1 scorecard** (36 word-runs, 28.5 min wall — the
+25–30 min/variant estimate holds; the model warms up over the first
+words):
+
+- screen: 13 bankable / 20 fixable / 3 bad — 36% of runs pass
+- 2.2 min per screen-bankable clue; 36,765 output tokens; 0 extract fails
+- edit turn: median 1,370 chars, max 33,260, 3 over 4k. PAIR r1's single
+  runaway edit turn cost 371 s — 22% of the whole panel's compute in one
+  turn. The edit-cap variant targets exactly this.
+- word texture: TWENTY 3/3, ROBIN 3/3, GROSS 2/3 — number-adjacent panel
+  words are fine here; STOCK 0/3 and CHECK 0/3 (all fixable, mostly
+  flat-or-referent complaints), PAIR 0/3 with 2 bad. Screen variance
+  visible: "Two of a kind?" (PAIR) drew bad in r1 and fixable in r2.
+
+Variant chain launched (one 26B block, no model switches): edit-cap,
+align-quest, every-keep (all replaying the baseline archive), then
+no-difficulty full. 31B work (tier-2 confirms + fixer repairs) queued as a
+single later block per the model-switch cost note now in the spec.
