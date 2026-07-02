@@ -22,8 +22,8 @@ preferred quantization.
       download from 2026-07-02 (~335 MB: `xd-clues.zip` plus the unpacked
       `clues.tsv`) sits in the fine-tuning session's scratchpad under
       `/private/tmp/claude-505/`. If the data design round adopts xd, move it to
-      a durable shared home (e.g. `/Users/Shared/corpora/xd/`); otherwise delete
-      it so the storage isn't swallowed forever.
+      a durable shared home (e.g. `/Users/Shared/data/xd/`); otherwise delete it
+      so the storage isn't swallowed forever.
 
 - [ ] **Retire the old Ollama store path** — the store moved to
       `/Users/Shared/models/gguf` (2026-07-02, shared-storage layout).
@@ -139,11 +139,12 @@ thread; the spec is self-contained.
       evaluate via the eval client (bare single-turn and scaffolded); Fable
       spot-check <$2. Depends on stage 0 (done). Sub-steps, in order:
   - User-run shopping list: Kaggle NYT clue zip + doshea clone (commands
-    supplied in chat 2026-07-02; suggested home `/Users/Shared/corpora/`, ACLs
-    via `share-directory.sh`).
-  - 12B sanity training steps (a few iters, same gate as stage 0) — needs GPU
-    coordination with the local-ceiling thread first: 12B is above the E2B-scale
-    line. Yields tokens/sec → slice size (one epoch, one overnight).
+    supplied in chat 2026-07-02; home `/Users/Shared/data/` (pulled 2026-07-02),
+    ACLs via `share-directory.sh`).
+  - 12B sanity training steps (a few iters) — training is user-gated (explicit
+    go-ahead per run, spec Constraints); also needs GPU coordination with the
+    local-ceiling thread first: 12B is above the E2B-scale line. Yields
+    tokens/sec → slice size (one epoch, one overnight).
   - Stage-1 slice builder per the spec recipe (normalized dedup, ≤ 4 per answer
     cross-bucket with mild recency tiebreak, weekday→bucket difficulty token in
     the training prompt, answer-split, panel + held-out excluded).

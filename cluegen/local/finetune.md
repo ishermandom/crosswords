@@ -165,6 +165,10 @@ Evidence from the 2026-07-02 eval round (details: `ceiling-log.md`):
 - Fable spot-checks fall under the standing agreement: self-launch under
   ~$2
   estimated, $5 total between user check-ins.
+- Training runs are user-gated: no fine-tune training iterations — however
+  brief, any model size — without the user's explicit go-ahead (user direction
+  2026-07-02). Data prep, serving, and eval stay under the ordinary footprint
+  rules below.
 - Thermal reality: training and big eval runs are overnight jobs, detached,
   under `caffeinate`.
 - Local compute is shared with the actively running local-ceiling thread, which
