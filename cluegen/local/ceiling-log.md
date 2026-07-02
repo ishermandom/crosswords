@@ -982,3 +982,14 @@ follow-ups: tighten the tagger's dominant-mechanism instruction; the
 align pair's earned-? example (SILT) is itself a pivot shown on every
 word — a back-door single-mechanism hint. Candidate eval variant:
 second earned-? example from a non-pivot mechanism.
+
+## 2026-07-02 — Held-out v9 measurement: 1/8, ceiling unmoved
+
+Single pass over the reserved 8 (numbers-heavy by construction): 1
+banked — ZED "One beyond Y?", an angle-distinct second ZED clue. Same
+1/8 as v7, so the session's gains are throughput-on-breadth, not a
+lifted hard-category ceiling. Texture: screen correctly rejected an
+inaccurate FORTY ("just shy of the answer to everything" = 41); COURT,
+SUE, NINETEEN died at confirm-fixable — angle discovery fine, craft
+polish failing the harsh gate, consistent with the original held-out
+diagnosis. Next passes test accumulation on hard words.
