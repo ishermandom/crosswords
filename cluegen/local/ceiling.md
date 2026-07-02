@@ -98,6 +98,13 @@ revises whose stated fix is trivial (retag, drop an apologetic `?`) enter with
 the fix applied and noted. Locally-judged clues stay out until the local judge
 clears its calibration bar.
 
+Bank shape (user direction 2026-07-01): breadth before depth. Every word having
+at least one good clue beats half the words having two and the rest none — but
+multiple good clues per word is the long-term ideal, and more is better whenever
+they are cost-effective to generate. Multiple bank records per word are
+therefore wins, and a pipeline pass may bank beyond a word's first clue when the
+marginal cost is low.
+
 ### Quota rules
 
 - Every `claude -p` run, single call or batch, is user-gated: propose the run —
