@@ -221,11 +221,27 @@ if __name__ == '__main__':
   parser.add_argument('--fewshot', action='store_true')
   parser.add_argument('--quiet', action='store_true',
                       help='print mismatches and totals only')
+  parser.add_argument('--only-banked-from', default=None,
+                      help='cascade test: judge only the clues a prior '
+                      'calibration run banked (path to its rows jsonl)')
   cli = parser.parse_args()
+
+  banked_filter: set[tuple[str, str]] | None = None
+  if cli.only_banked_from:
+    banked_filter = {
+      (r['version'], r['word'])
+      for r in map(json.loads,
+                   pathlib.Path(cli.only_banked_from).read_text()
+                   .splitlines())
+      if r['local'] == 'bankable'
+    }
 
   groups: dict[str, list[dict]] = {}
   for line in _DATA.read_text().splitlines():
     entry = json.loads(line)
+    if (banked_filter is not None
+        and (entry['version'], entry['word']) not in banked_filter):
+      continue
     groups.setdefault(entry['version'], []).append(entry)
 
   # Ground truth: raw Fable accepts from the latest checkpoint results.
