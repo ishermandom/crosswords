@@ -27,9 +27,10 @@ _DATA = _HERE / 'checkpoint_clues.jsonl'
 _RESULTS_DIR = _HERE / 'logs'
 
 
-def _load_groups(versions: list[str] | None) -> dict[str, list[dict]]:
+def _load_groups(versions: list[str] | None,
+                 data: pathlib.Path) -> dict[str, list[dict]]:
   groups: dict[str, list[dict]] = {}
-  for line in _DATA.read_text().splitlines():
+  for line in data.read_text().splitlines():
     entry = json.loads(line)
     if versions and entry['version'] not in versions:
       continue
@@ -75,9 +76,12 @@ if __name__ == '__main__':
   parser.add_argument('--dry-run', action='store_true')
   parser.add_argument('--versions', default=None,
                       help='comma list; default all')
+  parser.add_argument('--data', default=None,
+                      help='clues JSONL; default checkpoint_clues.jsonl')
   cli = parser.parse_args()
   wanted = cli.versions.split(',') if cli.versions else None
-  groups = _load_groups(wanted)
+  groups = _load_groups(wanted,
+                        pathlib.Path(cli.data) if cli.data else _DATA)
 
   if cli.dry_run:
     first = next(iter(groups))

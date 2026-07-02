@@ -634,3 +634,35 @@ clues (DAISY ×2, CHECK ×2, GRANT, GASP, AMBER, ZED).
 **Checkpoint 2 payload finalized:** 8 pipeline-banked + 4 earmarked
 judge-rejections = 12 clues. Estimate ~$0.80 at checkpoint-1 unit cost
 ($2.65/40 clues); cap $1.50. Awaiting user go.
+
+## Checkpoint 2: local judge validated on the metric of record (2026-07-02)
+
+Two verify calls, $0.778 total (cap was $1.50). Results log:
+`scratch/logs/checkpoint_2026-07-02T00-16-33.jsonl`.
+
+**Pipeline-banked clues: 7 accept / 1 revise / 0 reject.** The revise is
+DAISY's second clue — Fable flags it as a paraphrase of the first DAISY
+clue's angle, not a craft failure. As clue text, effectively 8/8. The local
+cascade's "bankable" maps to Fable-accept at ~0.9 precision on words the
+prompts never saw.
+
+**Rejection audit: 2 accept / 2 revise.** FORTY "A score doubled?" and COURT
+"Royal residence or tennis arena" were genuine recall losses — both now
+banked verbatim as Fable-accepted. On DOZEN "Baker's count?" the local judge
+beat my in-session grade (a baker's count is THIRTEEN — inaccurate
+definition); SECOND's trap "doesn't function". The conservative doubt-rule
+earns its keep in both directions.
+
+**Lessons recorded:** (a) depth-goal clues per word should eventually be
+angle-distinct, not just text-distinct — deferred to a later pass by user
+direction, don't over-invest now; (b) in-session grades have error bars in
+both directions (Baltic treasure: too generous on trivia metonymy; Baker's
+count: missed an inaccuracy).
+
+Bank: 32 records (8 local-cascade banks with Fable verdicts tagged in
+provenance, 2 audit rescues).
+
+**Next direction (user, 2026-07-02): throughput.** Target an order of
+magnitude better than ~7–8 min per banked clue; anatomize the cost and
+attack the 23%/5% per-run bank rates. Brainstorm with the user before
+experiments.
