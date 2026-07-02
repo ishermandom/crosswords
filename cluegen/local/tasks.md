@@ -133,13 +133,22 @@ thread; the spec is self-contained.
   - GPU coordination: the local-ceiling thread holds most of GPU/RAM; E2B-scale
     work fits alongside, but check with the user before anything heavier
     (scheduling protocol still TBD).
-- [ ] Data design round — source, curation recipe, difficulty conditioning;
-      everything data-side is provisional until this round. Must precede stage-1
-      data prep.
-- [ ] Stage 1 — probe: QLoRA `12B-it-qat-OptiQ-4bit` on 5–20k curated pairs
-      (source: data design round; answer-split; panel + held-out answers
-      excluded); evaluate via `eval_panel` (bare single-turn and scaffolded);
-      Fable spot-check <$2. Depends on stage 0.
+- [x] Data design round — settled 2026-07-02; see `finetune.md` (Data source,
+      Difficulty conditioning, Curation recipe, Slice size bullets).
+- [ ] Stage 1 — probe: QLoRA `12B-it-qat-OptiQ-4bit` on 5–20k curated pairs;
+      evaluate via the eval client (bare single-turn and scaffolded); Fable
+      spot-check <$2. Depends on stage 0 (done). Sub-steps, in order:
+  - User-run shopping list: Kaggle NYT clue zip + doshea clone (commands
+    supplied in chat 2026-07-02; suggested home `/Users/Shared/corpora/`, ACLs
+    via `share-directory.sh`).
+  - 12B sanity training steps (a few iters, same gate as stage 0) — needs GPU
+    coordination with the local-ceiling thread first: 12B is above the E2B-scale
+    line. Yields tokens/sec → slice size (one epoch, one overnight).
+  - Stage-1 slice builder per the spec recipe (normalized dedup, ≤ 4 per answer
+    cross-bucket with mild recency tiebreak, weekday→bucket difficulty token in
+    the training prompt, answer-split, panel + held-out excluded).
+  - Overnight train under `caffeinate`; then eval + steering spot-check (same
+    answer prompted easy vs hard).
 - [ ] Stage 2 — only on stage-1 signal: more data/epochs, DPO from judge labels,
       or 26B tune. Not committed.
 
