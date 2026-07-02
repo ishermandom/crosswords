@@ -460,3 +460,25 @@ session mostly consumed; NO `claude -p` calls of any size without the
 user's explicit go (spec, Quota rules). Clue bank: 22 records seeded from
 checkpoint 1; locally-judged additions allowed once the judge clears its
 bar, provenance-tagged.
+
+---
+
+## 2026-07-01 — Cascade result: production judge chosen
+
+**Cascade test (31B per-clue over J4's 13 banked clues):** the confirm
+stage banked 6, all 6 quality-adjusted-good — precision 1.00 on this
+sample (n=6; read as ≥0.9). It caught both bad clues the 26B screen had
+passed (v4 MARK "Hit to be sought?" → bad; v4 TWELVE → fixable) and judged
+all four banked controls bankable — per-clue also fixed the dense model's
+control failures. End-to-end recall 0.23 (6 of 26 good clues survive both
+stages): conservative, absorbed by retry + best-of-N.
+
+**Decision:** production judge = cascade (26B per-clue screen → 31B
+per-clue confirm on survivors). Judge iteration closes; remaining accuracy
+work is recall recovery, not precision.
+
+**Next after compaction:** (1) smoke `pipeline_local.py --word SUE
+--confirm-model gemma4:31b-qat`; (2) small fresh-word batch (words.in
+outside the iteration set), inspect banked output; (3) recall-recovery
+ideas only if bank throughput is too low (soften confirm's doubt-rule, or
+2 candidates/word).
