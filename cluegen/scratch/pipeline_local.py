@@ -330,11 +330,17 @@ def _phase_generate_and_screen(words, cli, tee):
 
 
 def _phase_confirm(candidates, cli, tee, provenance_extra):
-  """Phase B/D (31B): confirm screen-bankables; bank the passes."""
+  """Phase B/D (31B): confirm screen-bankables; bank the passes.
+
+  Returns (bank count, confirm-fixables) — the latter carry the judge's
+  critique so they can join the repair queue."""
   banked_count = 0
+  fixables = []
   for word, clue in candidates:
     confirm = _judge(cli.confirm_model, word, clue['clue'], tee, 'confirm')
     if confirm['verdict'] != 'bankable':
+      if confirm['verdict'] == 'fixable':
+        fixables.append((word, clue, confirm['analysis']))
       print(f'{word}: confirm {confirm["verdict"]} "{clue["clue"]}"',
             flush=True)
       continue
@@ -346,7 +352,7 @@ def _phase_confirm(candidates, cli, tee, provenance_extra):
     banked_count += banked
     print(f'{word}: {"BANKED" if banked else "duplicate"} '
           f'"{clue["clue"]}"', flush=True)
-  return banked_count
+  return banked_count, fixables
 
 
 def _phase_repair(fixables, cli, tee):
@@ -417,10 +423,8 @@ if __name__ == '__main__':
     candidates, fixables = _phase_generate_and_screen(words, cli, tee)
     print(f'phase A: {len(candidates)} candidates, '
           f'{len(fixables)} fixables from {len(words)} words', flush=True)
-    banked = _phase_confirm(candidates, cli, tee, {})
-    # TODO: feed confirm-stage fixables into the repair queue too; today
-    # only screen-stage fixables reach the fixer.
-    repairs = _phase_repair(fixables, cli, tee)
+    banked, confirm_fixables = _phase_confirm(candidates, cli, tee, {})
+    repairs = _phase_repair(fixables + confirm_fixables, cli, tee)
     rescreened = [
       (word, clue) for word, clue in repairs
       if _judge(cli.judge_model, word, clue['clue'], tee,
@@ -428,7 +432,9 @@ if __name__ == '__main__':
     ]
     print(f'fixer: {len(repairs)} repairs, '
           f'{len(rescreened)} screen-bankable', flush=True)
-    banked += _phase_confirm(rescreened, cli, tee,
-                             {'fix': 'fixer repair (31B)'})
+    # Repairs get one confirm shot; their fixables don't loop back.
+    repair_banked, _ = _phase_confirm(rescreened, cli, tee,
+                                      {'fix': 'fixer repair (31B)'})
+    banked += repair_banked
     print(f'banked {banked} clues from {len(words)} words', flush=True)
   print(f'log: {log_path}', file=sys.stderr)
