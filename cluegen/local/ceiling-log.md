@@ -1022,3 +1022,23 @@ apparent ROBIN flip at checkpoint 3 was text-sensitivity —
 capitalization/article — not sampling noise.) This localizes the
 remaining headroom squarely in the setter's craft prior — the
 fine-tuning question now under discussion with the user.
+
+## 2026-07-02 — Batch 3 (95 words): best yield yet; name-category hole
+
+14 banked from 95 word-runs (~9.5 min/bank; bank at 75, 49/547 words
+covered): NOAH "One who paired them up", SEVENTH "Interval that wants to
+resolve", THIRD "Between the slugger who hits second and the cleanup
+hitter?", SELDOM "Once in a blue moon", HEATHER, MAX, GAG, EXCEPT,
+ASIDE, TWENTY, LIGHT, CLIFF, CENTURY, LOG. Second passes redeem earlier
+failures (CENTURY: killed "Twelve decades" -> banked "Batsman's
+milestone"), so pass-2 yield ≈ fresh pass-1 yield; only pass 3+ decays.
+
+**Name-category screen hole, measured:** name words draw screen-bad at
+31% (5/16) vs 9% (7/81) for other words. The judge's associated-referent
+rule misfires on famous-bearer clues (LANA "Born to Die singer" — killed)
+while role-shaped name clues pass (NOAH — banked). Fix candidate: a
+name-answer calibration example in the judge prompt. Judge changes move
+the gate itself, so the eval is agreement-based: v2 vs v1 on the
+33 Fable-verdicted clues (agreement must hold) + name-clue sample
+(recall should rise), then Fable audits the recalibrated gate's banks at
+the next checkpoint.
