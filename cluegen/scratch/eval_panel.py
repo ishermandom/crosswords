@@ -329,6 +329,68 @@ def _report(paths):
       print(edit_line)
 
 
+# --- Dense-as-fixer: 31B repairs screen-fixable clues --------------------
+
+_FIXER_SYSTEM = """\
+You are an expert editor of American-style crossword clues. You receive a
+clue for a given answer word together with an independent editor's
+critique naming its flaw. Produce ONE corrected clue: fix exactly the
+named flaw while keeping what the clue does well. Keep the surface
+natural and vivid — an accurate-but-flat correction is a failure. The
+clue must not contain the answer word or a trivial inflection of it."""
+
+
+def _run_fixer(path):
+  """Have the dense model repair each screen-fixable clue from a tier-1
+  result file, then re-screen the repairs: measures how many fixables the
+  demand-driven fixer converts to screen-bankable."""
+  records = [json.loads(line)
+             for line in pathlib.Path(path).read_text().splitlines()]
+  variant = records[0]['variant']
+  fixables = [(r['word'], s) for r in records
+              for s in r['screens'] if s['verdict'] == 'fixable']
+  print(f'{variant}: {len(fixables)} screen-fixable clues to repair')
+
+  converted = 0
+  seconds = 0.0
+  for word, screen in fixables:
+    prompt = (
+      f'Answer word: {word}\n'
+      f'Clue: {screen["clue"]["clue"]}\n'
+      f'Critique: {screen["analysis"]}\n\n'
+      'Return the corrected clue as JSON: "clue" (exact print text), '
+      '"difficulty" (honest calibration), "trap" (one sentence, or null '
+      'if straight), "confidence" (honest).'
+    )
+    envelope = _chat_full(
+      _CONFIRM_MODEL,
+      [{'role': 'system', 'content': _FIXER_SYSTEM},
+       {'role': 'user', 'content': prompt}],
+      schema=pl._CLUE_SCHEMA,
+    )
+    seconds += _turn_stats(envelope)['seconds']
+    try:
+      repaired = json.loads(envelope['message']['content'])
+    except json.JSONDecodeError:
+      print(f'  {word}: repair parse failed', flush=True)
+      continue
+    if repaired['clue'].strip().lower() == \
+       screen['clue']['clue'].strip().lower():
+      print(f'  {word}: "{repaired["clue"]}" -> unchanged, skipped',
+            flush=True)
+      continue
+    verdict, stats = _screen(word, repaired['clue'])
+    seconds += stats['seconds']
+    if verdict['verdict'] == 'bankable':
+      converted += 1
+    print(f'  {word}: "{screen["clue"]["clue"]}" -> "{repaired["clue"]}" '
+          f'-> {verdict["verdict"]}', flush=True)
+
+  rate = f'{100 * converted / len(fixables):.0f}%' if fixables else 'n/a'
+  print(f'fixer: {converted}/{len(fixables)} converted to '
+        f'screen-bankable ({rate}), {seconds / 60:.1f} minutes')
+
+
 # --- Tier 2: confirm cascade on screen-passes ----------------------------
 
 def _run_tier2(path, do_bank):
@@ -393,13 +455,17 @@ if __name__ == '__main__':
                       help='result file whose screen-passes to confirm')
   parser.add_argument('--bank', action='store_true',
                       help='with --tier2: bank confirmed clues')
+  parser.add_argument('--fixer', default=None,
+                      help='result file whose screen-fixables to repair')
   cli = parser.parse_args()
 
   if cli.report:
     _report(cli.report)
   elif cli.tier2:
     _run_tier2(cli.tier2, cli.bank)
+  elif cli.fixer:
+    _run_fixer(cli.fixer)
   elif cli.variant:
     _run_tier1(cli.variant, cli.runs, cli.replay_from)
   else:
-    parser.error('pick one of --variant, --report, --tier2')
+    parser.error('pick one of --variant, --report, --tier2, --fixer')
