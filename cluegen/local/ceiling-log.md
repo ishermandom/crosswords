@@ -1076,3 +1076,39 @@ qwen3.5:2b silently ignores `format` under this build (chatml runner
 path) — fine as a latency smoke model, useless for structured-output
 validation; use gemma for that. Spec server command updated. Batch 4
 still held pending the user's go.
+
+## 2026-07-02 — Session close (written for relaunch)
+
+Correction to the serving-path entry: the `format`-ignoring quirk is a
+known ollama issue with MLX-backed models generally (user FYI) — GGUF
+models are fine, and every pipeline model (gemma QAT) is GGUF. Not a
+qwen-specific or build-specific problem.
+
+**State at close:** bank 75 records / 49 of 547 words; both repos clean,
+worktree rebased onto main; no detached runs or watchers active; ollama
+serving via `/opt/homebrew/bin/ollama serve` (leave up or down freely).
+Fable spend this check-in window: $1.085 — the user is checking in now,
+so the $5 cap window resets.
+
+**Next up, in order:**
+
+1. Relaunch batch 4 on the user's go: all currently unbanked,
+   non-held-out words.in entries (regenerate the list from the bank —
+   the old word file lives in the previous session's scratchpad),
+   `--skip-banked`, detached driver + watcher pattern. It is the live
+   test of judge v2: compare name-word bank rate against the 31%
+   screen-bad regime v1 produced.
+2. Fable checkpoint on the batch-4 banks should oversample name clues to
+   audit the recalibrated gate (standing agreement: <$2 self-launch).
+3. Angle-distinct depth criterion (mechanism/anchor tags exist in
+   scratch/mechanism_tags.jsonl) — checkpoint 3 showed same-angle dups
+   are the top quality leak in multi-clue banking.
+4. Eval-panel variant: diversify the align pair's earned-? example away
+   from pivot-only (back-door single-mechanism hint; audit measured
+   pivots at ~⅓ of bank and rising pressure from the SILT example).
+5. Mechanism tagger: tighten the dominant-mechanism instruction (it
+   over-attributes frame-anchored clues to sense pivot).
+
+Fine-tuning probe runs in its own thread (`finetune.md`); compute
+scheduling between threads is user-arbitrated — keep batches modest and
+drain on request.
