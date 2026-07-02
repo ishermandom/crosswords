@@ -48,8 +48,12 @@ done — see the log for the curve and the criteria re-analysis.
       Details: ceiling-log.md.
 - [~] **Throughput exploration** — target an order of magnitude better than ~7–8
   min of local compute per banked clue; attack per-run bank rate (23% friendly
-  categories, ~5% numbers) and per-run cost. Brainstorm with user first (in
-  progress 2026-07-02).
+  categories, ~5% numbers) and per-run cost. Governing principles and hypothesis
+  list: ceiling-log.md (Throughput brainstorm, 2026-07-02).
+  - [ ] Build the two-tier eval loop (screen-only iteration panel, cascade
+        adoption gate) before iterating variants
+  - [ ] User reads prompts + logs in detail before strong tweak opinions —
+        schedule a walkthrough
 - [ ] **Angle-distinct depth pass** — when banking multiple clues per word,
       require distinct angles (checkpoint 2: Fable flagged a same-angle DAISY
       paraphrase). Later pass by user direction; don't over-invest early.
