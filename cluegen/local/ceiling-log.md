@@ -587,3 +587,34 @@ HAZEL, SECOND, ZED, FORTY, DOZEN, NINETEEN), up to 3 skip-banked passes.
 Discipline: these words validate — their failures must NOT feed prompt
 iteration. Then propose checkpoint 2 (user-gated): Fable-verify all
 pipeline-banked clues, the true precision read on the metric of record.
+
+## Held-out validation: 1/8 — the category ceiling shows (2026-07-02)
+
+Three skip-banked passes over the 8 reserved words, frozen v8+tidy config.
+Banked: ZED "That last character, overseas" (pass 1, attempt 1). Everything
+else dropped — 22 word-runs, 1 bank (≈5% vs the fresh set's 23%).
+
+**Why the gap (analysis only — held-out failures do not feed prompt work):**
+
+- **Category difficulty.** Three of eight are number words. The local setter's
+  fallback for numbers is arithmetic ("Twice six", "One less than twenty?") —
+  flat by nature, and the judge correctly reads it as flat.
+- **Craft-under-pressure, not angle discovery.** Same-word comparison against
+  the cloud bank: the local setter FOUND Fable's angles — Lent for FORTY
+  (Fable: "Keep yen for Lent's duration in days"), the 19th hole for NINETEEN
+  (Fable: "Hole number where the drinks are?"), baker's dozen for DOZEN — but
+  fumbled execution: "The 19th hole's destination?" clues the clubhouse, not
+  the number. Fable lands the referent on the same angle; the 26B doesn't.
+- **Plausible recall losses worth auditing:** "A score doubled?" (FORTY),
+  "Baker's count?" (DOZEN), "Runner-up's rank?" (SECOND), "Royal residence or
+  tennis arena" (COURT). These go into the checkpoint 2 payload so Fable
+  measures the local judge's error in BOTH directions on unseen words.
+
+**Reading:** the fresh-set 23%/word-run was partly category luck (vivid
+concrete nouns). The local ceiling is category-dependent: strong on
+polysemous/concrete words, weak on numbers — exactly the words where the
+cloud bank is already deepest, which is a happy complementarity.
+
+**Next:** harvest never-extracted KEEP drafts from all pipeline logs through
+the cascade (production under the bank-shape goal + measures whether draft
+pools are underexploited), then propose checkpoint 2.
