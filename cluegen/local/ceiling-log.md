@@ -921,3 +921,35 @@ Reading:
   (same measured mechanism, one confirm shot, no loops). Second pass
   over the batch running — also the first multi-pass accumulation test
   under v9.
+
+## 2026-07-02 — v9.1 pass 2; session close-out
+
+Pass 2 over the same 40-word batch (36 unbanked, v9.1's wider repair
+queue): 16 candidates + 14 screen-fixables; 24 repairs (now including
+confirm-fixables), 10 screen-bankable; **7 banked** — THIRTEEN "A number
+often skipped in elevators", FELIX "Favored by fortune?", SISTER "Senior
+nurse on duty", CHARGE "Attack at full tilt", GOSH "Gee whiz!", POTS
+"Earthenware that might be thrown", MURMUR "Low hum of a restless
+crowd". The confirm-fixable repair queue roughly doubled pass yield
+(4 -> 7 on a shrunken, harder remainder).
+
+Cumulative batch reading: 11/40 words covered in two passes, ~90 min
+total ≈ 8 min/bank on a hard cross-section (numbers, names, misc) —
+the category mix that previously banked at ~5%/run now contributes
+(THIRTEEN via prize-fact, FELIX via etymology). Multi-pass accumulation
+works under v9: pass 2 banked different words than pass 1.
+
+**Session totals (autonomous run, 2026-07-02 01:30–06:00):** bank 32 ->
+53 (+21). Built and validated the two-tier eval harness; ran 6 variants
++ fixer experiment; adopted v9/v9.1 (align edit turn, every-KEEP
+extract, fixer replaces retry, confirm-fixables repairable,
+model-batched phases); killed edit-cap and no-difficulty with data;
+wrote satisfaction.md (five bases; aha not mandatory — user note);
+recorded the gemma4 switch-cost note in the spec; worked around
+harness background-task reaping with detached drivers + watcher tasks.
+
+**Proposed next (user-gated):** checkpoint 3 — Fable-verify the 21 new
+banks in two provenance groups (eval-round vs v9). ~21 clues across two
+verify calls; checkpoint 2 ran 12 clues for $0.778, so estimate ~$1.30,
+cap $2. Decides whether the align edit turn's ~2x is craft or
+criteria-echo, and whether fixer saves hold up.
