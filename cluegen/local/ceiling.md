@@ -129,9 +129,10 @@ clears its calibration bar.
 - Prompt iteration without limit — task wording, personas, turn structure — in
   scratch probes. (This campaign's core work; the usual
   don't-iterate-prompt-wording default is lifted here.)
-- Long local batch runs, when judged genuinely worth their cost — the costs
-  being thermal throttling on the fanless Air _and_ slow iteration. Record the
-  cost–benefit call in the campaign log before starting one.
+- Long local batch runs, when judged genuinely worth their cost — the cost being
+  slow iteration. Wrap unattended runs in `caffeinate -i` so the machine doesn't
+  sleep mid-run. Record the cost–benefit call in the campaign log before
+  starting one.
 
 **Server management:** Claude runs the Ollama server itself as needed —
 `OLLAMA_MODELS=/Users/Shared/ollama/models ~/tmp/ollama serve` from the
