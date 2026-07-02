@@ -4,5 +4,6 @@ __pycache__/
 .venv/
 dist/
 *.egg-info/
-cluegen/local/logs/
-cluegen/scratch/logs/
+# Runtime call logs; code writes them under several parents (repo root,
+# cluegen/, cluegen/local/, cluegen/scratch/), so match the name anywhere.
+logs/
