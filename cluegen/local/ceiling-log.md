@@ -542,3 +542,24 @@ better calibrated on that example than I did.
 
 **Next:** same 6 words with the tidy active (isolates the tidy as the
 variable). Then multi-candidate if bank rate still lags.
+
+## Tidy-active batch + the variance insight (2026-07-01)
+
+Same 6 words, tidy active. Banked 1/6: DAISY "Subject of a petal-plucking
+game?" (attempt 2, both stages). **Tidy verdict: fired 4×, converted 0.** In
+every case the stripped clue re-judged as still-fixable — the `?` complaint
+usually rides on an underlying flatness or looseness, so removing the mark
+exposes rather than cures it. The tidy stays (it costs nothing and will
+occasionally rescue a clean case), but it is not the recall lever.
+
+**The real finding is run-to-run variance.** Three runs, same words, same
+prompts (runs 2 and 3 identical code): CHECK banked in run 2, dropped in
+run 3; DAISY banked in runs 1 and 3, dropped in run 2. Per-word bank
+probability looks like ~20–35% per run at temp 1.0, and "1/6 per batch" is
+sampling noise, not a ceiling. Zero-marginal-cost implication: repeated
+passes with `--skip-banked` (added) accumulate coverage — best-of-N at the
+run level, judge untouched, precision preserved.
+
+**Next:** 3 sequential passes over the 6 fresh words with `--skip-banked`;
+measure cumulative coverage and passes-per-bank — the campaign's practical
+throughput number.

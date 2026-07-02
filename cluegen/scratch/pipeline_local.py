@@ -343,6 +343,8 @@ if __name__ == '__main__':
   parser.add_argument('--judge-model', default='gemma4:26b-qat')
   parser.add_argument('--confirm-model', default=None,
                       help='optional cascade confirm (e.g. gemma4:31b-qat)')
+  parser.add_argument('--skip-banked', action='store_true',
+                      help='skip words that already have any bank record')
   cli = parser.parse_args()
 
   if cli.word:
@@ -353,6 +355,10 @@ if __name__ == '__main__':
              if w.strip() and not w.startswith('#')]
   if cli.limit:
     words = words[:cli.limit]
+  if cli.skip_banked and _BANK.exists():
+    banked_words = {json.loads(line)['word']
+                    for line in _BANK.read_text().splitlines() if line}
+    words = [w for w in words if w not in banked_words]
 
   _LOG_DIR.mkdir(exist_ok=True)
   stamp = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
