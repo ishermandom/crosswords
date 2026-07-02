@@ -30,9 +30,12 @@ done — see the log for the curve and the criteria re-analysis.
 
 - [~] **Local judge iteration** — the binding constraint. Harness:
   `scratch/judge_quality.py`; ground truth: 40 checkpoint-1 clues with Fable
-  verdicts + quality-adjusted classification. Baselines: 26B non-thinking 52%,
-  31B non-thinking 60%, both with dirty controls. Target: ~75–80% agreement vs
-  quality-adjusted, clean controls. Levers, in order:
+  verdicts + quality-adjusted classification. Metric: precision of "bankable"
+  (a false accept pollutes the bank), target ≥0.9. RESOLVED 2026-07-01: the
+  production judge is the cascade — 26B per-clue screen, 31B per-clue confirm
+  — precision 1.00 on the calibration sample (n=6 banked), recall 0.23.
+  Scoreboard and history: ceiling-log.md. Original lever list, kept for
+  reference:
   - Scratchpad-then-verdict decomposition (analysis turn, then schema
     transcription) — validated pattern from the earlier quality work
   - Few-shot examples anchoring the referent-rule boundary (legitimate metonymy
