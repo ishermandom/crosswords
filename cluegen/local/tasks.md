@@ -53,15 +53,17 @@ done — see the log for the curve and the criteria re-analysis.
   - [ ] Build the two-tier eval loop (screen-only iteration panel, cascade
         adoption gate) before iterating variants
   - [ ] User reads prompts + logs in detail before strong tweak opinions —
-        schedule a walkthrough
+        deferred to a fresh-eyes session (2026-07-02); not blocking autonomous
+        progress
 - [ ] **Angle-distinct depth pass** — when banking multiple clues per word,
       require distinct angles (checkpoint 2: Fable flagged a same-angle DAISY
       paraphrase). Later pass by user direction; don't over-invest early.
 - [ ] **Satisfaction-mechanism taxonomy** — capture what makes a clue satisfying
-      more fundamentally than any one trick; derive the taxonomy empirically
-      from the cloud bank's accepts, then use the mechanism mix as diversity
-      pressure for setter and judge alike. Backlog by user direction; meanwhile,
-      no single-mechanism hints in prompts.
+      more fundamentally than any one trick. The cloud bank's accepts are ONE
+      input for deriving it — a biased sample, echo-chamber risk if treated as
+      the be-all-end-all evaluation (user note 2026-07-02). Timing at Claude's
+      discretion (sooner is fine); meanwhile, no single-mechanism hints in
+      prompts.
 
 ---
 
