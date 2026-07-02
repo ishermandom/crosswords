@@ -896,3 +896,28 @@ confirms on 31B — 3 switches per run regardless of word count.
 
 Bank at 42 (+10 this session: 6 align-quest, 1 every-keep, 3
 align-keep).
+
+## 2026-07-02 — v9 first production batch (40-word cross-section)
+
+Batch: every 13th fresh word from words.in (numbers, proper names,
+family words, misc) — a representative slice, not a friendly one.
+~45 min wall, single pass: phase A produced 19 screen-candidates + 15
+screen-fixables; 4 banked after confirm. MELODY "Whistleable earworm",
+TABLE "Place to settle a debate?", MARCH "Step in time?", GROSS
+"Stomach-turning total?" — the last a fixer save that turned a flat
+disgust clue into a gross=144 double meaning.
+
+Reading:
+
+- ~11 min/bank single-pass on a hard mix — not directly comparable to
+  the historical 7–8 min/bank (friendly words, cumulative passes), but
+  the honest current number for cold coverage of words.in.
+- The cascade caught a real inaccuracy screen missed (CENTURY "Twelve
+  decades", confirm bad). Confirm remains the harshest gate: 15 of 19
+  candidates died there, most as fixable with plausible clues one named
+  fix away (FELIX "Whiskered cartoon star", NINA "Columbus's smallest
+  ship").
+- v9.1 follow-up: confirm-fixables now join the fixer repair queue
+  (same measured mechanism, one confirm shot, no loops). Second pass
+  over the batch running — also the first multi-pass accumulation test
+  under v9.
