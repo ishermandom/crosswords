@@ -72,6 +72,13 @@ comparison against Fable output; include a few in every sample. Checkpoint
 samples are sized to fit the quota cap — start at 8–12 words; a full-eval-set
 run needs explicit approval.
 
+Read `words.in` for what it is (user context, 2026-07-02): an intentionally
+curated set seeded from known-hard-to-clue categories. Not every entry is
+actually hard, and not every hard category is represented — it is a high-value
+benchmark and starting point, not the full target vocabulary. Rates measured on
+it skew pessimistic relative to a general word list, and full coverage of
+`words.in` is not the campaign's finish line.
+
 The primary metric is the **bankable rate under quality-first judging**
 (clarified 2026-07-01: the goal is high-quality, satisfying-for-a-solver clues;
 label accuracy is secondary). The judge evaluates the clue TEXT on the craft
