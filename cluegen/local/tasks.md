@@ -54,9 +54,6 @@ done — see the log for the curve and the criteria re-analysis.
         2026-07-02. Winners adopted as pipeline v9 (align edit turn, every-KEEP
         extract, 31B fixer replaces setter retry, model-batched phases);
         edit-cap and no-difficulty dead. Scorecards: ceiling-log.md.
-  - [ ] Fable-validate v9's banked clues (checkpoint 3) — local judges share
-        criteria with the setter's new edit turn, so local gates can't fully
-        arbitrate the align win; needs user go + dollar estimate
   - [ ] User reads prompts + logs in detail before strong tweak opinions —
         deferred to a fresh-eyes session (2026-07-02); not blocking autonomous
         progress
