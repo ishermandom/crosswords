@@ -402,3 +402,23 @@ puts an `analysis` field before `verdict` so the reasoning precedes the
 commitment. Tests the user's batching prior head-to-head against J2
 (identical prompt content, batching the only variable), and whether
 J3-grade precision is reachable at ~10 s/clue on the cheap model.
+
+---
+
+## 2026-07-01 — J4: per-clue confirmed; cascade test running
+
+**J4 (26B, per-clue + few-shot + doubt-rule):** precision 0.85, recall
+0.42, and the best raw-verdict agreement of any run (28/40). Same prompt
+content as J2 with batching the only variable: batching cost the 26B ten
+precision points — the user's anti-batching prior confirmed.
+
+**Operational finding:** J4 took ~75 min against a ~10 min projection.
+Back-to-back sustained runs are hitting the fanless-Air throttle and/or
+model eviction (31B was still warm when 40 26B calls started) — the
+regime toolchains.md §4.4 flags. Plan long runs with cold-ish spacing or
+accept degraded tok/s.
+
+**Cascade test (running):** 31B per-clue re-judges only J4's 13 banked
+clues. If judge errors decorrelate, combined precision should clear 0.9
+with the 31B touching only ~⅓ of clues — the production judge shape:
+cheap screen, expensive confirm.
