@@ -1055,3 +1055,13 @@ one calibration example (LANA "Born to Die singer") in the shared judge
 prompt — a famous bearer instantiates a name answer. Next Fable
 checkpoint should sample banked name clues to audit the recalibrated
 gate ($1.09 of $5 spent so far).
+
+## 2026-07-02 — Model directory relocated; profile owns the path
+
+User moved the shared weights: `/Users/Shared/ollama/models` →
+`/Users/Shared/models/gguf` (ollama-managed, README in place; sibling
+`models/mlx` holds the HF hub cache for the fine-tuning thread). Both
+accounts' `~/.zprofile` now export `OLLAMA_MODELS`, so the server
+command is just `~/tmp/ollama serve` — earlier entries' hardcoded
+paths are historical. Docs, plan, and memory updated; spec server
+command no longer embeds the path.
