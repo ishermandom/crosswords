@@ -101,12 +101,12 @@ beats prompted-26B v9 as setter, in confirmed-bankable clues per GPU-minute.
 Spec (decisions, stages, gates): `finetune.md`. Intended to run in its own chat
 thread; the spec is self-contained.
 
-- [~] Stage 0 — plumbing: `e2b-it-OptiQ-4bit` + ~500 pairs; `mlx_lm.lora` train
-  → `optiq serve --adapter` → eval loop runs end to end. Model selection settled
-  2026-07-02 (see spec); E2B checkpoint is in the shared cache
-  (`HF_HUB_CACHE=/Users/Shared/models/mlx`), 12B pull in progress. The user
-  personally runs model/data downloads from a shopping list Claude supplies.
-  Remaining sub-steps, in order:
+- [x] Stage 0 — plumbing: `e2b-it-OptiQ-4bit` + ~500 pairs; `mlx_lm.lora` train
+      → `optiq serve --adapter` → eval loop runs end to end. Completed
+      2026-07-02. Model selection settled 2026-07-02 (see spec); E2B checkpoint
+      is in the shared cache (`HF_HUB_CACHE=/Users/Shared/models/mlx`), 12B pull
+      in progress. The user personally runs model/data downloads from a shopping
+      list Claude supplies. Sub-step record:
   - Done 2026-07-02: `finetune` optional-dependency group in
     `cluegen/pyproject.toml` (`mlx-lm`, `mlx-optiq`), installed in the sandbox
     venv at 0.31.3 / 0.2.10; imports and both CLIs verified.
@@ -123,11 +123,14 @@ thread; the spec is self-contained.
     batch 1: val loss 8.85 → 2.49, ~5 it/s, ~160 tok/s, peak 4.9 GB. Serve leg
     smoked too: `optiq serve --adapter` answered an OpenAI-style chat completion
     with the trained adapter.
-  - Harness client adapter (the remaining sub-step): `optiq serve` speaks an
-    OpenAI-style API; the Ollama endpoint is `_OLLAMA_CHAT_URL` in
-    `scratch/pipeline_local.py` (local-ceiling worktree), consumed by
-    `scratch/eval_panel.py`. Those files live on the local-ceiling branch —
-    decide with the user how to wire the adapter without cross-branch edits.
+  - Done 2026-07-02: eval client `scratch/finetune/eval_tuned.py` — standalone
+    per prototyping independence (panel, judge prompt, and schema copied from
+    the local-ceiling harness, not imported; no cross-branch edits). Bare
+    single-turn setter via `optiq serve`, screen judge via Ollama
+    (`gemma4:26b-qat`, same contract as the pipeline). Smoked end to end on 2
+    panel words: generations screened, verdicts recorded to
+    `scratch/finetune/evals/`. Clue quality was garbage as expected at 20 sanity
+    iterations; stage 1 is the real read.
   - GPU coordination: the local-ceiling thread holds most of GPU/RAM; E2B-scale
     work fits alongside, but check with the user before anything heavier
     (scheduling protocol still TBD).
