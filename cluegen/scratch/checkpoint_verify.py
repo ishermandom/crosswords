@@ -27,8 +27,9 @@ _DATA = _HERE / 'checkpoint_clues.jsonl'
 _RESULTS_DIR = _HERE / 'logs'
 
 
-def _load_groups(versions: list[str] | None,
-                 data: pathlib.Path) -> dict[str, list[dict]]:
+def _load_groups(
+  versions: list[str] | None, data: pathlib.Path
+) -> dict[str, list[dict]]:
   groups: dict[str, list[dict]] = {}
   for line in data.read_text().splitlines():
     entry = json.loads(line)
@@ -40,24 +41,32 @@ def _load_groups(versions: list[str] | None,
 
 def _render_prompt(entries: list[dict]) -> str:
   template = (_CLOUD / 'prompts' / 'verify.md').read_text()
-  clue_lines = [
-    json.dumps({'word': e['word'], **e['clue']}) for e in entries
-  ]
+  clue_lines = [json.dumps({'word': e['word'], **e['clue']}) for e in entries]
   return template.replace('{{CLUES_JSONL}}', '\n'.join(clue_lines))
 
 
 def _verify_call(prompt: str, cwd: str) -> dict:
   command = [
-    'claude', '-p',
-    '--output-format', 'json',
+    'claude',
+    '-p',
+    '--output-format',
+    'json',
     '--disable-slash-commands',
-    '--disallowedTools', '*',
-    '--model', 'claude-fable-5',
-    '--system-prompt-file', str(_CLOUD / 'CLUE_SPEC.md'),
+    '--disallowedTools',
+    '*',
+    '--model',
+    'claude-fable-5',
+    '--system-prompt-file',
+    str(_CLOUD / 'CLUE_SPEC.md'),
   ]
   completed = subprocess.run(
-    command, input=prompt, capture_output=True, text=True,
-    timeout=600, cwd=cwd, check=True,
+    command,
+    input=prompt,
+    capture_output=True,
+    text=True,
+    timeout=600,
+    cwd=cwd,
+    check=True,
   )
   return json.loads(completed.stdout)
 
@@ -74,19 +83,19 @@ def _parse_verdicts(result_text: str) -> list[dict]:
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument('--dry-run', action='store_true')
-  parser.add_argument('--versions', default=None,
-                      help='comma list; default all')
-  parser.add_argument('--data', default=None,
-                      help='clues JSONL; default checkpoint_clues.jsonl')
+  parser.add_argument(
+    '--versions', default=None, help='comma list; default all'
+  )
+  parser.add_argument(
+    '--data', default=None, help='clues JSONL; default checkpoint_clues.jsonl'
+  )
   cli = parser.parse_args()
   wanted = cli.versions.split(',') if cli.versions else None
-  groups = _load_groups(wanted,
-                        pathlib.Path(cli.data) if cli.data else _DATA)
+  groups = _load_groups(wanted, pathlib.Path(cli.data) if cli.data else _DATA)
 
   if cli.dry_run:
     first = next(iter(groups))
-    print(f'--- rendered prompt for {first} '
-          f'({len(groups[first])} clues) ---')
+    print(f'--- rendered prompt for {first} ({len(groups[first])} clues) ---')
     print(_render_prompt(groups[first]))
     raise SystemExit(0)
 
@@ -108,17 +117,22 @@ if __name__ == '__main__':
         tally.get(v.get('verdict', 'reject'), 0) + 1
       )
     record = {
-      'version': version, 'tally': tally, 'verdicts': verdicts,
-      'cost_usd': cost, 'usage': usage,
+      'version': version,
+      'tally': tally,
+      'verdicts': verdicts,
+      'cost_usd': cost,
+      'usage': usage,
       'session_id': envelope.get('session_id'),
     }
     with results_path.open('a') as f:
       f.write(json.dumps(record) + '\n')
-    print(f'{version}: {tally["accept"]}A/{tally["revise"]}RV/'
-          f'{tally["reject"]}RJ  ${cost:.3f}  '
-          f'in={usage.get("input_tokens")} out={usage.get("output_tokens")} '
-          f'cr={usage.get("cache_read_input_tokens")} '
-          f'cw={usage.get("cache_creation_input_tokens")}')
+    print(
+      f'{version}: {tally["accept"]}A/{tally["revise"]}RV/'
+      f'{tally["reject"]}RJ  ${cost:.3f}  '
+      f'in={usage.get("input_tokens")} out={usage.get("output_tokens")} '
+      f'cr={usage.get("cache_read_input_tokens")} '
+      f'cw={usage.get("cache_creation_input_tokens")}'
+    )
     for v in verdicts:
       if v.get('verdict') != 'accept':
         print(f'  {v["word"]} [{v["verdict"]}]: {v.get("reason")}')

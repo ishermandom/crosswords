@@ -491,74 +491,74 @@ the campaign's deliverable. Run kept awake via `caffeinate -i -w <pid>`.
 
 ## Fresh-word batch 1 — scorecard (2026-07-01)
 
-6 unseen words, full cascade, one retry, 10.5 min wall clock (caffeinated —
-same workload shape that "took 75 min" pre-diagnosis; sleep confirmed as the
-J4 culprit). Banked 1/6.
+6 unseen words, full cascade, one retry, 10.5 min wall clock (caffeinated — same
+workload shape that "took 75 min" pre-diagnosis; sleep confirmed as the J4
+culprit). Banked 1/6.
 
-| word  | attempt 1              | verdict            | attempt 2               | verdict | my grade of best        |
-| ----- | ---------------------- | ------------------ | ----------------------- | ------- | ----------------------- |
-| SCORE | "Make a mark?"         | screen ok, confirm fixable (? unearned) | "Film's background music" | fixable (flat) | borderline; a2 fine easy |
-| DAISY | "Petal-puller's target?" | BANKED           | —                       | —       | genuinely good          |
-| GRANT | "Allow or bestow?"     | fixable (? unearned) | "Provide or permit?"  | fixable | fair drop; trivial fix would salvage |
-| CHECK | "Bill at a bistro"     | screen ok, confirm fixable (flat) | "Diner's final tally" | fixable (flat) | a1 arguably bankable easy |
-| GASP  | "A sudden intake in horror" | fixable       | "Sharp intake at a shock?" | fixable | fair drops, both weak |
-| AMBER | "Baltic treasure"      | screen ok, confirm fixable | "Ancient resinous gem" | fixable | a1 a real recall loss — good metonymy |
+| word  | attempt 1                   | verdict                                 | attempt 2                  | verdict        | my grade of best                      |
+| ----- | --------------------------- | --------------------------------------- | -------------------------- | -------------- | ------------------------------------- |
+| SCORE | "Make a mark?"              | screen ok, confirm fixable (? unearned) | "Film's background music"  | fixable (flat) | borderline; a2 fine easy              |
+| DAISY | "Petal-puller's target?"    | BANKED                                  | —                          | —              | genuinely good                        |
+| GRANT | "Allow or bestow?"          | fixable (? unearned)                    | "Provide or permit?"       | fixable        | fair drop; trivial fix would salvage  |
+| CHECK | "Bill at a bistro"          | screen ok, confirm fixable (flat)       | "Diner's final tally"      | fixable (flat) | a1 arguably bankable easy             |
+| GASP  | "A sudden intake in horror" | fixable                                 | "Sharp intake at a shock?" | fixable        | fair drops, both weak                 |
+| AMBER | "Baltic treasure"           | screen ok, confirm fixable              | "Ancient resinous gem"     | fixable        | a1 a real recall loss — good metonymy |
 
 **Interpretation.** Precision holds (the one bank is the batch's one lively
 clue). The drops split: ~2 recall losses (AMBER a1 clearly; SCORE/CHECK a1 as
 easy fills), the rest genuinely dictionary-flat. The binding constraint is now
-**setter liveliness**, not judge recall — most drafts are accurate but flat,
-and the judge's "lacks liveliness" complaint is usually correct. Secondary bug:
-the retry turn ignores the judge's stated fix (GRANT's retry kept the unearned
-`?` the judge had named).
+**setter liveliness**, not judge recall — most drafts are accurate but flat, and
+the judge's "lacks liveliness" complaint is usually correct. Secondary bug: the
+retry turn ignores the judge's stated fix (GRANT's retry kept the unearned `?`
+the judge had named).
 
 **Next iteration (one variable at a time):**
 
-1. v8 setter — liveliness pressure in the drafts and edit turns; make the
-   retry directive (apply the judge's named fix verbatim). Rerun same 6 words.
+1. v8 setter — liveliness pressure in the drafts and edit turns; make the retry
+   directive (apply the judge's named fix verbatim). Rerun same 6 words.
 2. Then multi-candidate (judge setter's top 2) if bank rate still low.
 
 ## v8 setter (liveliness pressure) — same 6 words (2026-07-01)
 
 Banked 1/6 again, but the failure mode moved. Surfaces are no longer
 dictionary-flat: AMBER "Sunlight captured in stone?", DAISY "Morning's eye?",
-GASP "Sharp intake after a jump scare?", and the bank: CHECK "Threaten the
-king" (chess angle — vivid, economical, no `?` needed; screen and confirm both
+GASP "Sharp intake after a jump scare?", and the bank: CHECK "Threaten the king"
+(chess angle — vivid, economical, no `?` needed; screen and confirm both
 bankable at first attempt).
 
 Drop reasons shifted from "lacks liveliness" to `?` discipline and looseness:
 GASP a1 and SCORE a2 are straight secondary-sense definitions wearing an
 unearned `?` — exactly the shape the new mechanical tidy (user suggestion)
 converts to a free strip-and-re-judge. AMBER a2 "Ancient resin's golden glow"
-clues the glow, not the resin — confirm's `bad` is correct (referent
-mismatch). DAISY a1 "Morning's eye?" flirts with the day's-eye etymology but
-neither setter nor judge articulated it.
+clues the glow, not the resin — confirm's `bad` is correct (referent mismatch).
+DAISY a1 "Morning's eye?" flirts with the day's-eye etymology but neither setter
+nor judge articulated it.
 
 Calibration note (user exchange): my "clear recall loss" grade on batch 1's
 AMBER "Baltic treasure" assumed Baltic→amber is common solver knowledge; the
 user didn't have it. Trivia-dependent metonymy grades softer than I credited —
-in-session grades have error bars too, and the confirm's doubt-rule looks
-better calibrated on that example than I did.
+in-session grades have error bars too, and the confirm's doubt-rule looks better
+calibrated on that example than I did.
 
-**Next:** same 6 words with the tidy active (isolates the tidy as the
-variable). Then multi-candidate if bank rate still lags.
+**Next:** same 6 words with the tidy active (isolates the tidy as the variable).
+Then multi-candidate if bank rate still lags.
 
 ## Tidy-active batch + the variance insight (2026-07-01)
 
-Same 6 words, tidy active. Banked 1/6: DAISY "Subject of a petal-plucking
-game?" (attempt 2, both stages). **Tidy verdict: fired 4×, converted 0.** In
-every case the stripped clue re-judged as still-fixable — the `?` complaint
-usually rides on an underlying flatness or looseness, so removing the mark
-exposes rather than cures it. The tidy stays (it costs nothing and will
-occasionally rescue a clean case), but it is not the recall lever.
+Same 6 words, tidy active. Banked 1/6: DAISY "Subject of a petal-plucking game?"
+(attempt 2, both stages). **Tidy verdict: fired 4×, converted 0.** In every case
+the stripped clue re-judged as still-fixable — the `?` complaint usually rides
+on an underlying flatness or looseness, so removing the mark exposes rather than
+cures it. The tidy stays (it costs nothing and will occasionally rescue a clean
+case), but it is not the recall lever.
 
 **The real finding is run-to-run variance.** Three runs, same words, same
-prompts (runs 2 and 3 identical code): CHECK banked in run 2, dropped in
-run 3; DAISY banked in runs 1 and 3, dropped in run 2. Per-word bank
-probability looks like ~20–35% per run at temp 1.0, and "1/6 per batch" is
-sampling noise, not a ceiling. Zero-marginal-cost implication: repeated
-passes with `--skip-banked` (added) accumulate coverage — best-of-N at the
-run level, judge untouched, precision preserved.
+prompts (runs 2 and 3 identical code): CHECK banked in run 2, dropped in run 3;
+DAISY banked in runs 1 and 3, dropped in run 2. Per-word bank probability looks
+like ~20–35% per run at temp 1.0, and "1/6 per batch" is sampling noise, not a
+ceiling. Zero-marginal-cost implication: repeated passes with `--skip-banked`
+(added) accumulate coverage — best-of-N at the run level, judge untouched,
+precision preserved.
 
 **Next:** 3 sequential passes over the 6 fresh words with `--skip-banked`;
 measure cumulative coverage and passes-per-bank — the campaign's practical
@@ -591,8 +591,8 @@ pipeline-banked clues, the true precision read on the metric of record.
 ## Held-out validation: 1/8 — the category ceiling shows (2026-07-02)
 
 Three skip-banked passes over the 8 reserved words, frozen v8+tidy config.
-Banked: ZED "That last character, overseas" (pass 1, attempt 1). Everything
-else dropped — 22 word-runs, 1 bank (≈5% vs the fresh set's 23%).
+Banked: ZED "That last character, overseas" (pass 1, attempt 1). Everything else
+dropped — 22 word-runs, 1 bank (≈5% vs the fresh set's 23%).
 
 **Why the gap (analysis only — held-out failures do not feed prompt work):**
 
@@ -600,72 +600,72 @@ else dropped — 22 word-runs, 1 bank (≈5% vs the fresh set's 23%).
   fallback for numbers is arithmetic ("Twice six", "One less than twenty?") —
   flat by nature, and the judge correctly reads it as flat.
 - **Craft-under-pressure, not angle discovery.** Same-word comparison against
-  the cloud bank: the local setter FOUND Fable's angles — Lent for FORTY
-  (Fable: "Keep yen for Lent's duration in days"), the 19th hole for NINETEEN
-  (Fable: "Hole number where the drinks are?"), baker's dozen for DOZEN — but
-  fumbled execution: "The 19th hole's destination?" clues the clubhouse, not
-  the number. Fable lands the referent on the same angle; the 26B doesn't.
+  the cloud bank: the local setter FOUND Fable's angles — Lent for FORTY (Fable:
+  "Keep yen for Lent's duration in days"), the 19th hole for NINETEEN (Fable:
+  "Hole number where the drinks are?"), baker's dozen for DOZEN — but fumbled
+  execution: "The 19th hole's destination?" clues the clubhouse, not the number.
+  Fable lands the referent on the same angle; the 26B doesn't.
 - **Plausible recall losses worth auditing:** "A score doubled?" (FORTY),
   "Baker's count?" (DOZEN), "Runner-up's rank?" (SECOND), "Royal residence or
   tennis arena" (COURT). These go into the checkpoint 2 payload so Fable
   measures the local judge's error in BOTH directions on unseen words.
 
-**Reading:** the fresh-set 23%/word-run was partly category luck (vivid
-concrete nouns). The local ceiling is category-dependent: strong on
-polysemous/concrete words, weak on numbers — exactly the words where the
-cloud bank is already deepest, which is a happy complementarity.
+**Reading:** the fresh-set 23%/word-run was partly category luck (vivid concrete
+nouns). The local ceiling is category-dependent: strong on polysemous/concrete
+words, weak on numbers — exactly the words where the cloud bank is already
+deepest, which is a happy complementarity.
 
-**Next:** harvest never-extracted KEEP drafts from all pipeline logs through
-the cascade (production under the bank-shape goal + measures whether draft
-pools are underexploited), then propose checkpoint 2.
+**Next:** harvest never-extracted KEEP drafts from all pipeline logs through the
+cascade (production under the bank-shape goal + measures whether draft pools are
+underexploited), then propose checkpoint 2.
 
 ## KEEP-pool harvest: 1/7 (2026-07-02)
 
 `scratch/harvest_keeps.py` re-judged every never-extracted KEEP draft in the
-pipeline logs (7 clean candidates after filtering setter chatter). Banked:
-CHECK "Curb an impulse". Reading: draft pools are only mildly underexploited
-(~14% of runner-up KEEPs bank), so full reruns' fresh-brainstorm cost is
-earning its keep — but the harvest is nearly free and runs as a standard
-post-batch sweep under the bank-shape goal.
+pipeline logs (7 clean candidates after filtering setter chatter). Banked: CHECK
+"Curb an impulse". Reading: draft pools are only mildly underexploited (~14% of
+runner-up KEEPs bank), so full reruns' fresh-brainstorm cost is earning its keep
+— but the harvest is nearly free and runs as a standard post-batch sweep under
+the bank-shape goal.
 
-Bank: 30 records; 8 locally-judged pipeline banks across 8 distinct words'
-clues (DAISY ×2, CHECK ×2, GRANT, GASP, AMBER, ZED).
+Bank: 30 records; 8 locally-judged pipeline banks across 8 distinct words' clues
+(DAISY ×2, CHECK ×2, GRANT, GASP, AMBER, ZED).
 
 **Checkpoint 2 payload finalized:** 8 pipeline-banked + 4 earmarked
 judge-rejections = 12 clues. Estimate ~$0.80 at checkpoint-1 unit cost
-($2.65/40 clues); cap $1.50. Awaiting user go.
+($2.65/40
+clues); cap $1.50. Awaiting user go.
 
 ## Checkpoint 2: local judge validated on the metric of record (2026-07-02)
 
 Two verify calls, $0.778 total (cap was $1.50). Results log:
 `scratch/logs/checkpoint_2026-07-02T00-16-33.jsonl`.
 
-**Pipeline-banked clues: 7 accept / 1 revise / 0 reject.** The revise is
-DAISY's second clue — Fable flags it as a paraphrase of the first DAISY
-clue's angle, not a craft failure. As clue text, effectively 8/8. The local
-cascade's "bankable" maps to Fable-accept at ~0.9 precision on words the
-prompts never saw.
+**Pipeline-banked clues: 7 accept / 1 revise / 0 reject.** The revise is DAISY's
+second clue — Fable flags it as a paraphrase of the first DAISY clue's angle,
+not a craft failure. As clue text, effectively 8/8. The local cascade's
+"bankable" maps to Fable-accept at ~0.9 precision on words the prompts never
+saw.
 
 **Rejection audit: 2 accept / 2 revise.** FORTY "A score doubled?" and COURT
-"Royal residence or tennis arena" were genuine recall losses — both now
-banked verbatim as Fable-accepted. On DOZEN "Baker's count?" the local judge
-beat my in-session grade (a baker's count is THIRTEEN — inaccurate
-definition); SECOND's trap "doesn't function". The conservative doubt-rule
-earns its keep in both directions.
+"Royal residence or tennis arena" were genuine recall losses — both now banked
+verbatim as Fable-accepted. On DOZEN "Baker's count?" the local judge beat my
+in-session grade (a baker's count is THIRTEEN — inaccurate definition); SECOND's
+trap "doesn't function". The conservative doubt-rule earns its keep in both
+directions.
 
 **Lessons recorded:** (a) depth-goal clues per word should eventually be
 angle-distinct, not just text-distinct — deferred to a later pass by user
-direction, don't over-invest now; (b) in-session grades have error bars in
-both directions (Baltic treasure: too generous on trivia metonymy; Baker's
-count: missed an inaccuracy).
+direction, don't over-invest now; (b) in-session grades have error bars in both
+directions (Baltic treasure: too generous on trivia metonymy; Baker's count:
+missed an inaccuracy).
 
 Bank: 32 records (8 local-cascade banks with Fable verdicts tagged in
 provenance, 2 audit rescues).
 
-**Next direction (user, 2026-07-02): throughput.** Target an order of
-magnitude better than ~7–8 min per banked clue; anatomize the cost and
-attack the 23%/5% per-run bank rates. Brainstorm with the user before
-experiments.
+**Next direction (user, 2026-07-02): throughput.** Target an order of magnitude
+better than ~7–8 min per banked clue; anatomize the cost and attack the 23%/5%
+per-run bank rates. Brainstorm with the user before experiments.
 
 ## Throughput brainstorm with user (2026-07-02)
 
@@ -680,8 +680,7 @@ User principles now governing this exploration:
   banked clue genuinely satisfying for a solver.
 - **Explore model-role splits** — squeeze the sparse 26B harder, and test
   whether the dense 31B earns its runtime on specific setter turns (edit turn
-  first candidate: it is the craft gate, and dense could FIX, not just
-  reject).
+  first candidate: it is the craft gate, and dense could FIX, not just reject).
 - **The cloud config is not a craft maximum** — it is Good Enough™ aside from
   cost; treat its ~90% accept as a reference point, not a ceiling.
 - **Hard-word tricks are probably domain-general** — hypothesis: what rescues
@@ -693,434 +692,412 @@ User principles now governing this exploration:
 **Measurements grounding the micro-opt thread (49 setter conversations):**
 markdown leakage is a non-issue (3/196 turns — the plain-text instruction
 works). The find: **edit-turn runaways** — median 1,417 chars but 6/49 turns
-exceed 4k (max 31,436), and those 6 hold 58% of all edit-turn output. That
-tail is minutes of wasted 26B decode per occurrence and correlates with the
-setter chatter the harvest had to filter. Fix candidates: per-draft structure
+exceed 4k (max 31,436), and those 6 hold 58% of all edit-turn output. That tail
+is minutes of wasted 26B decode per occurrence and correlates with the setter
+chatter the harvest had to filter. Fix candidates: per-draft structure
 constraint in the prompt + a `num_predict` cap sized well above the median.
 
 **Cheap eval loop design (to build):** the Fable-validated cascade is a free,
 trusted metric. Tier 1 (iteration): fixed 12-word panel (friendly + numbers,
-excluding held-out) × 3 runs per variant, screen-only — report screen-pass
-rate, banks-eligible, tokens and seconds per run; ~25–30 min per variant.
-Tier 2 (adoption): full cascade on tier-1 winners. For single-turn variants,
-replay archived conversations up to the changed turn — pairs samples tightly
-and skips re-brainstorm cost. Honesty bound: 36 samples resolves only large
-effects (±13pp at p≈0.25); iterate on levers expected to clear that.
+excluding held-out) × 3 runs per variant, screen-only — report screen-pass rate,
+banks-eligible, tokens and seconds per run; ~25–30 min per variant. Tier 2
+(adoption): full cascade on tier-1 winners. For single-turn variants, replay
+archived conversations up to the changed turn — pairs samples tightly and skips
+re-brainstorm cost. Honesty bound: 36 samples resolves only large effects (±13pp
+at p≈0.25); iterate on levers expected to clear that.
 
-**Queued:** user wants a detailed personal read of prompts + logs before
-strong tweak opinions — schedule a walkthrough when they're ready.
+**Queued:** user wants a detailed personal read of prompts + logs before strong
+tweak opinions — schedule a walkthrough when they're ready.
 
 ## Correction: reference-space is one mechanism, not the law (2026-07-02)
 
-User pushback, accepted: a bank leaning on one trick reads tropey even when
-each clue is individually good. The cloud bank itself shows multiple
-satisfaction mechanisms — conceptual reframing (ZERO "It separates the
-positives from the negatives"), sense-pivot arithmetic (DOZEN "One-twelfth
-gross?" — arithmetic is fine WITH a pivot; don't ban it), double definition,
-part-of-speech traps, reference-anchoring, etymology. Implications for any
-prompt tuning: no single-mechanism hints in the setter, and watch the judge's
-few-shots too (currently metonymy-leaning) — monoculture can enter through
-either door.
+User pushback, accepted: a bank leaning on one trick reads tropey even when each
+clue is individually good. The cloud bank itself shows multiple satisfaction
+mechanisms — conceptual reframing (ZERO "It separates the positives from the
+negatives"), sense-pivot arithmetic (DOZEN "One-twelfth gross?" — arithmetic is
+fine WITH a pivot; don't ban it), double definition, part-of-speech traps,
+reference-anchoring, etymology. Implications for any prompt tuning: no
+single-mechanism hints in the setter, and watch the judge's few-shots too
+(currently metonymy-leaning) — monoculture can enter through either door.
 
-**Backlog (user direction):** dig into what makes a clue satisfying and
-capture it more fundamentally than one dimension. Concrete first step when
-picked up: derive a mechanism taxonomy empirically from the cloud bank's
-accepted clues and measure the distribution — that corpus is
-validated-satisfying and free to study; a mechanism-mix target could later
-serve both the setter (diversity pressure) and the angle-distinct depth pass.
+**Backlog (user direction):** dig into what makes a clue satisfying and capture
+it more fundamentally than one dimension. Concrete first step when picked up:
+derive a mechanism taxonomy empirically from the cloud bank's accepted clues and
+measure the distribution — that corpus is validated-satisfying and free to
+study; a mechanism-mix target could later serve both the setter (diversity
+pressure) and the angle-distinct depth pass.
 
 ---
 
 ## 2026-07-02 — Session state (written for compaction survival)
 
 **Where the campaign stands.** The single-American-clue validation loop is
-closed: pipeline (`scratch/pipeline_local.py`, v8 prompts + mechanical
-?-tidy + skip-banked passes) generates and banks; the judge cascade (26B
-per-clue screen → 31B per-clue confirm) is Fable-validated at ~0.9 precision
-on unseen words (checkpoint 2, $0.778: 7/8 accepts, the miss a same-angle
-duplicate). Bank: 32 records, Fable verdicts tagged in provenance. Throughput:
-~23% bank rate per word-run on friendly categories, ~5% on numbers, ~1.75
-min/word-run ≈ 7–8 min per banked clue.
+closed: pipeline (`scratch/pipeline_local.py`, v8 prompts + mechanical ?-tidy +
+skip-banked passes) generates and banks; the judge cascade (26B per-clue screen
+→ 31B per-clue confirm) is Fable-validated at ~0.9 precision on unseen words
+(checkpoint 2, $0.778: 7/8 accepts, the miss a same-angle duplicate). Bank: 32
+records, Fable verdicts tagged in provenance. Throughput: ~23% bank rate per
+word-run on friendly categories, ~5% on numbers, ~1.75 min/word-run ≈ 7–8 min
+per banked clue.
 
 **Current objective (user): order-of-magnitude throughput improvement.**
-Governing principles in the two brainstorm entries above — chief constraints:
-no creativity pruning without log evidence; difficulty deprioritized (drop
+Governing principles in the two brainstorm entries above — chief constraints: no
+creativity pruning without log evidence; difficulty deprioritized (drop
 targeting strain, keep recording judge labels); no single-mechanism prompt
 hints; cloud config is reference, not ceiling.
 
 **Autonomous work queue, in order:**
 
 1. **Build the two-tier eval loop** (tier 1: fixed 12-word panel × 3 runs,
-   screen-only, report screen-pass rate + tokens + seconds; tier 2: full
-   cascade on winners; replay archived conversations for single-turn
-   variants). Proposed panel — the 6 fresh words (SCORE, DAISY, GRANT, CHECK,
-   GASP, AMBER) + TWENTY, GROSS, PAIR, VIOLET, ROBIN, STOCK; held-out set
-   stays reserved.
+   screen-only, report screen-pass rate + tokens + seconds; tier 2: full cascade
+   on winners; replay archived conversations for single-turn variants). Proposed
+   panel — the 6 fresh words (SCORE, DAISY, GRANT, CHECK, GASP, AMBER) + TWENTY,
+   GROSS, PAIR, VIOLET, ROBIN, STOCK; held-out set stays reserved.
 2. **Variant: edit-turn runaway fix** — per-draft structure constraint +
-   `num_predict` backstop (~2× median; median 1,417 chars, 6/49 turns hold
-   58% of edit output). Expect time win; watch quality.
-3. **Variant: setter/judge criteria alignment** — the judge's earned-?
-   contrast few-shots (OCEAN vs SILT) into the setter's edit turn; referent
-   self-check ("what does this clue literally define?").
+   `num_predict` backstop (~2× median; median 1,417 chars, 6/49 turns hold 58%
+   of edit output). Expect time win; watch quality.
+3. **Variant: setter/judge criteria alignment** — the judge's earned-? contrast
+   few-shots (OCEAN vs SILT) into the setter's edit turn; referent self-check
+   ("what does this clue literally define?").
 4. **Variant: drop difficulty targeting** from the setter prompts.
-5. **Variant: judge-every-KEEP** (eager depth mode) — biggest structural
-   lever under the bank-shape goal.
-6. **Variant: dense-as-fixer** — 31B repairs `fixable` clues given the
-   judge's named flaw, demand-driven.
-7. Satisfaction-mechanism taxonomy: timing at Claude's discretion; cloud
-   bank is one INPUT, biased sample, echo-chamber risk if sole evaluation.
+5. **Variant: judge-every-KEEP** (eager depth mode) — biggest structural lever
+   under the bank-shape goal.
+6. **Variant: dense-as-fixer** — 31B repairs `fixable` clues given the judge's
+   named flaw, demand-driven.
+7. Satisfaction-mechanism taxonomy: timing at Claude's discretion; cloud bank is
+   one INPUT, biased sample, echo-chamber risk if sole evaluation.
 
 One variable per comparison; adopt only tier-2-confirmed wins; log every
 scorecard here.
 
-**Operational.** Ollama server runs under Claude's control (`OLLAMA_MODELS=
-/Users/Shared/ollama/models ~/tmp/ollama serve` from claude-sandbox; restart
-if down; never pull). Wrap unattended runs in `caffeinate -i` (machine
-sleeps otherwise — that, not throttling, caused the old 75-min anomaly).
-Quota: NO `claude -p` of any size without the user's explicit go; checkpoint
-3 (if wanted) gets proposed with scope + dollar estimate. User's detailed
-prompt/log read is deferred to a fresh-eyes session — not blocking. Worktree
-`/Users/Shared/code/crosswords-local-ceiling`, branch `local-ceiling`,
+**Operational.** Ollama server runs under Claude's control
+(`OLLAMA_MODELS= /Users/Shared/ollama/models ~/tmp/ollama serve` from
+claude-sandbox; restart if down; never pull). Wrap unattended runs in
+`caffeinate -i` (machine sleeps otherwise — that, not throttling, caused the old
+75-min anomaly). Quota: NO `claude -p` of any size without the user's explicit
+go; checkpoint 3 (if wanted) gets proposed with scope + dollar estimate. User's
+detailed prompt/log read is deferred to a fresh-eyes session — not blocking.
+Worktree `/Users/Shared/code/crosswords-local-ceiling`, branch `local-ceiling`,
 rebased onto main after each main-side commit; merge only with the user.
 
 ## 2026-07-02 — Eval harness built; tier-1 baseline scorecard
 
-Queue item 1 done: `scratch/eval_panel.py` — tier 1 runs a variant over
-the fixed 12-word panel × 3, screen-only, with per-turn token/second
-accounting; tier 2 (31B confirm over screen-passes, `--bank` keeps
-confirmed inventory) is the adoption gate; `--fixer` measures the
-dense-as-fixer conversion rate on a result file's fixables. Prefix replay
-reuses archived setter turns when a variant only changes later prompts —
-paired comparison, less compute, less noise. Validated live on IRIS
-(including replay). Satisfaction taxonomy also landed
-(`local/satisfaction.md`), revised per user: five bases of satisfaction,
-the "aha" is not mandatory — elegance, fair resistance, prize trivia, and
-fun all carry clues on their own.
+Queue item 1 done: `scratch/eval_panel.py` — tier 1 runs a variant over the
+fixed 12-word panel × 3, screen-only, with per-turn token/second accounting;
+tier 2 (31B confirm over screen-passes, `--bank` keeps confirmed inventory) is
+the adoption gate; `--fixer` measures the dense-as-fixer conversion rate on a
+result file's fixables. Prefix replay reuses archived setter turns when a
+variant only changes later prompts — paired comparison, less compute, less
+noise. Validated live on IRIS (including replay). Satisfaction taxonomy also
+landed (`local/satisfaction.md`), revised per user: five bases of satisfaction,
+the "aha" is not mandatory — elegance, fair resistance, prize trivia, and fun
+all carry clues on their own.
 
-**Baseline (v8) tier-1 scorecard** (36 word-runs, 28.5 min wall — the
-25–30 min/variant estimate holds; the model warms up over the first
-words):
+**Baseline (v8) tier-1 scorecard** (36 word-runs, 28.5 min wall — the 25–30
+min/variant estimate holds; the model warms up over the first words):
 
 - screen: 13 bankable / 20 fixable / 3 bad — 36% of runs pass
 - 2.2 min per screen-bankable clue; 36,765 output tokens; 0 extract fails
-- edit turn: median 1,370 chars, max 33,260, 3 over 4k. PAIR r1's single
-  runaway edit turn cost 371 s — 22% of the whole panel's compute in one
-  turn. The edit-cap variant targets exactly this.
-- word texture: TWENTY 3/3, ROBIN 3/3, GROSS 2/3 — number-adjacent panel
-  words are fine here; STOCK 0/3 and CHECK 0/3 (all fixable, mostly
-  flat-or-referent complaints), PAIR 0/3 with 2 bad. Screen variance
-  visible: "Two of a kind?" (PAIR) drew bad in r1 and fixable in r2.
+- edit turn: median 1,370 chars, max 33,260, 3 over 4k. PAIR r1's single runaway
+  edit turn cost 371 s — 22% of the whole panel's compute in one turn. The
+  edit-cap variant targets exactly this.
+- word texture: TWENTY 3/3, ROBIN 3/3, GROSS 2/3 — number-adjacent panel words
+  are fine here; STOCK 0/3 and CHECK 0/3 (all fixable, mostly flat-or-referent
+  complaints), PAIR 0/3 with 2 bad. Screen variance visible: "Two of a kind?"
+  (PAIR) drew bad in r1 and fixable in r2.
 
 Variant chain launched (one 26B block, no model switches): edit-cap,
-align-quest, every-keep (all replaying the baseline archive), then
-no-difficulty full. 31B work (tier-2 confirms + fixer repairs) queued as a
-single later block per the model-switch cost note now in the spec.
+align-quest, every-keep (all replaying the baseline archive), then no-difficulty
+full. 31B work (tier-2 confirms + fixer repairs) queued as a single later block
+per the model-switch cost note now in the spec.
 
 ## 2026-07-02 — Variant round complete: scorecards, tier 2, fixer
 
 All queue-item variants measured on the 12-word panel × 3 runs, paired via
-prefix replay of the baseline archive. End-to-end = screen-pass × tier-2
-confirm on 36 word-runs.
+prefix replay of the baseline archive. End-to-end = screen-pass × tier-2 confirm
+on 36 word-runs.
 
-| variant | screen-pass | adj min/screen-pass | tier-2 confirm | end-to-end |
-| --- | --- | --- | --- | --- |
-| baseline (v8) | 13/36 (36%) | 2.2 | 2/12 (17%) | ~6% |
-| edit-cap | 8/36 (22%) | 2.5 | — (dead at tier 1) | — |
-| align-quest | 21/36 (58%) | 1.2 | 6/21 (29%) | ~17% |
-| every-keep | 17/36 (47%), 39 clues | ~0.4 raw | 3/19 (16%) | ~8% |
-| no-difficulty | 14/36 (39%) | — | 0/14 (0%) | 0 |
+| variant       | screen-pass           | adj min/screen-pass | tier-2 confirm     | end-to-end |
+| ------------- | --------------------- | ------------------- | ------------------ | ---------- |
+| baseline (v8) | 13/36 (36%)           | 2.2                 | 2/12 (17%)         | ~6%        |
+| edit-cap      | 8/36 (22%)            | 2.5                 | — (dead at tier 1) | —          |
+| align-quest   | 21/36 (58%)           | 1.2                 | 6/21 (29%)         | ~17%       |
+| every-keep    | 17/36 (47%), 39 clues | ~0.4 raw            | 3/19 (16%)         | ~8%        |
+| no-difficulty | 14/36 (39%)           | —                   | 0/14 (0%)          | 0          |
 
 Verdicts:
 
-- **align-quest is the round's win**: the judge's earned-? contrast pair
-  (OCEAN vs SILT) + referent self-check inside the setter's edit turn.
-  ~3× baseline end-to-end; the teaching-to-the-test worry did not
-  materialize at tier 2 (its confirm rate is higher than baseline's).
-  Fable validation still pending — the shared judge criteria mean local
-  gates can't fully arbitrate this.
-- **edit-cap is dead**: the 33k-char runaway (PAIR r1, 371 s = 22% of the
-  whole baseline panel's compute) is a deliberation spiral on words with
-  no lively angle, but terseness constraints cut quality more than they
-  save time (22% pass, worse adjusted efficiency than baseline).
-- **no-difficulty is dead**: 0/14 at tier 2. Difficulty targeting in the
-  prompts does real work; keep it (labels stay judge-assigned).
-- **every-keep is a cheap positive**: same setter turns, +46% bankable
-  clues at tier 1 for ~10% more compute. Caveat: it extracted only
-  1.08 clues/run, so part of the lift is extract-turn re-roll variance.
-  minItems guard added after constrained decoding took the empty-list
-  escape hatch in 13/29 runs.
+- **align-quest is the round's win**: the judge's earned-? contrast pair (OCEAN
+  vs SILT) + referent self-check inside the setter's edit turn. ~3× baseline
+  end-to-end; the teaching-to-the-test worry did not materialize at tier 2 (its
+  confirm rate is higher than baseline's). Fable validation still pending — the
+  shared judge criteria mean local gates can't fully arbitrate this.
+- **edit-cap is dead**: the 33k-char runaway (PAIR r1, 371 s = 22% of the whole
+  baseline panel's compute) is a deliberation spiral on words with no lively
+  angle, but terseness constraints cut quality more than they save time (22%
+  pass, worse adjusted efficiency than baseline).
+- **no-difficulty is dead**: 0/14 at tier 2. Difficulty targeting in the prompts
+  does real work; keep it (labels stay judge-assigned).
+- **every-keep is a cheap positive**: same setter turns, +46% bankable clues at
+  tier 1 for ~10% more compute. Caveat: it extracted only 1.08 clues/run, so
+  part of the lift is extract-turn re-roll variance. minItems guard added after
+  constrained decoding took the empty-list escape hatch in 13/29 runs.
 - **fixer converts 45%** (9/20) of baseline's screen-fixables into
-  screen-bankables at ~0.6 min each — the cheapest per-pass lever
-  measured. It wins by literalizing accuracy flaws; it sometimes flattens
-  a lively draft. Not yet in the pipeline; composable with everything.
-- Tier-2 texture: the 31B confirm is harsh on panel words (17% on
-  baseline's screen-passes) and noisy at the margins — ROBIN "Boy
-  Wonder?" confirmed while "A boy wonder?" judged bad.
+  screen-bankables at ~0.6 min each — the cheapest per-pass lever measured. It
+  wins by literalizing accuracy flaws; it sometimes flattens a lively draft. Not
+  yet in the pipeline; composable with everything.
+- Tier-2 texture: the 31B confirm is harsh on panel words (17% on baseline's
+  screen-passes) and noisy at the margins — ROBIN "Boy Wonder?" confirmed while
+  "A boy wonder?" judged bad.
 
-7 clues banked from tier 2 (6 align-quest, 1 every-keep); bank at 39.
-Combined adoption candidate `align-keep` (align-quest edit turn +
-every-keep extract) queued as the final comparison; adopt into
-`pipeline_local` as v9 only if it confirms at tier 2.
+7 clues banked from tier 2 (6 align-quest, 1 every-keep); bank at 39. Combined
+adoption candidate `align-keep` (align-quest edit turn + every-keep extract)
+queued as the final comparison; adopt into `pipeline_local` as v9 only if it
+confirms at tier 2.
 
-**Ops.** Harness background tasks get reaped in this environment (all
-tasks killed simultaneously, twice, mid-progress — not sleep, not
-thermal; power log clean). Long runs now launch detached via Python
-`start_new_session` (macOS has no setsid; nohup can't detach here), with
-a disposable harness watcher whose kill/completion both wake the session.
+**Ops.** Harness background tasks get reaped in this environment (all tasks
+killed simultaneously, twice, mid-progress — not sleep, not thermal; power log
+clean). Long runs now launch detached via Python `start_new_session` (macOS has
+no setsid; nohup can't detach here), with a disposable harness watcher whose
+kill/completion both wake the session.
 
 ## 2026-07-02 — Combo run and corrections; v9 adoption decision
 
-`align-keep` (align-quest edit turn + every-keep extract): 13/36
-screen-pass (36%), 3/13 confirmed, 3 banked. It did not reproduce
-align-quest's 58% — the two runs differ only in the extract turn and the
-edit turn's re-roll, so edit-turn sampling variance is large and single
-36-run comparisons overstate. Corrections to the round's reading:
+`align-keep` (align-quest edit turn + every-keep extract): 13/36 screen-pass
+(36%), 3/13 confirmed, 3 banked. It did not reproduce align-quest's 58% — the
+two runs differ only in the extract turn and the edit turn's re-roll, so
+edit-turn sampling variance is large and single 36-run comparisons overstate.
+Corrections to the round's reading:
 
 - **Pooled align-edit-turn evidence** (72 word-runs): screen-pass 47% vs
-  baseline 36% (+11pp, at the noise edge); tier-2 confirm 26% vs 17%;
-  end-to-end ~12.5% vs 5.6% — call it ~2×, not 3×. Two independent
-  tier-2-positive replications (6 and 3 confirmed vs baseline's 2).
-- **every-keep attribution**: only 2/36 runs extracted more than one
-  clue; 17 of its 19 tier-1 bankables were clue #1. The earlier lift was
-  extract-turn re-roll variance, not the multi-KEEP mechanism — which
-  added just 2 clues. Kept anyway: harmless, tiny depth positive.
+  baseline 36% (+11pp, at the noise edge); tier-2 confirm 26% vs 17%; end-to-end
+  ~12.5% vs 5.6% — call it ~2×, not 3×. Two independent tier-2-positive
+  replications (6 and 3 confirmed vs baseline's 2).
+- **every-keep attribution**: only 2/36 runs extracted more than one clue; 17 of
+  its 19 tier-1 bankables were clue #1. The earlier lift was extract-turn
+  re-roll variance, not the multi-KEEP mechanism — which added just 2 clues.
+  Kept anyway: harmless, tiny depth positive.
 
-**Adopting as pipeline v9** (best-supported package, reversible, true
-gate remains a Fable checkpoint): align-quest edit turn; every-keep
-multi-extract; screen each clue; the 31B fixer replaces the setter
-retry (45% measured conversion vs the retry path's unmeasured, pricier
-loop); mechanical ?-tidy stays. Restructured into model-batched phases
-per the switch-cost note: (A) all setter+screen work on 26B, (B) all
-confirms + fixer repairs on 31B, (C) repair re-screens on 26B, (D) their
-confirms on 31B — 3 switches per run regardless of word count.
+**Adopting as pipeline v9** (best-supported package, reversible, true gate
+remains a Fable checkpoint): align-quest edit turn; every-keep multi-extract;
+screen each clue; the 31B fixer replaces the setter retry (45% measured
+conversion vs the retry path's unmeasured, pricier loop); mechanical ?-tidy
+stays. Restructured into model-batched phases per the switch-cost note: (A) all
+setter+screen work on 26B, (B) all confirms + fixer repairs on 31B, (C) repair
+re-screens on 26B, (D) their confirms on 31B — 3 switches per run regardless of
+word count.
 
-Bank at 42 (+10 this session: 6 align-quest, 1 every-keep, 3
-align-keep).
+Bank at 42 (+10 this session: 6 align-quest, 1 every-keep, 3 align-keep).
 
 ## 2026-07-02 — v9 first production batch (40-word cross-section)
 
-Batch: every 13th fresh word from words.in (numbers, proper names,
-family words, misc) — a representative slice, not a friendly one.
-~45 min wall, single pass: phase A produced 19 screen-candidates + 15
-screen-fixables; 4 banked after confirm. MELODY "Whistleable earworm",
-TABLE "Place to settle a debate?", MARCH "Step in time?", GROSS
-"Stomach-turning total?" — the last a fixer save that turned a flat
-disgust clue into a gross=144 double meaning.
+Batch: every 13th fresh word from words.in (numbers, proper names, family words,
+misc) — a representative slice, not a friendly one. ~45 min wall, single pass:
+phase A produced 19 screen-candidates + 15 screen-fixables; 4 banked after
+confirm. MELODY "Whistleable earworm", TABLE "Place to settle a debate?", MARCH
+"Step in time?", GROSS "Stomach-turning total?" — the last a fixer save that
+turned a flat disgust clue into a gross=144 double meaning.
 
 Reading:
 
-- ~11 min/bank single-pass on a hard mix — not directly comparable to
-  the historical 7–8 min/bank (friendly words, cumulative passes), but
-  the honest current number for cold coverage of words.in.
-- The cascade caught a real inaccuracy screen missed (CENTURY "Twelve
-  decades", confirm bad). Confirm remains the harshest gate: 15 of 19
-  candidates died there, most as fixable with plausible clues one named
-  fix away (FELIX "Whiskered cartoon star", NINA "Columbus's smallest
-  ship").
-- v9.1 follow-up: confirm-fixables now join the fixer repair queue
-  (same measured mechanism, one confirm shot, no loops). Second pass
-  over the batch running — also the first multi-pass accumulation test
-  under v9.
+- ~11 min/bank single-pass on a hard mix — not directly comparable to the
+  historical 7–8 min/bank (friendly words, cumulative passes), but the honest
+  current number for cold coverage of words.in.
+- The cascade caught a real inaccuracy screen missed (CENTURY "Twelve decades",
+  confirm bad). Confirm remains the harshest gate: 15 of 19 candidates died
+  there, most as fixable with plausible clues one named fix away (FELIX
+  "Whiskered cartoon star", NINA "Columbus's smallest ship").
+- v9.1 follow-up: confirm-fixables now join the fixer repair queue (same
+  measured mechanism, one confirm shot, no loops). Second pass over the batch
+  running — also the first multi-pass accumulation test under v9.
 
 ## 2026-07-02 — v9.1 pass 2; session close-out
 
-Pass 2 over the same 40-word batch (36 unbanked, v9.1's wider repair
-queue): 16 candidates + 14 screen-fixables; 24 repairs (now including
-confirm-fixables), 10 screen-bankable; **7 banked** — THIRTEEN "A number
-often skipped in elevators", FELIX "Favored by fortune?", SISTER "Senior
-nurse on duty", CHARGE "Attack at full tilt", GOSH "Gee whiz!", POTS
-"Earthenware that might be thrown", MURMUR "Low hum of a restless
-crowd". The confirm-fixable repair queue roughly doubled pass yield
-(4 -> 7 on a shrunken, harder remainder).
+Pass 2 over the same 40-word batch (36 unbanked, v9.1's wider repair queue): 16
+candidates + 14 screen-fixables; 24 repairs (now including confirm-fixables), 10
+screen-bankable; **7 banked** — THIRTEEN "A number often skipped in elevators",
+FELIX "Favored by fortune?", SISTER "Senior nurse on duty", CHARGE "Attack at
+full tilt", GOSH "Gee whiz!", POTS "Earthenware that might be thrown", MURMUR
+"Low hum of a restless crowd". The confirm-fixable repair queue roughly doubled
+pass yield (4 -> 7 on a shrunken, harder remainder).
 
-Cumulative batch reading: 11/40 words covered in two passes, ~90 min
-total ≈ 8 min/bank on a hard cross-section (numbers, names, misc) —
-the category mix that previously banked at ~5%/run now contributes
-(THIRTEEN via prize-fact, FELIX via etymology). Multi-pass accumulation
-works under v9: pass 2 banked different words than pass 1.
+Cumulative batch reading: 11/40 words covered in two passes, ~90 min total ≈ 8
+min/bank on a hard cross-section (numbers, names, misc) — the category mix that
+previously banked at ~5%/run now contributes (THIRTEEN via prize-fact, FELIX via
+etymology). Multi-pass accumulation works under v9: pass 2 banked different
+words than pass 1.
 
-**Session totals (autonomous run, 2026-07-02 01:30–06:00):** bank 32 ->
-53 (+21). Built and validated the two-tier eval harness; ran 6 variants
-+ fixer experiment; adopted v9/v9.1 (align edit turn, every-KEEP
-extract, fixer replaces retry, confirm-fixables repairable,
-model-batched phases); killed edit-cap and no-difficulty with data;
-wrote satisfaction.md (five bases; aha not mandatory — user note);
-recorded the gemma4 switch-cost note in the spec; worked around
-harness background-task reaping with detached drivers + watcher tasks.
+**Session totals (autonomous run, 2026-07-02 01:30–06:00):** bank 32 -> 53
+(+21). Built and validated the two-tier eval harness; ran 6 variants
 
-**Proposed next (user-gated):** checkpoint 3 — Fable-verify the 21 new
-banks in two provenance groups (eval-round vs v9). ~21 clues across two
-verify calls; checkpoint 2 ran 12 clues for $0.778, so estimate ~$1.30,
-cap $2. Decides whether the align edit turn's ~2x is craft or
-criteria-echo, and whether fixer saves hold up.
+- fixer experiment; adopted v9/v9.1 (align edit turn, every-KEEP extract, fixer
+  replaces retry, confirm-fixables repairable, model-batched phases); killed
+  edit-cap and no-difficulty with data; wrote satisfaction.md (five bases; aha
+  not mandatory — user note); recorded the gemma4 switch-cost note in the spec;
+  worked around harness background-task reaping with detached drivers + watcher
+  tasks.
+
+**Proposed next (user-gated):** checkpoint 3 — Fable-verify the 21 new banks in
+two provenance groups (eval-round vs v9). ~21 clues across two verify calls;
+checkpoint 2 ran 12 clues for $0.778, so estimate ~$1.30, cap $2. Decides
+whether the align edit turn's ~2x is craft or criteria-echo, and whether fixer
+saves hold up.
 
 ## 2026-07-02 — Checkpoint 3 ($1.085): v9 validated; depth leak named
 
 Self-launched under the new standing agreement (est. ~$1.30 < $2; actual
-$1.085; $1.09 of the $5 cap used since the user's check-in). 21 new
-banks in two provenance groups:
+$1.085; $1.09 of the $5 cap used since the user's check-in). 21 new banks in two
+provenance groups:
 
-- **v9 group: 8A/3RV/0RJ.** The fixer-heavy pipeline holds at the
-  reference judge — zero rejects; revises are a non-functioning trap
-  claim (TABLE), a POS mismatch (FELIX — Fable gifted the fix: "Apt
-  name for fortune's favorite?"), and padding + missing Britishism
-  signal (SISTER).
-- **eval-round group: 4A/6RV/0RJ**, but four of six revises are
-  same-angle duplicates (GRANT admit/concede, STOCK culinary ×2, ROBIN
-  Batman-sidekick) — bank-shape complaints, not craft failures. The
-  align edit turn survives the craft-vs-echo question: no inaccuracy or
-  broken referent anywhere in 21 clues.
-- **Actionable:** the angle-distinct depth criterion is now the top
-  quality leak; the mechanism audit's anchor tags are its tool. Fable
-  verdicts annotated onto all 21 bank records (checkpoint-2 precedent).
+- **v9 group: 8A/3RV/0RJ.** The fixer-heavy pipeline holds at the reference
+  judge — zero rejects; revises are a non-functioning trap claim (TABLE), a POS
+  mismatch (FELIX — Fable gifted the fix: "Apt name for fortune's favorite?"),
+  and padding + missing Britishism signal (SISTER).
+- **eval-round group: 4A/6RV/0RJ**, but four of six revises are same-angle
+  duplicates (GRANT admit/concede, STOCK culinary ×2, ROBIN Batman-sidekick) —
+  bank-shape complaints, not craft failures. The align edit turn survives the
+  craft-vs-echo question: no inaccuracy or broken referent anywhere in 21 clues.
+- **Actionable:** the angle-distinct depth criterion is now the top quality
+  leak; the mechanism audit's anchor tags are its tool. Fable verdicts annotated
+  onto all 21 bank records (checkpoint-2 precedent).
 
-**Mechanism audit, first run (53/53 tagged):** alarm fired — sense pivot
-45%. Spot check shows the 26B tagger over-attributes (cricket-DUCK and
-overseas-ZED tagged pivot despite frame anchors in their own anchor
-fields); true pivot share ≈ a third — plurality, watch it. Two
-follow-ups: tighten the tagger's dominant-mechanism instruction; the
-align pair's earned-? example (SILT) is itself a pivot shown on every
-word — a back-door single-mechanism hint. Candidate eval variant:
-second earned-? example from a non-pivot mechanism.
+**Mechanism audit, first run (53/53 tagged):** alarm fired — sense pivot 45%.
+Spot check shows the 26B tagger over-attributes (cricket-DUCK and overseas-ZED
+tagged pivot despite frame anchors in their own anchor fields); true pivot share
+≈ a third — plurality, watch it. Two follow-ups: tighten the tagger's
+dominant-mechanism instruction; the align pair's earned-? example (SILT) is
+itself a pivot shown on every word — a back-door single-mechanism hint.
+Candidate eval variant: second earned-? example from a non-pivot mechanism.
 
 ## 2026-07-02 — Held-out v9 measurement: 1/8, ceiling unmoved
 
-Single pass over the reserved 8 (numbers-heavy by construction): 1
-banked — ZED "One beyond Y?", an angle-distinct second ZED clue. Same
-1/8 as v7, so the session's gains are throughput-on-breadth, not a
-lifted hard-category ceiling. Texture: screen correctly rejected an
-inaccurate FORTY ("just shy of the answer to everything" = 41); COURT,
-SUE, NINETEEN died at confirm-fixable — angle discovery fine, craft
-polish failing the harsh gate, consistent with the original held-out
-diagnosis. Next passes test accumulation on hard words.
+Single pass over the reserved 8 (numbers-heavy by construction): 1 banked — ZED
+"One beyond Y?", an angle-distinct second ZED clue. Same 1/8 as v7, so the
+session's gains are throughput-on-breadth, not a lifted hard-category ceiling.
+Texture: screen correctly rejected an inaccurate FORTY ("just shy of the answer
+to everything" = 41); COURT, SUE, NINETEEN died at confirm-fixable — angle
+discovery fine, craft polish failing the harsh gate, consistent with the
+original held-out diagnosis. Next passes test accumulation on hard words.
 
 ## 2026-07-02 — Batch 2 (72 words): breadth grows, confirm is the wall
 
-Mixed batch: 5 uncovered held-out words (pass 2), 27 batch-1 leftovers
-(pass 3), 40-word fresh slice (pass 1). 7 banked — LARRY "Not quite
-Lawrence?", TOT "Small drink?", DUSK "When shadows stretch", WYE "Forked
-path?", EMIT "Cast a beam", ALOUD "Not just in one's head", FRINGE
-"Where the wilderness meets the clearing". Bank at 61.
+Mixed batch: 5 uncovered held-out words (pass 2), 27 batch-1 leftovers (pass 3),
+40-word fresh slice (pass 1). 7 banked — LARRY "Not quite Lawrence?", TOT "Small
+drink?", DUSK "When shadows stretch", WYE "Forked path?", EMIT "Cast a beam",
+ALOUD "Not just in one's head", FRINGE "Where the wilderness meets the
+clearing". Bank at 61.
 
-Accumulation curve so far: fresh slices bank ~10-15% of words on pass 1;
-third passes on leftovers yield little (1/27); held-out second passes
-0/5 — hard words stay hard under re-rolls. The 31B confirm passed ~7 of
-62 attempts this batch (~11%): the gate, not generation, is now the
-bottleneck. Launched a stability measurement: 12 borderline
-(confirm-fixable) clues × 5 re-judges — if verdicts flip, best-of-N
-voting recovers yield cheaply; if stable, the gate is a real bar and
-the clues themselves must improve.
+Accumulation curve so far: fresh slices bank ~10-15% of words on pass 1; third
+passes on leftovers yield little (1/27); held-out second passes 0/5 — hard words
+stay hard under re-rolls. The 31B confirm passed ~7 of 62 attempts this batch
+(~11%): the gate, not generation, is now the bottleneck. Launched a stability
+measurement: 12 borderline (confirm-fixable) clues × 5 re-judges — if verdicts
+flip, best-of-N voting recovers yield cheaply; if stable, the gate is a real bar
+and the clues themselves must improve.
 
 ## 2026-07-02 — Confirm gate is stable; voting lever dead
 
-Flip check: 12 borderline (confirm-fixable) clues × 5 re-judges on 31B.
-11/12 drew the identical verdict 5/5; the single flipper (ANNE
-"Red-haired orphan?") wavered fixable↔bad, never toward bankable.
-Best-of-N confirm voting would recover ~nothing — the gate is a real
-quality bar, and yield improves only if clue craft improves. (The
-apparent ROBIN flip at checkpoint 3 was text-sensitivity —
-capitalization/article — not sampling noise.) This localizes the
-remaining headroom squarely in the setter's craft prior — the
-fine-tuning question now under discussion with the user.
+Flip check: 12 borderline (confirm-fixable) clues × 5 re-judges on 31B. 11/12
+drew the identical verdict 5/5; the single flipper (ANNE "Red-haired orphan?")
+wavered fixable↔bad, never toward bankable. Best-of-N confirm voting would
+recover ~nothing — the gate is a real quality bar, and yield improves only if
+clue craft improves. (The apparent ROBIN flip at checkpoint 3 was
+text-sensitivity — capitalization/article — not sampling noise.) This localizes
+the remaining headroom squarely in the setter's craft prior — the fine-tuning
+question now under discussion with the user.
 
 ## 2026-07-02 — Batch 3 (95 words): best yield yet; name-category hole
 
-14 banked from 95 word-runs (~9.5 min/bank; bank at 75, 49/547 words
-covered): NOAH "One who paired them up", SEVENTH "Interval that wants to
-resolve", THIRD "Between the slugger who hits second and the cleanup
-hitter?", SELDOM "Once in a blue moon", HEATHER, MAX, GAG, EXCEPT,
-ASIDE, TWENTY, LIGHT, CLIFF, CENTURY, LOG. Second passes redeem earlier
-failures (CENTURY: killed "Twelve decades" -> banked "Batsman's
-milestone"), so pass-2 yield ≈ fresh pass-1 yield; only pass 3+ decays.
+14 banked from 95 word-runs (~9.5 min/bank; bank at 75, 49/547 words covered):
+NOAH "One who paired them up", SEVENTH "Interval that wants to resolve", THIRD
+"Between the slugger who hits second and the cleanup hitter?", SELDOM "Once in a
+blue moon", HEATHER, MAX, GAG, EXCEPT, ASIDE, TWENTY, LIGHT, CLIFF, CENTURY,
+LOG. Second passes redeem earlier failures (CENTURY: killed "Twelve decades" ->
+banked "Batsman's milestone"), so pass-2 yield ≈ fresh pass-1 yield; only pass
+3+ decays.
 
-**Name-category screen hole, measured:** name words draw screen-bad at
-31% (5/16) vs 9% (7/81) for other words. The judge's associated-referent
-rule misfires on famous-bearer clues (LANA "Born to Die singer" — killed)
-while role-shaped name clues pass (NOAH — banked). Fix candidate: a
-name-answer calibration example in the judge prompt. Judge changes move
-the gate itself, so the eval is agreement-based: v2 vs v1 on the
-33 Fable-verdicted clues (agreement must hold) + name-clue sample
-(recall should rise), then Fable audits the recalibrated gate's banks at
-the next checkpoint.
+**Name-category screen hole, measured:** name words draw screen-bad at 31%
+(5/16) vs 9% (7/81) for other words. The judge's associated-referent rule
+misfires on famous-bearer clues (LANA "Born to Die singer" — killed) while
+role-shaped name clues pass (NOAH — banked). Fix candidate: a name-answer
+calibration example in the judge prompt. Judge changes move the gate itself, so
+the eval is agreement-based: v2 vs v1 on the 33 Fable-verdicted clues (agreement
+must hold) + name-clue sample (recall should rise), then Fable audits the
+recalibrated gate's banks at the next checkpoint.
 
 ## 2026-07-02 — Judge v2 adopted: name-answer calibration example
 
-Eval (29 Fable-verdicted clues + 8 hand-verified famous-bearer name
-clues, both judge versions): v2 kills 1/8 name clues vs v1's 4/8, with
-Fable agreement unchanged (20/29 both). v2's accept-side is better (it
-recovers AMBER and GOSH, which v1 wrongly downgraded); its new lenient
-calls are all same-angle-duplicate revises — invisible to a per-clue
-judge by construction, owned by the future angle-distinct pass. Adopted:
-one calibration example (LANA "Born to Die singer") in the shared judge
-prompt — a famous bearer instantiates a name answer. Next Fable
-checkpoint should sample banked name clues to audit the recalibrated
-gate ($1.09 of $5 spent so far).
+Eval (29 Fable-verdicted clues + 8 hand-verified famous-bearer name clues, both
+judge versions): v2 kills 1/8 name clues vs v1's 4/8, with Fable agreement
+unchanged (20/29 both). v2's accept-side is better (it recovers AMBER and GOSH,
+which v1 wrongly downgraded); its new lenient calls are all same-angle-duplicate
+revises — invisible to a per-clue judge by construction, owned by the future
+angle-distinct pass. Adopted: one calibration example (LANA "Born to Die
+singer") in the shared judge prompt — a famous bearer instantiates a name
+answer. Next Fable checkpoint should sample banked name clues to audit the
+recalibrated gate ($1.09 of $5 spent so far).
 
 ## 2026-07-02 — Model directory relocated; profile owns the path
 
 User moved the shared weights: `/Users/Shared/ollama/models` →
 `/Users/Shared/models/gguf` (ollama-managed, README in place; sibling
-`models/mlx` holds the HF hub cache for the fine-tuning thread). Both
-accounts' `~/.zprofile` now export `OLLAMA_MODELS`, so the server
-command is just `~/tmp/ollama serve` — earlier entries' hardcoded
-paths are historical. Docs, plan, and memory updated; spec server
-command no longer embeds the path.
+`models/mlx` holds the HF hub cache for the fine-tuning thread). Both accounts'
+`~/.zprofile` now export `OLLAMA_MODELS`, so the server command is just
+`~/tmp/ollama serve` — earlier entries' hardcoded paths are historical. Docs,
+plan, and memory updated; spec server command no longer embeds the path.
 
 ## 2026-07-02 — Homebrew serving path validated
 
 User updated the homebrew ollama install (0.31.1); serving switched from
-`~/tmp/ollama` to `/opt/homebrew/bin/ollama serve` (path via
-`~/.zprofile`). Validated on the pipeline's own code path: gemma4:26b-qat
-returns correct schema-constrained JSON (9.6 s cold). One quirk found:
-qwen3.5:2b silently ignores `format` under this build (chatml runner
-path) — fine as a latency smoke model, useless for structured-output
-validation; use gemma for that. Spec server command updated. Batch 4
-still held pending the user's go.
+`~/tmp/ollama` to `/opt/homebrew/bin/ollama serve` (path via `~/.zprofile`).
+Validated on the pipeline's own code path: gemma4:26b-qat returns correct
+schema-constrained JSON (9.6 s cold). One quirk found: qwen3.5:2b silently
+ignores `format` under this build (chatml runner path) — fine as a latency smoke
+model, useless for structured-output validation; use gemma for that. Spec server
+command updated. Batch 4 still held pending the user's go.
 
 ## 2026-07-02 — Session close (written for relaunch)
 
-Correction to the serving-path entry: the `format`-ignoring quirk is a
-known ollama issue with MLX-backed models generally (user FYI) — GGUF
-models are fine, and every pipeline model (gemma QAT) is GGUF. Not a
-qwen-specific or build-specific problem.
+Correction to the serving-path entry: the `format`-ignoring quirk is a known
+ollama issue with MLX-backed models generally (user FYI) — GGUF models are fine,
+and every pipeline model (gemma QAT) is GGUF. Not a qwen-specific or
+build-specific problem.
 
 **State at close:** bank 75 records / 49 of 547 words; both repos clean,
-worktree rebased onto main; no detached runs or watchers active; ollama
-serving via `/opt/homebrew/bin/ollama serve` (leave up or down freely).
-Fable spend this check-in window: $1.085 — the user is checking in now,
-so the $5 cap window resets.
+worktree rebased onto main; no detached runs or watchers active; ollama serving
+via `/opt/homebrew/bin/ollama serve` (leave up or down freely). Fable spend this
+check-in window: $1.085 — the user is checking in now,
+so the $5 cap window
+resets.
 
 **Next up, in order:**
 
-1. Relaunch batch 4 on the user's go: all currently unbanked,
-   non-held-out words.in entries (regenerate the list from the bank —
-   the old word file lives in the previous session's scratchpad),
-   `--skip-banked`, detached driver + watcher pattern. It is the live
-   test of judge v2: compare name-word bank rate against the 31%
-   screen-bad regime v1 produced.
-2. Fable checkpoint on the batch-4 banks should oversample name clues to
-   audit the recalibrated gate (standing agreement: <$2 self-launch).
+1. Relaunch batch 4 on the user's go: all currently unbanked, non-held-out
+   words.in entries (regenerate the list from the bank — the old word file lives
+   in the previous session's scratchpad), `--skip-banked`, detached driver +
+   watcher pattern. It is the live test of judge v2: compare name-word bank rate
+   against the 31% screen-bad regime v1 produced.
+2. Fable checkpoint on the batch-4 banks should oversample name clues to audit
+   the recalibrated gate (standing agreement: <$2 self-launch).
 3. Angle-distinct depth criterion (mechanism/anchor tags exist in
-   scratch/mechanism_tags.jsonl) — checkpoint 3 showed same-angle dups
-   are the top quality leak in multi-clue banking.
-4. Eval-panel variant: diversify the align pair's earned-? example away
-   from pivot-only (back-door single-mechanism hint; audit measured
-   pivots at ~⅓ of bank and rising pressure from the SILT example).
+   scratch/mechanism_tags.jsonl) — checkpoint 3 showed same-angle dups are the
+   top quality leak in multi-clue banking.
+4. Eval-panel variant: diversify the align pair's earned-? example away from
+   pivot-only (back-door single-mechanism hint; audit measured pivots at ~⅓ of
+   bank and rising pressure from the SILT example).
 5. Mechanism tagger: tighten the dominant-mechanism instruction (it
    over-attributes frame-anchored clues to sense pivot).
 
-Fine-tuning probe runs in its own thread (`finetune.md`); compute
-scheduling between threads is user-arbitrated — keep batches modest and
-drain on request.
+Fine-tuning probe runs in its own thread (`finetune.md`); compute scheduling
+between threads is user-arbitrated — keep batches modest and drain on request.
 
 ## 2026-07-02 — Background-task reaper identified
 
-The session-long task killer is Claude Code issue #68625: the Desktop
-app's WarmLifecycle manager SIGTERMs the embedded CLI's process group
-after ~15 min with the session tab hidden. Explains the simultaneous
-batch kills, the irregular intervals (idle timer resets on interaction;
-this tab hides whenever the user works in another thread), and why
-`start_new_session=True` detachment survives (new process group, out of
-the group-kill's reach). Open upstream, no fix. Countermeasures: the
-detached-driver + watcher pattern (in use), or run batch-heavy sessions
-from the standalone terminal CLI.
+The session-long task killer is Claude Code issue #68625: the Desktop app's
+WarmLifecycle manager SIGTERMs the embedded CLI's process group after ~15 min
+with the session tab hidden. Explains the simultaneous batch kills, the
+irregular intervals (idle timer resets on interaction; this tab hides whenever
+the user works in another thread), and why `start_new_session=True` detachment
+survives (new process group, out of the group-kill's reach). Open upstream, no
+fix. Countermeasures: the detached-driver + watcher pattern (in use), or run
+batch-heavy sessions from the standalone terminal CLI.

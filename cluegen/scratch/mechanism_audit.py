@@ -29,9 +29,16 @@ _MODEL = 'gemma4:26b-qat'
 _MONOCULTURE_SHARE = 0.4
 
 _MECHANISMS = [
-  'sense pivot', 'frame anchor', 'count or role metonymy',
-  'definition by example', 'double definition', 'conceptual reframe',
-  'metaphor as definition', 'vignette', 'relational pivot', 'prize fact',
+  'sense pivot',
+  'frame anchor',
+  'count or role metonymy',
+  'definition by example',
+  'double definition',
+  'conceptual reframe',
+  'metaphor as definition',
+  'vignette',
+  'relational pivot',
+  'prize fact',
   'plain definition',
 ]
 
@@ -75,8 +82,7 @@ _TAG_SCHEMA = {
 
 
 def _bank_records():
-  return [json.loads(line)
-          for line in _BANK.read_text().splitlines() if line]
+  return [json.loads(line) for line in _BANK.read_text().splitlines() if line]
 
 
 def _load_tags():
@@ -98,20 +104,25 @@ def _tag_new():
       key = (record['word'], record['clue']['clue'])
       if key in tags:
         continue
-      prompt = ('Classify this clue.\n\n'
-                + json.dumps({'word': key[0], 'clue': key[1]}))
+      prompt = 'Classify this clue.\n\n' + json.dumps(
+        {'word': key[0], 'clue': key[1]}
+      )
       reply = _chat(
         _MODEL,
-        [{'role': 'system', 'content': _TAGGER_SYSTEM},
-         {'role': 'user', 'content': prompt}],
+        [
+          {'role': 'system', 'content': _TAGGER_SYSTEM},
+          {'role': 'user', 'content': prompt},
+        ],
         schema=_TAG_SCHEMA,
       )
       tag = {'word': key[0], 'clue': key[1], **json.loads(reply)}
       sidecar.write(json.dumps(tag) + '\n')
       sidecar.flush()
       new_count += 1
-      print(f'{key[0]}: "{key[1]}" -> {tag["mechanism"]} '
-            f'({tag["anchor"]})', flush=True)
+      print(
+        f'{key[0]}: "{key[1]}" -> {tag["mechanism"]} ({tag["anchor"]})',
+        flush=True,
+      )
   print(f'tagged {new_count} new records')
 
 
@@ -130,8 +141,9 @@ def _report():
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
-  parser.add_argument('--report', action='store_true',
-                      help='report only; skip tagging')
+  parser.add_argument(
+    '--report', action='store_true', help='report only; skip tagging'
+  )
   cli = parser.parse_args()
   if not cli.report:
     _tag_new()

@@ -28,9 +28,18 @@ _OLLAMA_CHAT_URL = 'http://localhost:11434/api/chat'
 # ceiling-log.md, criteria re-analysis). Everything else revised has a real
 # text flaw.
 _LABEL_ONLY = {
-  ('v1', 'IRIS'), ('v2', 'DUCK'), ('v2', 'DRAFT'), ('v2', 'TEE'),
-  ('v3', 'DUCK'), ('v3', 'IRIS'), ('v4', 'DUCK'), ('v5', 'DRAFT'),
-  ('v5', 'IRIS'), ('v5', 'TWELVE'), ('v5', 'TEE'), ('v6', 'DUCK'),
+  ('v1', 'IRIS'),
+  ('v2', 'DUCK'),
+  ('v2', 'DRAFT'),
+  ('v2', 'TEE'),
+  ('v3', 'DUCK'),
+  ('v3', 'IRIS'),
+  ('v4', 'DUCK'),
+  ('v5', 'DRAFT'),
+  ('v5', 'IRIS'),
+  ('v5', 'TWELVE'),
+  ('v5', 'TEE'),
+  ('v6', 'DUCK'),
   ('v6', 'MARK'),
 }
 
@@ -121,10 +130,8 @@ _SCHEMA = {
         'type': 'object',
         'properties': {
           'word': {'type': 'string'},
-          'verdict': {'type': 'string',
-                      'enum': ['bankable', 'fixable', 'bad']},
-          'difficulty': {'type': 'string',
-                         'enum': ['easy', 'medium', 'hard']},
+          'verdict': {'type': 'string', 'enum': ['bankable', 'fixable', 'bad']},
+          'difficulty': {'type': 'string', 'enum': ['easy', 'medium', 'hard']},
           'reason': {'type': 'string'},
         },
         'required': ['word', 'verdict', 'difficulty', 'reason'],
@@ -177,14 +184,21 @@ def _judge_per_clue(
     )
     content = _chat(
       model,
-      [{'role': 'system', 'content': system},
-       {'role': 'user', 'content': prompt}],
+      [
+        {'role': 'system', 'content': system},
+        {'role': 'user', 'content': prompt},
+      ],
       schema=_PER_CLUE_SCHEMA,
     )
     v = json.loads(content)
-    verdicts.append({'word': e['word'], 'verdict': v['verdict'],
-                     'difficulty': v['difficulty'],
-                     'reason': v['analysis']})
+    verdicts.append(
+      {
+        'word': e['word'],
+        'verdict': v['verdict'],
+        'difficulty': v['difficulty'],
+        'reason': v['analysis'],
+      }
+    )
   return verdicts
 
 
@@ -192,15 +206,13 @@ def _judge_group(
   model: str, entries: list[dict], use_scratchpad: bool, use_few_shot: bool
 ) -> list[dict]:
   clue_lines = '\n'.join(
-    json.dumps({'word': e['word'], 'clue': e['clue']['clue']})
-    for e in entries
+    json.dumps({'word': e['word'], 'clue': e['clue']['clue']}) for e in entries
   )
   system = _SYSTEM + (_FEW_SHOT if use_few_shot else '')
   messages: list[dict] = [{'role': 'system', 'content': system}]
   if use_scratchpad:
     messages.append(
-      {'role': 'user',
-       'content': _SCRATCHPAD_TEMPLATE.format(clues=clue_lines)}
+      {'role': 'user', 'content': _SCRATCHPAD_TEMPLATE.format(clues=clue_lines)}
     )
     analysis = _chat(model, messages, schema=None)
     messages.append({'role': 'assistant', 'content': analysis})
@@ -216,31 +228,40 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument('--model', default='gemma4:26b-qat')
   parser.add_argument('--scratchpad', action='store_true')
-  parser.add_argument('--per-clue', action='store_true',
-                      help='one clue per call, analysis-first schema')
+  parser.add_argument(
+    '--per-clue',
+    action='store_true',
+    help='one clue per call, analysis-first schema',
+  )
   parser.add_argument('--fewshot', action='store_true')
-  parser.add_argument('--quiet', action='store_true',
-                      help='print mismatches and totals only')
-  parser.add_argument('--only-banked-from', default=None,
-                      help='cascade test: judge only the clues a prior '
-                      'calibration run banked (path to its rows jsonl)')
+  parser.add_argument(
+    '--quiet', action='store_true', help='print mismatches and totals only'
+  )
+  parser.add_argument(
+    '--only-banked-from',
+    default=None,
+    help='cascade test: judge only the clues a prior '
+    'calibration run banked (path to its rows jsonl)',
+  )
   cli = parser.parse_args()
 
   banked_filter: set[tuple[str, str]] | None = None
   if cli.only_banked_from:
     banked_filter = {
       (r['version'], r['word'])
-      for r in map(json.loads,
-                   pathlib.Path(cli.only_banked_from).read_text()
-                   .splitlines())
+      for r in map(
+        json.loads, pathlib.Path(cli.only_banked_from).read_text().splitlines()
+      )
       if r['local'] == 'bankable'
     }
 
   groups: dict[str, list[dict]] = {}
   for line in _DATA.read_text().splitlines():
     entry = json.loads(line)
-    if (banked_filter is not None
-        and (entry['version'], entry['word']) not in banked_filter):
+    if (
+      banked_filter is not None
+      and (entry['version'], entry['word']) not in banked_filter
+    ):
       continue
     groups.setdefault(entry['version'], []).append(entry)
 
@@ -266,9 +287,7 @@ if __name__ == '__main__':
     if cli.per_clue:
       verdicts = _judge_per_clue(cli.model, entries, cli.fewshot)
     else:
-      verdicts = _judge_group(
-        cli.model, entries, cli.scratchpad, cli.fewshot
-      )
+      verdicts = _judge_group(cli.model, entries, cli.scratchpad, cli.fewshot)
     by_word = {v['word']: v for v in verdicts}
     # Two ZERO controls share a word; match those by order instead.
     if version == 'control':
@@ -283,16 +302,16 @@ if __name__ == '__main__':
       else:
         fable_verdict = fable.get((version, e['word']), 'accept')
       is_good_raw = fable_verdict == 'accept'
-      is_good_adjusted = (
-        is_good_raw or (version, e['word']) in _LABEL_ONLY
-      )
+      is_good_adjusted = is_good_raw or (version, e['word']) in _LABEL_ONLY
       local_good = local['verdict'] == 'bankable'
       total += 1
       agree_raw += local_good == is_good_raw
       agree_adjusted += local_good == is_good_adjusted
       row = {
-        'version': version, 'word': e['word'],
-        'clue': e['clue']['clue'], 'local': local['verdict'],
+        'version': version,
+        'word': e['word'],
+        'clue': e['clue']['clue'],
+        'local': local['verdict'],
         'local_difficulty': local['difficulty'],
         'fable': fable_verdict,
         'quality_adjusted_good': is_good_adjusted,
@@ -303,9 +322,11 @@ if __name__ == '__main__':
       marker = '=' if local_good == is_good_adjusted else '!'
       if cli.quiet and marker == '=':
         continue
-      print(f'{marker} {version:7s} {e["word"]:7s} '
-            f'local={local["verdict"]:8s}({local["difficulty"]:6s}) '
-            f'fable={fable_verdict:7s} adjusted_good={is_good_adjusted}')
+      print(
+        f'{marker} {version:7s} {e["word"]:7s} '
+        f'local={local["verdict"]:8s}({local["difficulty"]:6s}) '
+        f'fable={fable_verdict:7s} adjusted_good={is_good_adjusted}'
+      )
 
   rows = [json.loads(l) for l in out_path.read_text().splitlines()]
   banked = [r for r in rows if r['local'] == 'bankable']
@@ -315,6 +336,8 @@ if __name__ == '__main__':
   recall = true_positive / good_total if good_total else 0.0
   print(f'\nagreement vs raw accepts:      {agree_raw}/{total}')
   print(f'agreement vs quality-adjusted: {agree_adjusted}/{total}')
-  print(f'bankable precision={precision:.2f} recall={recall:.2f} '
-        f'(banked {len(banked)}, good {good_total})')
+  print(
+    f'bankable precision={precision:.2f} recall={recall:.2f} '
+    f'(banked {len(banked)}, good {good_total})'
+  )
   print(f'rows: {out_path}')

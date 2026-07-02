@@ -71,7 +71,8 @@ Evidence from the 2026-07-02 eval round (details: `ceiling-log.md`):
 
 - Model downloads are user-approved, per pull, per the campaign's standing rule
   (`ceiling.md`, Autonomy rules); fine-tuning runs are local-only.
-- Fable spot-checks fall under the standing agreement: self-launch under ~$2
+- Fable spot-checks fall under the standing agreement: self-launch under
+  ~$2
   estimated, $5 total between user check-ins.
 - Thermal reality: training and big eval runs are overnight jobs, detached,
   under `caffeinate`.

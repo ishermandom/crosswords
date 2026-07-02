@@ -143,8 +143,9 @@ _CLUE_SCHEMA = {
 # '{"clues": []}' is an escape hatch the model takes often.
 _CLUES_SCHEMA = {
   'type': 'object',
-  'properties': {'clues': {'type': 'array', 'items': _CLUE_SCHEMA,
-                           'minItems': 1}},
+  'properties': {
+    'clues': {'type': 'array', 'items': _CLUE_SCHEMA, 'minItems': 1}
+  },
   'required': ['clues'],
 }
 
@@ -225,10 +226,15 @@ _JUDGE_SCHEMA = {
 
 def _chat(model, messages, schema=None, think=False):
   body = {
-    'model': model, 'messages': messages, 'stream': False, 'think': think,
+    'model': model,
+    'messages': messages,
+    'stream': False,
+    'think': think,
     'keep_alive': '30m',
-    'options': {'num_ctx': 16384,
-                'temperature': 1.0 if schema is None else 0.2},
+    'options': {
+      'num_ctx': 16384,
+      'temperature': 1.0 if schema is None else 0.2,
+    },
   }
   if schema is not None:
     body['format'] = schema
@@ -241,10 +247,15 @@ def _run_setter(model, word, difficulty, tee):
   """Drive the setter conversation; returns the extracted KEEP clues."""
   substitutions = {'word': word, 'difficulty': difficulty}
   messages = [{'role': 'system', 'content': _SETTER_SYSTEM}]
-  for template, schema in [(_TURN_ANGLES, None), (_TURN_DRAFTS, None),
-                           (_TURN_EDIT, None), (_TURN_EXTRACT, _CLUES_SCHEMA)]:
-    messages.append({'role': 'user',
-                     'content': template.format(**substitutions)})
+  for template, schema in [
+    (_TURN_ANGLES, None),
+    (_TURN_DRAFTS, None),
+    (_TURN_EDIT, None),
+    (_TURN_EXTRACT, _CLUES_SCHEMA),
+  ]:
+    messages.append(
+      {'role': 'user', 'content': template.format(**substitutions)}
+    )
     reply = _chat(model, messages, schema=schema)
     messages.append({'role': 'assistant', 'content': reply})
     tee(f'--- setter {template.splitlines()[0][:30]}...\n{reply}\n')
@@ -259,13 +270,17 @@ def _judge(model, word, clue_text, tee, label):
   )
   content = _chat(
     model,
-    [{'role': 'system', 'content': _JUDGE_SYSTEM},
-     {'role': 'user', 'content': prompt}],
+    [
+      {'role': 'system', 'content': _JUDGE_SYSTEM},
+      {'role': 'user', 'content': prompt},
+    ],
     schema=_JUDGE_SCHEMA,
   )
   verdict = json.loads(content)
-  tee(f'--- judge[{label}] {verdict["verdict"]} ({verdict["difficulty"]}): '
-      f'{verdict["analysis"][:160]}\n')
+  tee(
+    f'--- judge[{label}] {verdict["verdict"]} ({verdict["difficulty"]}): '
+    f'{verdict["analysis"][:160]}\n'
+  )
   return verdict
 
 
@@ -280,12 +295,15 @@ def _bank(word, clue, judge_difficulty, provenance):
     return False
   record = {
     'word': word,
-    'clue': {'style': 'american', 'difficulty': judge_difficulty,
-             'clue': clue['clue'], 'trap': clue['trap'],
-             'confidence': clue['confidence']},
+    'clue': {
+      'style': 'american',
+      'difficulty': judge_difficulty,
+      'clue': clue['clue'],
+      'trap': clue['trap'],
+      'confidence': clue['confidence'],
+    },
     'provenance': provenance,
-    'ts': datetime.datetime.now(datetime.timezone.utc)
-          .isoformat(timespec='seconds'),
+    'ts': datetime.datetime.now(datetime.UTC).isoformat(timespec='seconds'),
   }
   with _BANK.open('a') as f:
     f.write(json.dumps(record) + '\n')
@@ -323,14 +341,14 @@ def _phase_generate_and_screen(words, cli, tee):
         if tidied:
           clue = tidied
           tee(f'--- tidy: stripped ? -> {clue["clue"]}\n')
-          screen = _judge(cli.judge_model, word, clue['clue'], tee,
-                          'screen tidy')
+          screen = _judge(
+            cli.judge_model, word, clue['clue'], tee, 'screen tidy'
+          )
       if screen['verdict'] == 'bankable':
         candidates.append((word, clue))
       elif screen['verdict'] == 'fixable':
         fixables.append((word, clue, screen['analysis']))
-      print(f'{word}: screen {screen["verdict"]} "{clue["clue"]}"',
-            flush=True)
+      print(f'{word}: screen {screen["verdict"]} "{clue["clue"]}"', flush=True)
   return candidates, fixables
 
 
@@ -347,17 +365,27 @@ def _phase_confirm(candidates, cli, tee, provenance_extra):
     if confirm['verdict'] != 'bankable':
       if confirm['verdict'] == 'fixable':
         fixables.append((word, clue, confirm['analysis']))
-      print(f'{word}: confirm {confirm["verdict"]} "{clue["clue"]}"',
-            flush=True)
+      print(
+        f'{word}: confirm {confirm["verdict"]} "{clue["clue"]}"', flush=True
+      )
       continue
-    banked = _bank(word, clue, confirm['difficulty'], {
-      'generator': cli.setter_model, 'prompt_version': 'v9',
-      'judge': f'{cli.judge_model} + {cli.confirm_model}',
-      'verdict': 'local-screen+confirm', **provenance_extra,
-    })
+    banked = _bank(
+      word,
+      clue,
+      confirm['difficulty'],
+      {
+        'generator': cli.setter_model,
+        'prompt_version': 'v9',
+        'judge': f'{cli.judge_model} + {cli.confirm_model}',
+        'verdict': 'local-screen+confirm',
+        **provenance_extra,
+      },
+    )
     banked_count += banked
-    print(f'{word}: {"BANKED" if banked else "duplicate"} '
-          f'"{clue["clue"]}"', flush=True)
+    print(
+      f'{word}: {"BANKED" if banked else "duplicate"} "{clue["clue"]}"',
+      flush=True,
+    )
   return banked_count, fixables
 
 
@@ -377,8 +405,10 @@ def _phase_repair(fixables, cli, tee):
     )
     reply = _chat(
       cli.confirm_model,
-      [{'role': 'system', 'content': _FIXER_SYSTEM},
-       {'role': 'user', 'content': prompt}],
+      [
+        {'role': 'system', 'content': _FIXER_SYSTEM},
+        {'role': 'user', 'content': prompt},
+      ],
       schema=_CLUE_SCHEMA,
     )
     repaired = json.loads(reply)
@@ -394,33 +424,46 @@ if __name__ == '__main__':
   parser.add_argument('--word', default=None)
   parser.add_argument('--words', default=None, help='file, one word/line')
   parser.add_argument('--limit', type=int, default=None)
-  parser.add_argument('--difficulty', default='medium',
-                      choices=['easy', 'medium', 'hard'])
+  parser.add_argument(
+    '--difficulty', default='medium', choices=['easy', 'medium', 'hard']
+  )
   parser.add_argument('--setter-model', default='gemma4:26b-qat')
   parser.add_argument('--judge-model', default='gemma4:26b-qat')
-  parser.add_argument('--confirm-model', default='gemma4:31b-qat',
-                      help='dense confirm + fixer model')
-  parser.add_argument('--skip-banked', action='store_true',
-                      help='skip words that already have any bank record')
+  parser.add_argument(
+    '--confirm-model',
+    default='gemma4:31b-qat',
+    help='dense confirm + fixer model',
+  )
+  parser.add_argument(
+    '--skip-banked',
+    action='store_true',
+    help='skip words that already have any bank record',
+  )
   cli = parser.parse_args()
 
   if cli.word:
     words = [cli.word.upper()]
   else:
-    words = [w.strip().upper()
-             for w in pathlib.Path(cli.words).read_text().splitlines()
-             if w.strip() and not w.startswith('#')]
+    words = [
+      w.strip().upper()
+      for w in pathlib.Path(cli.words).read_text().splitlines()
+      if w.strip() and not w.startswith('#')
+    ]
   if cli.limit:
-    words = words[:cli.limit]
+    words = words[: cli.limit]
   if cli.skip_banked and _BANK.exists():
-    banked_words = {json.loads(line)['word']
-                    for line in _BANK.read_text().splitlines() if line}
+    banked_words = {
+      json.loads(line)['word']
+      for line in _BANK.read_text().splitlines()
+      if line
+    }
     words = [w for w in words if w not in banked_words]
 
   _LOG_DIR.mkdir(exist_ok=True)
   stamp = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
   log_path = _LOG_DIR / f'pipeline_{stamp}.log'
   with log_path.open('w') as log_file:
+
     def tee(text):
       log_file.write(text)
       log_file.flush()
@@ -428,20 +471,29 @@ if __name__ == '__main__':
     # Model-batched phases: 26B, then 31B, then 26B, then 31B — three switches
     # per run regardless of word count.
     candidates, fixables = _phase_generate_and_screen(words, cli, tee)
-    print(f'phase A: {len(candidates)} candidates, '
-          f'{len(fixables)} fixables from {len(words)} words', flush=True)
+    print(
+      f'phase A: {len(candidates)} candidates, '
+      f'{len(fixables)} fixables from {len(words)} words',
+      flush=True,
+    )
     banked, confirm_fixables = _phase_confirm(candidates, cli, tee, {})
     repairs = _phase_repair(fixables + confirm_fixables, cli, tee)
     rescreened = [
-      (word, clue) for word, clue in repairs
-      if _judge(cli.judge_model, word, clue['clue'], tee,
-                'screen repair')['verdict'] == 'bankable'
+      (word, clue)
+      for word, clue in repairs
+      if _judge(cli.judge_model, word, clue['clue'], tee, 'screen repair')[
+        'verdict'
+      ]
+      == 'bankable'
     ]
-    print(f'fixer: {len(repairs)} repairs, '
-          f'{len(rescreened)} screen-bankable', flush=True)
+    print(
+      f'fixer: {len(repairs)} repairs, {len(rescreened)} screen-bankable',
+      flush=True,
+    )
     # Repairs get one confirm shot; their fixables don't loop back.
-    repair_banked, _ = _phase_confirm(rescreened, cli, tee,
-                                      {'fix': 'fixer repair (31B)'})
+    repair_banked, _ = _phase_confirm(
+      rescreened, cli, tee, {'fix': 'fixer repair (31B)'}
+    )
     banked += repair_banked
     print(f'banked {banked} clues from {len(words)} words', flush=True)
   print(f'log: {log_path}', file=sys.stderr)

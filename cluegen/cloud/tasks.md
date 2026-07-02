@@ -119,11 +119,12 @@ experiment concludes, so the original 20-word slices were cut down).
       letter math; the old checker rejected exactly this shape.
   - Note: the revise was NINETEEN's double definition (both halves reference the
     same sense) — a legitimate editorial catch.
-  - Note: usage — generate read=4014/write=6050, output 38,183 ($2.035); verify
-    read=4014/write=11,105, output 12,023 ($0.832); total $2.868. The generate
-    call cache-read the spec prefix despite no prewarm and hours since the last
-    spec-touching call — the cache outlived its nominal 5-minute TTL, so this is
-    not a clean cold data point.
+  - Note: usage — generate read=4014/write=6050, output 38,183
+    ($2.035); verify
+    read=4014/write=11,105, output 12,023 ($0.832); total
+    $2.868. The generate call cache-read the spec prefix despite no prewarm and
+    hours since the last spec-touching call — the cache outlived its nominal
+    5-minute TTL, so this is not a clean cold data point.
   - Note: quota ended at 91%; start estimated ~60% (session opened at 52%, then
     a file-edit turn before the run), so ~31% ≈ 3.9%/word. Token model (quota% ≈
     0.65 × output Ktok + 0.1 × prompt Ktok) predicted ~35% — directionally
@@ -174,9 +175,10 @@ reads the way dollar billing does (~0.1×). Measure before building.
     instructive case for caching questions — and the cheapest (~4.5% quota vs
     ~41% for the 12-word slice).
   - Note: batch 5, one retry word, 4/4 clues accepted. Usage — generate:
-    input=2069 output=4782 cache_read=15818 cache_write=13776 ($0.452); verify:
-    input=2069 output=2351 cache_read=15818 cache_write=14991 ($0.346); run
-    total $0.798.
+    input=2069 output=4782 cache_read=15818 cache_write=13776
+    ($0.452); verify:
+    input=2069 output=2351 cache_read=15818 cache_write=14991 ($0.346);
+    run total $0.798.
   - Note: quota 60% → 71%, so ~11% including Claude's report turn — high vs the
     ~3.4%/word at batch 8, confirming batching remains the dominant quota lever
     (fixed per-call cost).
@@ -241,10 +243,12 @@ reads the way dollar billing does (~0.1×). Measure before building.
     tracks prompt token volume more than dollar cost — answering Phase 3b's open
     question about quota discounting.
   - Note: second measured run (2026-06-10, batch 7, one retry word) — both calls
-    warm: generate read=4014/write=5469 ($0.516), verify read=4014/write=6682
-    ($0.316), total $0.831; 4/4 mech pass, 3 accept / 1 revise; quota 35% → 43%.
-    The warm prefix trims generate's write by ~4K tokens (~$0.05–0.07/call), but
-    output variance dominates: 11,546 total output tokens vs the first run's
+    warm: generate read=4014/write=5469
+    ($0.516), verify read=4014/write=6682
+    ($0.316), total
+    $0.831; 4/4 mech pass, 3 accept / 1 revise; quota 35% → 43%.
+    The warm prefix trims generate's write by ~4K tokens (~$0.05–0.07/call),
+    but output variance dominates: 11,546 total output tokens vs the first run's
     8,149 swung cost up $0.10 despite the cache gain. Input side is now as tuned
     as it gets; output noise is the remaining cost driver at 1-word scale.
 - [x] Haiku caching validation (quota at 96%, too high for a Fable run): two

@@ -301,10 +301,12 @@ dominate wall-clock — favor prefix-cache structuring over chasing decode tok/s
 ### 4.3 Fine-tuning recommendation
 
 - **31B fine-tuning cannot run on the Air.** Required path: **cloud-train →
-  local-infer.** A single **A100 80GB** (~$1–2/hr on-demand on budget clouds;
+  local-infer.** A single **A100 80GB**
+  (~$1–2/hr on-demand on budget clouds;
   spot lower) runs 31B QLoRA comfortably; a typical run is **~30 min–2 hr ≈
-  $2–10**; a full dev cycle of 10–20 runs ≈ $20–100. You carry back only a
-  **few-MB LoRA adapter**, so the deployed generator stays 100% local.
+  $2–10**;
+  a full dev cycle of 10–20 runs ≈ $20–100. You carry back only a **few-MB LoRA
+  adapter**, so the deployed generator stays 100% local.
 - **Alternative — borrowed 64 GB M1:** clears the memory bar (and if it's a
   MacBook Pro/Studio, the fanless thermal problem disappears), but an M1 is
   ~5–10× slower than an A100 → a 31B LoRA run is **several hours to overnight**.

@@ -29,6 +29,7 @@ _NAME_EXAMPLE = """
 
 _JUDGE_V2_SYSTEM = pl._JUDGE_SYSTEM + _NAME_EXAMPLE
 
+
 # Fable-verdicted clues: (word, clue, fable_verdict) from checkpoints 2-3, read
 # out of the bank's provenance annotations.
 def _fable_ground_truth():
@@ -67,8 +68,10 @@ def _run_judge(system, model, word, clue, tee):
   )
   content = pl._chat(
     model,
-    [{'role': 'system', 'content': system},
-     {'role': 'user', 'content': prompt}],
+    [
+      {'role': 'system', 'content': system},
+      {'role': 'user', 'content': prompt},
+    ],
     schema=pl._JUDGE_SCHEMA,
   )
   return json.loads(content)['verdict']
@@ -81,6 +84,7 @@ def main():
 
   log_path = pl._LOG_DIR / 'judge_eval.log'
   with log_path.open('w') as log_file:
+
     def tee(text):
       log_file.write(text)
 
@@ -88,28 +92,27 @@ def main():
     print(f'part A: agreement on {len(truth)} Fable-verdicted clues')
     # Fable accepts should stay local-bankable; Fable revises/rejects should
     # stay local-non-bankable. Score each judge the same way.
-    for label, system in [('v1', pl._JUDGE_SYSTEM),
-                          ('v2', _JUDGE_V2_SYSTEM)]:
+    for label, system in [('v1', pl._JUDGE_SYSTEM), ('v2', _JUDGE_V2_SYSTEM)]:
       agree = 0
       for word, clue, fable in truth:
         local = _run_judge(system, cli.model, word, clue, tee)
-        is_match = ((fable == 'accept') == (local == 'bankable'))
+        is_match = (fable == 'accept') == (local == 'bankable')
         agree += is_match
         if not is_match:
-          print(f'  {label} disagree: {word} fable={fable} '
-                f'local={local} "{clue}"', flush=True)
+          print(
+            f'  {label} disagree: {word} fable={fable} local={local} "{clue}"',
+            flush=True,
+          )
       print(f'  {label}: {agree}/{len(truth)} agree', flush=True)
 
     print(f'part B: recall on {len(_NAME_SAMPLE)} legit name clues')
-    for label, system in [('v1', pl._JUDGE_SYSTEM),
-                          ('v2', _JUDGE_V2_SYSTEM)]:
+    for label, system in [('v1', pl._JUDGE_SYSTEM), ('v2', _JUDGE_V2_SYSTEM)]:
       kills = 0
       for word, clue in _NAME_SAMPLE:
         verdict = _run_judge(system, cli.model, word, clue, tee)
         kills += verdict == 'bad'
         print(f'  {label} {word}: {verdict} "{clue}"', flush=True)
-      print(f'  {label}: {kills}/{len(_NAME_SAMPLE)} killed as bad',
-            flush=True)
+      print(f'  {label}: {kills}/{len(_NAME_SAMPLE)} killed as bad', flush=True)
 
 
 if __name__ == '__main__':
