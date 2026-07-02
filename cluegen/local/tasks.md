@@ -58,12 +58,12 @@ done — see the log for the curve and the criteria re-analysis.
 - [ ] **Angle-distinct depth pass** — when banking multiple clues per word,
       require distinct angles (checkpoint 2: Fable flagged a same-angle DAISY
       paraphrase). Later pass by user direction; don't over-invest early.
-- [ ] **Satisfaction-mechanism taxonomy** — capture what makes a clue satisfying
-      more fundamentally than any one trick. The cloud bank's accepts are ONE
-      input for deriving it — a biased sample, echo-chamber risk if treated as
-      the be-all-end-all evaluation (user note 2026-07-02). Timing at Claude's
-      discretion (sooner is fine); meanwhile, no single-mechanism hints in
-      prompts.
+- [x] **Satisfaction-mechanism taxonomy** — written as
+      `cluegen/local/satisfaction.md` (local-ceiling branch, 2026-07-02): five
+      bases of satisfaction (aha is not mandatory — user note), ten mechanisms,
+      failure modes, pipeline uses. Standing rule preserved there: no
+      single-mechanism hints in prompts; banks are biased inputs, never the
+      standard.
 
 ---
 
