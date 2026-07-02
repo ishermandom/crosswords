@@ -77,11 +77,16 @@ Return EVERY clue you marked KEEP, ordered strongest first, as JSON:
 "clues", a list where each item has "clue" (exact print text),
 "difficulty" (your honest calibration of that clue), "trap" (one sentence
 naming the specific wrong answer or wrong reading the surface invites;
-null if the clue is straight), and "confidence" (honest)."""
+null if the clue is straight), and "confidence" (honest). If every draft
+was cut, return the single strongest draft anyway with "confidence":
+"low" — never an empty list."""
 
+# minItems guards the constrained decode: without it, the trivially valid
+# '{"clues": []}' is an escape hatch the model takes often.
 _EVERY_KEEP_SCHEMA = {
   'type': 'object',
-  'properties': {'clues': {'type': 'array', 'items': pl._CLUE_SCHEMA}},
+  'properties': {'clues': {'type': 'array', 'items': pl._CLUE_SCHEMA,
+                           'minItems': 1}},
   'required': ['clues'],
 }
 
