@@ -22,9 +22,11 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` done · `[-]` droppe
 Installed system-wide via Homebrew (`brew install ollama` run as `ishermandom`).
 Binary lands at `/opt/homebrew/bin/ollama`.
 
-Model weights are shared between accounts at `/Users/Shared/ollama/models`, set
-via `OLLAMA_MODELS=/Users/Shared/ollama/models` in each account's shell config.
-This avoids duplicating the ~16 GB model download.
+Model weights are shared between accounts at `/Users/Shared/models/gguf`
+(managed via Ollama — see the README in that directory), set via `OLLAMA_MODELS`
+in each account's `~/.zprofile`. The profile is the single source of truth for
+the path; commands and docs should not hardcode it. This avoids duplicating the
+~16 GB model download.
 
 **The Ollama server must always be started manually** (`ollama serve`). Never
 use `brew services start ollama` or any other autolaunch mechanism — the server
@@ -38,10 +40,10 @@ brew install ollama
 
 # Create shared model directory; leave world-readable (no ACLs needed —
 # /Users/Shared/ is a shared space and these are the only two accounts)
-mkdir -p /Users/Shared/ollama/models
+mkdir -p /Users/Shared/models/gguf
 
-# In ishermandom's ~/.zprofile (claude-sandbox connects via HTTP, not CLI):
-export OLLAMA_MODELS=/Users/Shared/ollama/models
+# In each account's ~/.zprofile (claude-sandbox connects via HTTP, not CLI):
+export OLLAMA_MODELS=/Users/Shared/models/gguf
 
 # In claude-sandbox's ~/.zprofile (not set up automatically for non-Homebrew
 # users; needed to reach the ollama binary):
@@ -60,9 +62,9 @@ ollama pull gemma4:31b && ollama pull gemma4:26b
 from Python.
 
 - [x] `ishermandom`: `brew install ollama`
-- [x] Create `/Users/Shared/ollama/models`; world-readable, no ACLs needed
-- [x] `ishermandom`: add `OLLAMA_MODELS=/Users/Shared/ollama/models` to
-      `~/.zprofile`
+- [x] Create the shared model directory; world-readable, no ACLs needed
+      (relocated to `/Users/Shared/models/gguf` 2026-07-02)
+- [x] `ishermandom`: add `OLLAMA_MODELS` to `~/.zprofile`
 - [x] `claude-sandbox`: `/opt/homebrew/bin` already in PATH
 - [x] Start Ollama server manually (`ollama serve`) and pull both candidate
       models (`gemma4:31b` and `gemma4:26b`) sequentially (~38 GB total)

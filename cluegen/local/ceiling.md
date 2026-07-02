@@ -151,10 +151,10 @@ marginal cost is low.
   starting one.
 
 **Server management:** Claude runs the Ollama server itself as needed —
-`OLLAMA_MODELS=/Users/Shared/ollama/models ~/tmp/ollama serve` from the
-`claude-sandbox` account (user authorization 2026-07-01) — and may bring it up
-and down freely. Pulling models through it remains forbidden, per the ask-first
-rule above.
+`~/tmp/ollama serve` (the model path comes from `OLLAMA_MODELS` in the account's
+`~/.zprofile` — no override needed) from the `claude-sandbox` account (user
+authorization 2026-07-01) — and may bring it up and down freely. Pulling models
+through it remains forbidden, per the ask-first rule above.
 
 ## Model tier
 
