@@ -867,3 +867,32 @@ tasks killed simultaneously, twice, mid-progress — not sleep, not
 thermal; power log clean). Long runs now launch detached via Python
 `start_new_session` (macOS has no setsid; nohup can't detach here), with
 a disposable harness watcher whose kill/completion both wake the session.
+
+## 2026-07-02 — Combo run and corrections; v9 adoption decision
+
+`align-keep` (align-quest edit turn + every-keep extract): 13/36
+screen-pass (36%), 3/13 confirmed, 3 banked. It did not reproduce
+align-quest's 58% — the two runs differ only in the extract turn and the
+edit turn's re-roll, so edit-turn sampling variance is large and single
+36-run comparisons overstate. Corrections to the round's reading:
+
+- **Pooled align-edit-turn evidence** (72 word-runs): screen-pass 47% vs
+  baseline 36% (+11pp, at the noise edge); tier-2 confirm 26% vs 17%;
+  end-to-end ~12.5% vs 5.6% — call it ~2×, not 3×. Two independent
+  tier-2-positive replications (6 and 3 confirmed vs baseline's 2).
+- **every-keep attribution**: only 2/36 runs extracted more than one
+  clue; 17 of its 19 tier-1 bankables were clue #1. The earlier lift was
+  extract-turn re-roll variance, not the multi-KEEP mechanism — which
+  added just 2 clues. Kept anyway: harmless, tiny depth positive.
+
+**Adopting as pipeline v9** (best-supported package, reversible, true
+gate remains a Fable checkpoint): align-quest edit turn; every-keep
+multi-extract; screen each clue; the 31B fixer replaces the setter
+retry (45% measured conversion vs the retry path's unmeasured, pricier
+loop); mechanical ?-tidy stays. Restructured into model-batched phases
+per the switch-cost note: (A) all setter+screen work on 26B, (B) all
+confirms + fixer repairs on 31B, (C) repair re-screens on 26B, (D) their
+confirms on 31B — 3 switches per run regardless of word count.
+
+Bank at 42 (+10 this session: 6 align-quest, 1 every-keep, 3
+align-keep).
