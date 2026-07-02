@@ -111,9 +111,8 @@ thread; the spec is self-contained.
     `cluegen/pyproject.toml` (`mlx-lm`, `mlx-optiq`), installed in the sandbox
     venv at 0.31.3 / 0.2.10; imports and both CLIs verified.
   - Done 2026-07-02: 500/50 train/valid slice built by
-    `scratch/finetune/build_slice.py` (data/ gitignored — third-party corpus);
-    one clue per answer, answer-split, panel + held-out answers excluded and
-    verified absent.
+    `scratch/finetune/build_slice.py` (data/ gitignored); one clue per answer,
+    answer-split, panel + held-out answers excluded and verified absent.
   - Done 2026-07-02: chat-template formatting verified via the checkpoint's own
     template — Gemma 4's turn tags are `<|turn>` / `<turn|>` (not Gemma 1–3's
     `<start_of_turn>`); exactly one BOS, no doubling under default tokenization.
