@@ -164,6 +164,13 @@ long-conversation speed cliff observed on the 31B MLX variant (`tasks.md` —
 Findings) may or may not apply to the QAT quant; keep conversations short until
 measured.
 
+Switching between the gemma4 models is expensive on this machine: wired memory
+is drained and rewired, likely with swap along the way — only one of the big
+models is resident at a time. Where it's cheap to arrange, order a workload so
+same-model calls run in contiguous blocks (all 26B work, then all 31B work)
+rather than interleaving per item. Don't build heavy harness machinery for this;
+batching is worth it only when it falls out of the workload's structure.
+
 ## Git isolation
 
 The campaign runs in a dedicated git worktree on its own branch, leaving the
