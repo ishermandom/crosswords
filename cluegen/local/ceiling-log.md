@@ -384,3 +384,21 @@ recall).
 ("when in doubt, fixable, never bankable") — precision-first
 configuration; attribution ablation deferred until something clears the
 bar.
+
+---
+
+## 2026-07-01 — J3 clears the precision bar
+
+**J3 (31B, batched, scratchpad + few-shot + when-in-doubt-fixable):**
+bankable precision 0.90 (9 of 10 banked clues genuinely good), recall
+0.35. The asymmetric-cost rule traded recall for precision exactly as
+designed. Binary agreement fell to 22/40 — irrelevant; precision is the
+operational metric. This is already a usable conservative filter: with
+best-of-N generation, low recall costs compute (which is free locally),
+not bank quality. Cost: ~40 s/clue on the dense model.
+
+**J4 (running):** per-clue calls on the 26B — one clue per call, schema
+puts an `analysis` field before `verdict` so the reasoning precedes the
+commitment. Tests the user's batching prior head-to-head against J2
+(identical prompt content, batching the only variable), and whether
+J3-grade precision is reachable at ~10 s/clue on the cheap model.
