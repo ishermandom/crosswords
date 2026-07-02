@@ -709,3 +709,22 @@ effects (±13pp at p≈0.25); iterate on levers expected to clear that.
 
 **Queued:** user wants a detailed personal read of prompts + logs before
 strong tweak opinions — schedule a walkthrough when they're ready.
+
+## Correction: reference-space is one mechanism, not the law (2026-07-02)
+
+User pushback, accepted: a bank leaning on one trick reads tropey even when
+each clue is individually good. The cloud bank itself shows multiple
+satisfaction mechanisms — conceptual reframing (ZERO "It separates the
+positives from the negatives"), sense-pivot arithmetic (DOZEN "One-twelfth
+gross?" — arithmetic is fine WITH a pivot; don't ban it), double definition,
+part-of-speech traps, reference-anchoring, etymology. Implications for any
+prompt tuning: no single-mechanism hints in the setter, and watch the judge's
+few-shots too (currently metonymy-leaning) — monoculture can enter through
+either door.
+
+**Backlog (user direction):** dig into what makes a clue satisfying and
+capture it more fundamentally than one dimension. Concrete first step when
+picked up: derive a mechanism taxonomy empirically from the cloud bank's
+accepted clues and measure the distribution — that corpus is
+validated-satisfying and free to study; a mechanism-mix target could later
+serve both the setter (diversity pressure) and the angle-distinct depth pass.
