@@ -18,13 +18,6 @@ preferred quantization.
       once the QAT variants (`gemma4:26b-qat`) are confirmed stable. MLX models
       are the fallback if a QAT issue comes up.
 
-- [ ] **Relocate or delete the session-scratchpad xd corpus copy** — a research
-      download from 2026-07-02 (~335 MB: `xd-clues.zip` plus the unpacked
-      `clues.tsv`) sits in the fine-tuning session's scratchpad under
-      `/private/tmp/claude-505/`. If the data design round adopts xd, move it to
-      a durable shared home (e.g. `/Users/Shared/data/xd/`); otherwise delete it
-      so the storage isn't swallowed forever.
-
 - [ ] **Retire the old Ollama store path** — the store moved to
       `/Users/Shared/models/gguf` (2026-07-02, shared-storage layout).
       `ceiling.md`'s cutover is done (main + local-ceiling worktree, verified
