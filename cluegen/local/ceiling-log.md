@@ -953,3 +953,32 @@ banks in two provenance groups (eval-round vs v9). ~21 clues across two
 verify calls; checkpoint 2 ran 12 clues for $0.778, so estimate ~$1.30,
 cap $2. Decides whether the align edit turn's ~2x is craft or
 criteria-echo, and whether fixer saves hold up.
+
+## 2026-07-02 — Checkpoint 3 ($1.085): v9 validated; depth leak named
+
+Self-launched under the new standing agreement (est. ~$1.30 < $2; actual
+$1.085; $1.09 of the $5 cap used since the user's check-in). 21 new
+banks in two provenance groups:
+
+- **v9 group: 8A/3RV/0RJ.** The fixer-heavy pipeline holds at the
+  reference judge — zero rejects; revises are a non-functioning trap
+  claim (TABLE), a POS mismatch (FELIX — Fable gifted the fix: "Apt
+  name for fortune's favorite?"), and padding + missing Britishism
+  signal (SISTER).
+- **eval-round group: 4A/6RV/0RJ**, but four of six revises are
+  same-angle duplicates (GRANT admit/concede, STOCK culinary ×2, ROBIN
+  Batman-sidekick) — bank-shape complaints, not craft failures. The
+  align edit turn survives the craft-vs-echo question: no inaccuracy or
+  broken referent anywhere in 21 clues.
+- **Actionable:** the angle-distinct depth criterion is now the top
+  quality leak; the mechanism audit's anchor tags are its tool. Fable
+  verdicts annotated onto all 21 bank records (checkpoint-2 precedent).
+
+**Mechanism audit, first run (53/53 tagged):** alarm fired — sense pivot
+45%. Spot check shows the 26B tagger over-attributes (cricket-DUCK and
+overseas-ZED tagged pivot despite frame anchors in their own anchor
+fields); true pivot share ≈ a third — plurality, watch it. Two
+follow-ups: tighten the tagger's dominant-mechanism instruction; the
+align pair's earned-? example (SILT) is itself a pivot shown on every
+word — a back-door single-mechanism hint. Candidate eval variant:
+second earned-? example from a non-pivot mechanism.
