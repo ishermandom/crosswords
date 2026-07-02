@@ -41,10 +41,18 @@ done — see the log for the curve and the criteria re-analysis.
   - [-] Multi-candidate within one setter conversation — superseded: run-level
     best-of-N (repeated passes at temp 1.0) captures the same recall with no
     correlated-draft risk
-- [~] **Held-out validation** — pipeline over the 8 reserved words, ≤3 passes;
-  failures must not feed prompt iteration. Then propose checkpoint 2
-  (user-gated: scope + dollar estimate, launch on go): Fable-verify all
-  pipeline-banked clues — the true precision read on the metric of record.
+- [x] **Held-out validation + checkpoint 2** — held-out 1/8 (category-dependent
+      ceiling: numbers fall back to arithmetic-flat). Checkpoint 2 ($0.778): 7/8
+      Fable accepts on pipeline banks — judge validated at ~0.9 precision on
+      unseen words; 2 of 4 audited rejections were recall losses, now banked.
+      Details: ceiling-log.md.
+- [~] **Throughput exploration** — target an order of magnitude better than ~7–8
+  min of local compute per banked clue; attack per-run bank rate (23% friendly
+  categories, ~5% numbers) and per-run cost. Brainstorm with user first (in
+  progress 2026-07-02).
+- [ ] **Angle-distinct depth pass** — when banking multiple clues per word,
+      require distinct angles (checkpoint 2: Fable flagged a same-angle DAISY
+      paraphrase). Later pass by user direction; don't over-invest early.
 
 ---
 
