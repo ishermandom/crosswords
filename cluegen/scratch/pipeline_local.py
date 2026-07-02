@@ -3,11 +3,13 @@
 
 """End-to-end local pipeline prototype: setter -> judge -> bank.
 
-Per word: the v2 setter (the measured generation peak) produces one clue;
-the per-clue judge screens it (J4 config); optionally a dense-model judge
-confirms bankables (cascade). A "fixable" screen verdict earns one retry —
-the judge's analysis is fed back into the setter conversation, mirroring
-the cloud pipeline's revise path. Accepted clues append to
+v9 (eval-panel round, 2026-07-02): the setter's edit turn carries the
+judge's earned-? calibration pair; extraction returns every KEEP; a 31B
+fixer repairs screen-fixable clues in place of the old setter retry
+(45% measured conversion). Work runs in model-batched phases — all 26B
+setter+screen work, then the 31B confirm/repair block, then repair
+re-screens, then their confirms — because a gemma4 model switch drains
+and rewires wired memory. Accepted clues append to
 cluegen/local/clue_bank.jsonl with full provenance.
 
 Self-contained per the prototyping independence rule: prompts and HTTP
@@ -16,7 +18,6 @@ are local to this file.
 Usage:
   python cluegen/scratch/pipeline_local.py --word SUE
   python cluegen/scratch/pipeline_local.py --words words.txt --limit 10
-  python cluegen/scratch/pipeline_local.py --word SUE --confirm-model gemma4:31b-qat
 """
 
 import argparse
@@ -108,25 +109,26 @@ reads like a dictionary gloss or thesaurus entry, however accurate. An
 accurate-but-flat clue will be rejected downstream; it is not a safe pick.
 
 End with a verdict line per draft: KEEP or CUT, with the one-phrase
-reason. Plain unformatted text."""
+reason. Plain unformatted text.
+
+Two calibration examples from the downstream editor, to apply during the
+question-mark check:
+- "A large body of salt water?" for OCEAN: the ? is unearned — a straight
+  definition wearing a question mark. Strip the mark or cut the draft.
+- "Bank deposit?" for SILT: the ? is earned — "bank" pivots from finance
+  to riverbank.
+Also re-verify the referent: the clue must define the answer ITSELF,
+never a person, place, or thing merely associated with it."""
 
 _TURN_EXTRACT = """\
-Select the single best KEEP clue for a {difficulty} target and return it as
-JSON: "clue" (exact print text), "difficulty" (your honest calibration,
-which may differ from the target), "trap" (one sentence naming the specific
-wrong answer or wrong reading the surface invites; null if the clue is
-straight), "confidence" (honest; "low" if no draft survived cleanly)."""
-
-_TURN_RETRY = """\
-An independent editor reviewed your selected clue and found a flaw:
-
-{feedback}
-
-Produce ONE corrected clue. If the editor names a specific fix (drop an
-unearned question mark, retag the difficulty), apply exactly that fix and
-change nothing else. Otherwise select and polish a different draft — one
-whose surface is vivid, never dictionary-flat. Return the same JSON shape:
-"clue", "difficulty", "trap", "confidence"."""
+Return EVERY clue you marked KEEP, ordered strongest first, as JSON:
+"clues", a list where each item has "clue" (exact print text),
+"difficulty" (your honest calibration of that clue, which may differ from
+the {difficulty} target), "trap" (one sentence naming the specific wrong
+answer or wrong reading the surface invites; null if the clue is
+straight), and "confidence" (honest). If every draft was cut, return the
+single strongest draft anyway with "confidence": "low" — never an empty
+list."""
 
 _CLUE_SCHEMA = {
   'type': 'object',
@@ -138,6 +140,23 @@ _CLUE_SCHEMA = {
   },
   'required': ['clue', 'difficulty', 'trap', 'confidence'],
 }
+
+# minItems guards the constrained decode: without it, the trivially valid
+# '{"clues": []}' is an escape hatch the model takes often.
+_CLUES_SCHEMA = {
+  'type': 'object',
+  'properties': {'clues': {'type': 'array', 'items': _CLUE_SCHEMA,
+                           'minItems': 1}},
+  'required': ['clues'],
+}
+
+_FIXER_SYSTEM = """\
+You are an expert editor of American-style crossword clues. You receive a
+clue for a given answer word together with an independent editor's
+critique naming its flaw. Produce ONE corrected clue: fix exactly the
+named flaw while keeping what the clue does well. Keep the surface
+natural and vivid — an accurate-but-flat correction is a failure. The
+clue must not contain the answer word or a trivial inflection of it."""
 
 # --- Judge (J4 config: per-clue, few-shot, doubt-rule) ---
 
@@ -216,17 +235,17 @@ def _chat(model, messages, schema=None, think=False):
 
 
 def _run_setter(model, word, difficulty, tee):
-  """Drive the v7 setter conversation; returns (clue dict, messages)."""
+  """Drive the setter conversation; returns the extracted KEEP clues."""
   substitutions = {'word': word, 'difficulty': difficulty}
   messages = [{'role': 'system', 'content': _SETTER_SYSTEM}]
   for template, schema in [(_TURN_ANGLES, None), (_TURN_DRAFTS, None),
-                           (_TURN_EDIT, None), (_TURN_EXTRACT, _CLUE_SCHEMA)]:
+                           (_TURN_EDIT, None), (_TURN_EXTRACT, _CLUES_SCHEMA)]:
     messages.append({'role': 'user',
                      'content': template.format(**substitutions)})
     reply = _chat(model, messages, schema=schema)
     messages.append({'role': 'assistant', 'content': reply})
     tee(f'--- setter {template.splitlines()[0][:30]}...\n{reply}\n')
-  return json.loads(messages[-1]['content']), messages
+  return json.loads(messages[-1]['content'])['clues']
 
 
 def _judge(model, word, clue_text, tee, label):
@@ -280,56 +299,81 @@ def _strip_unearned_mark(clue, analysis):
   return {**clue, 'clue': clue['clue'][:-1].rstrip()}
 
 
-def _process_word(word, cli, tee):
-  """Setter -> screen -> (confirm) -> tidy/retry-once -> bank."""
-  clue, messages = _run_setter(cli.setter_model, word, cli.difficulty, tee)
-  attempt = 1
-  was_tidied = False
-  while True:
-    screen = _judge(cli.judge_model, word, clue['clue'], tee,
-                    f'screen a{attempt}')
-    if screen['verdict'] == 'bankable':
-      if cli.confirm_model:
-        confirm = _judge(cli.confirm_model, word, clue['clue'], tee,
-                         f'confirm a{attempt}')
-        if confirm['verdict'] != 'bankable':
-          screen = confirm
-        else:
-          verdict_path = 'screen+confirm'
-          difficulty = confirm['difficulty']
-      if not cli.confirm_model:
-        verdict_path = 'screen-only'
-        difficulty = screen['difficulty']
-      if screen['verdict'] == 'bankable':
-        banked = _bank(word, clue, difficulty, {
-          'generator': cli.setter_model, 'prompt_version': 'v8',
-          'judge': f'{cli.judge_model}'
-                   + (f' + {cli.confirm_model}' if cli.confirm_model
-                      else ''),
-          'verdict': f'local-{verdict_path}', 'attempt': attempt,
-          **({'fix': 'unearned ? stripped (mechanical tidy)'}
-             if was_tidied else {}),
-        })
-        return f'BANKED ({verdict_path}, attempt {attempt})' if banked \
-               else 'DUPLICATE'
-    if screen['verdict'] == 'fixable' and not was_tidied:
-      # A named ?-flaw is a one-character fix: strip and re-judge without
-      # spending the setter retry.
-      tidied = _strip_unearned_mark(clue, screen['analysis'])
-      if tidied:
-        clue = tidied
-        was_tidied = True
-        tee(f'--- tidy: stripped ? -> {clue["clue"]}\n')
+def _phase_generate_and_screen(words, cli, tee):
+  """Phase A (26B): setter + per-clue screen for every word; the free
+  mechanical ?-tidy fires here. Returns screen-bankable candidates and
+  fixables (with the judge's critique) for the 31B phases."""
+  candidates = []
+  fixables = []
+  for word in words:
+    tee(f'\n===== {word} =====\n')
+    clues = _run_setter(cli.setter_model, word, cli.difficulty, tee)
+    for clue in clues:
+      if not clue.get('clue'):
         continue
-    if screen['verdict'] == 'bad' or attempt >= 2:
-      return f'DROPPED ({screen["verdict"]}, attempt {attempt})'
-    messages.append({'role': 'user', 'content':
-                     _TURN_RETRY.format(feedback=screen['analysis'])})
-    reply = _chat(cli.setter_model, messages, schema=_CLUE_SCHEMA)
-    messages.append({'role': 'assistant', 'content': reply})
-    clue = json.loads(reply)
-    tee(f'--- setter retry\n{reply}\n')
-    attempt += 1
+      screen = _judge(cli.judge_model, word, clue['clue'], tee, 'screen')
+      if screen['verdict'] == 'fixable':
+        # A named ?-flaw is a one-character fix: strip and re-judge.
+        tidied = _strip_unearned_mark(clue, screen['analysis'])
+        if tidied:
+          clue = tidied
+          tee(f'--- tidy: stripped ? -> {clue["clue"]}\n')
+          screen = _judge(cli.judge_model, word, clue['clue'], tee,
+                          'screen tidy')
+      if screen['verdict'] == 'bankable':
+        candidates.append((word, clue))
+      elif screen['verdict'] == 'fixable':
+        fixables.append((word, clue, screen['analysis']))
+      print(f'{word}: screen {screen["verdict"]} "{clue["clue"]}"',
+            flush=True)
+  return candidates, fixables
+
+
+def _phase_confirm(candidates, cli, tee, provenance_extra):
+  """Phase B/D (31B): confirm screen-bankables; bank the passes."""
+  banked_count = 0
+  for word, clue in candidates:
+    confirm = _judge(cli.confirm_model, word, clue['clue'], tee, 'confirm')
+    if confirm['verdict'] != 'bankable':
+      print(f'{word}: confirm {confirm["verdict"]} "{clue["clue"]}"',
+            flush=True)
+      continue
+    banked = _bank(word, clue, confirm['difficulty'], {
+      'generator': cli.setter_model, 'prompt_version': 'v9',
+      'judge': f'{cli.judge_model} + {cli.confirm_model}',
+      'verdict': 'local-screen+confirm', **provenance_extra,
+    })
+    banked_count += banked
+    print(f'{word}: {"BANKED" if banked else "duplicate"} '
+          f'"{clue["clue"]}"', flush=True)
+  return banked_count
+
+
+def _phase_repair(fixables, cli, tee):
+  """Phase B (31B): the fixer repairs each screen-fixable clue given the
+  judge's critique. Returns repaired clues for phase-C re-screening."""
+  repairs = []
+  for word, clue, analysis in fixables:
+    prompt = (
+      f'Answer word: {word}\n'
+      f'Clue: {clue["clue"]}\n'
+      f'Critique: {analysis}\n\n'
+      'Return the corrected clue as JSON: "clue" (exact print text), '
+      '"difficulty" (honest calibration), "trap" (one sentence, or null '
+      'if straight), "confidence" (honest).'
+    )
+    reply = _chat(
+      cli.confirm_model,
+      [{'role': 'system', 'content': _FIXER_SYSTEM},
+       {'role': 'user', 'content': prompt}],
+      schema=_CLUE_SCHEMA,
+    )
+    repaired = json.loads(reply)
+    tee(f'--- fixer[{word}] {clue["clue"]} -> {repaired["clue"]}\n')
+    if repaired['clue'].strip().lower() == clue['clue'].strip().lower():
+      continue
+    repairs.append((word, repaired))
+  return repairs
 
 
 if __name__ == '__main__':
@@ -341,8 +385,8 @@ if __name__ == '__main__':
                       choices=['easy', 'medium', 'hard'])
   parser.add_argument('--setter-model', default='gemma4:26b-qat')
   parser.add_argument('--judge-model', default='gemma4:26b-qat')
-  parser.add_argument('--confirm-model', default=None,
-                      help='optional cascade confirm (e.g. gemma4:31b-qat)')
+  parser.add_argument('--confirm-model', default='gemma4:31b-qat',
+                      help='dense confirm + fixer model')
   parser.add_argument('--skip-banked', action='store_true',
                       help='skip words that already have any bank record')
   cli = parser.parse_args()
@@ -367,9 +411,24 @@ if __name__ == '__main__':
     def tee(text):
       log_file.write(text)
       log_file.flush()
-    for word in words:
-      tee(f'\n===== {word} =====\n')
-      status = _process_word(word, cli, tee)
-      print(f'{word}: {status}', flush=True)
-      tee(f'{word}: {status}\n')
+
+    # Model-batched phases: 26B, then 31B, then 26B, then 31B — three
+    # switches per run regardless of word count.
+    candidates, fixables = _phase_generate_and_screen(words, cli, tee)
+    print(f'phase A: {len(candidates)} candidates, '
+          f'{len(fixables)} fixables from {len(words)} words', flush=True)
+    banked = _phase_confirm(candidates, cli, tee, {})
+    # TODO: feed confirm-stage fixables into the repair queue too; today
+    # only screen-stage fixables reach the fixer.
+    repairs = _phase_repair(fixables, cli, tee)
+    rescreened = [
+      (word, clue) for word, clue in repairs
+      if _judge(cli.judge_model, word, clue['clue'], tee,
+                'screen repair')['verdict'] == 'bankable'
+    ]
+    print(f'fixer: {len(repairs)} repairs, '
+          f'{len(rescreened)} screen-bankable', flush=True)
+    banked += _phase_confirm(rescreened, cli, tee,
+                             {'fix': 'fixer repair (31B)'})
+    print(f'banked {banked} clues from {len(words)} words', flush=True)
   print(f'log: {log_path}', file=sys.stderr)

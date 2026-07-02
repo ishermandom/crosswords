@@ -54,119 +54,20 @@ _PANEL = ['SCORE', 'DAISY', 'GRANT', 'CHECK', 'GASP', 'AMBER',
 # --- Variant definitions -------------------------------------------------
 # A variant is: system prompt, ordered turns of (template, schema, extra
 # ollama options), and the index of the edit turn (for runaway stats).
-
-_EDIT_CAP_TURN = pl._TURN_EDIT + """
-
-Be terse. For each draft, write at most four lines: the two substitution
-sentences, one line covering the remaining checks, and the verdict line.
-No re-drafting, no exploring alternative phrasings, no restating drafts."""
-
-_ALIGN_QUEST_TURN = pl._TURN_EDIT + """
-
-Two calibration examples from the downstream editor, to apply during the
-question-mark check:
-- "A large body of salt water?" for OCEAN: the ? is unearned — a straight
-  definition wearing a question mark. Strip the mark or cut the draft.
-- "Bank deposit?" for SILT: the ? is earned — "bank" pivots from finance
-  to riverbank.
-Also re-verify the referent: the clue must define the answer ITSELF,
-never a person, place, or thing merely associated with it."""
-
-_EVERY_KEEP_EXTRACT = """\
-Return EVERY clue you marked KEEP, ordered strongest first, as JSON:
-"clues", a list where each item has "clue" (exact print text),
-"difficulty" (your honest calibration of that clue), "trap" (one sentence
-naming the specific wrong answer or wrong reading the surface invites;
-null if the clue is straight), and "confidence" (honest). If every draft
-was cut, return the single strongest draft anyway with "confidence":
-"low" — never an empty list."""
-
-# minItems guards the constrained decode: without it, the trivially valid
-# '{"clues": []}' is an escape hatch the model takes often.
-_EVERY_KEEP_SCHEMA = {
-  'type': 'object',
-  'properties': {'clues': {'type': 'array', 'items': pl._CLUE_SCHEMA,
-                           'minItems': 1}},
-  'required': ['clues'],
-}
-
-_NO_DIFFICULTY_SYSTEM = (
-  pl._SETTER_SYSTEM
-  .replace(' at a given difficulty', '')
-  .replace('Craft invariants, applying at every difficulty:',
-           'Craft invariants:')
-)
-
-_NO_DIFFICULTY_ANGLES = pl._TURN_ANGLES.replace(
-  '\nTarget difficulty: {difficulty}', '')
-_NO_DIFFICULTY_DRAFTS = pl._TURN_DRAFTS.replace(
-  ' for a {difficulty} clue', '')
-_NO_DIFFICULTY_EXTRACT = pl._TURN_EXTRACT.replace(
-  ' for a {difficulty} target', '').replace(
-  'your honest calibration,\nwhich may differ from the target',
-  'your honest calibration')
+# The 2026-07-02 round's variants (edit-cap, align-quest, every-keep,
+# align-keep, no-difficulty) were adopted into pipeline_local v9 or
+# killed; their definitions live in git history.
 
 _VARIANTS = {
-  # v8 pipeline prompts, unchanged: the reference point.
+  # Current pipeline prompts (v9): the reference point.
   'baseline': {
     'system': pl._SETTER_SYSTEM,
     'turns': [(pl._TURN_ANGLES, None, {}), (pl._TURN_DRAFTS, None, {}),
               (pl._TURN_EDIT, None, {}), (pl._TURN_EXTRACT,
-                                          pl._CLUE_SCHEMA, {})],
-    'edit_index': 2,
-  },
-  # Edit-turn runaway fix: per-draft structure constraint + token cap
-  # (~2x the measured 1,417-char median).
-  'edit-cap': {
-    'system': pl._SETTER_SYSTEM,
-    'turns': [(pl._TURN_ANGLES, None, {}), (pl._TURN_DRAFTS, None, {}),
-              (_EDIT_CAP_TURN, None, {'num_predict': 800}),
-              (pl._TURN_EXTRACT, pl._CLUE_SCHEMA, {})],
-    'edit_index': 2,
-  },
-  # Setter/judge criteria alignment: the judge's earned-? contrast pair
-  # and referent self-check inside the setter's edit turn.
-  'align-quest': {
-    'system': pl._SETTER_SYSTEM,
-    'turns': [(pl._TURN_ANGLES, None, {}), (pl._TURN_DRAFTS, None, {}),
-              (_ALIGN_QUEST_TURN, None, {}),
-              (pl._TURN_EXTRACT, pl._CLUE_SCHEMA, {})],
-    'edit_index': 2,
-  },
-  # Eager depth mode: extract every KEEP, screen each — same setter
-  # compute buys multiple lottery tickets per run.
-  'every-keep': {
-    'system': pl._SETTER_SYSTEM,
-    'turns': [(pl._TURN_ANGLES, None, {}), (pl._TURN_DRAFTS, None, {}),
-              (pl._TURN_EDIT, None, {}),
-              (_EVERY_KEEP_EXTRACT, _EVERY_KEEP_SCHEMA, {})],
-    'edit_index': 2,
-  },
-  # Adoption candidate: the two confirmed-positive, orthogonal changes
-  # composed — align-quest edit turn + every-keep extract.
-  'align-keep': {
-    'system': pl._SETTER_SYSTEM,
-    'turns': [(pl._TURN_ANGLES, None, {}), (pl._TURN_DRAFTS, None, {}),
-              (_ALIGN_QUEST_TURN, None, {}),
-              (_EVERY_KEEP_EXTRACT, _EVERY_KEEP_SCHEMA, {})],
-    'edit_index': 2,
-  },
-  # Difficulty targeting removed everywhere; judge labels still recorded.
-  'no-difficulty': {
-    'system': _NO_DIFFICULTY_SYSTEM,
-    'turns': [(_NO_DIFFICULTY_ANGLES, None, {}),
-              (_NO_DIFFICULTY_DRAFTS, None, {}),
-              (pl._TURN_EDIT, None, {}),
-              (_NO_DIFFICULTY_EXTRACT, pl._CLUE_SCHEMA, {})],
+                                          pl._CLUES_SCHEMA, {})],
     'edit_index': 2,
   },
 }
-
-# Guard against silent no-op replaces: every difficulty mention must be
-# gone from the no-difficulty variant's prompts.
-for _piece in ([_NO_DIFFICULTY_SYSTEM, _NO_DIFFICULTY_ANGLES,
-                _NO_DIFFICULTY_DRAFTS, _NO_DIFFICULTY_EXTRACT]):
-  assert 'difficulty' not in _piece.replace('"difficulty"', ''), _piece
 
 
 # --- Tier-1 runner -------------------------------------------------------
@@ -303,7 +204,9 @@ def _report(paths):
       if not records:
         continue
       variant = records[0]['variant']
-      edit_index = _VARIANTS[variant]['edit_index']
+      # Retired variants stay reportable; every round so far kept the
+      # edit turn at index 2.
+      edit_index = _VARIANTS.get(variant, {}).get('edit_index', 2)
 
       n = len(records)
       extract_failed = sum(r['status'] == 'extract_failed' for r in records)
