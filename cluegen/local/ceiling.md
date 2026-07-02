@@ -107,13 +107,15 @@ marginal cost is low.
 
 ### Quota rules
 
-- Every `claude -p` run, single call or batch, is user-gated: propose the run —
-  scope, clue count, dollar estimate — and launch only on the user's go.
-  Report-only on completion. Rationale (2026-07-01, checkpoint 1): Claude cannot
-  reliably calibrate session-quota cost — a run estimated at ~10% of a window
-  consumed most of one ($2.65 / 7 calls). Percent-of-quota caps are therefore
-  not an operational control; the gate is the control. Per-call dollar/token
-  usage still gets logged for the record.
+- Fable verification runs at infrequent checkpoints may self-launch when the
+  estimated cost is under ~$2, with a hard cap of $5 total spend between user
+  check-ins (user update, 2026-07-02). Anything larger, more frequent than
+  checkpoint cadence, or past the cap stays user-gated: propose scope, clue
+  count, and dollar estimate; launch only on the user's go. Report-only on
+  completion; per-call dollar/token usage logged for the record. Estimation
+  humility stands (2026-07-01, checkpoint 1: a run estimated at ~10% of a window
+  consumed most of one, $2.65 / 7 calls) — dollar estimates come from measured
+  unit costs of prior checkpoints, never from percent-of-quota intuition.
 - In-session review manages its own cost by sample size and format, per layer 3
   above.
 
