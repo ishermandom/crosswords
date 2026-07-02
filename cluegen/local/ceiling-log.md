@@ -1112,3 +1112,15 @@ so the $5 cap window resets.
 Fine-tuning probe runs in its own thread (`finetune.md`); compute
 scheduling between threads is user-arbitrated — keep batches modest and
 drain on request.
+
+## 2026-07-02 — Background-task reaper identified
+
+The session-long task killer is Claude Code issue #68625: the Desktop
+app's WarmLifecycle manager SIGTERMs the embedded CLI's process group
+after ~15 min with the session tab hidden. Explains the simultaneous
+batch kills, the irregular intervals (idle timer resets on interaction;
+this tab hides whenever the user works in another thread), and why
+`start_new_session=True` detachment survives (new process group, out of
+the group-kill's reach). Open upstream, no fix. Countermeasures: the
+detached-driver + watcher pattern (in use), or run batch-heavy sessions
+from the standalone terminal CLI.
