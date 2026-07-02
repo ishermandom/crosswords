@@ -72,6 +72,23 @@ done — see the log for the curve and the criteria re-analysis.
 
 ---
 
+## Fine-tuning probe
+
+**Goal:** directional go/no-go on whether a locally QLoRA-tuned small Gemma
+beats prompted-26B v9 as setter, in confirmed-bankable clues per GPU-minute.
+Spec (decisions, stages, gates): `finetune.md`. Intended to run in its own chat
+thread; the spec is self-contained.
+
+- [ ] Stage 0 — plumbing: smallest Gemma + ~500 pairs; train → fuse → serve →
+      eval loop runs end to end. Model download needs user approval.
+- [ ] Stage 1 — probe: QLoRA gemma4-12B on 5–20k curated xd pairs (answer-split;
+      panel + held-out answers excluded); evaluate via `eval_panel` (bare
+      single-turn and scaffolded); Fable spot-check <$2. Depends on stage 0.
+- [ ] Stage 2 — only on stage-1 signal: more data/epochs, DPO from judge labels,
+      or 26B tune. Not committed.
+
+---
+
 ## Phase 7 — Brainstorm prompt redesign
 
 **Goal:** Replace the single-turn brainstorm placeholder with a multi-turn
