@@ -85,18 +85,24 @@ thread; the spec is self-contained.
   - Done 2026-07-02: `finetune` optional-dependency group in
     `cluegen/pyproject.toml` (`mlx-lm`, `mlx-optiq`), installed in the sandbox
     venv at 0.31.3 / 0.2.10; imports and both CLIs verified.
-  - Build the ~500-pair stage-0 slice from the session-scratchpad xd copy
-    (`.../scratchpad/xd/clues.tsv`; any clean slice — curation is stage-1
-    scope), answer-split with `eval_panel` panel + held-out words excluded.
-  - Note: training examples must use Gemma's chat turn tags (`<start_of_turn>` /
-    `<end_of_turn>`), and the model is BOS-sensitive — format via the
-    checkpoint's own chat template, verified before training.
-  - A few sanity training steps first: confirms OptiQ-as-base trains under stock
-    `mlx_lm.lora` (expected-routine, undocumented) and yields a tokens/sec
-    anchor before any long run.
-  - Harness client adapter: `optiq serve` speaks an OpenAI-style API; the Ollama
-    endpoint is `_OLLAMA_CHAT_URL` in `scratch/pipeline_local.py` (local-ceiling
-    worktree), consumed by `scratch/eval_panel.py`.
+  - Done 2026-07-02: 500/50 train/valid slice built by
+    `scratch/finetune/build_slice.py` (data/ gitignored — third-party corpus);
+    one clue per answer, answer-split, panel + held-out answers excluded and
+    verified absent.
+  - Done 2026-07-02: chat-template formatting verified via the checkpoint's own
+    template — Gemma 4's turn tags are `<|turn>` / `<turn|>` (not Gemma 1–3's
+    `<start_of_turn>`); exactly one BOS, no doubling under default tokenization.
+    mlx-lm applies the template itself to messages-format JSONL.
+  - Done 2026-07-02: sanity training confirmed — OptiQ-as-base trains under
+    stock `mlx_lm.lora` (QLoRA auto-engaged, 0.147% trainable); 20 iters at
+    batch 1: val loss 8.85 → 2.49, ~5 it/s, ~160 tok/s, peak 4.9 GB. Serve leg
+    smoked too: `optiq serve --adapter` answered an OpenAI-style chat completion
+    with the trained adapter.
+  - Harness client adapter (the remaining sub-step): `optiq serve` speaks an
+    OpenAI-style API; the Ollama endpoint is `_OLLAMA_CHAT_URL` in
+    `scratch/pipeline_local.py` (local-ceiling worktree), consumed by
+    `scratch/eval_panel.py`. Those files live on the local-ceiling branch —
+    decide with the user how to wire the adapter without cross-branch edits.
   - GPU coordination: the local-ceiling thread holds most of GPU/RAM; E2B-scale
     work fits alongside, but check with the user before anything heavier
     (scheduling protocol still TBD).
