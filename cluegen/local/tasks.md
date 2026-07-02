@@ -25,6 +25,13 @@ preferred quantization.
       a durable shared home (e.g. `/Users/Shared/corpora/xd/`); otherwise delete
       it so the storage isn't swallowed forever.
 
+- [ ] **Retire the old Ollama store path** — the store moved to
+      `/Users/Shared/models/ollama` (2026-07-02, shared-storage layout); a
+      compatibility symlink remains at `/Users/Shared/ollama/models`. After the
+      local-ceiling campaign updates its `OLLAMA_MODELS` value (`ceiling.md`,
+      Server management — coordinate with that thread; it owns the branch),
+      delete `/Users/Shared/ollama` entirely.
+
 ---
 
 ## Git workflow
