@@ -3,21 +3,19 @@
 
 """End-to-end local pipeline prototype: setter -> judge -> bank.
 
-v9 (eval-panel round, 2026-07-02): the setter's edit turn carries the
-judge's earned-? calibration pair; extraction returns every KEEP; a 31B
-fixer repairs screen-fixable clues in place of the old setter retry
-(45% measured conversion). Work runs in model-batched phases — all 26B
-setter+screen work, then the 31B confirm/repair block, then repair
-re-screens, then their confirms — because a gemma4 model switch drains
-and rewires wired memory. Accepted clues append to
+v9 (eval-panel round, 2026-07-02): the setter's edit turn carries the judge's
+earned-? calibration pair; extraction returns every KEEP; a 31B fixer repairs
+screen-fixable clues in place of the old setter retry (45% measured conversion).
+Work runs in model-batched phases — all 26B setter+screen work, then the 31B
+confirm/repair block, then repair re-screens, then their confirms — because a
+gemma4 model switch drains and rewires wired memory. Accepted clues append to
 cluegen/local/clue_bank.jsonl with full provenance.
 
-Self-contained per the prototyping independence rule: prompts and HTTP
-are local to this file.
+Self-contained per the prototyping independence rule: prompts and HTTP are local
+to this file.
 
-Usage:
-  python cluegen/scratch/pipeline_local.py --word SUE
-  python cluegen/scratch/pipeline_local.py --words words.txt --limit 10
+Usage: python cluegen/scratch/pipeline_local.py --word SUE python
+cluegen/scratch/pipeline_local.py --words words.txt --limit 10
 """
 
 import argparse
@@ -158,7 +156,9 @@ named flaw while keeping what the clue does well. Keep the surface
 natural and vivid — an accurate-but-flat correction is a failure. The
 clue must not contain the answer word or a trivial inflection of it."""
 
-# --- Judge (J4 config: per-clue, few-shot, doubt-rule) ---
+# ---
+#
+# Judge (J4 config: per-clue, few-shot, doubt-rule) ---
 
 _JUDGE_SYSTEM = """\
 You are a demanding editor for an American-style crossword clue bank. A
@@ -207,7 +207,10 @@ Calibration examples — where the boundaries sit:
 - "A large body of salt water?" -> OCEAN: fixable. Straight definition
   wearing a question mark.
 - "Bank deposit?" -> SILT: bankable (hard). The ? is earned: "bank"
-  pivots from finance to riverbank."""
+  pivots from finance to riverbank.
+- "Born to Die singer" -> LANA: bankable (medium). For a name answer, a
+  famous bearer is a legitimate definition — the bearer is not "merely
+  associated" with the name; she instantiates it."""
 
 _JUDGE_SCHEMA = {
   'type': 'object',
@@ -290,8 +293,9 @@ def _bank(word, clue, judge_difficulty, provenance):
 
 
 def _strip_unearned_mark(clue, analysis):
-  """If the judge's complaint names the '?', return the clue with it
-  stripped for a free re-judge; None when the tidy doesn't apply."""
+  """If the judge's complaint names the '?', return the clue with it stripped
+  for a free re-judge; None when the tidy doesn't apply.
+  """
   if not clue['clue'].endswith('?'):
     return None
   if 'question mark' not in analysis.lower():
@@ -300,9 +304,10 @@ def _strip_unearned_mark(clue, analysis):
 
 
 def _phase_generate_and_screen(words, cli, tee):
-  """Phase A (26B): setter + per-clue screen for every word; the free
-  mechanical ?-tidy fires here. Returns screen-bankable candidates and
-  fixables (with the judge's critique) for the 31B phases."""
+  """Phase A (26B): setter + per-clue screen for every word; the free mechanical
+  ?-tidy fires here. Returns screen-bankable candidates and fixables (with the
+  judge's critique) for the 31B phases.
+  """
   candidates = []
   fixables = []
   for word in words:
@@ -332,8 +337,9 @@ def _phase_generate_and_screen(words, cli, tee):
 def _phase_confirm(candidates, cli, tee, provenance_extra):
   """Phase B/D (31B): confirm screen-bankables; bank the passes.
 
-  Returns (bank count, confirm-fixables) — the latter carry the judge's
-  critique so they can join the repair queue."""
+  Returns (bank count, confirm-fixables) — the latter carry the judge's critique
+  so they can join the repair queue.
+  """
   banked_count = 0
   fixables = []
   for word, clue in candidates:
@@ -356,8 +362,9 @@ def _phase_confirm(candidates, cli, tee, provenance_extra):
 
 
 def _phase_repair(fixables, cli, tee):
-  """Phase B (31B): the fixer repairs each screen-fixable clue given the
-  judge's critique. Returns repaired clues for phase-C re-screening."""
+  """Phase B (31B): the fixer repairs each screen-fixable clue given the judge's
+  critique. Returns repaired clues for phase-C re-screening.
+  """
   repairs = []
   for word, clue, analysis in fixables:
     prompt = (
@@ -418,8 +425,8 @@ if __name__ == '__main__':
       log_file.write(text)
       log_file.flush()
 
-    # Model-batched phases: 26B, then 31B, then 26B, then 31B — three
-    # switches per run regardless of word count.
+    # Model-batched phases: 26B, then 31B, then 26B, then 31B — three switches
+    # per run regardless of word count.
     candidates, fixables = _phase_generate_and_screen(words, cli, tee)
     print(f'phase A: {len(candidates)} candidates, '
           f'{len(fixables)} fixables from {len(words)} words', flush=True)

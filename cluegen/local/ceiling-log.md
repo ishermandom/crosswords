@@ -1042,3 +1042,16 @@ the gate itself, so the eval is agreement-based: v2 vs v1 on the
 33 Fable-verdicted clues (agreement must hold) + name-clue sample
 (recall should rise), then Fable audits the recalibrated gate's banks at
 the next checkpoint.
+
+## 2026-07-02 — Judge v2 adopted: name-answer calibration example
+
+Eval (29 Fable-verdicted clues + 8 hand-verified famous-bearer name
+clues, both judge versions): v2 kills 1/8 name clues vs v1's 4/8, with
+Fable agreement unchanged (20/29 both). v2's accept-side is better (it
+recovers AMBER and GOSH, which v1 wrongly downgraded); its new lenient
+calls are all same-angle-duplicate revises — invisible to a per-clue
+judge by construction, owned by the future angle-distinct pass. Adopted:
+one calibration example (LANA "Born to Die singer") in the shared judge
+prompt — a famous bearer instantiates a name answer. Next Fable
+checkpoint should sample banked name clues to audit the recalibrated
+gate ($1.09 of $5 spent so far).
