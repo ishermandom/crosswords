@@ -422,3 +422,41 @@ accept degraded tok/s.
 clues. If judge errors decorrelate, combined precision should clear 0.9
 with the 31B touching only ~⅓ of clues — the production judge shape:
 cheap screen, expensive confirm.
+
+---
+
+## 2026-07-01 — Session state (written for compaction survival)
+
+**Judge scoreboard (precision/recall of "bankable" vs quality-adjusted
+ground truth, 40-clue calibration set):** J1-26B batched 0.68/0.50 ·
+J1-31B batched 0.78/0.54 · J2-26B batched+scratchpad+fewshot 0.75/0.58 ·
+J3-31B batched+scratchpad+fewshot+doubt-rule **0.90**/0.35 · J4-26B
+per-clue+fewshot+doubt-rule 0.85/0.42. Per-clue beats batched (user prior
+confirmed). Target: ≥0.9 precision, recall as high as possible.
+
+**In flight:** cascade test — 31B per-clue re-judging ONLY J4's 13 banked
+clues (`judge_quality.py --only-banked-from <J4 rows>`). Read the newest
+`scratch/logs/judge_calibration_*.jsonl` when it completes; cascade
+precision = fraction of clues banked by BOTH stages that are
+quality-adjusted-good (10 of J4's 13 are good — so if the 31B confirms
+mostly the good ones, combined precision clears 0.9). Decision rule:
+cascade ≥0.9 → production judge = 26B screen + 31B confirm; else → J3
+(31B batched) is the judge, slower.
+
+**Built, committed, NOT yet smoke-tested:** `scratch/pipeline_local.py` —
+end-to-end prototype: v2-lineage setter (v7) → per-clue screen judge →
+optional `--confirm-model` cascade → one retry with judge feedback →
+appends accepts to `cluegen/local/clue_bank.jsonl` (dedup, provenance).
+Next actions, in order: (1) read cascade result, pick judge config;
+(2) smoke `pipeline_local.py --word SUE` (single word, screen-only);
+(3) small fresh-word batch (words.in words outside the iteration set)
+with the chosen config; inspect banked output in-session.
+
+**Operational:** Ollama server runs under Claude's control in a background
+task this session (`~/tmp/ollama serve`, OLLAMA_MODELS=/Users/Shared/
+ollama/models); restart it the same way if down. Sustained back-to-back
+runs throttle the fanless Air (J4 ran 75 min vs ~10 projected). Quota:
+session mostly consumed; NO `claude -p` calls of any size without the
+user's explicit go (spec, Quota rules). Clue bank: 22 records seeded from
+checkpoint 1; locally-judged additions allowed once the judge clears its
+bar, provenance-tagged.
