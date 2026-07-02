@@ -89,6 +89,22 @@ thread; the spec is self-contained.
 
 ---
 
+## Machine ops
+
+- [ ] Restructure the model directory: `/Users/Shared/ollama/models` →
+      `/Users/Shared/models/gguf`, with a README documenting the directory is
+      managed via ollama; ownership `ishermandom`, world-readable (user request
+      2026-07-02). Blocked on: (a) no ollama runs in flight, (b) the mlx thread
+      finishes setting up `/Users/Shared/models/mlx` (collision avoidance), (c)
+      commands likely need to run as `ishermandom` (chown).
+  - Note: at execution, stop the ollama server first; afterwards update the
+    `OLLAMA_MODELS` path in `ceiling.md` (Autonomy rules / server command) and
+    restart. Check whether `ollama serve` run by `claude-sandbox` needs any
+    write access to the models dir (pull-less serving should be read-only, but
+    verify locks/tmp behavior).
+
+---
+
 ## Phase 7 — Brainstorm prompt redesign
 
 **Goal:** Replace the single-turn brainstorm placeholder with a multi-turn
