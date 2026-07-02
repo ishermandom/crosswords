@@ -116,10 +116,15 @@ Evidence from the 2026-07-02 eval round (details: `ceiling-log.md`):
 
 ## Constraints and gates
 
-- The user personally runs every model pull, pip install, and data download
-  (user direction 2026-07-02, superseding the approve-per-pull rule for this
-  probe); Claude supplies exact commands, repo ids, and URLs at each point.
-  Fine-tuning runs are local-only.
+- The user personally runs every model pull and data download from the
+  `ishermandom` account, so shared-store artifacts get the right ownership (user
+  direction 2026-07-02, superseding the approve-per-pull rule for this probe);
+  Claude supplies exact commands, repo ids, and URLs at each point. Model
+  checkpoints land in `/Users/Shared/models/mlx/` per the shared-storage layout
+  (`~/.claude/docs/shared-storage.md`); the harness loads them by directory
+  path. Python dependency syncs are the carve-out: declared in a reviewable
+  `cluegen/pyproject.toml` edit, then installed by Claude into the sandbox venv
+  without a further gate. Fine-tuning runs are local-only.
 - Fable spot-checks fall under the standing agreement: self-launch under ~$2
   estimated, $5 total between user check-ins.
 - Thermal reality: training and big eval runs are overnight jobs, detached,
