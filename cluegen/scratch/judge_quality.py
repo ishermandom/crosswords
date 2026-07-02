@@ -151,6 +151,43 @@ def _chat(model: str, messages: list[dict], schema: dict | None) -> str:
   return response.json()['message']['content']
 
 
+# Per-clue schema: 'analysis' precedes 'verdict', so the model reasons in
+# writing before committing — a single call carries its own scratchpad.
+_PER_CLUE_SCHEMA = {
+  'type': 'object',
+  'properties': {
+    'analysis': {'type': 'string'},
+    'difficulty': {'type': 'string', 'enum': ['easy', 'medium', 'hard']},
+    'verdict': {'type': 'string', 'enum': ['bankable', 'fixable', 'bad']},
+  },
+  'required': ['analysis', 'difficulty', 'verdict'],
+}
+
+
+def _judge_per_clue(
+  model: str, entries: list[dict], use_few_shot: bool
+) -> list[dict]:
+  system = _SYSTEM + (_FEW_SHOT if use_few_shot else '')
+  verdicts = []
+  for e in entries:
+    prompt = (
+      'Judge this one clue. In "analysis": name the sense used, write the '
+      'substitution sentence, and name any flaws — before the verdict.\n\n'
+      + json.dumps({'word': e['word'], 'clue': e['clue']['clue']})
+    )
+    content = _chat(
+      model,
+      [{'role': 'system', 'content': system},
+       {'role': 'user', 'content': prompt}],
+      schema=_PER_CLUE_SCHEMA,
+    )
+    v = json.loads(content)
+    verdicts.append({'word': e['word'], 'verdict': v['verdict'],
+                     'difficulty': v['difficulty'],
+                     'reason': v['analysis']})
+  return verdicts
+
+
 def _judge_group(
   model: str, entries: list[dict], use_scratchpad: bool, use_few_shot: bool
 ) -> list[dict]:
@@ -179,6 +216,8 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument('--model', default='gemma4:26b-qat')
   parser.add_argument('--scratchpad', action='store_true')
+  parser.add_argument('--per-clue', action='store_true',
+                      help='one clue per call, analysis-first schema')
   parser.add_argument('--fewshot', action='store_true')
   parser.add_argument('--quiet', action='store_true',
                       help='print mismatches and totals only')
@@ -208,9 +247,12 @@ if __name__ == '__main__':
   agree_raw = agree_adjusted = total = 0
 
   for version, entries in groups.items():
-    verdicts = _judge_group(
-      cli.model, entries, cli.scratchpad, cli.fewshot
-    )
+    if cli.per_clue:
+      verdicts = _judge_per_clue(cli.model, entries, cli.fewshot)
+    else:
+      verdicts = _judge_group(
+        cli.model, entries, cli.scratchpad, cli.fewshot
+      )
     by_word = {v['word']: v for v in verdicts}
     # Two ZERO controls share a word; match those by order instead.
     if version == 'control':
