@@ -78,12 +78,17 @@ Pick the 4 or 5 strongest angles for a {difficulty} clue — favor genuine
 traps and lively surfaces over safe, predictable definitions. Draft exactly
 one clue per chosen angle.
 
-Two hard rules when drafting:
+Three hard rules when drafting:
 - The clue must define the answer word ITSELF — never a person or thing
   merely associated with it.
 - If a sense exists only inside a longer phrase (an idiom fragment),
   discard the angle unless the clue genuinely works for the answer word
   alone.
+- No dictionary-flat surfaces. A draft that could pass as a thesaurus
+  entry or dictionary gloss is dead on arrival — each surface must put a
+  specific scene, image, or wordplay in the solver's head. (Both clue
+  IRIS: "Messenger from the clouds?" lives; "Part of the eye" is flat
+  despite being accurate.)
 
 For each draft: the clue text as it would appear in print, then on the next
 line its angle name and the trap it sets — the specific wrong answer or
@@ -98,7 +103,9 @@ definition in place of {word}. The draft fails if the rewritten sentence
 changes part of speech, tense, number, or referent — or reads unnaturally.
 
 Then check each surviving draft: question-mark honesty, no answer leakage,
-and whether the trap survives a re-read.
+whether the trap survives a re-read — and liveliness: CUT any draft that
+reads like a dictionary gloss or thesaurus entry, however accurate. An
+accurate-but-flat clue will be rejected downstream; it is not a safe pick.
 
 End with a verdict line per draft: KEEP or CUT, with the one-phrase
 reason. Plain unformatted text."""
@@ -115,9 +122,11 @@ An independent editor reviewed your selected clue and found a flaw:
 
 {feedback}
 
-Produce ONE corrected clue — fix the flaw, or select and polish a different
-draft. Return the same JSON shape: "clue", "difficulty", "trap",
-"confidence"."""
+Produce ONE corrected clue. If the editor names a specific fix (drop an
+unearned question mark, retag the difficulty), apply exactly that fix and
+change nothing else. Otherwise select and polish a different draft — one
+whose surface is vivid, never dictionary-flat. Return the same JSON shape:
+"clue", "difficulty", "trap", "confidence"."""
 
 _CLUE_SCHEMA = {
   'type': 'object',
@@ -261,10 +270,21 @@ def _bank(word, clue, judge_difficulty, provenance):
   return True
 
 
+def _strip_unearned_mark(clue, analysis):
+  """If the judge's complaint names the '?', return the clue with it
+  stripped for a free re-judge; None when the tidy doesn't apply."""
+  if not clue['clue'].endswith('?'):
+    return None
+  if 'question mark' not in analysis.lower():
+    return None
+  return {**clue, 'clue': clue['clue'][:-1].rstrip()}
+
+
 def _process_word(word, cli, tee):
-  """Setter -> screen -> (confirm) -> retry-once -> bank. Returns status."""
+  """Setter -> screen -> (confirm) -> tidy/retry-once -> bank."""
   clue, messages = _run_setter(cli.setter_model, word, cli.difficulty, tee)
   attempt = 1
+  was_tidied = False
   while True:
     screen = _judge(cli.judge_model, word, clue['clue'], tee,
                     f'screen a{attempt}')
@@ -282,14 +302,25 @@ def _process_word(word, cli, tee):
         difficulty = screen['difficulty']
       if screen['verdict'] == 'bankable':
         banked = _bank(word, clue, difficulty, {
-          'generator': cli.setter_model, 'prompt_version': 'v7',
+          'generator': cli.setter_model, 'prompt_version': 'v8',
           'judge': f'{cli.judge_model}'
                    + (f' + {cli.confirm_model}' if cli.confirm_model
                       else ''),
           'verdict': f'local-{verdict_path}', 'attempt': attempt,
+          **({'fix': 'unearned ? stripped (mechanical tidy)'}
+             if was_tidied else {}),
         })
         return f'BANKED ({verdict_path}, attempt {attempt})' if banked \
                else 'DUPLICATE'
+    if screen['verdict'] == 'fixable' and not was_tidied:
+      # A named ?-flaw is a one-character fix: strip and re-judge without
+      # spending the setter retry.
+      tidied = _strip_unearned_mark(clue, screen['analysis'])
+      if tidied:
+        clue = tidied
+        was_tidied = True
+        tee(f'--- tidy: stripped ? -> {clue["clue"]}\n')
+        continue
     if screen['verdict'] == 'bad' or attempt >= 2:
       return f'DROPPED ({screen["verdict"]}, attempt {attempt})'
     messages.append({'role': 'user', 'content':

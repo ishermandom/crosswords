@@ -517,3 +517,28 @@ the retry turn ignores the judge's stated fix (GRANT's retry kept the unearned
 1. v8 setter — liveliness pressure in the drafts and edit turns; make the
    retry directive (apply the judge's named fix verbatim). Rerun same 6 words.
 2. Then multi-candidate (judge setter's top 2) if bank rate still low.
+
+## v8 setter (liveliness pressure) — same 6 words (2026-07-01)
+
+Banked 1/6 again, but the failure mode moved. Surfaces are no longer
+dictionary-flat: AMBER "Sunlight captured in stone?", DAISY "Morning's eye?",
+GASP "Sharp intake after a jump scare?", and the bank: CHECK "Threaten the
+king" (chess angle — vivid, economical, no `?` needed; screen and confirm both
+bankable at first attempt).
+
+Drop reasons shifted from "lacks liveliness" to `?` discipline and looseness:
+GASP a1 and SCORE a2 are straight secondary-sense definitions wearing an
+unearned `?` — exactly the shape the new mechanical tidy (user suggestion)
+converts to a free strip-and-re-judge. AMBER a2 "Ancient resin's golden glow"
+clues the glow, not the resin — confirm's `bad` is correct (referent
+mismatch). DAISY a1 "Morning's eye?" flirts with the day's-eye etymology but
+neither setter nor judge articulated it.
+
+Calibration note (user exchange): my "clear recall loss" grade on batch 1's
+AMBER "Baltic treasure" assumed Baltic→amber is common solver knowledge; the
+user didn't have it. Trivia-dependent metonymy grades softer than I credited —
+in-session grades have error bars too, and the confirm's doubt-rule looks
+better calibrated on that example than I did.
+
+**Next:** same 6 words with the tidy active (isolates the tidy as the
+variable). Then multi-candidate if bank rate still lags.
