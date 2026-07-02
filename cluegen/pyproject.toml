@@ -41,6 +41,19 @@ dev = [
   "ruff>=0.4",
 ]
 
+# Fine-tuning probe (see local/finetune.md): mlx-lm supplies QLoRA training
+# (mlx_lm.lora) over quantized Gemma checkpoints; mlx-optiq supplies unfused
+# adapter serving (optiq serve --adapter) with an OpenAI-compatible API.
+# Optional because only the fine-tuning workflow needs them. Install with:
+#   pip install -e ".[finetune]"
+# Version floors are the current releases at selection time (2026-07-02):
+# mlx-lm 0.31.3, mlx-optiq 0.2.10 — recent enough for Gemma 4 + OptiQ
+# checkpoint support.
+finetune = [
+  "mlx-lm>=0.31",
+  "mlx-optiq>=0.2.10",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["local/tests"]
 markers = [
@@ -54,11 +67,17 @@ markers = [
 [tool.hatch.build.targets.wheel]
 packages = ["local"]
 
+# Editable installs can't express the local/ → cluegen/local prefix rewrite
+# through hatchling's default path detection — it raises rather than emit a
+# broken install (https://github.com/pfmoore/editables/issues/20).
+# dev-mode-dirs bypasses detection: it puts the listed directory — here the
+# parent, i.e. the repo root — on the import path, under which cluegen/local
+# resolves naturally. Relies on this project directory being named cluegen
+# and sitting at the repo root.
+dev-mode-dirs = [".."]
+
 [tool.hatch.build.targets.wheel.sources]
 "local" = "cluegen/local"
-
-[tool.hatch.build.targets.editable]
-mode = "strict"
 
 [build-system]
 requires = ["hatchling"]
