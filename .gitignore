@@ -6,8 +6,7 @@ dist/
 *.egg-info/
 cluegen/local/logs/
 cluegen/scratch/logs/
-# Stage-0 fine-tuning slice: derived from the third-party xd clue corpus, so
-# the data stays out of the public repo; build_slice.py regenerates it.
+# Stage-0 fine-tuning slice: generated data; build_slice.py regenerates it.
 cluegen/scratch/finetune/data/
 # Trained LoRA adapters: multi-MB binaries, regenerable from data + config.
 cluegen/scratch/finetune/adapters/
