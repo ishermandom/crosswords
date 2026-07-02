@@ -815,3 +815,55 @@ Variant chain launched (one 26B block, no model switches): edit-cap,
 align-quest, every-keep (all replaying the baseline archive), then
 no-difficulty full. 31B work (tier-2 confirms + fixer repairs) queued as a
 single later block per the model-switch cost note now in the spec.
+
+## 2026-07-02 — Variant round complete: scorecards, tier 2, fixer
+
+All queue-item variants measured on the 12-word panel × 3 runs, paired via
+prefix replay of the baseline archive. End-to-end = screen-pass × tier-2
+confirm on 36 word-runs.
+
+| variant | screen-pass | adj min/screen-pass | tier-2 confirm | end-to-end |
+| --- | --- | --- | --- | --- |
+| baseline (v8) | 13/36 (36%) | 2.2 | 2/12 (17%) | ~6% |
+| edit-cap | 8/36 (22%) | 2.5 | — (dead at tier 1) | — |
+| align-quest | 21/36 (58%) | 1.2 | 6/21 (29%) | ~17% |
+| every-keep | 17/36 (47%), 39 clues | ~0.4 raw | 3/19 (16%) | ~8% |
+| no-difficulty | 14/36 (39%) | — | 0/14 (0%) | 0 |
+
+Verdicts:
+
+- **align-quest is the round's win**: the judge's earned-? contrast pair
+  (OCEAN vs SILT) + referent self-check inside the setter's edit turn.
+  ~3× baseline end-to-end; the teaching-to-the-test worry did not
+  materialize at tier 2 (its confirm rate is higher than baseline's).
+  Fable validation still pending — the shared judge criteria mean local
+  gates can't fully arbitrate this.
+- **edit-cap is dead**: the 33k-char runaway (PAIR r1, 371 s = 22% of the
+  whole baseline panel's compute) is a deliberation spiral on words with
+  no lively angle, but terseness constraints cut quality more than they
+  save time (22% pass, worse adjusted efficiency than baseline).
+- **no-difficulty is dead**: 0/14 at tier 2. Difficulty targeting in the
+  prompts does real work; keep it (labels stay judge-assigned).
+- **every-keep is a cheap positive**: same setter turns, +46% bankable
+  clues at tier 1 for ~10% more compute. Caveat: it extracted only
+  1.08 clues/run, so part of the lift is extract-turn re-roll variance.
+  minItems guard added after constrained decoding took the empty-list
+  escape hatch in 13/29 runs.
+- **fixer converts 45%** (9/20) of baseline's screen-fixables into
+  screen-bankables at ~0.6 min each — the cheapest per-pass lever
+  measured. It wins by literalizing accuracy flaws; it sometimes flattens
+  a lively draft. Not yet in the pipeline; composable with everything.
+- Tier-2 texture: the 31B confirm is harsh on panel words (17% on
+  baseline's screen-passes) and noisy at the margins — ROBIN "Boy
+  Wonder?" confirmed while "A boy wonder?" judged bad.
+
+7 clues banked from tier 2 (6 align-quest, 1 every-keep); bank at 39.
+Combined adoption candidate `align-keep` (align-quest edit turn +
+every-keep extract) queued as the final comparison; adopt into
+`pipeline_local` as v9 only if it confirms at tier 2.
+
+**Ops.** Harness background tasks get reaped in this environment (all
+tasks killed simultaneously, twice, mid-progress — not sleep, not
+thermal; power log clean). Long runs now launch detached via Python
+`start_new_session` (macOS has no setsid; nohup can't detach here), with
+a disposable harness watcher whose kill/completion both wake the session.
