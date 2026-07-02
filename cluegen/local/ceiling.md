@@ -151,10 +151,13 @@ marginal cost is low.
   starting one.
 
 **Server management:** Claude runs the Ollama server itself as needed —
-`~/tmp/ollama serve` (the model path comes from `OLLAMA_MODELS` in the account's
-`~/.zprofile` — no override needed) from the `claude-sandbox` account (user
-authorization 2026-07-01) — and may bring it up and down freely. Pulling models
-through it remains forbidden, per the ask-first rule above.
+`/opt/homebrew/bin/ollama serve` (validated 2026-07-02; the model path comes
+from `OLLAMA_MODELS` in the account's `~/.zprofile` — no override needed) from
+the `claude-sandbox` account (user authorization 2026-07-01) — and may bring it
+up and down freely. Pulling models through it remains forbidden, per the
+ask-first rule above. A long-lived session whose environment predates a
+`~/.zprofile` change must launch via a login shell (`zsh -lc`) to pick up the
+current profile.
 
 ## Model tier
 
