@@ -666,3 +666,46 @@ provenance, 2 audit rescues).
 magnitude better than ~7–8 min per banked clue; anatomize the cost and
 attack the 23%/5% per-run bank rates. Brainstorm with the user before
 experiments.
+
+## Throughput brainstorm with user (2026-07-02)
+
+User principles now governing this exploration:
+
+- **No pruning setter creativity early** — trim output only when it clearly
+  isn't providing value (evidence first, e.g. angle-position-of-banked-clue
+  stats before shrinking the brainstorm).
+- **Difficulty is deprioritized, not discarded** — the judge is suspected
+  miscalibrated on it; remove targeting strain, keep recording judge-assigned
+  difficulty, return to calibration later. The bar that matters now: every
+  banked clue genuinely satisfying for a solver.
+- **Explore model-role splits** — squeeze the sparse 26B harder, and test
+  whether the dense 31B earns its runtime on specific setter turns (edit turn
+  first candidate: it is the craft gate, and dense could FIX, not just
+  reject).
+- **The cloud config is not a craft maximum** — it is Good Enough™ aside from
+  cost; treat its ~90% accept as a reference point, not a ceiling.
+- **Hard-word tricks are probably domain-general** — hypothesis: what rescues
+  numbers (hunt the concrete cultural object the word owns — forty winks,
+  jurors) should also lift friendly words. Test tips on both classes.
+- **Micro-optimize for superlinear wins** and build the cheapest possible
+  variant-testing loop.
+
+**Measurements grounding the micro-opt thread (49 setter conversations):**
+markdown leakage is a non-issue (3/196 turns — the plain-text instruction
+works). The find: **edit-turn runaways** — median 1,417 chars but 6/49 turns
+exceed 4k (max 31,436), and those 6 hold 58% of all edit-turn output. That
+tail is minutes of wasted 26B decode per occurrence and correlates with the
+setter chatter the harvest had to filter. Fix candidates: per-draft structure
+constraint in the prompt + a `num_predict` cap sized well above the median.
+
+**Cheap eval loop design (to build):** the Fable-validated cascade is a free,
+trusted metric. Tier 1 (iteration): fixed 12-word panel (friendly + numbers,
+excluding held-out) × 3 runs per variant, screen-only — report screen-pass
+rate, banks-eligible, tokens and seconds per run; ~25–30 min per variant.
+Tier 2 (adoption): full cascade on tier-1 winners. For single-turn variants,
+replay archived conversations up to the changed turn — pairs samples tightly
+and skips re-brainstorm cost. Honesty bound: 36 samples resolves only large
+effects (±13pp at p≈0.25); iterate on levers expected to clear that.
+
+**Queued:** user wants a detailed personal read of prompts + logs before
+strong tweak opinions — schedule a walkthrough when they're ready.
