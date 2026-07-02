@@ -142,6 +142,15 @@ _VARIANTS = {
               (_EVERY_KEEP_EXTRACT, _EVERY_KEEP_SCHEMA, {})],
     'edit_index': 2,
   },
+  # Adoption candidate: the two confirmed-positive, orthogonal changes
+  # composed — align-quest edit turn + every-keep extract.
+  'align-keep': {
+    'system': pl._SETTER_SYSTEM,
+    'turns': [(pl._TURN_ANGLES, None, {}), (pl._TURN_DRAFTS, None, {}),
+              (_ALIGN_QUEST_TURN, None, {}),
+              (_EVERY_KEEP_EXTRACT, _EVERY_KEEP_SCHEMA, {})],
+    'edit_index': 2,
+  },
   # Difficulty targeting removed everywhere; judge labels still recorded.
   'no-difficulty': {
     'system': _NO_DIFFICULTY_SYSTEM,
