@@ -728,3 +728,57 @@ picked up: derive a mechanism taxonomy empirically from the cloud bank's
 accepted clues and measure the distribution — that corpus is
 validated-satisfying and free to study; a mechanism-mix target could later
 serve both the setter (diversity pressure) and the angle-distinct depth pass.
+
+---
+
+## 2026-07-02 — Session state (written for compaction survival)
+
+**Where the campaign stands.** The single-American-clue validation loop is
+closed: pipeline (`scratch/pipeline_local.py`, v8 prompts + mechanical
+?-tidy + skip-banked passes) generates and banks; the judge cascade (26B
+per-clue screen → 31B per-clue confirm) is Fable-validated at ~0.9 precision
+on unseen words (checkpoint 2, $0.778: 7/8 accepts, the miss a same-angle
+duplicate). Bank: 32 records, Fable verdicts tagged in provenance. Throughput:
+~23% bank rate per word-run on friendly categories, ~5% on numbers, ~1.75
+min/word-run ≈ 7–8 min per banked clue.
+
+**Current objective (user): order-of-magnitude throughput improvement.**
+Governing principles in the two brainstorm entries above — chief constraints:
+no creativity pruning without log evidence; difficulty deprioritized (drop
+targeting strain, keep recording judge labels); no single-mechanism prompt
+hints; cloud config is reference, not ceiling.
+
+**Autonomous work queue, in order:**
+
+1. **Build the two-tier eval loop** (tier 1: fixed 12-word panel × 3 runs,
+   screen-only, report screen-pass rate + tokens + seconds; tier 2: full
+   cascade on winners; replay archived conversations for single-turn
+   variants). Proposed panel — the 6 fresh words (SCORE, DAISY, GRANT, CHECK,
+   GASP, AMBER) + TWENTY, GROSS, PAIR, VIOLET, ROBIN, STOCK; held-out set
+   stays reserved.
+2. **Variant: edit-turn runaway fix** — per-draft structure constraint +
+   `num_predict` backstop (~2× median; median 1,417 chars, 6/49 turns hold
+   58% of edit output). Expect time win; watch quality.
+3. **Variant: setter/judge criteria alignment** — the judge's earned-?
+   contrast few-shots (OCEAN vs SILT) into the setter's edit turn; referent
+   self-check ("what does this clue literally define?").
+4. **Variant: drop difficulty targeting** from the setter prompts.
+5. **Variant: judge-every-KEEP** (eager depth mode) — biggest structural
+   lever under the bank-shape goal.
+6. **Variant: dense-as-fixer** — 31B repairs `fixable` clues given the
+   judge's named flaw, demand-driven.
+7. Satisfaction-mechanism taxonomy: timing at Claude's discretion; cloud
+   bank is one INPUT, biased sample, echo-chamber risk if sole evaluation.
+
+One variable per comparison; adopt only tier-2-confirmed wins; log every
+scorecard here.
+
+**Operational.** Ollama server runs under Claude's control (`OLLAMA_MODELS=
+/Users/Shared/ollama/models ~/tmp/ollama serve` from claude-sandbox; restart
+if down; never pull). Wrap unattended runs in `caffeinate -i` (machine
+sleeps otherwise — that, not throttling, caused the old 75-min anomaly).
+Quota: NO `claude -p` of any size without the user's explicit go; checkpoint
+3 (if wanted) gets proposed with scope + dollar estimate. User's detailed
+prompt/log read is deferred to a fresh-eyes session — not blocking. Worktree
+`/Users/Shared/code/crosswords-local-ceiling`, branch `local-ceiling`,
+rebased onto main after each main-side commit; merge only with the user.
