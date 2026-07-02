@@ -22,9 +22,11 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` done · `[-]` droppe
 Installed system-wide via Homebrew (`brew install ollama` run as `ishermandom`).
 Binary lands at `/opt/homebrew/bin/ollama`.
 
-Model weights are shared between accounts at `/Users/Shared/ollama/models`, set
-via `OLLAMA_MODELS=/Users/Shared/ollama/models` in each account's shell config.
-This avoids duplicating the ~16 GB model download.
+Model weights are shared between accounts at `/Users/Shared/models/gguf`, set
+via `OLLAMA_MODELS=/Users/Shared/models/gguf` in the shared `.zprofile`
+(dotfiles). This avoids duplicating the ~16 GB model download. Store layout and
+rationale: `dotfiles/claude/docs/shared-storage.md` (the store moved from
+`/Users/Shared/ollama/models` on 2026-07-02).
 
 **The Ollama server must always be started manually** (`ollama serve`). Never
 use `brew services start ollama` or any other autolaunch mechanism — the server
@@ -36,12 +38,12 @@ should only run during active development sessions.
 # Run as ishermandom (requires admin)
 brew install ollama
 
-# Create shared model directory; leave world-readable (no ACLs needed —
-# /Users/Shared/ is a shared space and these are the only two accounts)
-mkdir -p /Users/Shared/ollama/models
+# Create shared model directory and grant both accounts inheritable ACLs:
+mkdir -p /Users/Shared/models/gguf
+~/.claude/scripts/share-directory.sh /Users/Shared/models/gguf
 
-# In ishermandom's ~/.zprofile (claude-sandbox connects via HTTP, not CLI):
-export OLLAMA_MODELS=/Users/Shared/ollama/models
+# In the shared .zprofile (dotfiles zsh/.zprofile, both accounts):
+export OLLAMA_MODELS=/Users/Shared/models/gguf
 
 # In claude-sandbox's ~/.zprofile (not set up automatically for non-Homebrew
 # users; needed to reach the ollama binary):
