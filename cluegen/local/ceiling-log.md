@@ -1010,3 +1010,15 @@ bottleneck. Launched a stability measurement: 12 borderline
 (confirm-fixable) clues × 5 re-judges — if verdicts flip, best-of-N
 voting recovers yield cheaply; if stable, the gate is a real bar and
 the clues themselves must improve.
+
+## 2026-07-02 — Confirm gate is stable; voting lever dead
+
+Flip check: 12 borderline (confirm-fixable) clues × 5 re-judges on 31B.
+11/12 drew the identical verdict 5/5; the single flipper (ANNE
+"Red-haired orphan?") wavered fixable↔bad, never toward bankable.
+Best-of-N confirm voting would recover ~nothing — the gate is a real
+quality bar, and yield improves only if clue craft improves. (The
+apparent ROBIN flip at checkpoint 3 was text-sensitivity —
+capitalization/article — not sampling noise.) This localizes the
+remaining headroom squarely in the setter's craft prior — the
+fine-tuning question now under discussion with the user.
