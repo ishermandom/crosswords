@@ -93,15 +93,16 @@ thread; the spec is self-contained.
 
 - [ ] Restructure the model directory: `/Users/Shared/ollama/models` →
       `/Users/Shared/models/gguf`, with a README documenting the directory is
-      managed via ollama; ownership `ishermandom`, world-readable (user request
-      2026-07-02). Blocked on: (a) no ollama runs in flight, (b) the mlx thread
-      finishes setting up `/Users/Shared/models/mlx` (collision avoidance), (c)
-      commands likely need to run as `ishermandom` (chown).
+      managed via ollama; ownership tidied to `ishermandom`, keeping effective
+      permissions equivalent to today's — the goal is layout and
+      accident-avoidance, not tightening (user request + clarification
+      2026-07-02). Blocked on: (a) no ollama runs in flight — Claude drains
+      batches on request, (b) the mlx thread finishes setting up
+      `/Users/Shared/models/mlx` (collision avoidance), (c) commands likely need
+      to run as `ishermandom` (chown).
   - Note: at execution, stop the ollama server first; afterwards update the
     `OLLAMA_MODELS` path in `ceiling.md` (Autonomy rules / server command) and
-    restart. Check whether `ollama serve` run by `claude-sandbox` needs any
-    write access to the models dir (pull-less serving should be read-only, but
-    verify locks/tmp behavior).
+    restart.
 
 ---
 
