@@ -60,23 +60,59 @@ Evidence from the 2026-07-02 eval round (details: `ceiling-log.md`):
   unchanged: an external quality bar a worse setter cannot silently degrade — it
   just banks less. (Judge tuning lacks labels at scale anyway; our
   Fable-verified verdicts number in the dozens.)
-- **Data: unscoped — everything on the data side is provisional.** Source,
-  curation recipe, and difficulty conditioning all get a dedicated design round
-  before stage-1 data prep (user direction 2026-07-02); none of them is settled
-  here. Candidate facts gathered so far, recorded only as input to that round:
-  the xd corpus (xd.saul.pw) is one candidate source — a free download of 8.0M
-  answer/clue pairs whose `clues.tsv` carries only `pubid`, `year`, `answer`,
-  and `clue`, so difficulty conditioning would need its fuller metadata, the
-  by-request raw puzzle corpus, or a different source; the question stays open.
-  Its licensing is gray for redistribution, standard for personal research use.
-  The cryptics dataset (cryptics.georgeho.org, ODbL) remains out of scope —
-  wrong style for this track.
-- **Curation is the core risk control.** Fine-tuning pulls toward the corpus
-  median, and for any crossword corpus the median is dictionary-flat Monday
-  fill. Recipe specifics (era, publications, question-mark share, length bands,
-  dedup) belong to the data design round above. Stage 0 doesn't wait on that
-  round: its ~500 pairs only exercise plumbing, so any clean slice works,
-  subject to the answer-split rule below. Judges remain the backstop.
+- **Data source: the Kaggle NYT clue set, with doshea as backup** (design round
+  settled 2026-07-02). Primary:
+  `kaggle.com/datasets/darinhawley/new-york-times-crossword-clues-answers-19932021`
+  — 781,573 rows, each with a full date (the set opens on the first
+  Shortz-edited puzzle, 1993-11-21), answer, and clue; one 11.5 MB zip; latin-1
+  encoding; needs a Kaggle account (user-run download). Backup and cross-check:
+  `github.com/doshea/nyt_crosswords` — per-day puzzle JSON 1976–2018 with an
+  explicit weekday field. Rejected: CrosswordQA (6.78M rows, no dates → no
+  difficulty proxy); public xd for stage 1 (clue rows carry year only; the dated
+  `gxd` corpus is by-request via Discord); cryptics (wrong style). The xd copy
+  stays around for frequency cross-checks.
+- **Difficulty conditioning: one conditioned adapter, coarse weekday buckets.**
+  Mon–Tue → easy, Wed–Thu → medium, Fri–Sat → hard, Sun → medium (bigger grid,
+  mid-week difficulty; the Mon→Sat ramp is stable across the Shortz era). The
+  bucket enters the training prompt as a difficulty token; eval prompts say
+  medium, matching the harness. One pooled fine-tune rather than per-difficulty
+  adapters: cluing skill is shared across difficulties, so at 5–20k pairs
+  pooling feeds the shared skill all the data instead of a third of it, for one
+  overnight instead of three; and same-answer contrast pairs across buckets (see
+  the answer cap) are exactly what teach the token. After training, a cheap
+  steering spot-check (same answer prompted easy vs hard); per-difficulty
+  adapters are the recorded stage-2 fallback if the token doesn't steer.
+- **Curation recipe** (settled 2026-07-02; motivation: fine-tuning pulls toward
+  the corpus median, so the recipe shapes the distribution the setter imitates —
+  but filters need evidence, not vibes, so speculative cutoffs were dropped):
+  - Era: no cutoff. The dataset is entirely Shortz-edited — no convention break
+    inside it — and gradual reference-staleness is barely visible to the judge
+    metric. Recency appears only as a mild tiebreak preference in cap selection.
+  - Dedup: normalized collapse — case/punctuation/whitespace-insensitive
+    (answer, clue) key — keeping the most recent copy.
+  - Answer cap: ≤ 4 clues per answer, picked cross-bucket first (difficulty
+    contrast pairs), recency as the mild tiebreak.
+  - Answers: all of them, 3–15 letters A–Z, flattened phrases included; narrow
+    to single dictionary words only if evidence shows phrase answers hurt
+    single-word deployment.
+  - Clues: non-empty; drop cross-references ("17-Across"), clue-contains-
+    answer, and encoding-mangled rows. Bracketed meta-clues stay; question-mark
+    share stays natural (the difficulty token already carries that signal).
+  - Mechanism diversity (`satisfaction.md`): considered explicitly, no active
+    balancing. The recipe filters nothing style-shaped, so natural-frequency
+    sampling carries the corpus's own mechanism spread into the slice; tagging
+    clues to balance them would need exactly the expensive evaluator we're
+    avoiding. The existing diversity-audit practice (satisfaction.md, "Uses in
+    the pipeline") applies unchanged to tuned-setter output, so a mechanism
+    monoculture would surface at the bank audit rather than pass silently;
+    mechanism-balanced sampling is the recorded lever if an audit ever shows
+    collapse.
+  - Split: by answer; panel + held-out answers excluded (rule below). Stage 0
+    didn't wait on this round: its ~500 pairs only exercised plumbing. Judges
+    remain the backstop for whatever curation misses.
+- **Slice size: set by 12B sanity timing.** Run the gated 12B sanity steps, take
+  tokens/sec, and size the slice so one epoch fits one overnight under
+  `caffeinate`, within the 5–20k band.
 - **Serving for eval: `optiq serve` with the unfused adapter, not Ollama.** The
   tuned setter runs as the base checkpoint plus the trained adapter
   (`optiq serve --adapter`), never fused: fusing over a quantized base
@@ -126,7 +162,8 @@ Evidence from the 2026-07-02 eval round (details: `ceiling-log.md`):
   carve-out: declared in a reviewable `cluegen/pyproject.toml` edit, then
   installed by Claude into the sandbox venv without a further gate. Fine-tuning
   runs are local-only.
-- Fable spot-checks fall under the standing agreement: self-launch under ~$2
+- Fable spot-checks fall under the standing agreement: self-launch under
+  ~$2
   estimated, $5 total between user check-ins.
 - Thermal reality: training and big eval runs are overnight jobs, detached,
   under `caffeinate`.
@@ -139,8 +176,6 @@ Evidence from the 2026-07-02 eval round (details: `ceiling-log.md`):
 
 - Stage-1 model size: 12B as proposed, or repeat stage 0's model at larger data
   first? Decide after stage 0, with its training timings in hand.
-- Everything on the data side — source, curation recipe, difficulty conditioning
-  — a dedicated design round before stage-1 data prep.
 - Whether stage 1's single-turn variant needs a short output-format wrapper
   (bare clue text vs JSON) — bare text avoids instruction-following decay and
   simplifies extraction.
