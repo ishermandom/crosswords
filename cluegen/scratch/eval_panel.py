@@ -343,7 +343,11 @@ clue must not contain the answer word or a trivial inflection of it."""
 def _run_fixer(path):
   """Have the dense model repair each screen-fixable clue from a tier-1
   result file, then re-screen the repairs: measures how many fixables the
-  demand-driven fixer converts to screen-bankable."""
+  demand-driven fixer converts to screen-bankable.
+
+  Two batched phases (all 31B repairs, then all 26B re-screens): a gemma4
+  model switch drains and rewires wired memory, so interleaving per clue
+  would pay that cost twice per fixable."""
   records = [json.loads(line)
              for line in pathlib.Path(path).read_text().splitlines()]
   variant = records[0]['variant']
@@ -351,8 +355,8 @@ def _run_fixer(path):
               for s in r['screens'] if s['verdict'] == 'fixable']
   print(f'{variant}: {len(fixables)} screen-fixable clues to repair')
 
-  converted = 0
   seconds = 0.0
+  repairs = []
   for word, screen in fixables:
     prompt = (
       f'Answer word: {word}\n'
@@ -379,11 +383,15 @@ def _run_fixer(path):
       print(f'  {word}: "{repaired["clue"]}" -> unchanged, skipped',
             flush=True)
       continue
+    repairs.append((word, screen['clue']['clue'], repaired))
+
+  converted = 0
+  for word, original, repaired in repairs:
     verdict, stats = _screen(word, repaired['clue'])
     seconds += stats['seconds']
     if verdict['verdict'] == 'bankable':
       converted += 1
-    print(f'  {word}: "{screen["clue"]["clue"]}" -> "{repaired["clue"]}" '
+    print(f'  {word}: "{original}" -> "{repaired["clue"]}" '
           f'-> {verdict["verdict"]}', flush=True)
 
   rate = f'{100 * converted / len(fixables):.0f}%' if fixables else 'n/a'
