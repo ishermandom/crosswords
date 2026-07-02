@@ -993,3 +993,20 @@ inaccurate FORTY ("just shy of the answer to everything" = 41); COURT,
 SUE, NINETEEN died at confirm-fixable — angle discovery fine, craft
 polish failing the harsh gate, consistent with the original held-out
 diagnosis. Next passes test accumulation on hard words.
+
+## 2026-07-02 — Batch 2 (72 words): breadth grows, confirm is the wall
+
+Mixed batch: 5 uncovered held-out words (pass 2), 27 batch-1 leftovers
+(pass 3), 40-word fresh slice (pass 1). 7 banked — LARRY "Not quite
+Lawrence?", TOT "Small drink?", DUSK "When shadows stretch", WYE "Forked
+path?", EMIT "Cast a beam", ALOUD "Not just in one's head", FRINGE
+"Where the wilderness meets the clearing". Bank at 61.
+
+Accumulation curve so far: fresh slices bank ~10-15% of words on pass 1;
+third passes on leftovers yield little (1/27); held-out second passes
+0/5 — hard words stay hard under re-rolls. The 31B confirm passed ~7 of
+62 attempts this batch (~11%): the gate, not generation, is now the
+bottleneck. Launched a stability measurement: 12 borderline
+(confirm-fixable) clues × 5 re-judges — if verdicts flip, best-of-N
+voting recovers yield cheaply; if stable, the gate is a real bar and
+the clues themselves must improve.
