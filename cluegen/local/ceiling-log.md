@@ -618,3 +618,19 @@ cloud bank is already deepest, which is a happy complementarity.
 **Next:** harvest never-extracted KEEP drafts from all pipeline logs through
 the cascade (production under the bank-shape goal + measures whether draft
 pools are underexploited), then propose checkpoint 2.
+
+## KEEP-pool harvest: 1/7 (2026-07-02)
+
+`scratch/harvest_keeps.py` re-judged every never-extracted KEEP draft in the
+pipeline logs (7 clean candidates after filtering setter chatter). Banked:
+CHECK "Curb an impulse". Reading: draft pools are only mildly underexploited
+(~14% of runner-up KEEPs bank), so full reruns' fresh-brainstorm cost is
+earning its keep — but the harvest is nearly free and runs as a standard
+post-batch sweep under the bank-shape goal.
+
+Bank: 30 records; 8 locally-judged pipeline banks across 8 distinct words'
+clues (DAISY ×2, CHECK ×2, GRANT, GASP, AMBER, ZED).
+
+**Checkpoint 2 payload finalized:** 8 pipeline-banked + 4 earmarked
+judge-rejections = 12 clues. Estimate ~$0.80 at checkpoint-1 unit cost
+($2.65/40 clues); cap $1.50. Awaiting user go.
