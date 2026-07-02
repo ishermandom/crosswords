@@ -17,9 +17,7 @@ import json
 import random
 from pathlib import Path
 
-XD_CLUES_PATH = Path(
-    '/private/tmp/claude-505/-Users-Shared-code-crosswords/'
-    '70c87c92-15e0-4649-80ce-e3809033d468/scratchpad/xd/clues.tsv')
+XD_CLUES_PATH = Path('/Users/Shared/data/xd/clues.tsv')
 OUTPUT_DIR = Path(__file__).parent / 'data'
 
 # Answers the eval harness reserves: the 12-word iteration panel
