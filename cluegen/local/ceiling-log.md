@@ -488,3 +488,32 @@ spread across categories, outside iteration + held-out sets), full cascade.
 Estimated ~30–60 min wall clock. Worth it: this is the first true validation of
 the end-to-end pipeline on unseen words, and the banked output it produces is
 the campaign's deliverable. Run kept awake via `caffeinate -i -w <pid>`.
+
+## Fresh-word batch 1 — scorecard (2026-07-01)
+
+6 unseen words, full cascade, one retry, 10.5 min wall clock (caffeinated —
+same workload shape that "took 75 min" pre-diagnosis; sleep confirmed as the
+J4 culprit). Banked 1/6.
+
+| word  | attempt 1              | verdict            | attempt 2               | verdict | my grade of best        |
+| ----- | ---------------------- | ------------------ | ----------------------- | ------- | ----------------------- |
+| SCORE | "Make a mark?"         | screen ok, confirm fixable (? unearned) | "Film's background music" | fixable (flat) | borderline; a2 fine easy |
+| DAISY | "Petal-puller's target?" | BANKED           | —                       | —       | genuinely good          |
+| GRANT | "Allow or bestow?"     | fixable (? unearned) | "Provide or permit?"  | fixable | fair drop; trivial fix would salvage |
+| CHECK | "Bill at a bistro"     | screen ok, confirm fixable (flat) | "Diner's final tally" | fixable (flat) | a1 arguably bankable easy |
+| GASP  | "A sudden intake in horror" | fixable       | "Sharp intake at a shock?" | fixable | fair drops, both weak |
+| AMBER | "Baltic treasure"      | screen ok, confirm fixable | "Ancient resinous gem" | fixable | a1 a real recall loss — good metonymy |
+
+**Interpretation.** Precision holds (the one bank is the batch's one lively
+clue). The drops split: ~2 recall losses (AMBER a1 clearly; SCORE/CHECK a1 as
+easy fills), the rest genuinely dictionary-flat. The binding constraint is now
+**setter liveliness**, not judge recall — most drafts are accurate but flat,
+and the judge's "lacks liveliness" complaint is usually correct. Secondary bug:
+the retry turn ignores the judge's stated fix (GRANT's retry kept the unearned
+`?` the judge had named).
+
+**Next iteration (one variable at a time):**
+
+1. v8 setter — liveliness pressure in the drafts and edit turns; make the
+   retry directive (apply the judge's named fix verbatim). Rerun same 6 words.
+2. Then multi-candidate (judge setter's top 2) if bank rate still low.
