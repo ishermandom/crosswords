@@ -26,11 +26,19 @@ preferred quantization.
       it so the storage isn't swallowed forever.
 
 - [ ] **Retire the old Ollama store path** — the store moved to
-      `/Users/Shared/models/gguf` (2026-07-02, shared-storage layout); no
-      compatibility symlink (user is coordinating the cutover with the
-      local-ceiling thread directly). Once `ceiling.md`'s `OLLAMA_MODELS` value
-      (Server management section — that thread owns the branch) points at the
-      new path, delete the now-empty `/Users/Shared/ollama`.
+      `/Users/Shared/models/gguf` (2026-07-02, shared-storage layout).
+      `ceiling.md`'s cutover is done (main + local-ceiling worktree, verified
+      2026-07-02) and the old store's contents are deleted; all that remains is
+      the empty directory shell. User-run (sandbox lacks write on the parent):
+      `rm -rf /Users/Shared/ollama`
+
+- [ ] **Reinstall the venv's editable `clue-gen` from the main checkout after
+      the `finetune-probe` branch merges** — the 2026-07-02 reinstall (which
+      fixed the editable-install config and the broken `clue-gen` console
+      script) ran from the probe worktree, so the venv's `.pth` resolves
+      `cluegen.local` from `/Users/Shared/code/crosswords-finetune-probe`. Once
+      that worktree is deleted, imports dangle. Fix:
+      `cd /Users/Shared/code/crosswords/cluegen &&     pip install -e ".[dev,finetune]"`
 
 ---
 
@@ -74,9 +82,9 @@ thread; the spec is self-contained.
   (`HF_HUB_CACHE=/Users/Shared/models/mlx`), 12B pull in progress. The user
   personally runs model/data downloads from a shopping list Claude supplies.
   Remaining sub-steps, in order:
-  - Add `finetune` optional-dependency group to `cluegen/pyproject.toml`
-    (`mlx-lm`, `mlx-optiq`; 0.31.3 / 0.2.10 current at selection time) and sync
-    into the sandbox venv — Claude-run per the declared-deps carve-out.
+  - Done 2026-07-02: `finetune` optional-dependency group in
+    `cluegen/pyproject.toml` (`mlx-lm`, `mlx-optiq`), installed in the sandbox
+    venv at 0.31.3 / 0.2.10; imports and both CLIs verified.
   - Build the ~500-pair stage-0 slice from the session-scratchpad xd copy
     (`.../scratchpad/xd/clues.tsv`; any clean slice — curation is stage-1
     scope), answer-split with `eval_panel` panel + held-out words excluded.
