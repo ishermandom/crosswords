@@ -24,9 +24,18 @@ if len(sys.argv) > 1:
   pipeline_local.SCHEMA_TEMPERATURE = float(sys.argv[1])
 
 # Optional second argument restricts to one stage ('screen'/'confirm'); a third
-# argument tags the output file (e.g. a prompt-variant name).
+# argument tags the output file AND selects the confirm-stage prompt variant:
+# '_taste31' runs the confirm model on the screen's full taste prompt minus the
+# coupling-license sentence; anything else uses the verification confirm.
 _STAGE_FILTER = sys.argv[2] if len(sys.argv) > 2 else None
 _RUN_TAG = sys.argv[3] if len(sys.argv) > 3 else ''
+
+_COUPLING_LICENSE = '''; a named basis with
+no named flaw means "bankable"'''
+_TASTE_NO_LICENSE_SYSTEM = pipeline_local._JUDGE_SYSTEM.replace(
+  _COUPLING_LICENSE, ''
+)
+assert _TASTE_NO_LICENSE_SYSTEM != pipeline_local._JUDGE_SYSTEM
 
 _TEMPERATURE_TAG = str(pipeline_local.SCHEMA_TEMPERATURE).replace('.', 'p')
 _LOG = (
@@ -63,11 +72,17 @@ def main():
   for stage, model in STAGES:
     if _STAGE_FILTER and stage != _STAGE_FILTER:
       continue
-    system = pipeline_local._CONFIRM_SYSTEM if stage == 'confirm' else None
+    is_confirm = stage == 'confirm'
+    system = protocol = None
+    if is_confirm and _RUN_TAG == '_taste31':
+      system = _TASTE_NO_LICENSE_SYSTEM
+    elif is_confirm:
+      system = pipeline_local._CONFIRM_SYSTEM
+      protocol = pipeline_local._CONFIRM_PROMPT
     for word, clue in TARGETS:
       for i in range(K):
         v = pipeline_local._judge(
-          model, word, clue, quiet, stage, system=system
+          model, word, clue, quiet, stage, system=system, protocol=protocol
         )
         samples.append(
           {
