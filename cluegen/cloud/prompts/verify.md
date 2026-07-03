@@ -37,9 +37,21 @@ ALL clues (craft invariants, spec §A2):
    another quantity earns its keep only when the relation itself carries a pivot
    or surprise ("One-twelfth gross?" for DOZEN) — a bare equation or
    category-membership statement ("Twenty times two" for FORTY) is the flat end
-   of the same mechanism, and flat. This applies at every difficulty: easy means
-   direct and signposted, not dull — "Toward the south" fails where "Like a
-   snowbird's November flight" passes, at identical difficulty and accuracy.
+   of the same mechanism, and flat.
+
+   "Fun" sits on the same kind of gradient and is the easiest basis to
+   over-grant. Fun means humor or surprise in the surface itself — an image or
+   turn of phrase with its own wit ("Heads down!" for DUCK), enjoyable to read
+   before solving. Recognition is not fun: a clue that merely fuses stock
+   associations of the answer ("Old enough to order a drink" for TWENTYONE) or
+   drapes a breezy register over a plain fact pleases only by familiarity — that
+   is a flat gloss in disguise. Before writing `basis: "fun"`, ask: is there a
+   joke or a surprise here, or just something the solver already knows,
+   pleasantly phrased?
+
+   All of this applies at every difficulty: easy means direct and signposted,
+   not dull — "Toward the south" fails where "Like a snowbird's November flight"
+   passes, at identical difficulty and accuracy.
 
 American clues additionally: 7. **Trap proportionate to difficulty** — not every
 clue needs a trap; required deception scales with the tag (spec §A2b):

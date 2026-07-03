@@ -1201,3 +1201,28 @@ Texture worth keeping:
 Spend this check-in window: $2.251 of the $5 cap ($0.442 checkpoint 4 +
 $1.809
 here, user-directed).
+
+## 2026-07-02 — Fun gradient closes the escape hatch ($0.785)
+
+User-directed follow-up: the criterion had a gradient for fact-based clues but
+none for "fun", so the judge granted fun to anything pleasant. Added the
+parallel calibration — fun is humor or surprise in the surface itself ("Heads
+down!" for DUCK); recognition is not fun (fusing stock associations, "Old enough
+to order a drink" for TWENTYONE); plus a pre-commitment question before writing
+`basis: "fun"`.
+
+Same 20-clue set, side by side with the previous run (15A/5RV → **9A/11RV**):
+
+- All five fun-basis chunk-1 accepts flipped to revise with the right reasoning
+  — THREE "stock fact plainly stated", SEVEN "fuses two stock associations",
+  SIXTEEN "breezy register", plus ZERO and TWO. **All 8 chunk-1 banks now draw
+  revises**, matching the user's read of the set.
+- THIRTEEN held accept and relabeled fun → prize-fact (the desired behavior:
+  basis moves, verdict doesn't). GASP kept fun honestly; CHECK/GROSS/MURMUR
+  relabeled without verdict changes.
+- One new regression flip, off-axis: MELODY "Whistleable earworm" revised as
+  unmarked definition-by-example (an earworm is a kind of melody — spec wants a
+  ?). Defensible; noted on #judge-satisfaction as a watch item, with the general
+  strictness rise.
+
+Spend this check-in window: $3.036 of the $5 cap.
