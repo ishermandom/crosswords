@@ -1326,3 +1326,34 @@ Gate amendment (user, 2026-07-02): with the lease held, local runs under ~1 hour
 each self-serve — no per-batch ping. Multi-hour local runs and all cloud
 spending still get user notice first. Recorded in the shared memory store; the
 fine-tune thread needs a one-line relay from the user to adopt it.
+
+## 2026-07-02 — Judge iterations 1–2: prize-fact fixed; prompt tuning hits its noise floor
+
+Three agreement-eval runs, two prompt iterations
+(`scratch/logs/agreement_eval_*.jsonl`):
+
+| iteration                           | keeps (Fable accepts bankable) | kills (revises non-bankable) |
+| ----------------------------------- | ------------------------------ | ---------------------------- |
+| baseline (first alignment)          | 2/11                           | 20/21                        |
+| 1: positive gradient side           | 4/11                           | 20/21                        |
+| 2: named-flaw doubt rule, ROOK pair | 5/11                           | 18/21                        |
+
+Iteration 2's win: THIRTEEN "A number often skipped in elevators" — the
+prize-fact control — now banks at both stages. Its costs: ZED and MELODY leak
+(both soft Fable revises — an economy nit and the ?-convention call, not
+liveliness), and FOURTEEN flip-flopped across the three runs (banked / died /
+banked at temp 0.2) — single-sample deltas of ±1–2 on this 32-clue set are
+within run noise, so the instrument can't resolve further prompt gains.
+
+What persists: **familiar-domain blindness**. CHECK "Threaten the king",
+CENTURY, GASP, MARCH, MURMUR all still die as "dictionary-flat / stock
+association" — the judge grades the topic's familiarity, not the leap, and the
+ROOK calibration pair didn't transfer. This looks like a capability limit of the
+26B/31B cascade on taste distinctions, not a wording problem.
+
+Where that leaves the cascade: precision on flats is solid (every chunk-1 and
+holdout flat dies in all three runs); recall on good clues is ~half. Recall loss
+costs throughput (fewer banks per run), not bank quality. The honest next
+instrument is batch-4 chunk 2: measure the real bank rate under the new judge
+
+- fixer and let the user judge the tradeoff on production numbers.

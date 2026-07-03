@@ -91,14 +91,14 @@ done — see the log for the curve and the criteria re-analysis.
   Local cascade alignment implemented 2026-07-02 (liveliness bullet gains both
   gradients; the NINE calibration example that blessed flat count metonymy is
   now a graded ELEVEN/NINE pair; stock-association example added). Agreement
-  eval run 2026-07-02 (`scratch/agreement_eval.py`): kill side works (20/21
-  Fable revises die locally, all chunk-1 flats included; one leak — FOURTEEN),
-  but the keep side collapsed (2/11 Fable accepts stay bankable; diagnosis in
-  ceiling-log — the recognition language generalized into "commonly known =
-  flat"). Remaining: rebalance the liveliness bullet (state the positive side of
-  the gradient — a remark-worthy fact needs no pivot; familiarity doesn't
-  flatten), then re-run the eval. Prompt edit free; re-run is a local batch,
-  user-gated.
+  eval (`scratch/agreement_eval.py`) run three times over two prompt iterations
+  2026-07-02: flats die in every run; keeps recovered 2/11 → 5/11 and the
+  prize-fact control (THIRTEEN) now banks, but further deltas sit inside
+  single-sample run noise, and familiar-domain ahas (CHECK, MARCH, MURMUR) still
+  die — likely a 26B/31B capability limit, not wording; full three-run table in
+  ceiling-log. Prompt tuning stopped there. Remaining: decide via batch-4 chunk
+  2 (#batch4) whether ~half recall on good clues is an acceptable throughput
+  cost given precision holds — user decision on production numbers.
   - Note: the "fun" escape hatch is closed — a fun gradient (humor/surprise in
     the surface vs. recognition of stock associations) landed 2026-07-02; all
     five fun-basis chunk-1 accepts flipped to revise with regression accepts

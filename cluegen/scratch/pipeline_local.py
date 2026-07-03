@@ -206,7 +206,9 @@ Verdicts:
 - "bad" — fundamentally flawed for this answer.
 
 The costly error is banking a flawed clue. When your analysis leaves
-genuine doubt, verdict "fixable", never "bankable".
+genuine doubt, verdict "fixable", never "bankable" — but doubt means a
+concrete flaw named in the analysis. If the analysis names no flaw, the
+verdict is "bankable": vague unease is not a flaw.
 
 Calibration examples — where the boundaries sit:
 
@@ -218,6 +220,12 @@ Calibration examples — where the boundaries sit:
   stated. Liveliness grades the fact, not the mechanism.
 - "Old enough to order a drink" -> TWENTYONE: fixable. Fuses the
   answer's stock associations — recognition, not surprise.
+- "Corner piece?" -> ROOK: bankable (medium). The chess fact is
+  schoolchild-familiar, but the surface points at a jigsaw puzzle — the
+  pivot makes the leap, and the leap is the liveliness. A familiar
+  domain does not flatten a clue whose surface misleads.
+- "Castle-shaped chess piece" -> ROOK: fixable. The same familiar domain
+  with no leap — a picture-dictionary entry.
 - "One who delivers your letters" -> MAIL: bad. Defines the mail CARRIER,
   not the answer itself.
 - "Unwanted gift" -> ELEPHANT: bad. The sense lives only inside the idiom
