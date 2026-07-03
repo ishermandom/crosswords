@@ -165,6 +165,19 @@ thread; the spec is self-contained.
     (3) panel eval at medium via `eval_tuned.py` + screen; (4) steering
     spot-check (same answers at easy vs hard); (5) decision-metric read:
     confirmed-bankable per GPU-minute vs v9.
+- [ ] Investigate training throughput (after the overnight run; needs the
+      lease). The log's `Tokens/sec` ≈ 1.5–2.0 counts only trained (response)
+      tokens — ~8/example under prompt masking — so it is not comparable to
+      inference decode tok/s. But the implied full-sequence rate (~0.21 it/s ×
+      ~40 tokens forward+backward through the 12B 4-bit model) still looks low
+      vs MLX prefill throughput. Suspects, in order: backward pass through
+      quantized layers (dequantize cost), batch-1 hardware underutilization
+      (batch 4 gave only ~15% more examples/s — itself evidence the bottleneck
+      isn't compute saturation), fanless thermal throttling on a multi-hour run.
+      Cheap probes: time a forward-only pass over the same batch shape vs the
+      training step; compare early-run vs late-run it/s in `train_stage1.log`
+      for thermal drift. Payoff: if step time is fixable, stage-2 epochs get
+      cheaper across the board.
 - [ ] Stage 2 — only on stage-1 signal. Options, not commitments: more
       data/epochs; DPO from judge labels (converts judge preferences into the
       training objective — the quality-not-shape lever); judge-filtered training
