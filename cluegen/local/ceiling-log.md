@@ -1411,3 +1411,57 @@ screen split-rates on imagery accepts. Next validation (machine- gated): the
 49-clue agreement eval under the full new cascade; then the fixer replay; then
 batch-4 chunk 2. Machine handed to the fine-tune thread 2026-07-03 ~01:30; no
 further runs without the user's go.
+
+## 2026-07-03 — Autonomous iteration window: protocol
+
+User grant: ~5–10 hours of self-directed iteration once the fine-tune thread's
+compute needs are met. Goal: a mix of judge quality, setter quality, and
+throughput — steer by apparent leverage, no forced bouncing. Budgets: $10 of
+Fable checkpoints over the window; up to 10 tries per task, stopping earlier on
+diminishing returns; every batch ≤45 min with a small-first validation ladder.
+Chat gets an update every time new data lands.
+
+**Validation ladder** — every idea climbs, none skips:
+
+- Rung 0 — execution smoke: one clue/word, changed stage only, everything else
+  replayed. Confirms the change runs and the output shape is right; carries NO
+  efficacy signal.
+- Rung 1 — targeted probe: the relevant slice (e.g. variance-probe 12, a
+  category subset), changed stage only, K samples where verdict stability
+  matters.
+- Rung 2 — full battery, replaying unchanged stages; ≤45 min. Reserved for
+  adoption decisions.
+
+**Adoption methodology** (adversarially refined once, per user direction):
+
+1. Pre-register in the ledger before each run: hypothesis, target metric, guard
+   metrics, expected direction. (Counters forking-paths metric shopping.)
+2. Tuning set = the 32-clue satisfaction reference; holdout = the 17
+   fresh-validation clues, consulted only at adoption decisions. (The reject
+   bank adds no independent signal — all 14 records are a subset of the tuning
+   set, `source: satisfaction-reference`. This counters holdout leakage across
+   20+ ideas; a mid-window Fable-labeled fresh set from the $10 budget becomes
+   the true test for the final stack.)
+3. Adopt when the target improves with a mechanism-consistent causal story —
+   flipped clues' analyses show the change doing what it was designed to do —
+   and guards hold on tuning + holdout. A bare count delta of ±1 clue is noise
+   at N=49. (Counters small-N adoption.)
+4. Precision guard is hard: zero new stable false-banks on tuning or holdout
+   revises; verdict stability checked at K≥3 on any flipped clue. Recall gains
+   are the usual win condition; throughput ideas instead need quality
+   non-regression plus a meaningful compute drop.
+5. Every ~5 adoptions, or before switching idea families: re-run the full
+   battery on the adopted stack against the WINDOW-START baseline, not the
+   previous step. (Counters ratchet drift and interaction effects.)
+
+**Compute courtesy**: lease held per run-series; between runs, check `status`
+for the fine-tune thread's I'm-waiting note (new advisory-waiter mechanism,
+c562f2b) and yield on sight. Stage-1 training finished 08:36 today; machine
+measured idle at window start.
+
+Ledger: `scratch/window_ledger.md` (one pre-registered line per idea, outcome
+appended). Idea list seeded from tasks.md queue — cascade roles (#taste-31b
+variants, inversion, 26B-only, split-routing), wording gaps (padding, GASP fun),
+temperatures, fixer replay + variants, category ceilings (numbers,
+letter-names), eval infrastructure (battery harness, replay cache, fresh Fable
+labels), and code-only fillers (reject-bank wiring, tagger, template dedup).
