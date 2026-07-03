@@ -18,7 +18,10 @@ anyone else waits their turn. The protocol (agreed with the user 2026-07-02):
   user rather than piling on.
 - **FIFO**: a blocked session runs `wait` (typically as a background watcher),
   then retries `acquire`; the file-creation race between two waiters has a
-  single winner.
+  single winner. `wait` also leaves an advisory I'm-waiting note (shown by
+  `status`) so the holder can see demand: between self-served runs, the holder
+  checks `status` and, seeing a waiter, releases instead of starting the next
+  run.
 - **Release unloads**: releasing asks ollama to unload loaded models so the next
   holder starts from measured idle. MLX frees its memory on process exit by
   itself.
@@ -48,7 +51,8 @@ Usage:
 cluegen/local/compute_lease.py status
 cluegen/local/compute_lease.py acquire --holder ceiling \\
     --task 'agreement eval' --minutes 20 [--pid 74146]
-cluegen/local/compute_lease.py wait [--timeout-minutes 240]
+cluegen/local/compute_lease.py wait --holder finetune \\
+    [--task 'stage-1 eval'] [--timeout-minutes 240]
 cluegen/local/compute_lease.py release --holder ceiling
 ```
 
@@ -76,6 +80,7 @@ import urllib.error
 import urllib.request
 
 _LEASE_PATH = pathlib.Path('/Users/Shared/models/.compute-lease.json')
+_WAITERS_PATH = pathlib.Path('/Users/Shared/models/.compute-waiters.json')
 _OLLAMA_PS_URL = 'http://localhost:11434/api/ps'
 _OLLAMA_BINARY = shutil.which('ollama') or '/opt/homebrew/bin/ollama'
 
@@ -120,6 +125,81 @@ class Lease:
       f'{self.holder} (pid {self.pid or "untracked"}): {self.task} '
       f'[acquired {acquired:%H:%M:%S}, expires {expires:%H:%M:%S}]'
     )
+
+
+@dataclasses.dataclass(frozen=True)
+class Waiter:
+  """One session's advisory note that it wants the machine next.
+
+  Purely informational — it never blocks anyone. It lets the lease holder see
+  demand between self-served runs and yield instead of starting another batch.
+  """
+
+  holder: str
+  task: str
+  since: float
+
+  def describe(self) -> str:
+    """One line naming the waiter, its task, and when it started waiting."""
+    since = datetime.datetime.fromtimestamp(self.since)
+    return f'{self.holder}: {self.task} [waiting since {since:%H:%M:%S}]'
+
+
+def _read_waiters() -> list[Waiter]:
+  """All registered I'm-waiting notes; [] when nobody is waiting.
+
+  Raises ValueError on a malformed waiters file — like the lease file, that
+  means a protocol bug worth a look rather than a silent default.
+  """
+  try:
+    text = _WAITERS_PATH.read_text()
+  except FileNotFoundError:
+    return []
+  entries: object = json.loads(text)
+  if not isinstance(entries, list):
+    raise ValueError(f'malformed waiters file {_WAITERS_PATH}: {text!r}')
+  waiters: list[Waiter] = []
+  for entry in entries:
+    if not isinstance(entry, dict):
+      raise ValueError(f'malformed waiters file {_WAITERS_PATH}: {text!r}')
+    try:
+      waiters.append(
+        Waiter(
+          holder=str(entry['holder']),
+          task=str(entry['task']),
+          since=float(entry['since']),
+        )
+      )
+    except (KeyError, TypeError, ValueError) as error:
+      raise ValueError(
+        f'malformed waiters file {_WAITERS_PATH}: {text!r}'
+      ) from error
+  return waiters
+
+
+def _write_waiters(waiters: list[Waiter]) -> None:
+  """Persist the waiter notes; an empty list removes the file."""
+  if waiters:
+    _WAITERS_PATH.write_text(
+      json.dumps([dataclasses.asdict(waiter) for waiter in waiters])
+    )
+  else:
+    _WAITERS_PATH.unlink(missing_ok=True)
+
+
+def _set_waiting_note(holder: str, task: str) -> None:
+  """Register `holder`'s I'm-waiting note, replacing any prior one."""
+  others = [
+    waiter for waiter in _read_waiters() if waiter.holder != holder
+  ]
+  _write_waiters(others + [Waiter(holder=holder, task=task, since=time.time())])
+
+
+def _clear_waiting_note(holder: str) -> None:
+  """Drop `holder`'s I'm-waiting note, if present."""
+  _write_waiters(
+    [waiter for waiter in _read_waiters() if waiter.holder != holder]
+  )
 
 
 def _loaded_models() -> list[str]:
@@ -255,25 +335,36 @@ def _acquire(holder: str, task: str, minutes: float, pid: int) -> ExitCode:
   except FileExistsError:
     print('lost an acquire race; wait and retry')
     return ExitCode.LEASE_HELD
+  _clear_waiting_note(holder)
   print(f'acquired: {new_lease.describe()}')
+  for waiter in _read_waiters():
+    print(f'note — also waiting: {waiter.describe()}')
   return ExitCode.OK
 
 
-def _wait(timeout_minutes: float) -> ExitCode:
-  """Block until an acquire should succeed; report each change of blocker."""
-  deadline = time.time() + timeout_minutes * 60
-  last_reason = ''
-  while time.time() < deadline:
-    reason = _blocking_reason()
-    if reason is None:
-      print('machine is free')
-      return ExitCode.OK
-    if reason != last_reason:
-      print(f'waiting: {reason}', flush=True)
-      last_reason = reason
-    time.sleep(_POLL_SECONDS)
-  print(f'still blocked after {timeout_minutes:g} minutes: {last_reason}')
-  return ExitCode.WAIT_TIMEOUT
+def _wait(holder: str, task: str, timeout_minutes: float) -> ExitCode:
+  """Block until an acquire should succeed; report each change of blocker.
+
+  Leaves `holder`'s advisory I'm-waiting note registered for the duration so the
+  lease holder can see the demand and yield between runs.
+  """
+  _set_waiting_note(holder, task)
+  try:
+    deadline = time.time() + timeout_minutes * 60
+    last_reason = ''
+    while time.time() < deadline:
+      reason = _blocking_reason()
+      if reason is None:
+        print('machine is free')
+        return ExitCode.OK
+      if reason != last_reason:
+        print(f'waiting: {reason}', flush=True)
+        last_reason = reason
+      time.sleep(_POLL_SECONDS)
+    print(f'still blocked after {timeout_minutes:g} minutes: {last_reason}')
+    return ExitCode.WAIT_TIMEOUT
+  finally:
+    _clear_waiting_note(holder)
 
 
 def _release(holder: str) -> ExitCode:
@@ -305,6 +396,8 @@ def _status() -> ExitCode:
     print(f'lease: {lease.describe()}{staleness}')
   busy = _busy_reason()
   print(f'machine: {busy if busy else "measures idle"}')
+  for waiter in _read_waiters():
+    print(f'waiting: {waiter.describe()}')
   return ExitCode.OK
 
 
@@ -320,6 +413,8 @@ def main() -> int:
   acquire.add_argument('--minutes', type=float, required=True)
   acquire.add_argument('--pid', type=int, default=0)
   wait = subcommands.add_parser('wait')
+  wait.add_argument('--holder', required=True)
+  wait.add_argument('--task', default='unspecified')
   wait.add_argument('--timeout-minutes', type=float, default=240)
   release = subcommands.add_parser('release')
   release.add_argument('--holder', required=True)
@@ -330,7 +425,7 @@ def main() -> int:
   if args.subcommand == 'acquire':
     return _acquire(args.holder, args.task, args.minutes, args.pid)
   if args.subcommand == 'wait':
-    return _wait(args.timeout_minutes)
+    return _wait(args.holder, args.task, args.timeout_minutes)
   return _release(args.holder)
 
 
