@@ -74,7 +74,10 @@ def main():
       log.write(json.dumps(record) + '\n')
 
   # Agreement table + the two success counts.
-  print(f'\n{"word":12s} {"fable":22s} {"screen":9s} {"cascade":9s} agree?')
+  print(
+    f'\n{"word":12s} {"fable":22s} {"screen":9s} {"cascade":9s} '
+    f'{"basis":11s} agree?'
+  )
   accepts_held = flats_died = accepts_total = revises_total = 0
   for record in records:
     fable_as_local = _FABLE_TO_LOCAL[record['verdict']]
@@ -86,11 +89,13 @@ def main():
       revises_total += 1
       flats_died += record['local_cascade'] != 'bankable'
     fable_label = f'{record["verdict"]} ({record["basis"] or "-"})'
+    deciding_stage = record['local_confirm'] or record['local_screen']
+    local_basis = deciding_stage.get('basis', '-')
     print(
       f'{record["word"]:12s} {fable_label:22s} '
       f'{record["local_screen"]["verdict"]:9s} '
-      f'{record["local_cascade"]:9s} {"yes" if is_match else "NO"}'
-      f'  "{record["clue"]}"'
+      f'{record["local_cascade"]:9s} {local_basis:11s} '
+      f'{"yes" if is_match else "NO"}  "{record["clue"]}"'
     )
 
   print(
