@@ -52,17 +52,11 @@ def main() -> None:
   _LOG_DIR.mkdir(exist_ok=True)
   _STOP_FILE.unlink(missing_ok=True)
 
-  words = [
-    w.strip()
-    for w in _WORDS.read_text().splitlines()
-    if w.strip()
-  ]
+  words = [w.strip() for w in _WORDS.read_text().splitlines() if w.strip()]
   # Skip banked words up front so chunk numbering reflects remaining work; each
   # chunk also passes --skip-banked as the authoritative re-check.
   banked_words = {
-    json.loads(line)['word']
-    for line in _BANK.read_text().splitlines()
-    if line
+    json.loads(line)['word'] for line in _BANK.read_text().splitlines() if line
   }
   words = [w for w in words if w not in banked_words]
 
