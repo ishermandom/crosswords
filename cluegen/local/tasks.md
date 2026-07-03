@@ -154,8 +154,13 @@ thread; the spec is self-contained.
     pairs (~6.6 bench-hours; thermal margin for the fanless overnight) and
     rebuilt: 1,712 answers, buckets 16/54/30%, 1,119 contrast answers, median
     year 2010; valid unchanged (1,382 pairs / 500 answers).
-  - Overnight train (user-gated): batch 1, 5,000 iters ≈ one epoch, under
-    `caffeinate`, detached.
+  - Overnight train (user-gated; footprint ~10 GB, ~7–8 h). Launch procedure for
+    a fresh session — acquire the machine-wide compute lease first (script lives
+    on main, not this branch):
+    `python /Users/Shared/code/crosswords/cluegen/local/compute_lease.py acquire --holder finetune --task 'stage-1 overnight' --minutes 480 --pid <trainer pid>`,
+    then from `cluegen/scratch/finetune/`:
+    `HF_HUB_CACHE=/Users/Shared/models/mlx caffeinate -is ~/.venvs/default/bin/optiq lora train mlx-community/gemma-4-12B-it-qat-OptiQ-4bit --data data_stage1 -o adapters_12b_stage1 --rank-scaling constant --preset default --batch-size 1 --iters 5000`,
+    detached; release the lease in the morning.
   - Morning-after protocol, in order: (1) loss curve + best-checkpoint val; (2)
     loss-gap diagnostics (`scratch/finetune/loss_gaps.py`) base vs tuned —
     answer-shuffle gap measures answer-conditional content learning,
