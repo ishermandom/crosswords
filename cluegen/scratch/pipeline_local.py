@@ -191,6 +191,10 @@ Judge each clue's TEXT ONLY, on:
   and a genuine sense pivot or misleading surface is an aha even when
   its subject is well known. Flatness is the absence of any pivot,
   surprise, or specificity — never the presence of common knowledge.
+  Judge the surface before the fact: what does a solver first picture,
+  and what shifts when the answer clicks? Misdirection, imagery, and
+  register live in the surface — a clue can earn its basis entirely
+  there, whatever the fact's familiarity.
 - Question-mark honesty: a ? belongs only with genuine wordplay or a
   stretched definition; a straight definition takes none.
 - Fair misdirection: when the surface misleads, the answer must be fair in
@@ -210,20 +214,24 @@ genuine doubt, verdict "fixable", never "bankable" — but doubt means a
 concrete flaw named in the analysis. If the analysis names no flaw, the
 verdict is "bankable": vague unease is not a flaw.
 
+The "basis" field commits your liveliness call: "none" means the clue
+is a flat gloss and caps the verdict at "fixable"; a named basis with
+no named flaw means "bankable".
+
 Calibration examples — where the boundaries sit:
 
-- "Spinal Tap amp's top setting" -> ELEVEN: bankable (medium). A number
-  is legitimately defined by what it counts, and this count is
-  remark-worthy — a prize fact.
+- "Spinal Tap amp's top setting" -> ELEVEN: bankable (medium; basis:
+  prize-fact). A number is legitimately defined by what it counts, and
+  this count is remark-worthy.
 - "Innings in a standard ballgame" -> NINE: fixable. The same mechanism
   at its flat end: an accurate count everyone already knows, plainly
   stated. Liveliness grades the fact, not the mechanism.
 - "Old enough to order a drink" -> TWENTYONE: fixable. Fuses the
   answer's stock associations — recognition, not surprise.
-- "Corner piece?" -> ROOK: bankable (medium). The chess fact is
-  schoolchild-familiar, but the surface points at a jigsaw puzzle — the
-  pivot makes the leap, and the leap is the liveliness. A familiar
-  domain does not flatten a clue whose surface misleads.
+- "Corner piece?" -> ROOK: bankable (medium; basis: aha). The chess
+  fact is schoolchild-familiar, but the surface points at a jigsaw
+  puzzle — the pivot makes the leap, and the leap is the liveliness. A
+  familiar domain does not flatten a clue whose surface misleads.
 - "Castle-shaped chess piece" -> ROOK: fixable. The same familiar domain
   with no leap — a picture-dictionary entry.
 - "One who delivers your letters" -> MAIL: bad. Defines the mail CARRIER,
@@ -246,10 +254,14 @@ _JUDGE_SCHEMA = {
   'type': 'object',
   'properties': {
     'analysis': {'type': 'string'},
+    'basis': {
+      'type': 'string',
+      'enum': ['aha', 'elegance', 'resistance', 'prize-fact', 'fun', 'none'],
+    },
     'difficulty': {'type': 'string', 'enum': ['easy', 'medium', 'hard']},
     'verdict': {'type': 'string', 'enum': ['bankable', 'fixable', 'bad']},
   },
-  'required': ['analysis', 'difficulty', 'verdict'],
+  'required': ['analysis', 'basis', 'difficulty', 'verdict'],
 }
 
 
@@ -293,9 +305,12 @@ def _run_setter(model, word, difficulty, tee):
 
 def _judge(model, word, clue_text, tee, label):
   prompt = (
-    'Judge this one clue. In "analysis": name the sense used, write the '
-    'substitution sentence, and name any flaws — before the verdict.\n\n'
-    + json.dumps({'word': word, 'clue': clue_text})
+    'Judge this one clue. In "analysis", in order: (1) name the sense '
+    'used and write the substitution sentence; (2) say what a solver '
+    'first pictures on reading the surface, and what shifts when the '
+    'answer clicks; (3) name the basis of satisfaction that moment '
+    'earns, or "none"; (4) name any flaws. Then commit the basis in '
+    'the "basis" field.\n\n' + json.dumps({'word': word, 'clue': clue_text})
   )
   content = _chat(
     model,
@@ -307,7 +322,8 @@ def _judge(model, word, clue_text, tee, label):
   )
   verdict = json.loads(content)
   tee(
-    f'--- judge[{label}] {verdict["verdict"]} ({verdict["difficulty"]}): '
+    f'--- judge[{label}] {verdict["verdict"]} '
+    f'({verdict["difficulty"]}, {verdict["basis"]}): '
     f'{verdict["analysis"][:160]}\n'
   )
   return verdict
