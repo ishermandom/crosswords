@@ -1303,3 +1303,25 @@ negative — familiarity of the domain doesn't flatten a clue; flatness is the
 absence of pivot/surprise/specificity, not the presence of common knowledge.
 Next iteration is a prompt edit (free) plus an eval re-run (local batch,
 user-gated).
+
+## 2026-07-02 — Compute-lease protocol: threads coordinate contention themselves
+
+Today's memory-pressure collision (18 GB ollama + 11 GB MLX, the two threads
+launching within minutes of each other) prompted a user-designed coordination
+protocol, decided via a question round: exclusive lease, FIFO waiting, and — the
+user's addition — **measured idle, not trusted state**: acquisition and
+stale-lease breaking both require the machine to measure idle (ollama `/api/ps`
+empty, kernel memory-pressure level normal), so a dead holder whose memory is
+still wired blocks rather than getting stomped. Release unloads ollama models,
+so the next holder starts from measured idle.
+
+Implementation: `~/.claude/scripts/compute-lease.py` (machine-global, in
+dotfiles; full protocol in its docstring), lease file at
+`/Users/Shared/models/.compute-lease.json`. All four safety paths tested live:
+refuse-while-held, refuse-wrong-holder, refuse-stale-but-busy (exit 2, lease
+left for inspection), break-stale-only-when-idle.
+
+Gate amendment (user, 2026-07-02): with the lease held, local runs under ~1 hour
+each self-serve — no per-batch ping. Multi-hour local runs and all cloud
+spending still get user notice first. Recorded in the shared memory store; the
+fine-tune thread needs a one-line relay from the user to adopt it.
