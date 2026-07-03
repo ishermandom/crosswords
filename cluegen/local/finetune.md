@@ -40,15 +40,19 @@ Evidence from the 2026-07-02 eval round (details: `ceiling-log.md`):
   and trains). Constant rank 8 / alpha 8 approximates stock behavior; optiq's
   sensitivity-aware rank scaling stays a stage-2 lever. One training-objective
   difference from the stage-0 run: optiq masks prompt tokens from the loss by
-  default (only the clue text trains), which is the better objective anyway.
-  Framework survey (2026-07-02) confirmed mlx-lm is effectively the only mature
-  option for this machine: Unsloth's Mac training is announced but unshipped,
-  torchtune is unmaintained and stops at Gemma 2, LLaMA-Factory has no macOS
-  backend. Fallback if mlx-lm hits a wall: Hugging Face PEFT + TRL on the
-  PyTorch MPS backend — functional since bitsandbytes 0.49.2, but its 4-bit path
-  is officially flagged as slow. Reference point: Mistral-7B, 5k examples, ~90
-  min on an M2 Max at ~7GB peak; the fanless M4 Air runs slower sustained, so
-  training is an overnight job under `caffeinate`.
+  default (only the clue text trains), which is the better objective anyway. No
+  text-only 12B exists to sidestep this (verified 2026-07-02: every
+  mlx-community 12B export is `gemma4_unified*`), and mlx-lm `main` already
+  carries the same remap — the next mlx-lm release restores the stock path on
+  the checkpoint already in the cache. Framework survey (2026-07-02) confirmed
+  mlx-lm is effectively the only mature option for this machine: Unsloth's Mac
+  training is announced but unshipped, torchtune is unmaintained and stops at
+  Gemma 2, LLaMA-Factory has no macOS backend. Fallback if mlx-lm hits a wall:
+  Hugging Face PEFT + TRL on the PyTorch MPS backend — functional since
+  bitsandbytes 0.49.2, but its 4-bit path is officially flagged as slow.
+  Reference point: Mistral-7B, 5k examples, ~90 min on an M2 Max at ~7GB peak;
+  the fanless M4 Air runs slower sustained, so training is an overnight job
+  under `caffeinate`.
 - **Models: `gemma-4-e2b-it-OptiQ-4bit` for stage 0,
   `gemma-4-12B-it-qat-OptiQ-4bit` for stage 1** (both under `mlx-community` on
   Hugging Face; 5.3 and 9.0 GB; settled 2026-07-02). OptiQ is a
