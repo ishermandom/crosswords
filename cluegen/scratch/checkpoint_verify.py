@@ -3,15 +3,14 @@
 
 """Cloud-verify checkpoint: judge archived probe clues with the bank's judge.
 
-Groups checkpoint_clues.jsonl by version and fires one verify-only
-`claude -p` call per version, using the cloud pipeline's exact judge
-contract (CLUE_SPEC as system prompt, prompts/verify.md as the user turn,
-trimmed flags, scratch cwd). Cloud files are read, never written.
+Groups checkpoint_clues.jsonl by version and fires one verify-only `claude -p`
+call per version, using the cloud pipeline's exact judge contract (CLUE_SPEC as
+system prompt, prompts/verify.md as the user turn, trimmed flags, scratch cwd).
+Cloud files are read, never written.
 
-Usage:
-  python cluegen/scratch/checkpoint_verify.py --dry-run
-  python cluegen/scratch/checkpoint_verify.py
-  python cluegen/scratch/checkpoint_verify.py --versions v2,v6
+Usage: python cluegen/scratch/checkpoint_verify.py --dry-run python
+cluegen/scratch/checkpoint_verify.py python cluegen/scratch/checkpoint_verify.py
+--versions v2,v6
 """
 
 import argparse
@@ -89,7 +88,16 @@ if __name__ == '__main__':
   parser.add_argument(
     '--data', default=None, help='clues JSONL; default checkpoint_clues.jsonl'
   )
+  parser.add_argument(
+    '--cloud',
+    default=None,
+    help='cloud dir (CLUE_SPEC.md + prompts/); default main checkout',
+  )
   cli = parser.parse_args()
+  if cli.cloud:
+    # The verify call runs from a temp cwd, so a relative path must be resolved
+    # here.
+    _CLOUD = pathlib.Path(cli.cloud).resolve()
   wanted = cli.versions.split(',') if cli.versions else None
   groups = _load_groups(wanted, pathlib.Path(cli.data) if cli.data else _DATA)
 

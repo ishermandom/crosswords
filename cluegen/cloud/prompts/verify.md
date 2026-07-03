@@ -25,8 +25,23 @@ ALL clues (craft invariants, spec §A2):
    reject the leak — UNLESS the shared root is the clue's deliberate point and
    still leaves real solving work (etymology angles like "nepotism" for NEPHEW
    can be fair; "southerly heading" for SOUTHWARD is just a leak).
+6. **Liveliness (spec §A2)** — decide what the clue makes a solver feel on
+   filling it in, and commit to it in the output's `basis` field: an aha,
+   elegance, fair resistance, a prize fact, or fun. If no basis survives honest
+   scrutiny, the clue is a flat gloss — accurate, but no leap and no other
+   virtue — and the verdict is "revise" with `basis: null`.
 
-American clues additionally: 6. **Trap proportionate to difficulty** — not every
+   Calibration, because fact-based clues sit on a gradient within the same
+   mechanism: a prize fact is remark-worthy and specific ("Spinal Tap amp's top
+   setting" for ELEVEN), not a fact every schoolchild recites; a relation to
+   another quantity earns its keep only when the relation itself carries a pivot
+   or surprise ("One-twelfth gross?" for DOZEN) — a bare equation or
+   category-membership statement ("Twenty times two" for FORTY) is the flat end
+   of the same mechanism, and flat. This applies at every difficulty: easy means
+   direct and signposted, not dull — "Toward the south" fails where "Like a
+   snowbird's November flight" passes, at identical difficulty and accuracy.
+
+American clues additionally: 7. **Trap proportionate to difficulty** — not every
 clue needs a trap; required deception scales with the tag (spec §A2b):
 
 - easy: no trap expected; judge on invariants + liveliness. A null/none `trap`
@@ -38,14 +53,14 @@ clue needs a trap; required deception scales with the tag (spec §A2b):
   clue must survive a re-read once solved (fair in retrospect). A hard tag with
   no functioning trap → "revise".
 
-7. **Difficulty tag sanity** — does the tag match the dial (§A2b)? Hard must be
+8. **Difficulty tag sanity** — does the tag match the dial (§A2b)? Hard must be
    twisted, not merely obscure.
 
-Cryptic clues additionally: 8. **Parse validity** — does the stated parse
+Cryptic clues additionally: 9. **Parse validity** — does the stated parse
 actually work, word by word? For compound clues, do the chain's pieces assemble
 exactly the answer's letters, in order? Definition at one end? Indicators
 standard and unambiguous in function? No padding outside
-definition/fodder/indicator/connector? 9. **Synonym fairness** — are the
+definition/fodder/indicator/connector? 10. **Synonym fairness** — are the
 wordplay substitutions (e.g. "shower" = RAIN) dictionary-fair, not stretches?
 
 Verdicts:
@@ -64,8 +79,8 @@ unsalvageable word/style combinations.
 Output rules (strict — machine-parsed):
 
 - One JSON object per CLUE, one per line (JSONL), in input order: {"word": ...,
-  "clue": ..., "style": ..., "verdict": "accept|revise|reject", "reason": null |
-  "..."}
+  "clue": ..., "style": ..., "verdict": "accept|revise|reject", "basis": null |
+  "aha|elegance|resistance|prize-fact|fun", "reason": null | "..."}
 - No prose, no markdown fences, no commentary.
 
 CLUES TO REVIEW: {{CLUES_JSONL}}

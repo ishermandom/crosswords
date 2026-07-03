@@ -1155,3 +1155,49 @@ judge's on this axis. That breaks two assumptions in the queued work:
   examples.
 
 Spend this check-in window: $0.442 of the $5 cap.
+
+## 2026-07-02 — Satisfaction criterion built into the cloud verify contract
+
+User-directed ($2 cap; spent $1.809 over three calls). The verify prompt now
+implements the liveliness invariant CLUE_SPEC §A2 always declared but the rubric
+never asked about: new criterion 6 plus a mandatory `basis` field in the output
+schema (aha / elegance / resistance / prize-fact / fun, or null → revise). Cloud
+runner compatibility checked: `match_verdicts` pairs by clue text and ignores
+extra keys.
+
+Iteration story, on a 20-clue set (8 chunk-1 flats + 12 Fable-accepted
+regression clues):
+
+- **v1 failed (18A/2RV)**: a bases list phrased as "name the basis that earns
+  its keep" let the judge file any fact under prize-fact; only THIRTY (accuracy)
+  drew a revise.
+- **v2 bit (15A/5RV)**: two changes — the mandatory `basis` commitment, and
+  gradient calibration inside fact mechanisms using satisfaction.md's own
+  pre-chunk-1 examples ("Spinal Tap amp's top setting" vs "Twenty times two").
+  NINE and NINETY revised with exactly-right reasons ("schoolchild-level fact
+  stated bureaucratically"; "bare quantity relation with no pivot"); the
+  THIRTEEN prize-fact control survived.
+- **Held-out probe (12 unseen clues)**: all six flat confirm-fixables from chunk
+  1 drew revises — SIX "chestnut-flat bare relation", FIFTEEN "bare
+  unit-conversion relation" — with zero liveliness false-positives on the lively
+  side. It also caught a real error the local cascade missed: ELEVEN "One short
+  of a baker's dozen" is TWELVE.
+
+Texture worth keeping:
+
+- **"Fun" is the escape-hatch basis**: THREE "A hat trick's total" and TWO "A
+  couplet's length" pass as fun. Tightening would mean teaching the prompt
+  chunk-1 skeletons — deferred until independent evidence accumulates.
+- **First Fable exposure for batch-2/3 banks**: 4 of 6 lively holdouts drew
+  revises on OTHER axes — trap-field mismatches (DUSK, FRINGE), economy (THIRD),
+  an accuracy quibble (LARRY). None cites liveliness; these criteria predate the
+  change. The un-audited bank slice likely carries a real Fable revise rate — an
+  argument for the checkpoint cadence, and for reading trap-field hygiene as its
+  own leak.
+- GOSH "Gee whiz!" (a checkpoint-3 accept) now draws "flat synonym swap" — the
+  criterion applying satisfaction.md's thesaurus-entry failure mode to an
+  interjection. Defensible both ways; user call at purge time.
+
+Spend this check-in window: $2.251 of the $5 cap ($0.442 checkpoint 4 +
+$1.809
+here, user-directed).

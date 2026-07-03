@@ -1,0 +1,12 @@
+{"version": "satisfaction-holdout", "word": "ONE", "clue": {"style": "american", "difficulty": "easy", "clue": "Sole digit", "trap": null, "confidence": "high"}}
+{"version": "satisfaction-holdout", "word": "SIX", "clue": {"style": "american", "difficulty": "easy", "clue": "Half a dozen", "trap": null, "confidence": "high"}}
+{"version": "satisfaction-holdout", "word": "FIFTEEN", "clue": {"style": "american", "difficulty": "easy", "clue": "A quarter of an hour", "trap": null, "confidence": "high"}}
+{"version": "satisfaction-holdout", "word": "HUNDRED", "clue": {"style": "american", "difficulty": "easy", "clue": "Five scores", "trap": null, "confidence": "high"}}
+{"version": "satisfaction-holdout", "word": "ELEVEN", "clue": {"style": "american", "difficulty": "easy", "clue": "One short of a baker's dozen", "trap": null, "confidence": "high"}}
+{"version": "satisfaction-holdout", "word": "FOURTEEN", "clue": {"style": "american", "difficulty": "easy", "clue": "A score, slightly diminished", "trap": null, "confidence": "high"}}
+{"version": "satisfaction-holdout", "word": "LARRY", "clue": {"style": "american", "difficulty": "easy", "clue": "Not quite Lawrence?", "trap": "The solver expects the full version of the name, LAWRENCE.", "confidence": "low"}}
+{"version": "satisfaction-holdout", "word": "FRINGE", "clue": {"style": "american", "difficulty": "medium", "clue": "Where the wilderness meets the clearing", "trap": null, "confidence": "high"}}
+{"version": "satisfaction-holdout", "word": "DUSK", "clue": {"style": "american", "difficulty": "easy", "clue": "When shadows stretch", "trap": "The solver may think of a person feeling weary or longing for rest.", "confidence": "high"}}
+{"version": "satisfaction-holdout", "word": "WYE", "clue": {"style": "american", "difficulty": "medium", "clue": "Forked path?", "trap": "A junction or a fork in a road.", "confidence": "high"}}
+{"version": "satisfaction-holdout", "word": "THIRD", "clue": {"style": "american", "difficulty": "medium", "clue": "Between the slugger who hits second and the cleanup hitter?", "trap": "The fourth batter or 'cleanup' hitter.", "confidence": "low"}}
+{"version": "satisfaction-holdout", "word": "CENTURY", "clue": {"style": "american", "difficulty": "medium", "clue": "Batsman's milestone", "trap": "The solver may think of a specific number like 'hundred' rather than the term for it.", "confidence": "high"}}
