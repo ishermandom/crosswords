@@ -11,4 +11,4 @@ cluegen/scratch/logs/
 cluegen/scratch/finetune/data/
 cluegen/scratch/finetune/data_stage1/
 # Trained LoRA adapters: multi-MB binaries, regenerable from data + config.
-cluegen/scratch/finetune/adapters/
+cluegen/scratch/finetune/adapters*/
