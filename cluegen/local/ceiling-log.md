@@ -1255,3 +1255,38 @@ Prompt changes (validation runs pending, machine on the fine-tune):
 Queued validation (local runs, user-gated): 26B/31B agreement eval on the 32
 Fable-labeled clues; fixer replay of chunk-1's critiques checking trap survival;
 then batch-4 chunk 2 as the integration test of all three fixes.
+
+## 2026-07-02 — Session close (written for relaunch)
+
+**State at close:** bank 75 (chunk-1 purge done); worktree clean; `main` and
+`local-ceiling` both pushed through a913b59; commits after that (purge + prompt
+alignments, reference-verdicts artifact) are local to `local-ceiling` — push
+both branches with the next batch. Batch 4 stands drained after chunk 1 (19
+chunks remain; relaunch = detached `python3 cluegen/scratch/batch4_driver.py`,
+resumes via `--skip-banked`). Local machine is on the fine-tuning thread. Fable
+spend this check-in window: $3.036 of $5.
+
+**Standing gate (new):** tell the user before running ANY local or cloud batch.
+Prompt/code edits and file surgery proceed freely.
+
+**Next up, all user-gated on machine availability, in order:**
+
+1. Local-judge agreement eval (~20 min local): updated 26B screen + 31B confirm
+   re-judge the 32 labeled clues in
+   `scratch/satisfaction_reference_verdicts.jsonl` (20 under the final fun-
+   gradient contract, 12 holdout under pre-fun-gradient v2 — flats all revise
+   either way). Success: chunk-1 flats die locally; regression accepts stay
+   bankable.
+2. Fixer replay (~10 min local): chunk-1's ~10 fixable critiques (in
+   `scratch/logs/batch4_driver.log` + pipeline log) under the new fixer prompt;
+   success = traps survive, no flattening.
+3. Batch-4 chunk 2 (~30 min local): integration test of purge + judge + fixer
+   changes; chunks 2–7 carry the name section — the still-unrun judge-v2
+   name-word live test (vs the 31% screen-bad v1 regime).
+4. Then the older queue: angle-distinct depth pass (+ cross-word template
+   monoculture), eval-panel earned-? diversification, mechanism-tagger
+   tightening.
+
+Watch items on the new verify contract: the judge runs stricter overall (9A/11RV
+vs 15A/5RV on the same 20 clues) and flags unmarked definition-by-example clues
+(MELODY) — ?-convention calls, not liveliness.
