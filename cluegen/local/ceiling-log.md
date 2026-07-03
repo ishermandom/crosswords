@@ -1269,24 +1269,37 @@ spend this check-in window: $3.036 of $5.
 **Standing gate (new):** tell the user before running ANY local or cloud batch.
 Prompt/code edits and file surgery proceed freely.
 
-**Next up, all user-gated on machine availability, in order:**
+**Pending work:** tracked in tasks.md — the single source for the queue; nothing
+pending lives only in this log.
 
-1. Local-judge agreement eval (~20 min local): updated 26B screen + 31B confirm
-   re-judge the 32 labeled clues in
-   `scratch/satisfaction_reference_verdicts.jsonl` (20 under the final fun-
-   gradient contract, 12 holdout under pre-fun-gradient v2 — flats all revise
-   either way). Success: chunk-1 flats die locally; regression accepts stay
-   bankable.
-2. Fixer replay (~10 min local): chunk-1's ~10 fixable critiques (in
-   `scratch/logs/batch4_driver.log` + pipeline log) under the new fixer prompt;
-   success = traps survive, no flattening.
-3. Batch-4 chunk 2 (~30 min local): integration test of purge + judge + fixer
-   changes; chunks 2–7 carry the name section — the still-unrun judge-v2
-   name-word live test (vs the 31% screen-bad v1 regime).
-4. Then the older queue: angle-distinct depth pass (+ cross-word template
-   monoculture), eval-panel earned-? diversification, mechanism-tagger
-   tightening.
+## 2026-07-02 — Agreement eval: flats die, but the local judge overshot
 
-Watch items on the new verify contract: the judge runs stricter overall (9A/11RV
-vs 15A/5RV on the same 20 clues) and flags unmarked definition-by-example clues
-(MELODY) — ?-convention calls, not liveliness.
+The 32 reference clues re-judged through the production cascade (26B screen →
+31B confirm; `scratch/agreement_eval.py`, results in
+`scratch/logs/agreement_eval_*.jsonl`).
+
+**Kill side works:** 20/21 Fable revises die locally — every chunk-1 flat among
+them. The one leak: FOURTEEN "A score, slightly diminished" (bare relation)
+banked clean through both stages.
+
+**Keep side collapsed:** only 2/11 Fable accepts stay bankable (GROSS, POTS).
+The recalibrated judge kills THIRTEEN "A number often skipped in elevators" —
+the prize-fact control — with "relies on a common piece of trivia rather than a
+clever pivot," directly contradicting its own ELEVEN calibration example (a
+remark-worthy fact needs no pivot). Genuine ahas die the same way: CHECK
+"Threaten the king" called "dictionary-flat game mechanic," DAISY
+"Petal-puller's target?" called "recognition dressed up as a riddle." The
+stock-association/recognition language generalized into "anything commonly known
+is flat" — the judge now demands a pivot on top of every basis. Six of nine
+false kills happen at the 26B screen.
+
+**Watch item:** three screen verdicts (AMBER, MARCH, MURMUR) returned an empty
+`analysis` string with verdict fixable — the doubt-rule may be absorbing
+degenerate generations; schema-valid but reasoning-free.
+
+Verdict on the prompt alignment: precision fixed, recall broken. The liveliness
+bullet needs the positive side of the gradient stated as strongly as the
+negative — familiarity of the domain doesn't flatten a clue; flatness is the
+absence of pivot/surprise/specificity, not the presence of common knowledge.
+Next iteration is a prompt edit (free) plus an eval re-run (local batch,
+user-gated).

@@ -185,7 +185,12 @@ Judge each clue's TEXT ONLY, on:
   bankable, however accurate; neither is recognition dressed up as fun —
   a clue that merely fuses the answer's stock associations or plainly
   states a fact everyone knows. A fact earns its keep by surprise or
-  specificity; a relation to another quantity needs a pivot.
+  specificity; a relation to another quantity needs a pivot. The
+  gradient cuts both ways: familiarity of the subject does NOT flatten a
+  clue. A remark-worthy or specific fact needs no pivot on top of it,
+  and a genuine sense pivot or misleading surface is an aha even when
+  its subject is well known. Flatness is the absence of any pivot,
+  surprise, or specificity — never the presence of common knowledge.
 - Question-mark honesty: a ? belongs only with genuine wordplay or a
   stretched definition; a straight definition takes none.
 - Fair misdirection: when the surface misleads, the answer must be fair in

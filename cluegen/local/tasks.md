@@ -63,10 +63,15 @@ done — see the log for the curve and the criteria re-analysis.
   flat set with zero liveliness false-positives; iteration story in ceiling-log.
   Local cascade alignment implemented 2026-07-02 (liveliness bullet gains both
   gradients; the NINE calibration example that blessed flat count metonymy is
-  now a graded ELEVEN/NINE pair; stock-association example added). Remaining:
-  the agreement eval — local 26B/31B re-judge the 32 Fable-labeled clues,
-  measure agreement against the fun-gradient reference. Local runs; user-gated
-  on machine availability.
+  now a graded ELEVEN/NINE pair; stock-association example added). Agreement
+  eval run 2026-07-02 (`scratch/agreement_eval.py`): kill side works (20/21
+  Fable revises die locally, all chunk-1 flats included; one leak — FOURTEEN),
+  but the keep side collapsed (2/11 Fable accepts stay bankable; diagnosis in
+  ceiling-log — the recognition language generalized into "commonly known =
+  flat"). Remaining: rebalance the liveliness bullet (state the positive side of
+  the gradient — a remark-worthy fact needs no pivot; familiarity doesn't
+  flatten), then re-run the eval. Prompt edit free; re-run is a local batch,
+  user-gated.
   - Note: the "fun" escape hatch is closed — a fun gradient (humor/surprise in
     the surface vs. recognition of stock associations) landed 2026-07-02; all
     five fun-basis chunk-1 accepts flipped to revise with regression accepts
@@ -81,6 +86,17 @@ done — see the log for the curve and the criteria re-analysis.
   demand a fresh angle, not a rephrase. Remaining: validation probe — replay
   chunk-1's ~10 fixable critiques under the new prompt, check angle/trap
   survival. Local runs; user-gated on machine availability.
+- [~] **Batch 4** #batch4 — all unbanked, non-held-out words.in entries
+  (`scratch/batch4_words.txt`, 493 words) via the chunked detached driver
+  (`scratch/batch4_driver.py`; per-chunk `--skip-banked`, stop-file drain,
+  relaunch resumes where it left off). Chunk 1 done, drained 2026-07-02
+  (findings: ceiling-log). Next: chunk 2 as the integration test of the purge +
+  judge + fixer changes; chunks 2–7 carry the name section — the judge-v2
+  name-word live test (v1 ran 31% screen-bad). Run after #judge-satisfaction's
+  agreement eval and the fixer replay. Local runs; user-gated.
+- [ ] **Mechanism tagger: tighten the dominant-mechanism instruction** — it
+      over-attributes frame-anchored clues to sense pivot (2026-07-02 audit);
+      matters once bank-level angle passes consume the tags.
 - [ ] **Angle-distinct depth pass** — when banking multiple clues per word,
       require distinct angles (checkpoint 2: Fable flagged a same-angle DAISY
       paraphrase). Later pass by user direction; don't over-invest early.
