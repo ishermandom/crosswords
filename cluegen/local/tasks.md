@@ -202,6 +202,12 @@ thread; the spec is self-contained.
       prompted-26B response loss on the same val sample — anchors what a
       known-good clue writer scores, i.e. how much of 5.8 is entropy floor vs
       deficit.
+- [ ] Before the next 12B fine-tune run: rehearse the identical recipe on the
+      cheap e2b variant first and sanity-check the outputs — generate a few
+      clues and run the loss-gap gaps — before spending a 7-hour 12B night. The
+      overnight run's failure mode (degenerate generations, collapsed
+      conditioning) would have shown up in minutes at e2b scale. Reminder only;
+      no action now (user request, 2026-07-03).
 - [ ] Hand-tagged quality bank (user-in-the-loop; queued 2026-07-03). User walks
       a sample of the data bank in a review UI and hand-tags examples on
       multiple quality dimensions, fast per item. Design TBD: possibly several
