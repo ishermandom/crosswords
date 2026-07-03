@@ -130,12 +130,21 @@ thread; the spec is self-contained.
     rebuilt: 1,712 answers, buckets 16/54/30%, 1,119 contrast answers, median
     year 2010; valid unchanged (1,382 pairs / 500 answers).
   - Overnight train (user-gated; footprint ~10 GB, ~7–8 h). Launch procedure for
-    a fresh session — acquire the machine-wide compute lease first (protocol
-    details in the script docstring):
-    `python cluegen/local/compute_lease.py acquire --holder finetune --task 'stage-1 overnight' --minutes 480 --pid <trainer pid>`,
-    then from `cluegen/scratch/finetune/`:
-    `HF_HUB_CACHE=/Users/Shared/models/mlx caffeinate -is ~/.venvs/default/bin/optiq lora train mlx-community/gemma-4-12B-it-qat-OptiQ-4bit --data data_stage1 -o adapters_12b_stage1 --rank-scaling constant --preset default --batch-size 1 --iters 5000`,
-    detached; release the lease in the morning.
+    a fresh session:
+    1. Acquire the machine-wide compute lease (protocol in the script
+       docstring). No `--pid` — the trainer doesn't exist yet; the 480-min
+       estimate times the grace factor is the staleness backstop:
+       `python cluegen/local/compute_lease.py acquire --holder finetune --task 'stage-1 overnight' --minutes 480`
+    2. Launch detached (`project-detached-runs` memory): the Desktop app kills
+       the session's process group after ~15 min hidden, so a plain Bash command
+       — backgrounded or not — dies mid-run. From `cluegen/scratch/finetune/`:
+       `python3 -c "import os, subprocess; env = dict(os.environ, HF_HUB_CACHE='/Users/Shared/models/mlx'); p = subprocess.Popen(['caffeinate', '-is', os.path.expanduser('~/.venvs/default/bin/optiq'), 'lora', 'train', 'mlx-community/gemma-4-12B-it-qat-OptiQ-4bit', '--data', 'data_stage1', '-o', 'adapters_12b_stage1', '--rank-scaling', 'constant', '--preset', 'default', '--batch-size', '1', '--iters', '5000'], env=env, stdout=open('train_stage1.log', 'w'), stderr=subprocess.STDOUT, start_new_session=True); print(p.pid)"`
+    3. Attach an expendable background watcher on the printed pid — poll
+       `kill -0 <pid>` every minute; when the trainer exits, run
+       `python cluegen/local/compute_lease.py release --holder finetune`. A
+       reaped watcher is harmless: the detached trainer keeps running, a fresh
+       watcher can re-attach, and lease expiry covers a lost release. Progress
+       readable any time via `tail train_stage1.log`.
   - Morning-after protocol, in order: (1) loss curve + best-checkpoint val; (2)
     loss-gap diagnostics (`scratch/finetune/loss_gaps.py`) base vs tuned —
     answer-shuffle gap measures answer-conditional content learning,
