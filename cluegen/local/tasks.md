@@ -97,12 +97,15 @@ done — see the log for the curve and the criteria re-analysis.
   variance-probe evidence (`scratch/variance_probe.py`): screen = 26B taste +
   craft; confirm = 31B precision verification with its own protocol
   (`_CONFIRM_SYSTEM`/`_CONFIRM_PROMPT` — v2 kills ONE/FOURTEEN/FELIX-class
-  precision errors 0:4 with zero false kills); taste-at-31B tested and rejected.
-  Remaining: (a) re-validate the full new cascade on the 49-clue combined set;
-  (b) decide judge temperature (1.0 improved the screen's stable-wrongs with no
-  control regressions — measure, don't assume); (c) known gaps for later —
-  padding bites at no stage, GASP-class contested fun. Local runs; machine with
-  the fine-tune thread — user-gated.
+  precision errors 0:4 with zero false kills); the role split is an intermediate
+  state, not settled — see #taste-31b. Remaining: (a) re-validate the full new
+  cascade on the 49-clue combined set (concatenate
+  `scratch/satisfaction_reference_verdicts.jsonl` +
+  `scratch/fresh_validation_verdicts.jsonl`, pass to agreement_eval as its
+  reference argument); (b) decide judge temperature (1.0 improved the screen's
+  stable-wrongs with no control regressions — measure, don't assume); (c) known
+  gaps for later — padding bites at no stage, GASP-class contested fun. Local
+  runs; machine with the fine-tune thread — user-gated.
   - Note: the "fun" escape hatch is closed — a fun gradient (humor/surprise in
     the surface vs. recognition of stock associations) landed 2026-07-02; all
     five fun-basis chunk-1 accepts flipped to revise with regression accepts
@@ -110,6 +113,18 @@ done — see the log for the curve and the criteria re-analysis.
     the 20-clue set vs. 15A/5RV before), and it now flags unmarked
     definition-by-example clues (MELODY "Whistleable earworm") — a spec
     ?-convention call, not a liveliness one.
+- [ ] **Taste authority: give the 31B a fair shot** #taste-31b — the current
+      role split (screen = 26B taste, confirm = 31B precision) rests on
+      partially validated data: a handful of probe runs over a 12-clue sample,
+      with six iterations of tuning invested in the 26B's taste prompt and zero
+      in the 31B's (user judgment 2026-07-03: fine intermediate state, probably
+      not the right end state — a priori, the dense 31B should out-judge the
+      4B-active MoE 26B on taste). Queue: a symmetric taste-iteration campaign
+      for the 31B — calibration and protocol tuned against ITS observed failure
+      modes (starting from the charity/leniency pattern in the probe logs),
+      evaluated with the distribution instrument (`scratch/variance_probe.py`)
+      on a larger sample plus the 49-clue set; then re-decide role assignment on
+      comparable-effort evidence. Local runs; user-gated.
 - [~] **Fixer: preserve angle and misdirection** — chunk 1 showed the repair
   path flattens drafts into unimpeachable facts (all six fixer banks lost their
   `trap`). Prompt updated 2026-07-02: the angle is named as what the clue does
