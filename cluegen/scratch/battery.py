@@ -45,6 +45,12 @@ _SCRATCH = pathlib.Path(__file__).parent
 _SETS = {
   'tuning': _SCRATCH / 'satisfaction_reference_verdicts.jsonl',
   'holdout': _SCRATCH / 'fresh_validation_verdicts.jsonl',
+  # Reject-bank records use the nested clue-dict schema; _load_set flattens them
+  # and drops the 14 backfills that duplicate the tuning set.
+  'rejects': _SCRATCH.parent / 'local' / 'reject_bank.jsonl',
+  # Chunk-1 kills that Fable accepts — false-kill targets, probed explicitly
+  # (not in the default sets).
+  'losses': _SCRATCH / 'recall_loss_verdicts.jsonl',
 }
 _CACHE_PATH = _SCRATCH / 'cache' / 'judge_cache.jsonl'
 _LOG_DIR = _SCRATCH / 'logs'
@@ -130,6 +136,33 @@ def _distribution(verdicts):
   )
 
 
+def _load_set(set_name):
+  """Labeled records for one set, flattened to the reference schema."""
+  records = []
+  for line in _SETS[set_name].read_text().splitlines():
+    if not line:
+      continue
+    record = json.loads(line)
+    if set_name == 'rejects':
+      record = {
+        'word': record['word'],
+        'clue': record['clue']['clue'],
+        'verdict': record['label']['verdict'],
+        'basis': record['label']['basis'],
+        'source': record['source'],
+      }
+    record['eval_set'] = set_name
+    records.append(record)
+  if set_name == 'rejects':
+    tuning_keys = {
+      (r['word'], r['clue'].lower()) for r in _load_set('tuning')
+    }
+    records = [
+      r for r in records if (r['word'], r['clue'].lower()) not in tuning_keys
+    ]
+  return records
+
+
 def _majority(verdict_names):
   """The strict-majority verdict name, or 'split' on a tie."""
   ranked = collections.Counter(verdict_names).most_common()
@@ -140,7 +173,7 @@ def _majority(verdict_names):
 
 def main():
   parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-  parser.add_argument('--sets', default='tuning,holdout')
+  parser.add_argument('--sets', default='tuning,holdout,rejects')
   parser.add_argument('--samples', type=int, default=1)
   parser.add_argument('--only', default=None, help='single word, rung-0 smoke')
   parser.add_argument('--screen-temp', type=float,
@@ -157,12 +190,7 @@ def main():
 
   records = []
   for set_name in args.sets.split(','):
-    for line in _SETS[set_name].read_text().splitlines():
-      if not line:
-        continue
-      record = json.loads(line)
-      record['eval_set'] = set_name
-      records.append(record)
+    records.extend(_load_set(set_name))
   if args.only:
     records = [r for r in records if r['word'] == args.only]
     if not records:

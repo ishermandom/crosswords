@@ -1,0 +1,4 @@
+{"word": "FIFTY", "clue": "The denomination on a red bill", "verdict": "accept", "basis": "prize-fact", "reason": null, "set": "chunk1-recall-losses", "contract": "CLUE_SPEC 2026-07-03 (satisfaction v3)"}
+{"word": "NIL", "clue": "Nothing on the scoreboard", "verdict": "accept", "basis": "elegance", "reason": null, "set": "chunk1-recall-losses", "contract": "CLUE_SPEC 2026-07-03 (satisfaction v3)"}
+{"word": "NINE", "clue": "A full lineup on a baseball field?", "verdict": "accept", "basis": "aha", "reason": null, "set": "chunk1-recall-losses", "contract": "CLUE_SPEC 2026-07-03 (satisfaction v3)"}
+{"word": "FOURTEEN", "clue": "Score minus six", "verdict": "accept", "basis": "aha", "reason": null, "set": "chunk1-recall-losses", "contract": "CLUE_SPEC 2026-07-03 (satisfaction v3)"}
