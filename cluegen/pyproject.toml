@@ -52,6 +52,9 @@ dev = [
 finetune = [
   "mlx-lm>=0.31",
   "mlx-optiq>=0.2.10",
+  # Wordnet interface: concise glosses for the flat-definition register
+  # control (loss_gaps diagnostics).
+  "wn>=1.1",
 ]
 
 [tool.pytest.ini_options]
