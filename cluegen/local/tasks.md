@@ -135,10 +135,15 @@ thread; the spec is self-contained.
     loss-gap diagnostics (`scratch/finetune/loss_gaps.py`) base vs tuned —
     answer-shuffle gap measures answer-conditional content learning,
     difficulty-swap gap measures whether the conditioning token is load-bearing;
-    shape-only learning = val loss fell but gaps didn't grow (baseline numbers
-    from the 20-step adapter recorded 2026-07-02); (3) panel eval at medium via
-    `eval_tuned.py` + screen; (4) steering spot-check (same answers at easy vs
-    hard); (5) decision-metric read: confirmed-bankable per GPU-minute vs v9.
+    shape-only learning = val loss fell but gaps didn't grow. Baseline
+    (2026-07-02, n=200): base true 9.99, answer gap +0.59, difficulty gap −0.19
+    (noise ≈ not load-bearing); 20-step adapter true 6.37, answer gap +0.19,
+    difficulty gap +0.00 — early training is pure shape and even diluted the
+    base's answer-conditioning. Overnight content success = answer gap
+    recovering past +0.59 and a positive difficulty gap; (3) panel eval at
+    medium via `eval_tuned.py` + screen; (4) steering spot-check (same answers
+    at easy vs hard); (5) decision-metric read: confirmed-bankable per
+    GPU-minute vs v9.
 - [ ] Stage 2 — only on stage-1 signal. Options, not commitments: more
       data/epochs; DPO from judge labels (converts judge preferences into the
       training objective — the quality-not-shape lever); judge-filtered training
