@@ -27,6 +27,7 @@ import sys
 import httpx
 
 _OLLAMA_CHAT_URL = 'http://localhost:11434/api/chat'
+SCHEMA_TEMPERATURE = 0.2
 _BANK = pathlib.Path(__file__).parent.parent / 'local' / 'clue_bank.jsonl'
 _LOG_DIR = pathlib.Path(__file__).parent / 'logs'
 
@@ -277,6 +278,23 @@ Calibration examples — where the boundaries sit:
   famous bearer is a legitimate definition — the bearer is not "merely
   associated" with the name; she instantiates it."""
 
+# Confirm shares the judge's craft core but plays a different role: the screen
+# has already made the taste call, and a same-prompt confirm mostly repeats it.
+# The suffix points the stronger model at the precision verification a first
+# read misses.
+_CONFIRM_SYSTEM = (
+  _JUDGE_SYSTEM
+  + """
+
+You are the confirming editor — the second and final gate before the
+bank. A first screen has already judged this clue bankable; a second
+opinion that repeats its reasoning adds nothing. Your job is what a
+first read misses: re-run the substitution sentence word by word, test
+every qualifier and factual claim literally against the fact, and
+verify the clued sense genuinely belongs to the answer string. A flaw
+you wave through here goes straight into the bank."""
+)
+
 _JUDGE_SCHEMA = {
   'type': 'object',
   'properties': {
@@ -301,7 +319,11 @@ def _chat(model, messages, schema=None, think=False):
     'keep_alive': '30m',
     'options': {
       'num_ctx': 16384,
-      'temperature': 1.0 if schema is None else 0.2,
+      # Schema'd calls (judgments, extractions) run at a lower default
+      # temperature than free-text setter turns. Whether 0.2 helps or hurts
+      # judgment quality vs the model's native 1.0 is an open question; scratch
+      # probes override this to measure it.
+      'temperature': 1.0 if schema is None else SCHEMA_TEMPERATURE,
     },
   }
   if schema is not None:
@@ -330,7 +352,7 @@ def _run_setter(model, word, difficulty, tee):
   return json.loads(messages[-1]['content'])['clues']
 
 
-def _judge(model, word, clue_text, tee, label):
+def _judge(model, word, clue_text, tee, label, system=None):
   prompt = (
     'Judge this one clue. In "analysis", in order: (1) name the sense '
     'used and write the substitution sentence; (2) say what a solver '
@@ -342,7 +364,7 @@ def _judge(model, word, clue_text, tee, label):
   content = _chat(
     model,
     [
-      {'role': 'system', 'content': _JUDGE_SYSTEM},
+      {'role': 'system', 'content': system or _JUDGE_SYSTEM},
       {'role': 'user', 'content': prompt},
     ],
     schema=_JUDGE_SCHEMA,
@@ -433,7 +455,14 @@ def _phase_confirm(candidates, cli, tee, provenance_extra):
   banked_count = 0
   fixables = []
   for word, clue in candidates:
-    confirm = _judge(cli.confirm_model, word, clue['clue'], tee, 'confirm')
+    confirm = _judge(
+      cli.confirm_model,
+      word,
+      clue['clue'],
+      tee,
+      'confirm',
+      system=_CONFIRM_SYSTEM,
+    )
     if confirm['verdict'] != 'bankable':
       if confirm['verdict'] == 'fixable':
         fixables.append((word, clue, confirm['analysis']))

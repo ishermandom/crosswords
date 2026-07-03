@@ -86,6 +86,15 @@ done — see the log for the curve and the criteria re-analysis.
   demand a fresh angle, not a rephrase. Remaining: validation probe — replay
   chunk-1's ~10 fixable critiques under the new prompt, check angle/trap
   survival. Local runs; user-gated on machine availability.
+- [~] **Reject bank** #reject-bank — `cluegen/local/reject_bank.jsonl`: bank of
+  correctly-rejected clues with labeled reasons (user request 2026-07-03) —
+  reusable eval data now, judge fine-tuning data later. Backfilled 2026-07-03
+  from the Fable-labeled reference sets, excluding clues currently in clue_bank
+  (banked and rejected stay disjoint; the 7 in-bank Fable-revises are purge
+  candidates, not settled rejects). Remaining: append at the natural capture
+  points — bank purges, checkpoint revises on unbanked candidates — and wire the
+  append into the checkpoint/purge flow so the bank grows without manual
+  backfills.
 - [~] **Batch 4** #batch4 — all unbanked, non-held-out words.in entries
   (`scratch/batch4_words.txt`, 493 words) via the chunked detached driver
   (`scratch/batch4_driver.py`; per-chunk `--skip-banked`, stop-file drain,

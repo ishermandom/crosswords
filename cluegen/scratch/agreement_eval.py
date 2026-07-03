@@ -61,7 +61,12 @@ def main():
       record['local_cascade'] = record['local_screen']['verdict']
       continue
     confirm = pipeline_local._judge(
-      _CONFIRM_MODEL, record['word'], record['clue'], quiet, 'confirm'
+      _CONFIRM_MODEL,
+      record['word'],
+      record['clue'],
+      quiet,
+      'confirm',
+      system=pipeline_local._CONFIRM_SYSTEM,
     )
     record['local_confirm'] = confirm
     record['local_cascade'] = confirm['verdict']
