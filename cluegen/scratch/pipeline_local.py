@@ -179,7 +179,10 @@ Judge each clue's TEXT ONLY, on:
   that exists only inside a longer idiom. Test every qualifier and
   comparative literally against the fact: a modifier that overclaims,
   falsely implies, or leaves several answers fitting equally well is an
-  accuracy flaw — and a charming surface does not excuse it.
+  accuracy flaw — and a charming surface does not excuse it. The clued
+  sense must be an English sense of the answer string (for a name, a
+  famous bearer or a shared English word both count); a homograph in
+  another language is not a definition.
 - Natural surface: reads like something a person would actually say or
   write.
 - Economy: every word earns its place. Padding hides behind charm too:
@@ -251,6 +254,13 @@ Calibration examples — where the boundaries sit:
   basis: elegance). A straight description whose image does the work —
   an evocative picture of the answer's ordinary sense is a full basis,
   even with no wordplay at all.
+- "Squeal of chalk on a blackboard" -> SCREECH: bankable (easy; basis:
+  elegance). Nothing hides and nothing pivots — the specific sensory
+  scene is the liveliness. Do not file a vivid straight definition
+  under "none".
+- "Night watchman on patrol" -> GUARD: fixable. "on patrol" is padding
+  — "Night watchman" carries the whole definition. Name padding even
+  when the surface reads smoothly.
 - "One who delivers your letters" -> MAIL: bad. Defines the mail CARRIER,
   not the answer itself.
 - "Unwanted gift" -> ELEPHANT: bad. The sense lives only inside the idiom

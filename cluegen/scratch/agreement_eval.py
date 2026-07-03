@@ -35,8 +35,9 @@ _FABLE_TO_LOCAL = {'accept': 'bankable', 'revise': 'fixable', 'reject': 'bad'}
 
 def main():
   """Run the cascade over the reference clues; print the agreement table."""
+  reference = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else _REFERENCE
   records = [
-    json.loads(line) for line in _REFERENCE.read_text().splitlines() if line
+    json.loads(line) for line in reference.read_text().splitlines() if line
   ]
   stamp = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
   log_path = _LOG_DIR / f'agreement_eval_{stamp}.jsonl'
