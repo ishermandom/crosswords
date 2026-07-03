@@ -165,6 +165,53 @@ thread; the spec is self-contained.
     (3) panel eval at medium via `eval_tuned.py` + screen; (4) steering
     spot-check (same answers at easy vs hard); (5) decision-metric read:
     confirmed-bankable per GPU-minute vs v9.
+  - Done 2026-07-03: overnight run completed — 5,000 iters in 6.9 h, no thermal
+    drift, peak 9.9 GB. Val curve: 13.86 → plateau ~4.6–5.2 from ~iter 2200;
+    best val 4.647 at iter 2799 (auto-kept in `adapters_12b_stage1/best/`);
+    final 4.899.
+  - Done 2026-07-03: loss-gap diagnostics on best checkpoint (n=200 + 103
+    definitions): true 5.830, answer gap +0.001, difficulty gap +0.001, register
+    sep +0.688, flat@hard +0.002. Every content bar missed: the answer gap
+    collapsed monotonically with training (+0.59 base → +0.19 at 20 steps →
+    +0.001 at 2799) while register was fully learned (separation crossed zero —
+    real clues now outscore flat definitions). Reading: the tuned model writes
+    clue-register text while ignoring the prompt — both the answer and the
+    difficulty token. Open discrepancy to reconcile: trainer's best val 4.647 vs
+    the script's true-condition 5.830 on the same val distribution (token
+    weighting? subset?). No stage-1 verdict until the discrimination ladder
+    (task below) separates "model really ignores the prompt" from "measurement
+    artifact".
+- [ ] Conditioning-collapse discrimination ladder, cheapest rung first; stop at
+      the first rung that discriminates. (a) Free, no model: reconcile the
+      4.647-vs-5.830 val discrepancy from logs/code; read optiq's chat-format
+      dataset + prompt-masking path end-to-end and confirm the prompt tokens are
+      present in the training input (masked from loss only, not from attention).
+      (b) Generation probe (~10 min, lease + footprint OK): panel eval at medium
+      on the best checkpoint — if generated clues are topically related to their
+      answers, conditioning survives generation and the loss-gap collapse needs
+      a measurement explanation; if unrelated, the model genuinely ignores the
+      prompt. (c) Checkpoint trace (~25 min): loss_gaps on iters 400 / 1400 /
+      2799 — was the answer gap ever healthy mid-run, and when did it die?
+      Zero-from-the-start points mechanical; gradual decay points at training
+      dynamics (single fixed template teaching prompt-invariance). (d) If
+      dynamics: cheapest counters are prompt-template variety (several phrasings
+      of the same instruction) and LR decay; then the capacity-vs-data pair —
+      two short matched-wall-clock runs, rank 16 on the same 5k vs rank 8 on
+      10k, compared on val + gaps, which also answers the plateau-cause
+      question. (e) Loss anchor (footprint OK needed, 26B in memory):
+      prompted-26B response loss on the same val sample — anchors what a
+      known-good clue writer scores, i.e. how much of 5.8 is entropy floor vs
+      deficit.
+- [ ] Hand-tagged quality bank (user-in-the-loop; queued 2026-07-03). User walks
+      a sample of the data bank in a review UI and hand-tags examples on
+      multiple quality dimensions, fast per item. Design TBD: possibly several
+      single-dimension passes rather than one heavy pass; UI should make tagging
+      a few seconds per clue (keyboard-driven, batched). Dimensions worth
+      considering: bankable yes/no, difficulty read, register/flavor, mechanism
+      (per satisfaction taxonomy), dated/evergreen. Payoffs, in order:
+      calibration set for the local judge; seed preference pairs for DPO;
+      validation set for the judge-filtered-training knob; ground truth for any
+      future curation filter.
 - [ ] Investigate training throughput (after the overnight run; needs the
       lease). The log's `Tokens/sec` ≈ 1.5–2.0 counts only trained (response)
       tokens — ~8/example under prompt masking — so it is not comparable to
