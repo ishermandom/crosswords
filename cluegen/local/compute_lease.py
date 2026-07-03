@@ -27,10 +27,11 @@ anyone else waits their turn. The protocol (agreed with the user 2026-07-02):
 With the lease held, a session may self-serve local runs under ~1 hour each;
 multi-hour runs and all cloud spending still get user notice first.
 
-Running a job under the lease — the detached-driver + watcher pattern. The
-Claude Code Desktop app kills the session's process group once its tab has been
-hidden for ~15 minutes (upstream issue #68625), so any job that might outlive
-that must not run as a plain in-session command:
+Running a job under the lease — the detached-driver + watcher pattern.
+Session-scoped background processes get killed after roughly 15 minutes (cause
+unidentified — observed in both the Desktop app and the standalone terminal
+CLI), so any job that might outlive that must not run as a plain in-session
+command:
 
 1. Acquire the lease.
 2. Launch the job detached, writing to a log file, e.g. `subprocess.Popen([...],
