@@ -1315,8 +1315,9 @@ empty, kernel memory-pressure level normal), so a dead holder whose memory is
 still wired blocks rather than getting stomped. Release unloads ollama models,
 so the next holder starts from measured idle.
 
-Implementation: `~/.claude/scripts/compute-lease.py` (machine-global, in
-dotfiles; full protocol in its docstring), lease file at
+Implementation: `cluegen/local/compute_lease.py` (in-repo — the user's placement
+call: it's project infrastructure while this is the only model-running project
+on the machine; full protocol in its docstring), lease file at
 `/Users/Shared/models/.compute-lease.json`. All four safety paths tested live:
 refuse-while-held, refuse-wrong-holder, refuse-stale-but-busy (exit 2, lease
 left for inspection), break-stale-only-when-idle.
