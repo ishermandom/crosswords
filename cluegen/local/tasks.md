@@ -121,7 +121,8 @@ thread; the spec is self-contained.
     0.31.3); switched to the spec's recorded fallback
     `optiq lora train --rank-scaling constant --preset default`, which registers
     the remap — loads and trains cleanly (val loss 12.99 → 5.40 over 20 iters).
-    Timing anchor at batch 1: ~0.21 it/s, peak 9.9 GB (16 GB machine).
+    Timing anchor at batch 1: ~0.21 it/s, peak 9.9 GB (32 GB machine — optiq's
+    "10% of total RAM" log line is misleading; user-corrected).
   - Done 2026-07-02 (user-cleared): batch-4 timing run — 0.059–0.062 it/s × 4 ≈
     0.24 examples/s vs batch 1's 0.21: only ~15% gain for +0.6 GB, so batch
     stays 1 (and keeps 4× more optimizer steps per epoch). Slice sized at 5,000
