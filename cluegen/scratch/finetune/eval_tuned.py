@@ -24,14 +24,12 @@ import pathlib
 
 import httpx
 
+from prompts import DIFFICULTIES, PROMPT_TEMPLATE
+
 _SERVE_URL_DEFAULT = 'http://127.0.0.1:8788/v1/chat/completions'
 _OLLAMA_CHAT_URL = 'http://localhost:11434/api/chat'
 _SCREEN_MODEL = 'gemma4:26b-qat'
 _RESULTS_DIR = pathlib.Path(__file__).parent / 'evals'
-
-# Must match the training prompt in build_slice.py: the adapter learned this
-# exact framing.
-_PROMPT_TEMPLATE = 'Write a crossword clue for the answer: {word}'
 
 # Fixed iteration panel — copied from scratch/eval_panel.py (local-ceiling).
 _PANEL = ['SCORE', 'DAISY', 'GRANT', 'CHECK', 'GASP', 'AMBER',
@@ -101,11 +99,13 @@ _JUDGE_SCHEMA = {
 }
 
 
-def generate_clue(serve_url: str, word: str) -> str:
+def generate_clue(serve_url: str, word: str, difficulty: str) -> str:
   """One bare single-turn completion from the tuned setter."""
   body = {
       'messages': [
-          {'role': 'user', 'content': _PROMPT_TEMPLATE.format(word=word)},
+          {'role': 'user',
+           'content': PROMPT_TEMPLATE.format(difficulty=difficulty,
+                                             answer=word)},
       ],
       'max_tokens': 60,
       'temperature': 1.0,
@@ -142,6 +142,8 @@ def main() -> None:
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument('--runs', type=int, default=1)
   parser.add_argument('--words', nargs='+', default=_PANEL)
+  # The harness evals at medium; other values drive the steering spot-check.
+  parser.add_argument('--difficulty', choices=DIFFICULTIES, default='medium')
   parser.add_argument('--no-screen', action='store_true')
   parser.add_argument('--serve-url', default=_SERVE_URL_DEFAULT)
   args = parser.parse_args()
@@ -152,8 +154,9 @@ def main() -> None:
 
   for word in args.words:
     for run_index in range(args.runs):
-      clue = generate_clue(args.serve_url, word)
-      record = {'word': word, 'run': run_index, 'clue': clue}
+      clue = generate_clue(args.serve_url, word, args.difficulty)
+      record = {'word': word, 'run': run_index,
+                'difficulty': args.difficulty, 'clue': clue}
       if not args.no_screen:
         record |= screen_clue(word, clue)
       with out_path.open('a') as file:
