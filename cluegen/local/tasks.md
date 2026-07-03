@@ -122,13 +122,15 @@ thread; the spec is self-contained.
     `optiq lora train --rank-scaling constant --preset default`, which registers
     the remap — loads and trains cleanly (val loss 12.99 → 5.40 over 20 iters).
     Timing anchor at batch 1: ~0.21 it/s, peak 9.9 GB (16 GB machine).
-  - Slice sizing decision (open): batch-1 throughput gives only ~6k pairs per 8h
-    night — bottom of the 5–20k band. Options: one more gated mini-run to time
-    batch 4 (likely 2–3× throughput → 10–15k pairs/night), or size
-    conservatively at batch 1 numbers. Then rebuild slice at the chosen
-    `--size`.
-  - Overnight train under `caffeinate`; then eval + steering spot-check (same
-    answer prompted easy vs hard).
+  - Done 2026-07-02 (user-cleared): batch-4 timing run — 0.059–0.062 it/s × 4 ≈
+    0.24 examples/s vs batch 1's 0.21: only ~15% gain for +0.6 GB, so batch
+    stays 1 (and keeps 4× more optimizer steps per epoch). Slice sized at 5,000
+    pairs (~6.6 bench-hours; thermal margin for the fanless overnight) and
+    rebuilt: 1,712 answers, buckets 16/54/30%, 1,119 contrast answers, median
+    year 2010; valid unchanged (1,382 pairs / 500 answers).
+  - Overnight train (user-gated): batch 1, 5,000 iters ≈ one epoch, under
+    `caffeinate`, detached; then eval + steering spot-check (same answer
+    prompted easy vs hard).
 - [ ] Stage 2 — only on stage-1 signal: more data/epochs, DPO from judge labels,
       or 26B tune. Not committed.
 
