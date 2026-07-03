@@ -31,17 +31,24 @@ Evidence from the 2026-07-02 eval round (details: `ceiling-log.md`):
 - **Method: QLoRA via mlx-lm.** Adapters over frozen 4-bit weights are the only
   local-feasible option (full fine-tuning needs 10×+ the memory). MLX is the
   mature Apple Silicon stack with Gemma support and one-command training.
-  Trainer: stock `mlx_lm.lora`; optiq's own trainer (sensitivity-aware adapter
-  sizing, standard adapter output) is the recorded fallback if stock balks on
-  the OptiQ base, and a possible stage-2 lever. Framework survey (2026-07-02)
-  confirmed mlx-lm is effectively the only mature option for this machine:
-  Unsloth's Mac training is announced but unshipped, torchtune is unmaintained
-  and stops at Gemma 2, LLaMA-Factory has no macOS backend. Fallback if mlx-lm
-  hits a wall: Hugging Face PEFT + TRL on the PyTorch MPS backend — functional
-  since bitsandbytes 0.49.2, but its 4-bit path is officially flagged as slow.
-  Reference point: Mistral-7B, 5k examples, ~90 min on an M2 Max at ~7GB peak;
-  the fanless M4 Air runs slower sustained, so training is an overnight job
-  under `caffeinate`.
+  Trainer: stock `mlx_lm.lora` for plain `gemma4` checkpoints (stage 0 ran on
+  it); for stage 1 the trainer is
+  `optiq lora train --rank-scaling constant --preset default` — the 12B
+  QAT-OptiQ checkpoint ships as `model_type: gemma4_unified`, which stock mlx-lm
+  0.31.3 doesn't recognize, and optiq's entry points register the
+  `gemma4_unified → gemma4` remap (12B sanity run 2026-07-02 confirmed it loads
+  and trains). Constant rank 8 / alpha 8 approximates stock behavior; optiq's
+  sensitivity-aware rank scaling stays a stage-2 lever. One training-objective
+  difference from the stage-0 run: optiq masks prompt tokens from the loss by
+  default (only the clue text trains), which is the better objective anyway.
+  Framework survey (2026-07-02) confirmed mlx-lm is effectively the only mature
+  option for this machine: Unsloth's Mac training is announced but unshipped,
+  torchtune is unmaintained and stops at Gemma 2, LLaMA-Factory has no macOS
+  backend. Fallback if mlx-lm hits a wall: Hugging Face PEFT + TRL on the
+  PyTorch MPS backend — functional since bitsandbytes 0.49.2, but its 4-bit path
+  is officially flagged as slow. Reference point: Mistral-7B, 5k examples, ~90
+  min on an M2 Max at ~7GB peak; the fanless M4 Air runs slower sustained, so
+  training is an overnight job under `caffeinate`.
 - **Models: `gemma-4-e2b-it-OptiQ-4bit` for stage 0,
   `gemma-4-12B-it-qat-OptiQ-4bit` for stage 1** (both under `mlx-community` on
   Hugging Face; 5.3 and 9.0 GB; settled 2026-07-02). OptiQ is a

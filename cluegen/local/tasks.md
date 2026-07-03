@@ -141,10 +141,17 @@ thread; the spec is self-contained.
     buckets 15/54/31% (matches weekday-weight prediction), 2,232 contrast
     answers, median year 2010; valid 1,382 pairs / 500 answers. Rebuild at the
     final `--size` once 12B timing lands.
-  - 12B sanity training steps (a few iters) — training is user-gated (explicit
-    go-ahead per run, spec Constraints); also needs GPU coordination with the
-    local-ceiling thread first: 12B is above the E2B-scale line. Yields
-    tokens/sec → slice size (one epoch, one overnight) → rebuild slice.
+  - Done 2026-07-02 (user-cleared): 12B sanity steps. Stock `mlx_lm.lora`
+    rejected the checkpoint (`model_type: gemma4_unified` unknown to mlx-lm
+    0.31.3); switched to the spec's recorded fallback
+    `optiq lora train --rank-scaling constant --preset default`, which registers
+    the remap — loads and trains cleanly (val loss 12.99 → 5.40 over 20 iters).
+    Timing anchor at batch 1: ~0.21 it/s, peak 9.9 GB (16 GB machine).
+  - Slice sizing decision (open): batch-1 throughput gives only ~6k pairs per 8h
+    night — bottom of the 5–20k band. Options: one more gated mini-run to time
+    batch 4 (likely 2–3× throughput → 10–15k pairs/night), or size
+    conservatively at batch 1 numbers. Then rebuild slice at the chosen
+    `--size`.
   - Overnight train under `caffeinate`; then eval + steering spot-check (same
     answer prompted easy vs hard).
 - [ ] Stage 2 — only on stage-1 signal: more data/epochs, DPO from judge labels,
