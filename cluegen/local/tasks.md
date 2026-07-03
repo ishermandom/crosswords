@@ -84,6 +84,13 @@ done — see the log for the curve and the criteria re-analysis.
   - [ ] User reads prompts + logs in detail before strong tweak opinions —
         deferred to a fresh-eyes session (2026-07-02); not blocking autonomous
         progress
+- [~] **Autonomous iteration window** #window — user-granted ~5–10 h of
+  self-directed iteration (2026-07-03) across judge quality, setter quality, and
+  throughput, steered by apparent leverage. Protocol (validation ladder,
+  adoption methodology, budgets: $10 Fable, ≤45 min batches, ≤10 tries/task):
+  ceiling-log.md 2026-07-03 window entry. Per-idea record:
+  `scratch/window_ledger.md`. Yields compute to the fine-tune thread on its
+  I'm-waiting note.
 - [~] **Judge: satisfaction criterion** #judge-satisfaction — the cloud verify
   contract now carries it (criterion 6 + mandatory `basis` output field,
   2026-07-02): flags flat glosses with `basis: null`, validated on a held-out
