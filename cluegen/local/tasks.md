@@ -155,10 +155,22 @@ thread; the spec is self-contained.
     rebuilt: 1,712 answers, buckets 16/54/30%, 1,119 contrast answers, median
     year 2010; valid unchanged (1,382 pairs / 500 answers).
   - Overnight train (user-gated): batch 1, 5,000 iters ≈ one epoch, under
-    `caffeinate`, detached; then eval + steering spot-check (same answer
-    prompted easy vs hard).
-- [ ] Stage 2 — only on stage-1 signal: more data/epochs, DPO from judge labels,
-      or 26B tune. Not committed.
+    `caffeinate`, detached.
+  - Morning-after protocol, in order: (1) loss curve + best-checkpoint val; (2)
+    loss-gap diagnostics (`scratch/finetune/loss_gaps.py`) base vs tuned —
+    answer-shuffle gap measures answer-conditional content learning,
+    difficulty-swap gap measures whether the conditioning token is load-bearing;
+    shape-only learning = val loss fell but gaps didn't grow (baseline numbers
+    from the 20-step adapter recorded 2026-07-02); (3) panel eval at medium via
+    `eval_tuned.py` + screen; (4) steering spot-check (same answers at easy vs
+    hard); (5) decision-metric read: confirmed-bankable per GPU-minute vs v9.
+- [ ] Stage 2 — only on stage-1 signal. Options, not commitments: more
+      data/epochs; DPO from judge labels (converts judge preferences into the
+      training objective — the quality-not-shape lever); judge-filtered training
+      subset (screen training clues through the local judge — the
+      previously-rejected expensive evaluator, justifiable only on signal);
+      optiq sensitivity-aware rank scaling; 26B tune; scaffold-trace
+      distillation (train on v9 conversation prefixes → final clue).
 
 ---
 
