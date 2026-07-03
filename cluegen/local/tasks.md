@@ -177,7 +177,20 @@ thread; the spec is self-contained.
       Cheap probes: time a forward-only pass over the same batch shape vs the
       training step; compare early-run vs late-run it/s in `train_stage1.log`
       for thermal drift. Payoff: if step time is fixable, stage-2 epochs get
-      cheaper across the board.
+      cheaper across the board. If it is dequantize-in-backward, the first
+      question is which form: MLX has native transposed quantized-matmul
+      kernels, so backward _can_ run on 4-bit weights directly (then the cost is
+      ~3× weight reads per step — bandwidth-bound, near a hardware floor); a
+      dequantize-then-matmul fallback in optiq's unified path would instead be
+      fixable software waste (grep the training path for explicit dequantize;
+      check newer mlx/optiq releases). Levers either way: gradient checkpointing
+      off if the preset enables it (9.9 GB peak on 32 GB — memory headroom is
+      not the constraint); fewer adapted layers (halves backward weight traffic;
+      capacity tradeoff — stage-2 only); more tokens per step via batching or
+      sequence packing (weight reads are per step, not per token) — though batch
+      4's mere ~15% gain cuts against the pure bandwidth story and itself wants
+      explaining (per-example serialization? short-sequence kernel
+      inefficiency?).
 - [ ] Stage 2 — only on stage-1 signal. Options, not commitments: more
       data/epochs; DPO from judge labels (converts judge preferences into the
       training objective — the quality-not-shape lever); judge-filtered training
