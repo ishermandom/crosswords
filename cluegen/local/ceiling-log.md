@@ -1357,3 +1357,57 @@ costs throughput (fewer banks per run), not bank quality. The honest next
 instrument is batch-4 chunk 2: measure the real bank rate under the new judge
 
 - fixer and let the user judge the tradeoff on production numbers.
+
+## 2026-07-03 — Iterations 3–6, probes, and the confirm redesign
+
+The "capability limit" call above was wrong (user pushback, twice vindicated).
+The keep side recovered 5/11 → 10/11 across iterations 3–5 once the fixes went
+structural rather than wordsmithing:
+
+- **Iteration 3 — basis commitment ported as mechanism** (required `basis` enum
+  in the judge schema + solver-simulation protocol + basis–verdict coupling):
+  the whole familiar-domain aha cluster banked (CHECK "Threaten the king", MARCH
+  "Step in time?", CENTURY "Batsman's milestone", DAISY "Petal-puller's
+  target?", AMBER "Prehistoric time capsule?"). Keeps 5/11 → 8/11.
+- **Iterations 4–5 — diagnosed clusters, not adjectives**: modifier honesty (ONE
+  "Sole digit", FOURTEEN "A score, slightly diminished"), padding-behind- charm,
+  fun/elegance-in-imagery examples (DUCK, SCREECH, SOUTHWARD), foreign-
+  homograph rule for names (FELIX). Keeps 9/11 then 10/11.
+- **Fresh validation** (17 checkpoint-labeled bank clues, never tuned against):
+  the core transferred — unseen ahas banked, flats died; 8/10 of its revises are
+  independence/tag/trap axes a per-clue judge structurally can't see.
+- **Iteration 6 regressions revealed the instrument's limit**: ~10 borderlines
+  flip run-to-run at temp 0.2; single-run deltas at the margin are sampling
+  noise. (A temp-0 determinism test was started and killed — wrong instrument:
+  user's calibration point taken.)
+
+**Variance probes** (12 clues × 4 samples/stage) replaced single-sample flips
+with distributions and rewrote the cascade's story:
+
+- With the shared prompt the 26B screen is the only real gate — flats die 4:0,
+  strong ahas bank 4:0, true borderlines split. The 31B confirm banks ~90% of
+  accepts AND revises alike, at temp 0.2 and 1.0 both. Every historical "confirm
+  kill" was a low-probability draw.
+- Temperature: 0.2 was convention, never measured. At 1.0 the screen improves on
+  stable-wrongs with no control regressions — live candidate, decide with the
+  49-clue eval.
+- **Confirm v1 (role suffix) failed**: the shared solver-simulation user turn
+  steered analysis to taste; verification never executed. **v2 (own system
+  prompt + own verification protocol; no basis coupling)** works: ONE, FOURTEEN,
+  FELIX all die 0:4 (mostly `bad`), zero false kills on accepts. Residuals:
+  padding (ZED "That last character, overseas") bites nowhere; WYE "Forked
+  path?" dies on strict sense-ownership (letter-name outlier — it's in words.in
+  as the spelled-out letter, lines 533–547 block).
+- **Taste-at-31B tested and rejected** (user hypothesis: the stronger model
+  should judge taste better): screen taste prompt minus the coupling license
+  still banks everything (SEVEN "Lucky prime" 2:2 at best). The 31B's leniency
+  is core behavior, not a license artifact; verdict-expressed taste
+  discrimination lives at the 26B, as fitted by the iteration campaign.
+
+**Cascade as redesigned**: screen = 26B, taste + craft (iterated prompt);
+confirm = 31B, v2 precision verification (own protocol). Known gaps: padding (no
+stage catches it), GASP-class contested fun (screen kills what Fable calls fun),
+screen split-rates on imagery accepts. Next validation (machine- gated): the
+49-clue agreement eval under the full new cascade; then the fixer replay; then
+batch-4 chunk 2. Machine handed to the fine-tune thread 2026-07-03 ~01:30; no
+further runs without the user's go.

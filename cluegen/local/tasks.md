@@ -64,14 +64,18 @@ done — see the log for the curve and the criteria re-analysis.
   Local cascade alignment implemented 2026-07-02 (liveliness bullet gains both
   gradients; the NINE calibration example that blessed flat count metonymy is
   now a graded ELEVEN/NINE pair; stock-association example added). Agreement
-  eval (`scratch/agreement_eval.py`) run three times over two prompt iterations
-  2026-07-02: flats die in every run; keeps recovered 2/11 → 5/11 and the
-  prize-fact control (THIRTEEN) now banks, but further deltas sit inside
-  single-sample run noise, and familiar-domain ahas (CHECK, MARCH, MURMUR) still
-  die — likely a 26B/31B capability limit, not wording; full three-run table in
-  ceiling-log. Prompt tuning stopped there. Remaining: decide via batch-4 chunk
-  2 (#batch4) whether ~half recall on good clues is an acceptable throughput
-  cost given precision holds — user decision on production numbers.
+  eval (`scratch/agreement_eval.py`) iterated to keeps 10/11 with flats dying in
+  every run (iterations 3–6: basis-commitment mechanism, diagnosed-cluster
+  fixes; full trajectory in ceiling-log 2026-07-03). Cascade redesigned from
+  variance-probe evidence (`scratch/variance_probe.py`): screen = 26B taste +
+  craft; confirm = 31B precision verification with its own protocol
+  (`_CONFIRM_SYSTEM`/`_CONFIRM_PROMPT` — v2 kills ONE/FOURTEEN/FELIX-class
+  precision errors 0:4 with zero false kills); taste-at-31B tested and rejected.
+  Remaining: (a) re-validate the full new cascade on the 49-clue combined set;
+  (b) decide judge temperature (1.0 improved the screen's stable-wrongs with no
+  control regressions — measure, don't assume); (c) known gaps for later —
+  padding bites at no stage, GASP-class contested fun. Local runs; machine with
+  the fine-tune thread — user-gated.
   - Note: the "fun" escape hatch is closed — a fun gradient (humor/surprise in
     the surface vs. recognition of stock associations) landed 2026-07-02; all
     five fun-basis chunk-1 accepts flipped to revise with regression accepts
