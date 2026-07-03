@@ -20,6 +20,33 @@ preferred quantization.
 
 ---
 
+## Git workflow
+
+**Goal:** Implement the agent-managed git workflow (strict-linear main,
+structural history preservation). Spec and full rationale: `docs/git-workflow/`.
+
+- [ ] **GitHub rulesets** (user-run, GitHub UI): `main` → require linear
+      history + block force pushes + block deletions, scoped to `main` only —
+      and retire the current all-branches no-merge-commits rule;
+      `refs/archive/**` → creation allowed, updates and deletions blocked.
+- [ ] **Auto-archive Action** — `.github/workflows/archive-rewrites.yml`: on
+      force-push and ref-deletion events, snapshot the `before` SHA to
+      `refs/archive/<branch>/<utc-timestamp>` via the API. The dragnet layer;
+      verify by force-pushing a throwaway branch and checking the archive ref
+      appears.
+- [ ] **Land script** — `scripts/land.py`: replay → presubmit (full suite once;
+      per-commit flag) → FF-push main → archive superseded chain → reset branch
+      onto main. Includes the archive recovery drill in its docs (one
+      `ls-remote` pattern, one fetch/diff example). Depends on the rulesets
+      existing (FF-rejection behavior).
+- [ ] **Dotfiles migration** (after dotfiles construction settles): move
+      `docs/git-workflow/` + `land.py` to dotfiles as the all-repos standard;
+      add ruleset assertions to `gh-protect.sh`; narrow the git gate to
+      lease-only-off-main (spec, Enforcement layer 4); enable `rerere` in global
+      git config; roll rulesets + Action out to remaining personal repos.
+
+---
+
 ## Local ceiling campaign
 
 **Goal:** Explore the quality ceiling of single American-style clue generation
