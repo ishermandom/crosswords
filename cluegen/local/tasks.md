@@ -57,9 +57,35 @@ done — see the log for the curve and the criteria re-analysis.
   - [ ] User reads prompts + logs in detail before strong tweak opinions —
         deferred to a fresh-eyes session (2026-07-02); not blocking autonomous
         progress
+- [ ] **Purge flat batch-4 chunk-1 clues from the bank** — the numbers chunk
+      banked fixer-flattened fact glosses (user: not satisfying). Checkpoint 4
+      ran (6A/2RV/0RJ, verdicts annotated on the records) but did not identify
+      them: Fable's revises are accuracy complaints, and it accepted the flat
+      glosses — the verify contract carries no satisfaction bar. Selection
+      therefore needs the user's read, or the #judge-satisfaction criterion
+      applied retroactively.
+  - Open question: the reference judge (CLUE_SPEC + verify.md) not penalizing
+    triviality means Fable-agreement evals can't validate a satisfaction
+    criterion either — does the verify contract itself get the criterion
+    (cloud-side change), or does the user hand-label a calibration set?
+- [ ] **Judge: satisfaction criterion** #judge-satisfaction — the confirm gate
+      is harsh on accuracy but passes dictionary glosses ("Standard baseball
+      lineup size"). Add a triviality bar sourced from `satisfaction.md`'s five
+      bases: a clue must earn its keep on at least one. Gate change → the
+      judge-v2 protocol: agreement-based eval on Fable-verdicted clues, then a
+      Fable audit of the recalibrated gate's banks.
+- [ ] **Fixer: preserve angle and misdirection** — chunk 1 showed the repair
+      path flattens drafts into unimpeachable facts (all six fixer banks lost
+      their `trap`; NINE: "A full lineup on a baseball field?" → "Standard
+      baseball lineup size"). Constrain the fixer prompt to keep the draft's
+      angle, or send repairs through the satisfaction check rather than only a
+      re-screen. Depends on #judge-satisfaction for the check variant.
 - [ ] **Angle-distinct depth pass** — when banking multiple clues per word,
       require distinct angles (checkpoint 2: Fable flagged a same-angle DAISY
       paraphrase). Later pass by user direction; don't over-invest early.
+  - Note: sibling leak, cross-word rather than same-word — chunk 1 banked the
+    "X's total/tally" template three times across different words. A per-clue
+    judge can't see either; both need a bank-level pass.
 - [x] **Satisfaction-mechanism taxonomy** — written as
       `cluegen/local/satisfaction.md` (local-ceiling branch, 2026-07-02): five
       bases of satisfaction (aha is not mandatory — user note), ten mechanisms,

@@ -1101,3 +1101,57 @@ the user works in another thread), and why `start_new_session=True` detachment
 survives (new process group, out of the group-kill's reach). Open upstream, no
 fix. Countermeasures: the detached-driver + watcher pattern (in use), or run
 batch-heavy sessions from the standalone terminal CLI.
+
+## 2026-07-02 — Batch 4 chunk 1: fixer flattening exposed; drained
+
+Batch 4 launched as a chunked detached driver (`scratch/batch4_driver.py`, 493
+words in 25-word chunks, per-chunk `--skip-banked`, stop-file drain). The user
+drained it after chunk 1 — the machine went to the fine-tuning run — and set a
+standing preference: **short runs over long slabs**; a single chunk carried
+plenty of signal, and it did.
+
+Chunk 1 (25 numbers words): 8 banked, bank at 83 — nominally the best
+single-pass rate yet (32%) on the historically hardest category. The user's
+read: not satisfying. The records agree, and they localize the mechanism:
+
+- **The fixer does the flattening.** 6 of 8 banks came via the repair path; all
+  six lost their `trap` (the two straight banks kept theirs). Diffs show it:
+  NINE "A full lineup on a baseball field?" → "Standard baseball lineup size";
+  THIRTY "A number of days in June" → "June's total". The eval round's "it
+  sometimes flattens a lively draft" was the majority product here.
+- **Adverse selection, not bad luck**: the confirm gate is harsh on accuracy and
+  lenient on triviality; the fixer manufactures accuracy by stripping
+  liveliness. The highest-throughput path therefore converges on flat,
+  unimpeachable fact glosses — worst on numbers, whose count-metonymy/
+  arithmetic skew satisfaction.md already names.
+- **Template monoculture**: "X's total/tally" three times in eight clues —
+  invisible to any per-clue judge; cross-word sibling of the angle-distinct
+  leak.
+- The setter's honest-calibration field flagged it: all eight self-rated `easy`
+  against a medium target.
+
+Queued in tasks.md: purge the flat chunk-1 banks after Fable verdicts; a
+satisfaction criterion for the judge (judge-v2 eval protocol applies); a fixer
+angle-preservation constraint; the monoculture note on the angle-distinct task.
+
+## 2026-07-02 — Checkpoint 4 ($0.442): the reference judge has no flatness bar
+
+Fable on the 8 chunk-1 banks (user go; cloud-only): **6A/2RV/0RJ**, verdicts
+annotated on the records. The surprise is what it did NOT flag: both revises are
+accuracy/anchoring complaints (ZERO — a shutout's tally is the full score, not
+the zero; THIRTY — "total" unanchored), while the flat glosses the user called
+out ("Standard baseball lineup size", "A decade shy of a century") were
+accepted.
+
+Implication: the verify contract (CLUE_SPEC + verify.md) carries no
+satisfaction/triviality criterion, so the user's bar sits above the reference
+judge's on this axis. That breaks two assumptions in the queued work:
+
+- The chunk-1 purge can't be selected by Fable verdicts — it needs the user's
+  read or a satisfaction criterion applied retroactively.
+- The judge-v2 agreement protocol can't validate a satisfaction criterion
+  against this reference; the criterion has to enter the verify contract itself
+  (a cloud-side spec change, user-gated) or be calibrated against user-labeled
+  examples.
+
+Spend this check-in window: $0.442 of the $5 cap.
