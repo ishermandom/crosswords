@@ -6,7 +6,9 @@ dist/
 *.egg-info/
 cluegen/local/logs/
 cluegen/scratch/logs/
-# Stage-0 fine-tuning slice: generated data; build_slice.py regenerates it.
+# Fine-tuning slices: generated data; the build_*slice scripts regenerate
+# them.
 cluegen/scratch/finetune/data/
+cluegen/scratch/finetune/data_stage1/
 # Trained LoRA adapters: multi-MB binaries, regenerable from data + config.
 cluegen/scratch/finetune/adapters/

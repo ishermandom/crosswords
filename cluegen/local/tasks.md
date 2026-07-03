@@ -106,16 +106,20 @@ thread; the spec is self-contained.
 - [ ] Stage 1 — probe: QLoRA `12B-it-qat-OptiQ-4bit` on 5–20k curated pairs;
       evaluate via the eval client (bare single-turn and scaffolded); Fable
       spot-check <$2. Depends on stage 0 (done). Sub-steps, in order:
-  - User-run shopping list: Kaggle NYT clue zip + doshea clone (commands
-    supplied in chat 2026-07-02; home `/Users/Shared/data/` (pulled 2026-07-02),
-    ACLs via `share-directory.sh`).
+  - Done 2026-07-02: corpora pulled to `/Users/Shared/data/` (Kaggle CSV
+    verified: 781,573 rows; doshea clone; xd moved alongside).
+  - Done 2026-07-02: slice builder `scratch/finetune/build_stage1_slice.py`
+    implements the spec recipe; prompt template frozen in
+    `scratch/finetune/prompts.py` (shared with `eval_tuned.py`, which now takes
+    `--difficulty`). Provisional 10k slice built and verified: funnel 543,762
+    pairs after dedup / 62,955 answers; train 10,000 pairs / 3,444 answers,
+    buckets 15/54/31% (matches weekday-weight prediction), 2,232 contrast
+    answers, median year 2010; valid 1,382 pairs / 500 answers. Rebuild at the
+    final `--size` once 12B timing lands.
   - 12B sanity training steps (a few iters) — training is user-gated (explicit
     go-ahead per run, spec Constraints); also needs GPU coordination with the
     local-ceiling thread first: 12B is above the E2B-scale line. Yields
-    tokens/sec → slice size (one epoch, one overnight).
-  - Stage-1 slice builder per the spec recipe (normalized dedup, ≤ 4 per answer
-    cross-bucket with mild recency tiebreak, weekday→bucket difficulty token in
-    the training prompt, answer-split, panel + held-out excluded).
+    tokens/sec → slice size (one epoch, one overnight) → rebuild slice.
   - Overnight train under `caffeinate`; then eval + steering spot-check (same
     answer prompted easy vs hard).
 - [ ] Stage 2 — only on stage-1 signal: more data/epochs, DPO from judge labels,
