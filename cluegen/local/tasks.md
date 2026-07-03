@@ -160,15 +160,22 @@ thread; the spec is self-contained.
     loss-gap diagnostics (`scratch/finetune/loss_gaps.py`) base vs tuned —
     answer-shuffle gap measures answer-conditional content learning,
     difficulty-swap gap measures whether the conditioning token is load-bearing;
-    shape-only learning = val loss fell but gaps didn't grow. Baseline
-    (2026-07-02, n=200): base true 9.99, answer gap +0.59, difficulty gap −0.19
-    (noise ≈ not load-bearing); 20-step adapter true 6.37, answer gap +0.19,
-    difficulty gap +0.00 — early training is pure shape and even diluted the
-    base's answer-conditioning. Overnight content success = answer gap
-    recovering past +0.59 and a positive difficulty gap; (3) panel eval at
-    medium via `eval_tuned.py` + screen; (4) steering spot-check (same answers
-    at easy vs hard); (5) decision-metric read: confirmed-bankable per
-    GPU-minute vs v9.
+    shape-only learning = val loss fell but gaps didn't grow. The register
+    control (WordNet flat definitions) adds: register separation (definitions −
+    real clues; growth = quality not flatness) and the flat-under-hard penalty
+    (difficulty token acting on register). Baseline (2026-07-02, n=200 + 103
+    definitions): base — true 9.99, answer gap +0.59, difficulty gap −0.19
+    (noise), register sep −1.38, flat@hard +0.84; 20-step adapter — true 6.37,
+    answer gap +0.19, difficulty gap +0.00, register sep −0.55, flat@hard +0.02.
+    Reading: early training is shape-dominated; it diluted answer-conditioning
+    and erased the base's difficulty sensitivity (both difficulty instruments
+    agree), while register separation moved the right way (−1.38 → −0.55),
+    likely partly residual shape (definitions run longer than real clues).
+    Overnight content bars: answer gap past +0.59; difficulty gap clearly
+    positive; flat@hard recovering past +0.84; register sep continuing toward 0;
+    (3) panel eval at medium via `eval_tuned.py` + screen; (4) steering
+    spot-check (same answers at easy vs hard); (5) decision-metric read:
+    confirmed-bankable per GPU-minute vs v9.
 - [ ] Stage 2 — only on stage-1 signal. Options, not commitments: more
       data/epochs; DPO from judge labels (converts judge preferences into the
       training objective — the quality-not-shape lever); judge-filtered training
