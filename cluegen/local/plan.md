@@ -22,10 +22,12 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` done · `[-]` droppe
 Installed system-wide via Homebrew (`brew install ollama` run as `ishermandom`).
 Binary lands at `/opt/homebrew/bin/ollama`.
 
-Model weights are shared between accounts at `/Users/Shared/models/gguf`, set
-via `OLLAMA_MODELS=/Users/Shared/models/gguf` in the shared `.zprofile`
-(dotfiles). This avoids duplicating the ~16 GB model download. Store layout and
-rationale: `dotfiles/claude/docs/shared-storage.md` (the store moved from
+Model weights are shared between accounts at `/Users/Shared/models/gguf`
+(managed via Ollama — see the README in that directory), set via `OLLAMA_MODELS`
+in the shared `.zprofile` (dotfiles). The profile is the single source of truth
+for the path; commands and docs should not hardcode it. This avoids duplicating
+the ~16 GB model download. Store layout and rationale:
+`dotfiles/claude/docs/shared-storage.md` (the store moved from
 `/Users/Shared/ollama/models` on 2026-07-02).
 
 **The Ollama server must always be started manually** (`ollama serve`). Never
