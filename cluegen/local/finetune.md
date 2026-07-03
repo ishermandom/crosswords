@@ -87,11 +87,20 @@ Evidence from the 2026-07-02 eval round (details: `ceiling-log.md`):
   but filters need evidence, not vibes, so speculative cutoffs were dropped):
   - Era: no cutoff. The dataset is entirely Shortz-edited — no convention break
     inside it — and gradual reference-staleness is barely visible to the judge
-    metric. Recency appears only as a mild tiebreak preference in cap selection.
+    metric. Recency enters only as a mild sampling weight: linear in year, 1.0
+    (1993) rising to 2.0 (2021).
+  - Sampling weights (builder round 2026-07-02): every sampling choice weights a
+    row by weekday weight × recency weight. Weekday weights, Mon→Sun: 1 / 1.5 /
+    2 / 4 / 3 / 2 / 4 (user-set) — Thursday is the top target difficulty, Sunday
+    sits with it, Monday stays present at low frequency. Bucket-level
+    consequence: easy ≈ 2.5, medium ≈ 10, hard ≈ 5 — a medium-centered tilt
+    matching the eval register.
   - Dedup: normalized collapse — case/punctuation/whitespace-insensitive
     (answer, clue) key — keeping the most recent copy.
-  - Answer cap: ≤ 4 clues per answer, picked cross-bucket first (difficulty
-    contrast pairs), recency as the mild tiebreak.
+  - Answer cap: ≤ 4 clues per answer, drawn by the combined sampling weight
+    without replacement. Same-answer contrast pairs (the conditioning token's
+    teaching signal) still land for most multi-bucket answers; the funnel report
+    counts them.
   - Answers: all of them, 3–15 letters A–Z, flattened phrases included; narrow
     to single dictionary words only if evidence shows phrase answers hurt
     single-word deployment.
@@ -107,9 +116,26 @@ Evidence from the 2026-07-02 eval round (details: `ceiling-log.md`):
     monoculture would surface at the bank audit rather than pass silently;
     mechanism-balanced sampling is the recorded lever if an audit ever shows
     collapse.
-  - Split: by answer; panel + held-out answers excluded (rule below). Stage 0
-    didn't wait on this round: its ~500 pairs only exercised plumbing. Judges
-    remain the backstop for whatever curation misses.
+  - Split: by answer; panel + held-out answers excluded (rule below). The
+    validation set is a fixed ~500 answers rather than a percentage — enough for
+    a stable loss curve without shrinking training data as the slice grows.
+    Stage 0 didn't wait on this round: its ~500 pairs only exercised plumbing.
+    Judges remain the backstop for whatever curation misses.
+- **Training prompt: a fixed natural-English single-turn instruction** (builder
+  round 2026-07-02):
+  `Write a {difficulty} crossword clue for the answer: {answer}`, difficulty ∈
+  easy/medium/hard, no system prompt, target output the bare clue text. This
+  string is a frozen interface — the eval client reproduces it exactly and the
+  steering spot-check varies only the difficulty word — and it lives in one
+  shared constants module so builder and eval can't fork. Rationale: adapter
+  benefit tracks distribution proximity, not exact wording, and a short natural
+  instruction doubles as an invocation phrase a future scaffolded pipeline can
+  append at its clue-emission turns — with unfused serving, the adapter is a
+  register module the pipeline applies per turn (base model for reasoning
+  turns), so the fine-tune retains value even if one-shot quality falls short.
+  Training bare (no system prompt) keeps the adapter uncoupled from the
+  still-evolving v9 setter prompt. Distilling real scaffold traces into training
+  data stays a stage-2 lever.
 - **Slice size: set by 12B sanity timing.** Run the gated 12B sanity steps, take
   tokens/sec, and size the slice so one epoch fits one overnight under
   `caffeinate`, within the 5–20k band.
