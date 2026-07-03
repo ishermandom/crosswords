@@ -278,21 +278,69 @@ Calibration examples — where the boundaries sit:
   famous bearer is a legitimate definition — the bearer is not "merely
   associated" with the name; she instantiates it."""
 
-# Confirm shares the judge's craft core but plays a different role: the screen
-# has already made the taste call, and a same-prompt confirm mostly repeats it.
-# The suffix points the stronger model at the precision verification a first
-# read misses.
-_CONFIRM_SYSTEM = (
-  _JUDGE_SYSTEM
-  + """
+# Confirm is a different job, not a second opinion: the screen owns the taste
+# call; confirm owns precision. It gets its own system prompt (no basis-verdict
+# coupling — that rule is a bank-license in a fluent model's hands) and its own
+# user-turn protocol (_CONFIRM_PROMPT), because the shared solver-simulation
+# protocol steers the analysis toward taste and away from verification.
+_CONFIRM_SYSTEM = """\
+You are the final verification editor for an American-style crossword
+clue bank. A clue reaches you only after an editorial screen has made
+the taste call; your judgment is precision. A flaw you wave through
+goes straight into the bank; the costly error is banking a flawed
+clue. When a check leaves genuine doubt, verdict "fixable", never
+"bankable".
 
-You are the confirming editor — the second and final gate before the
-bank. A first screen has already judged this clue bankable; a second
-opinion that repeats its reasoning adds nothing. Your job is what a
-first read misses: re-run the substitution sentence word by word, test
-every qualifier and factual claim literally against the fact, and
-verify the clued sense genuinely belongs to the answer string. A flaw
-you wave through here goes straight into the bank."""
+Verify the clue's TEXT ONLY:
+- Substitution: the clue could replace the answer in a sentence — part
+  of speech, tense, number, register, and referent all hold.
+- Literal truth: test every qualifier, comparative, and factual claim
+  against the fact. A modifier that overclaims, falsely implies, or
+  leaves several answers fitting equally well is a flaw — however
+  charming the surface.
+- Sense ownership: the clued sense must be an English sense of the
+  answer string (for a name, a famous bearer or a shared English word
+  both count); a homograph in another language is not a definition.
+- Economy: name padding even when the surface reads smoothly.
+- Question-mark honesty: a ? belongs only with genuine wordplay or a
+  stretched definition; a straight definition takes none.
+
+Also assign the difficulty the text actually achieves: easy (direct,
+signposted), medium (less-first sense, mild ambiguity), or hard
+(active misdirection).
+
+Verdicts:
+- "bankable" — every check passes.
+- "fixable" — one concrete text flaw; name it.
+- "bad" — fundamentally flawed for this answer.
+
+The "basis" field reports what the clue makes a solver feel; it does
+not gate your verdict — taste was judged at the screen.
+
+Calibration examples:
+- "One who delivers your letters" -> MAIL: bad. Defines the mail
+  CARRIER, not the answer itself — the referent shifts.
+- "Unwanted gift" -> ELEPHANT: bad. The sense lives only inside the
+  idiom WHITE ELEPHANT.
+- "Current affairs?" -> EELS: fixable. The pivot delights, but
+  "affairs" defines nothing about eels — charm does not rescue a
+  failed substitution.
+- "Night watchman on patrol" -> GUARD: fixable. "on patrol" is padding
+  — "Night watchman" carries the whole definition.
+- "You, old-style" -> THOU: bankable. A secondary or archaic sense is
+  fully legitimate.
+- "Born to Die singer" -> LANA: bankable. A famous bearer is a
+  legitimate definition for a name answer."""
+
+_CONFIRM_PROMPT = (
+  'Verify this one clue. In "analysis", in order: (1) write one '
+  'natural sentence using the answer in the clued sense, substitute '
+  "the clue's definition, and say whether part of speech, tense, "
+  'number, or referent shifts; (2) test each qualifier and factual '
+  'claim literally against the fact, one by one; (3) say whether the '
+  'clued sense is an English sense of the answer string; (4) name any '
+  'padding. Name every flaw you find; the "basis" field does not gate '
+  'the verdict.\n\n'
 )
 
 _JUDGE_SCHEMA = {
@@ -352,14 +400,19 @@ def _run_setter(model, word, difficulty, tee):
   return json.loads(messages[-1]['content'])['clues']
 
 
-def _judge(model, word, clue_text, tee, label, system=None):
-  prompt = (
-    'Judge this one clue. In "analysis", in order: (1) name the sense '
-    'used and write the substitution sentence; (2) say what a solver '
-    'first pictures on reading the surface, and what shifts when the '
-    'answer clicks; (3) name the basis of satisfaction that moment '
-    'earns, or "none"; (4) name any flaws. Then commit the basis in '
-    'the "basis" field.\n\n' + json.dumps({'word': word, 'clue': clue_text})
+_SCREEN_PROMPT = (
+  'Judge this one clue. In "analysis", in order: (1) name the sense '
+  'used and write the substitution sentence; (2) say what a solver '
+  'first pictures on reading the surface, and what shifts when the '
+  'answer clicks; (3) name the basis of satisfaction that moment '
+  'earns, or "none"; (4) name any flaws. Then commit the basis in '
+  'the "basis" field.\n\n'
+)
+
+
+def _judge(model, word, clue_text, tee, label, system=None, protocol=None):
+  prompt = (protocol or _SCREEN_PROMPT) + json.dumps(
+    {'word': word, 'clue': clue_text}
   )
   content = _chat(
     model,
@@ -462,6 +515,7 @@ def _phase_confirm(candidates, cli, tee, provenance_extra):
       tee,
       'confirm',
       system=_CONFIRM_SYSTEM,
+      protocol=_CONFIRM_PROMPT,
     )
     if confirm['verdict'] != 'bankable':
       if confirm['verdict'] == 'fixable':

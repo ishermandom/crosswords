@@ -67,6 +67,7 @@ def main():
       quiet,
       'confirm',
       system=pipeline_local._CONFIRM_SYSTEM,
+      protocol=pipeline_local._CONFIRM_PROMPT,
     )
     record['local_confirm'] = confirm
     record['local_cascade'] = confirm['verdict']
