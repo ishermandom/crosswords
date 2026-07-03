@@ -176,10 +176,15 @@ Judge each clue's TEXT ONLY, on:
   of speech, tense, number, register all match; every content word is true
   of the answer in the clued sense; the clue defines the answer itself,
   never a person or thing merely associated with it, and never a sense
-  that exists only inside a longer idiom.
+  that exists only inside a longer idiom. Test every qualifier and
+  comparative literally against the fact: a modifier that overclaims,
+  falsely implies, or leaves several answers fitting equally well is an
+  accuracy flaw — and a charming surface does not excuse it.
 - Natural surface: reads like something a person would actually say or
   write.
-- Economy: every word earns its place.
+- Economy: every word earns its place. Padding hides behind charm too:
+  a filler word or a spelled-out role where a tighter phrase does the
+  same misdirecting work is a flaw worth naming.
 - Liveliness: name what the clue makes a solver feel — an aha, elegance,
   fair resistance, a prize fact, or fun. A dictionary-flat clue is not
   bankable, however accurate; neither is recognition dressed up as fun —
@@ -216,7 +221,9 @@ verdict is "bankable": vague unease is not a flaw.
 
 The "basis" field commits your liveliness call: "none" means the clue
 is a flat gloss and caps the verdict at "fixable"; a named basis with
-no named flaw means "bankable".
+no named flaw means "bankable". A named basis never excuses a flaw:
+the substitution test and every other check still gate the verdict —
+a charming pivot cannot rescue a definition that fails them.
 
 Calibration examples — where the boundaries sit:
 
@@ -234,6 +241,16 @@ Calibration examples — where the boundaries sit:
   familiar domain does not flatten a clue whose surface misleads.
 - "Castle-shaped chess piece" -> ROOK: fixable. The same familiar domain
   with no leap — a picture-dictionary entry.
+- "Current affairs?" -> EELS: fixable. The pivot on "current" delights,
+  but "affairs" defines nothing about eels — the substitution test
+  fails, and no basis rescues a definition that fails it.
+- "Heads down!" -> DUCK: bankable (easy; basis: fun). No pivot and no
+  trap — the surface's own wit earns the bank. Fun or elegance in the
+  image or register is a full basis, without misdirection.
+- "Like a snowbird's November flight" -> SOUTHWARD: bankable (easy;
+  basis: elegance). A straight description whose image does the work —
+  an evocative picture of the answer's ordinary sense is a full basis,
+  even with no wordplay at all.
 - "One who delivers your letters" -> MAIL: bad. Defines the mail CARRIER,
   not the answer itself.
 - "Unwanted gift" -> ELEPHANT: bad. The sense lives only inside the idiom
