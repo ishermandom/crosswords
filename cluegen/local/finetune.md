@@ -206,6 +206,12 @@ Evidence from the 2026-07-02 eval round (details: `ceiling-log.md`):
   brief, any model size — without the user's explicit go-ahead (user direction
   2026-07-02). Data prep, serving, and eval stay under the ordinary footprint
   rules below.
+- Any job that loads a multi-gigabyte model — training, serving, or
+  inference-only eval alike — gets announced with its expected memory footprint
+  and duration before launch, and waits for an explicit OK whenever the user may
+  be active on the machine. Footprint, not training-vs-inference, is what
+  contends for shared RAM (incident 2026-07-02: a backgrounded 12B eval thrashed
+  the user's session).
 - Thermal reality: training and big eval runs are overnight jobs, detached,
   under `caffeinate`.
 - Local compute is shared with the actively running local-ceiling thread, which
