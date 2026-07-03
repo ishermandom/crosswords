@@ -1226,3 +1226,32 @@ Same 20-clue set, side by side with the previous run (15A/5RV → **9A/11RV**):
   strictness rise.
 
 Spend this check-in window: $3.036 of the $5 cap.
+
+## 2026-07-02 — Purge; fixer and local-judge prompts aligned to the bar
+
+**Bank purged 83 → 75**: all 8 chunk-1 records removed (every one draws a revise
+under the final verify contract, matching the user's read). Git history and the
+committed eval sets preserve them as labeled negatives.
+
+**Local-judge root cause found**: the judge prompt already had a liveliness rule
+and a flat-count fixable example (SEVEN, days-in-week) — but its FIRST
+calibration example taught "Innings in a standard ballgame" -> NINE: bankable,
+"metonymic count clues are fine." Near-verbatim the clue chunk 1 banked; two
+near-identical count facts calibrated to opposite verdicts, and the permissive
+one won. Same lesson as the cloud iteration: blessing a mechanism without a
+gradient blesses its flat end.
+
+Prompt changes (validation runs pending, machine on the fine-tune):
+
+- **Judge**: liveliness bullet now carries both gradients (fact and
+  fun/stock-association); the NINE example became a graded pair (ELEVEN Spinal
+  Tap bankable / NINE innings fixable — "liveliness grades the fact, not the
+  mechanism"); TWENTYONE stock-association example added, mirroring the cloud
+  contract's.
+- **Fixer**: the draft's angle is named as the thing to preserve — repair around
+  it, carry it into the `trap` field, and when the critique names flatness,
+  produce a fresh angle, not a rephrase.
+
+Queued validation (local runs, user-gated): 26B/31B agreement eval on the 32
+Fable-labeled clues; fixer replay of chunk-1's critiques checking trap survival;
+then batch-4 chunk 2 as the integration test of all three fixes.

@@ -153,8 +153,13 @@ _FIXER_SYSTEM = """\
 You are an expert editor of American-style crossword clues. You receive a
 clue for a given answer word together with an independent editor's
 critique naming its flaw. Produce ONE corrected clue: fix exactly the
-named flaw while keeping what the clue does well. Keep the surface
-natural and vivid — an accurate-but-flat correction is a failure. The
+named flaw while keeping what the clue does well. The draft's angle —
+its image, misdirection, or trap — IS what the clue does well: repair
+around it and carry it into the corrected clue's "trap" field. If the
+named flaw cannot be fixed without discarding the angle, find a fresh
+angle instead — an accurate-but-flat correction is a failure. When the
+critique names flatness itself, rephrasing is no fix: the corrected
+clue needs a genuine angle (an image, a pivot, a surprising fact). The
 clue must not contain the answer word or a trivial inflection of it."""
 
 # ---
@@ -175,7 +180,12 @@ Judge each clue's TEXT ONLY, on:
 - Natural surface: reads like something a person would actually say or
   write.
 - Economy: every word earns its place.
-- Liveliness: a dictionary-flat clue is not bankable, however accurate.
+- Liveliness: name what the clue makes a solver feel — an aha, elegance,
+  fair resistance, a prize fact, or fun. A dictionary-flat clue is not
+  bankable, however accurate; neither is recognition dressed up as fun —
+  a clue that merely fuses the answer's stock associations or plainly
+  states a fact everyone knows. A fact earns its keep by surprise or
+  specificity; a relation to another quantity needs a pivot.
 - Question-mark honesty: a ? belongs only with genuine wordplay or a
   stretched definition; a straight definition takes none.
 - Fair misdirection: when the surface misleads, the answer must be fair in
@@ -195,8 +205,14 @@ genuine doubt, verdict "fixable", never "bankable".
 
 Calibration examples — where the boundaries sit:
 
-- "Innings in a standard ballgame" -> NINE: bankable (easy). A number is
-  legitimately defined by what it counts; metonymic count clues are fine.
+- "Spinal Tap amp's top setting" -> ELEVEN: bankable (medium). A number
+  is legitimately defined by what it counts, and this count is
+  remark-worthy — a prize fact.
+- "Innings in a standard ballgame" -> NINE: fixable. The same mechanism
+  at its flat end: an accurate count everyone already knows, plainly
+  stated. Liveliness grades the fact, not the mechanism.
+- "Old enough to order a drink" -> TWENTYONE: fixable. Fuses the
+  answer's stock associations — recognition, not surprise.
 - "One who delivers your letters" -> MAIL: bad. Defines the mail CARRIER,
   not the answer itself.
 - "Unwanted gift" -> ELEPHANT: bad. The sense lives only inside the idiom

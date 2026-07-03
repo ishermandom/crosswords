@@ -57,24 +57,16 @@ done — see the log for the curve and the criteria re-analysis.
   - [ ] User reads prompts + logs in detail before strong tweak opinions —
         deferred to a fresh-eyes session (2026-07-02); not blocking autonomous
         progress
-- [ ] **Purge flat batch-4 chunk-1 clues from the bank** — the numbers chunk
-      banked fixer-flattened fact glosses (user: not satisfying). Checkpoint 4
-      ran (6A/2RV/0RJ, verdicts annotated on the records) but did not identify
-      them: Fable's revises are accuracy complaints, and it accepted the flat
-      glosses — the verify contract carries no satisfaction bar. Selection
-      therefore needs the user's read, or the #judge-satisfaction criterion
-      applied retroactively.
-  - Note: settled — the verify contract got the criterion plus the fun gradient
-    (2026-07-02, see #judge-satisfaction). Under the final version all 8 chunk-1
-    banks draw revises, matching the user's read; the purge can simply act on
-    that.
 - [~] **Judge: satisfaction criterion** #judge-satisfaction — the cloud verify
   contract now carries it (criterion 6 + mandatory `basis` output field,
   2026-07-02): flags flat glosses with `basis: null`, validated on a held-out
   flat set with zero liveliness false-positives; iteration story in ceiling-log.
-  Remaining: align the local cascade (26B screen / 31B confirm) to the same bar
-  so flat clues die locally rather than at Fable audits — the judge-v2 agreement
-  protocol works again now that the reference enforces the bar.
+  Local cascade alignment implemented 2026-07-02 (liveliness bullet gains both
+  gradients; the NINE calibration example that blessed flat count metonymy is
+  now a graded ELEVEN/NINE pair; stock-association example added). Remaining:
+  the agreement eval — local 26B/31B re-judge the 32 Fable-labeled clues,
+  measure agreement against the fun-gradient reference. Local runs; user-gated
+  on machine availability.
   - Note: the "fun" escape hatch is closed — a fun gradient (humor/surprise in
     the surface vs. recognition of stock associations) landed 2026-07-02; all
     five fun-basis chunk-1 accepts flipped to revise with regression accepts
@@ -82,12 +74,13 @@ done — see the log for the curve and the criteria re-analysis.
     the 20-clue set vs. 15A/5RV before), and it now flags unmarked
     definition-by-example clues (MELODY "Whistleable earworm") — a spec
     ?-convention call, not a liveliness one.
-- [ ] **Fixer: preserve angle and misdirection** — chunk 1 showed the repair
-      path flattens drafts into unimpeachable facts (all six fixer banks lost
-      their `trap`; NINE: "A full lineup on a baseball field?" → "Standard
-      baseball lineup size"). Constrain the fixer prompt to keep the draft's
-      angle, or send repairs through the satisfaction check rather than only a
-      re-screen. Depends on #judge-satisfaction for the check variant.
+- [~] **Fixer: preserve angle and misdirection** — chunk 1 showed the repair
+  path flattens drafts into unimpeachable facts (all six fixer banks lost their
+  `trap`). Prompt updated 2026-07-02: the angle is named as what the clue does
+  well, must survive the repair and land in the `trap` field; flatness critiques
+  demand a fresh angle, not a rephrase. Remaining: validation probe — replay
+  chunk-1's ~10 fixable critiques under the new prompt, check angle/trap
+  survival. Local runs; user-gated on machine availability.
 - [ ] **Angle-distinct depth pass** — when banking multiple clues per word,
       require distinct angles (checkpoint 2: Fable flagged a same-angle DAISY
       paraphrase). Later pass by user direction; don't over-invest early.
