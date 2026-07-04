@@ -1,128 +1,304 @@
 # Autonomous window ledger — 2026-07-03
 
-Protocol: ceiling-log.md (2026-07-03 "Autonomous iteration window"). One entry
-per idea: pre-registration first (hypothesis, target, guards), outcome appended
-after the run. Status: PLANNED / RUNG0 / RUNG1 / RUNG2 / ADOPTED / REJECTED /
-PARKED.
+Protocol: ceiling-log.md (2026-07-03 "Autonomous iteration window"). One section
+per idea: pre-registration first (hypothesis, target, guards), outcome entries
+appended after each run, newest last. The status board holds only the current
+status; the narrative lives in the sections.
 
-| #   | idea                                                  | status      | pre-registration → outcome                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| --- | ----------------------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | battery harness                                       | BUILT       | Infrastructure, no model verdict at stake. One command → keeps/kills table over tuning (32) + holdout (17), per-call replay cache. Found: reject bank ⊂ tuning set (no independent signal). Rung-0 smoke pending compute (machine with fine-tune thread).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| 2   | window-start baseline                                 | PLANNED     | Full battery on the current cascade (post-redesign screen + confirm v2), K=1. All later rung-2 reads compare here.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| 3   | fresh labels, kill side                               | DONE        | Fable-label the 22 unlabeled chunk-1 kills (`fresh_label_input.jsonl`, version fresh-kill). Purpose: recall-loss audit — every Fable-accept among them is a cascade recall loss with stage attribution. DIAGNOSTIC set (tuning allowed). Expectation: most kills confirmed. Caveat: numbers-slanted (chunk 1). The 24 fresh-bank entries stay UNLABELED until end-of-window → fully sealed precision test. → 4A/18RV/0RJ, $0.704 ($9.30 left). 18 true kills → reject bank. 4 recall losses: FIFTY "The denomination on a red bill" (screen kill; Fable prize-fact), NIL "Nothing on the scoreboard" (confirm; elegance), NINE "A full lineup on a baseball field?" (confirm; aha), FOURTEEN "Score minus six" (confirm; aha). All four were killed by the PRE-redesign cascade — see idea 5.                   |
-| 4   | reject-bank wiring                                    | ADOPTED     | Code-only: `reject_bank_append.py`, checkpoint results → reject_bank (Fable revise/reject on unbanked candidates, dedupe, disjoint-from-bank invariant, banked hits print as purge candidates). First live run appended the 18 confirmed kills; bank 14 → 32. Battery gains a `rejects` set (the 18 non-tuning-subset entries) as an independent precision guard.                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| 5   | re-judge the 4 recall losses                          | PLANNED     | Rung-1 probe, first thing when compute frees: run the 4 Fable-accepted kills through TODAY'S cascade (screen iter-6 + confirm v2) via battery `--only`. Hypothesis: some were fixed by the redesign (chunk 1 predates it). Any that still die are live false-kill targets, each with a Fable basis to aim at (prize-fact, elegance, aha ×2).                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| 6   | padding: deletion-test confirm (v1)                   | RUNG0-READY | Hypothesis: "name any padding" invites a gestalt read (smooth surface → "None"); Fable's economy standard is per-word deletion (ZED: "'That' is padding — 'Last character, overseas' is tighter"). Patch `variants/padding_v1.py`: economy bullet + step 4 become a delete-each-word test, plain-article carve-out (NINE "A full lineup on a baseball field?" is a Fable accept), invented EVEREST demonstrative example (not ZED — no answer-key memorization). Target: ZED → confirm-fixable at K≥3 (now bankable 8/8 in probes). Guards: zero new confirm false-kills on tuning accepts; article-bearing accepts hold.                                                                                                                                                                                       |
-| 7   | fun gradient: evoked moment vs listed properties (v1) | RUNG0-READY | Hypothesis: the screen extends the stock-association kill to surfaces whose vividness is one precise cultural moment — GASP "Reaction to a jump scare" (Fable accept, fun) goes 8/8 screen-fixable with the model explicitly citing "recognition of a common experience". With N=1 labeled GASP, tuning on it = memorization, so Fable generated 5 invented graded pairs ($0.32, `fun_calibration_verdicts.jsonl`, battery set `funcal`): the line is an evoked lived moment (SNOOZE "Button smacked at 6:00, 6:09, and 6:18") vs props/frames ("Alarm clock button"). Patch `variants/fun_v1.py` states the line + adds the SNOOZE pair. Target: funcal 5 accepts bank, 5 revises die; GASP flips bankable. Guards: tuning's ex-fun stock-association revises stay dead; no screen false-banks on rejects set. |
+## Status board
 
-**User calibration (2026-07-03):** GASP "Reaction to a jump scare" is borderline
-— acceptable judged either way. So idea 7 loses its only observed failure case:
-GASP is no longer a flip target, and its row discounts in all scorecards (a
-screen kill there is not a false kill). Idea 7 reframed: first measure the
-CURRENT screen on the funcal set (10 screens, ~4 min, no patch). If the 5
-clear-cut evoked-moment accepts already bank → no gap, park fun_v1 unrun. Only
-if vivid non-borderline accepts die does fun_v1 get its rung-0. General note for
-scoring: single borderline rows the user flags are soft labels — don't tune
-toward them and don't count them as defects.
+| #   | idea                         | status             |
+| --- | ---------------------------- | ------------------ |
+| 1   | battery harness              | BUILT              |
+| 2   | window-start baseline        | DONE               |
+| 3   | fresh labels, kill side      | DONE               |
+| 4   | reject-bank wiring           | ADOPTED            |
+| 5   | re-judge the 4 recall losses | DONE               |
+| 6   | padding: deletion-test       | SUPERSEDED (by 10) |
+| 7   | fun gradient                 | PARKED             |
+| 8   | caffeinate detached runs     | ADOPTED            |
+| 9   | confirm v3                   | REJECTED           |
+| 10  | multi-turn confirm           | ADOPTED-IN-BATTERY |
+| 11  | screen non-pinning removal   | QUEUED             |
 
-**User calibration #2 (2026-07-03):** NIL "Nothing on the scoreboard" leans PASS
-— the virtue is slight misdirection: "Nothing" reads first as absence and
-resolves to the posted score, with no immediate collapse to the dull paraphrase
-("a score equal to nothing, on a scoreboard"). So NIL stays a live recall-loss
-target (today's screen kills it), with the user's lean agreeing with Fable's
-accept — a mild-but-real pivot, not a soft label like GASP.
+## Idea 1 — battery harness (BUILT)
 
-| #   | idea                                             | status  | pre-registration → outcome                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| --- | ------------------------------------------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2   | window-start baseline (batch A: tuning + losses) | PARTIAL | → Tuning: accepts held 4/11 (discount GASP per user: 4/10), revises killed 18/21. Stage attribution — screen kills accepts CENTURY "Batsman's milestone", MURMUR "Low hum of a restless crowd" (+GASP, discounted); confirm kills WYE "Forked path?", DAISY "Petal-puller's target?", CHECK "Threaten the king", AMBER "Prehistoric time capsule?". False banks: LARRY "Not quite Lawrence?", ZED "That last character, overseas" (padding, expected), ZERO "A shutout's tally". Losses set: FOURTEEN "Score minus six" recovered by the redesign (banks); FIFTY dies screen-bad, NIL screen-fixable, NINE confirm-bad — 3 live false kills. Model time ~27 min; wall 141.6 min (see idea 8). Batch B (holdout+rejects+funcal) pending.       |
-| 8   | caffeinate detached runs                         | ADOPTED | Batch A's 6 uniform ~1000s stalls = macOS maintenance sleep (pmset log matches call-for-call; 45 s dark-wakes every ~17 min; full wake on user HID at 17:33 exactly when confirms ran clean). Fix: every detached driver wraps in `caffeinate -is`. Recipe updated in compute_lease.py docstring + shared detached-runs memory (fine-tune thread's overnight trains stretch the same way).                                                                                                                                                                                                                                                                                                                                                    |
-| 9   | confirm v3: ?-license + clean substitution       | RUNG0   | Hypothesis: v2 prosecutes marked metaphor/metonymy as substitution failure (DAISY/AMBER analyses acknowledge the ? then kill the stretch; CHECK's substitution doubled "the king" into wreckage and called it a referent shift). Patch `variants/confirm_v3.py`: ? licenses the stretch it marks (invented CAVE example; EELS counterweight stays — the stretch must still be true); substitute where the answer stands alone. Target: DAISY, CHECK, AMBER, NINE "A full lineup on a baseball field?" flip confirm-bankable; WYE watch (letter-name outlier). Guards: confirm's correct revise-kills (DUSK, THIRD, SIXTEEN) stay dead; rejects-set precision at rung 2 vs baseline; screens fully cache-replayed (same-sample comparability). |
+Infrastructure, no model verdict at stake. One command → keeps/kills table over
+tuning (32) + holdout (17), per-call replay cache. Found: reject bank ⊂ tuning
+set (no independent signal).
 
-| #   | idea       | status | outcome append                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| --- | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 6   | padding v1 | RUNG1  | → Rung-0: ZED "That last character, overseas" dies at confirm (0:1:0) — first stage ever to catch it. Rung-1 guards in slot 2: article-bearing accepts (MARCH, GROSS, THIRTEEN, POTS, NINE "A full lineup on a baseball field?", FOURTEEN "Score minus six") must stay bankable under the deletion test.                                                                                                                              |
-| 9   | confirm v3 | RUNG1  | → Rung-0: 5/5 targets flip to bankable — WYE "Forked path?", DAISY "Petal-puller's target?", CHECK "Threaten the king", AMBER "Prehistoric time capsule?", NINE "A full lineup on a baseball field?" (4.3 min; screens cache-replayed). Rubber-stamp risk is THE guard concern (v1 history): rung-1 re-runs v3 on the correct kills (DUSK, THIRD, SIXTEEN) + correct banks; rung-2 pairs v2/v3 on batch B's identical screen samples. |
+## Idea 2 — window-start baseline (DONE)
 
-| #   | idea                                  | status   | outcome append (slot 2, 2026-07-03 evening)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| --- | ------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2   | window-start baseline                 | DONE     | → Batch B (v2): holdout accepts held 2/7 (recall collapse replicates on never-tuned data; screen kills GRANT "Academic windfall?", CHECK "Curb an impulse", STOCK "Simmering base for a stew"; confirm kills DAISY "Sun-watcher?", ROBIN "Boy Wonder?"), revises killed 8/10 (false banks: SCORE "Leave a notch", ROBIN "Sidekick to a Dark Knight?"). Rejects killed 17/18 — 14 die at screen (screen is a strong true-reject gate); false bank THOUSAND "M-shaped Roman numeral's value". Full-battery v2 agreement ≈ 57/81.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| 6   | padding v1                            | NEEDS-V2 | → Rung-1: target holds (ZED dies) but the plain-article carve-out FAILED — NINE "A full lineup on a baseball field?" killed. GROSS "Stomach-turning total?" also flipped (unstable across all patches — K=3 candidate). Padding-v2 wording (skip articles/grammatical connectives entirely, test content words only) drafted conceptually, then superseded: economy becomes its own turn in idea 10's decomposition.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| 7   | fun gradient                          | PARKED   | → Decision probe (funcal at v2 baseline): screen banks 4/5 vivid accepts (only LATTE "Order handed over with an unrequested foam heart" dies at screen) and kills 5/5 flat revises — the screen's fun line is fine; SNOOZE/KARAOKE die at the CONFIRM (precision literalism, idea 9's territory). fun_v1 patch parked unrun.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| 9   | confirm v3                            | REJECTED | → Rung-1/2: rubber stamp. Tuning revises at confirm: v2 killed DUSK/THIRD/SIXTEEN, v3 banks all (kills 1/6, and that one is the cached screen's); holdout revises 8/10 → 6/10; rejects 17 → 16. Cache ablation: v3 still NAMES the flaws (THIRD: "distinct concepts"; SIXTEEN: "does not substitute as a noun phrase") then banks anyway — the license text broke flaw→verdict coupling globally (DUSK/SIXTEEN carry no ?). Keeper: the clean-substitution procedure (CHECK "threaten the king the black king" fix). v2's DUSK kill was legitimate ("shadows also stretch at dawn" — non-pinning). Wording-level v4 parked in favor of idea 10.                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| 10  | multi-turn confirm, code-side verdict | PLANNED  | User-directed (2026-07-04): short focused turns, one check each — (1) substitution `{shift, shift_is_the_marked_stretch}`, (2) literal truth `{failing_qualifiers}`, (3) economy `{padding_words}` (articles excluded), (4) sense ownership `{is_english_sense}` — fresh conversation per turn (KV-cliff-safe), VERDICT COMPUTED BY CODE from the fields. Structurally eliminates the two observed failure modes: flaw-named-but-banked (v3) and posture bleed across checks (v2↔v3 whiplash); ?-license becomes a code rule on turn-1 fields. Cost ~1.5-2× confirm wall per clue, paid only on screen-bankables; per-turn cache multiplies iteration speed. Probe: 14-row discrimination set — flips WYE, DAISY "Petal-puller's target?", CHECK "Threaten the king", AMBER, NINE "A full lineup...", KARAOKE, ROBIN "Boy Wonder?", DAISY "Sun-watcher?" must bank; guards DUSK, THIRD, SIXTEEN, THREE "A hat trick's tally?", TEN "A strike in bowling?", FELIX "Favored by fortune?" must die. If it threads the needle, the same decomposition is a candidate for the screen (taste/craft split). |
+Full battery on the current cascade (post-redesign screen + confirm v2), K=1.
+All later rung-2 reads compare here.
 
-| #   | idea               | status | outcome append (2026-07-04, built while fine-tune holds the machine)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| --- | ------------------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 10  | multi-turn confirm | BUILT  | → Built offline. Battery gains a `CONFIRM_STAGE` hook: a patch installs `pipeline_local.CONFIRM_STAGE(judge_turn, word, clue)`; `judge_turn(stage, system, protocol, schema)` runs one cached single-shot turn (per-turn schema now explicit in `_call_key`; single-turn keys unchanged, so the whole existing cache still hits). Variant `variants/confirm_multiturn_v1.py`: 4 fresh-conversation turns, verdict + ?-license + article carve-out all code-side. 12 canned-field verdict checks pass; stock path replays byte-identical (WYE, 0 model calls). Probe next: rung-0/1 on the 14-row discrimination set the row above registers, ~44-56 31B calls, well under the 45-min cap. |
+**Batch A (tuning + losses):** accepts held 4/11 (discount GASP per user: 4/10),
+revises killed 18/21. Stage attribution — screen kills accepts CENTURY
+"Batsman's milestone", MURMUR "Low hum of a restless crowd" (+GASP, discounted);
+confirm kills WYE "Forked path?", DAISY "Petal-puller's target?", CHECK
+"Threaten the king", AMBER "Prehistoric time capsule?". False banks: LARRY "Not
+quite Lawrence?", ZED "That last character, overseas" (padding, expected), ZERO
+"A shutout's tally". Losses set: FOURTEEN "Score minus six" recovered by the
+redesign (banks); FIFTY dies screen-bad, NIL screen-fixable, NINE confirm-bad —
+3 live false kills. Model time ~27 min; wall 141.6 min (see idea 8).
 
-| #   | idea               | status | outcome append (2026-07-04 morning, post-fine-tune)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| --- | ------------------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 10  | multi-turn confirm | RUNG1  | → Rung-0 (CHECK flip + DUSK guard). Try 1: both die via `substitution: referent` on one-line analyses — the turn committed the enum without performing the substitution; DUSK's truth turn passed the two-good-answers reading — ratified by user calibration #3 below (non-pinning is a feature, not a flaw). Try 2 (structural): schema requires `sentence_with_answer` + `sentence_with_clue` before the shift fields, so the judgment conditions on visible evidence; system adds "a shift must be visible in the pair". Result: CHECK banks with a clean evidenced pair; DUSK dies fixable (`part_of_speech`, noun vs adverbial clause — evidenced, defensible). Both agree with Fable. Also fixed en route: battery `--patch` exec needed its own namespace (deferred functions from a patch crashed on name lookup); in-session non-caffeinate rerun stalled to 29 min on maintenance sleep — even "quick" model runs go detached+caffeinate. Rung-1 (14-row set) launched 11:21. |
+**Batch B (holdout + rejects + funcal):** holdout accepts held 2/7 (recall
+collapse replicates on never-tuned data; screen kills GRANT "Academic
+windfall?", CHECK "Curb an impulse", STOCK "Simmering base for a stew"; confirm
+kills DAISY "Sun-watcher?", ROBIN "Boy Wonder?"), revises killed 8/10 (false
+banks: SCORE "Leave a notch", ROBIN "Sidekick to a Dark Knight?"). Rejects
+killed 17/18 — 14 die at screen (screen is a strong true-reject gate); false
+bank THOUSAND "M-shaped Roman numeral's value". Full-battery v2 agreement ≈
+57/81.
 
-**Machine (overnight 2026-07-03→04):** handed to the fine-tune thread for a
-larger overnight training run ("12B overnight re-run at 5e-5", lease expires
-16:20) — NO local runs until the lease releases; the user green-lit resuming the
-moment it does. A `wait` (branch copy, waiter note registered, 960-min timeout)
-is armed in this session's background and fires on release. Then: restart
-`ollama serve`, re-verify with MAIN's copy's `acquire` (process scan, edbfcc2),
-and launch the idea-10 probe detached under `caffeinate -is`.
+## Idea 3 — fresh labels, kill side (DONE)
 
-**User calibration #3 (2026-07-04):** Non-pinning is NOT a flaw — a true clue
-that also fits other answers is a strong clue: it forces cross-checking against
-crossing answers. "When shadows stretch" fitting DAWN as well as DUSK is a
-feature. This supersedes the idea-9 remark that v2's DUSK kill was legitimate on
-non-pinning grounds (DUSK still dies — Fable revises it — but on the
-substitution turn's part-of-speech evidence). Consequence: "leaves several
-answers fitting equally well is a flaw" language sits in BOTH production prompts
-(screen `_JUDGE_SYSTEM` and confirm `_CONFIRM_SYSTEM`) — a candidate cause of
-the screen-recall family (CENTURY "Batsman's milestone", NIL "Nothing on the
-scoreboard", FIFTY "The denomination on a red bill" are all
-under-determined-but-true surfaces). Queued as idea 11.
+Fable-label the 22 unlabeled chunk-1 kills (`fresh_label_input.jsonl`, version
+fresh-kill). Purpose: recall-loss audit — every Fable-accept among them is a
+cascade recall loss with stage attribution. DIAGNOSTIC set (tuning allowed).
+Caveat: numbers-slanted (chunk 1). The 24 fresh-bank entries stay UNLABELED
+until end-of-window → fully sealed precision test.
 
-| #   | idea               | status     | outcome append (2026-07-04 midday)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| --- | ------------------ | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 10  | multi-turn confirm | RUNG1-ITER | → Rung-1 (14-row set, 60 calls, 24.9 min wall): flips 6/8 — WYE, DAISY "Petal-puller's target?", CHECK "Threaten the king", AMBER, ROBIN "Boy Wonder?", DAISY "Sun-watcher?" bank; NINE dies on economy ('full' flagged as padding), KARAOKE on a substitution article-frame artifact + economy flagging its vignette clause. Guards 4/6 by verdict, and label triage reassigns both misses: THREE "A hat trick's tally?" = flat fact + unearned ? + phantom trap (SCREEN territory — the screen banked it; feeds idea 11 and the trap gap), TEN "A strike in bowling?" = real confirm miss (marked-stretch too generous; Fable: "a strike isn't TEN itself"). False banks DAISY "Subject of a petal-plucking game?" and ROBIN "Sidekick to a Dark Knight?" are Fable "same-angle duplicate" — independence, structurally invisible per-clue (v2 false-banked ROBIN-dup too); discounted. Guard kills evidenced: THIRD economy, SIXTEEN register + 'Sweet', FELIX referent. Try 3 pre-registered: economy turn gets a redundancy-based padding rule + SCREECH example (NINE + KARAOKE must bank; GUARD "on patrol" must stay padding); substitution turn gets article-frame tolerance (KARAOKE) and "a ? does not make a near-miss equivalence right — an event is not its score" (TEN must die; DAISY/AMBER must hold). The truth turn's non-pinning recalibration lands in the same rerun. |
+**Outcome:** 4A/18RV/0RJ, $0.704 ($9.30 left). 18 true kills → reject bank. 4
+recall losses: FIFTY "The denomination on a red bill" (screen kill; Fable
+prize-fact), NIL "Nothing on the scoreboard" (confirm; elegance), NINE "A full
+lineup on a baseball field?" (confirm; aha), FOURTEEN "Score minus six"
+(confirm; aha). All four were killed by the PRE-redesign cascade — see idea 5.
 
-**User calibration #4 (2026-07-04):** Same-angle duplicates banked for one word
-are intentionally FINE in the local run — the cloud judge's independence check
-controlled for laziness in the cloud setter, and the local structure has no
-analogous need (reevaluate at cleanup: `#angle-distinct` in tasks.md). Scoring
-consequence: holdout rows whose Fable revise reason is "same-angle duplicate" —
-DAISY "Subject of a petal-plucking game?" and ROBIN "Sidekick to a Dark Knight?"
-— are discounted in ALL scorecards from here on (a local bank there is not a
-false bank). Requirements-alignment audit queued as `#judge-alignment`.
+## Idea 4 — reject-bank wiring (ADOPTED)
 
-| #   | idea               | status        | outcome append (2026-07-04 afternoon)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| --- | ------------------ | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 10  | multi-turn confirm | TRY3-REVERTED | → Try 3 net worse — wording whack-a-mole, stop rule invoked after 3 tries. Deltas vs try 2: THREE dies (fluke mechanism: `economy: tally`), but TEN still banks (model reads strike≈ten as fair metonymy despite the "event is not its score" line written for it), THIRD + FELIX regress to bankable (the reworded license flipped their marked-stretch judgment calls — jitter, not signal), NINE/KARAOKE still die and now as `bad` (common root: the substitution turn builds broken frames — NINE's pair reads "a full lineup on a baseball field on the field", the CHECK-wreckage bug reborn; KARAOKE gets "singing a pastime where..."). Economy redundancy rule failed its target (still flags NINE's 'full') while un-killing THIRD. Reverted to try-2 wording + the calibrated truth turn = the CANDIDATE. Accepted misses: NINE (economy flags 'full'), KARAOKE (frame artifact), TEN (metonymy fairness) — future angle: make the turn verify its frame doesn't duplicate clue words, structurally not wordingly. Next: rung-2 full battery vs window-start baseline, split A (tuning+losses) / B (holdout+rejects+funcal). |
+Code-only: `reject_bank_append.py`, checkpoint results → reject_bank (Fable
+revise/reject on unbanked candidates, dedupe, disjoint-from-bank invariant,
+banked hits print as purge candidates). First live run appended the 18 confirmed
+kills; bank 14 → 32. Battery gains a `rejects` set (the 18 non-tuning-subset
+entries) as an independent precision guard.
 
-**Machine handoff (2026-07-04 13:26):** rung-2 batch A killed at launch (zero
-confirm calls made — the replay cache makes the re-run free) to yield to the
-fine-tune thread ("morning analyses", lease to 16:11). Waiter note registered;
-on release: re-acquire, re-run batch A, then batch B. User will sort out the git
-branch divergence soon to ease cross-thread scheduling. (Fine-tune thread
-finished in ~20 min; batch A re-ran 13:47.)
+## Idea 5 — re-judge the 4 recall losses (DONE)
 
-| #   | idea               | status | outcome append (2026-07-04, rung-2 batch A)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| --- | ------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 10  | multi-turn confirm | RUNG2A | → Batch A (tuning+losses, 24 calls, 12.8 min): verdict-gated economy first gave revises 21/21 but killed four Fable accepts on their FLAVOR words (GROSS "Stomach-turning"+"total" — the whole clue flagged; THIRTEEN "often" — deleting it makes the clue falser; POTS "that might be thrown" — the pun itself; NINE "full") — the isolated economy turn is blind to taste by design and prosecutes the words that earn the basis. Code-side fix, pre-registered and re-scored FREE from cached fields (0 calls): padding demoted to advisory (`advisories` in the log, never gates). Result vs window-start baseline on tuning: accepts 8/10 vs 4/10 (every screen-passed accept banks; remaining misses CENTURY/MURMUR are screen kills — idea 11), revises 18/21 = baseline (THIRD the sole regression; LARRY/ZERO were v2 false banks too), losses NINE recovered / FOURTEEN lost (substitution register technicality on an unmarked arithmetic clue — accepted miss, future structural angle). ZED/SIXTEEN keep substitution kills — idea 6's ZED goal holds without economy gating. Batch B (holdout+rejects+funcal) launched 14:05. → Batch B (36 calls, 18.1 min): holdout accepts 3/7 (screen kills GRANT "Academic windfall?"/CHECK "Curb an impulse"/STOCK — idea 11; confirm gains DAISY "Sun-watcher?"+ROBIN "Boy Wonder?" vs v2, loses GRANT "Concede a point?" to frame WRECKAGE: "I will concede a point your request"), revises 6/10 raw → 6/8 with the calibration-#4 dup discounts (false banks SCORE — v2 shared — and TABLE "Place to settle a debate?", new). Rejects 16/18 (v2's THOUSAND false bank now dies; THREE/TEN the known ?-taste banks). Funcal accepts 1/5: OREO banks, but SNOOZE (bad!)/KARAOKE/GLITTER die at the substitution turn on the same definite-description frame family as GRANT-concede — 4 Fable fun/aha accepts, one mechanism. Try 4 pre-registered (frame repair, substitution-turn only, ~35 calls): "substitute the clue as one complete phrase, adding an article if the frame needs it; if the substituted sentence comes out ungrammatical, rebuild the frame — a broken frame is your error, not the clue's flaw." Targets SNOOZE/KARAOKE/GLITTER/GRANT-concede bank; guards: MAIL-family referent kills (FELIX, CHECK "A king's sudden peril", GRANT "Admit a point?"), DUSK/ZED/SIXTEEN substitution kills, EELS-side ?-refusals must all hold. |
+Run the 4 Fable-accepted kills through today's cascade via the battery `losses`
+set. Hypothesis: some were fixed by the redesign (chunk 1 predates it). Outcome
+(baseline batch A): FOURTEEN recovered; FIFTY (screen-bad), NIL
+(screen-fixable), NINE (confirm-bad) stayed live false-kill targets, each with a
+Fable basis to aim at (prize-fact, elegance, aha).
 
-| #   | idea               | status             | final outcome (2026-07-04 ~15:30)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| --- | ------------------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 10  | multi-turn confirm | ADOPTED-IN-BATTERY | → Try 4 (frame repair) REJECTED — won GRANT "Concede a point?"/FOURTEEN/NINE but globally softened shift-reporting: guards ZED and FELIX un-killed, POTS and OREO regressed, and the funcal vignette family it targeted didn't move. Reverted. ADOPTED config: sentence-pair substitution (try 2) + truth with non-pinning removed (user calibration #3) + economy advisory + sense; verdict + ?-license in code. Full-battery vs window-start baseline: tuning accepts 8/10 vs 4/10, revises 18/21 = baseline; holdout accepts 3/7 vs 2/7, revises 6/8 (disc.) vs 7/8; rejects 16/18 vs 17/18 (swap: THOUSAND killed, THREE/TEN banked); losses NINE recovered; funcal 1/5 (OREO). Known residual: definite-description vignettes die at substitution (SNOOZE/KARAOKE/GLITTER + GRANT-concede) — attack AFTER `#eval-expansion` gives it real sample size. Production wiring deferred to end-of-window consolidation (needs a difficulty source — screen already assigns one). |
+## Idea 6 — padding: deletion-test confirm (SUPERSEDED by idea 10)
 
-**Remaining queue beyond idea 10 (reordered 2026-07-04, user priority):** FIRST
-`#eval-expansion` — grow the labeled set to ~100 via one-off Fable generation
-(design in tasks.md; two detached calls, ~$1-1.5 each, window budget $8.98);
-then re-read v2 vs the idea-10 candidate on the expanded set before further
-tuning. Then idea 11 — drop non-pinning prosecution from the screen (variant of
-`_JUDGE_SYSTEM`; flip targets = the screen-killed Fable-accepts above; guards =
-rejects-set precision, which the screen currently carries at 14/18 kills);
-screen-recall families (diagnose from cached analyses — free: CENTURY "Batsman's
-milestone", MURMUR "Low hum of a restless crowd", NIL "Nothing on the
-scoreboard" (user: leans PASS, mild misdirection), FIFTY "The denomination on a
-red bill" (dies screen-bad!), LATTE, GRANT "Academic windfall?", CHECK "Curb an
-impulse", STOCK "Simmering base for a stew"); K=3 stability on GROSS +
-adopted-stack flips; sealed fresh-bank labeling at end-of-window (24 clues,
-`fresh_label_input.jsonl` version fresh-bank — still unlabeled, still sealed);
-judge-temperature decision; #taste-31b. Budget: $8.98 of $10 remains.
+Hypothesis: "name any padding" invites a gestalt read (smooth surface → "None");
+Fable's economy standard is per-word deletion (ZED: "'That' is padding — 'Last
+character, overseas' is tighter"). Patch `variants/padding_v1.py`:
+delete-each-word test, plain-article carve-out, invented EVEREST example.
+
+**Rung-0/1:** ZED dies at confirm — first stage ever to catch it — but the
+plain-article carve-out FAILED: NINE "A full lineup on a baseball field?"
+killed. GROSS "Stomach-turning total?" also flipped (unstable across all patches
+— K=3 candidate). Padding-v2 wording drafted conceptually, then superseded:
+economy became its own turn in idea 10's decomposition, and the adopted config
+kills ZED via its substitution turn with economy advisory.
+
+## Idea 7 — fun gradient (PARKED)
+
+Hypothesis: the screen extends the stock-association kill to surfaces whose
+vividness is one precise cultural moment — GASP "Reaction to a jump scare" went
+8/8 screen-fixable citing "recognition of a common experience". With N=1 labeled
+GASP, tuning on it = memorization, so Fable generated graded pairs ($0.32,
+`fun_calibration_verdicts.jsonl`, battery set `funcal`): evoked lived moment
+(SNOOZE "Button smacked at 6:00, 6:09, and 6:18") vs props/frames ("Alarm clock
+button"). Patch `variants/fun_v1.py` written but PARKED unrun: the decision
+probe (funcal at v2 baseline) showed the screen banks 4/5 vivid accepts (only
+LATTE "Order handed over with an unrequested foam heart" dies at screen) and
+kills 5/5 flat revises — the screen's fun line is fine; SNOOZE/KARAOKE die at
+the CONFIRM (precision literalism, idea 10's territory).
+
+## Idea 8 — caffeinate detached runs (ADOPTED)
+
+Batch A's 6 uniform ~1000s stalls = macOS maintenance sleep (pmset log matches
+call-for-call; 45 s dark-wakes every ~17 min; full wake on user HID exactly when
+confirms ran clean). Fix: every detached driver wraps in `caffeinate -is`.
+Recipe updated in compute_lease.py docstring + shared detached-runs memory.
+Reconfirmed 2026-07-04: an in-session non-caffeinate rerun stalled to 29 min for
+40 s of model time — even "quick" model runs go detached+caffeinate.
+
+## Idea 9 — confirm v3: ?-license + clean substitution (REJECTED)
+
+Hypothesis: v2 prosecutes marked metaphor/metonymy as substitution failure
+(DAISY/AMBER analyses acknowledge the ? then kill the stretch; CHECK's
+substitution doubled "the king" into wreckage and called it a referent shift).
+Patch `variants/confirm_v3.py`: ? licenses the stretch it marks (invented CAVE
+example; EELS counterweight stays); substitute where the answer stands alone.
+
+**Rung-0:** 5/5 targets flip bankable (WYE, DAISY "Petal-puller's target?",
+CHECK "Threaten the king", AMBER, NINE "A full lineup on a baseball field?").
+
+**Rung-1/2:** rubber stamp. v2 killed DUSK/THIRD/SIXTEEN; v3 banks all (kills
+1/6, and that one is the cached screen's); holdout revises 8/10 → 6/10; rejects
+17 → 16. Cache ablation: v3 still NAMES the flaws then banks anyway — the
+license text broke flaw→verdict coupling globally (DUSK/SIXTEEN carry no ?).
+Keeper: the clean-substitution procedure (the CHECK "threaten the king the black
+king" fix). Wording-level v4 parked in favor of idea 10.
+
+## Idea 10 — multi-turn confirm, code-side verdict (ADOPTED-IN-BATTERY)
+
+**Pre-registration (user-directed, 2026-07-04):** short focused turns, one check
+each — (1) substitution `{shift, shift_is_the_marked_stretch}`, (2) literal
+truth `{failing_qualifiers}`, (3) economy `{padding_words}` (articles excluded),
+(4) sense ownership `{is_english_sense}` — fresh conversation per turn, VERDICT
+COMPUTED BY CODE from the fields. Structurally eliminates the two observed
+failure modes: flaw-named-but-banked (v3) and posture bleed across checks (v2↔v3
+whiplash); ?-license becomes a code rule on turn-1 fields. Probe: 14-row
+discrimination set — flips WYE, DAISY "Petal-puller's target?", CHECK "Threaten
+the king", AMBER, NINE "A full lineup...", KARAOKE, ROBIN "Boy Wonder?", DAISY
+"Sun-watcher?" must bank; guards DUSK, THIRD, SIXTEEN, THREE "A hat trick's
+tally?", TEN "A strike in bowling?", FELIX "Favored by fortune?" must die. If it
+threads the needle, the same decomposition is a candidate for the screen
+(taste/craft split).
+
+**Built (2026-07-04, while fine-tune held the machine):** battery gains a
+`CONFIRM_STAGE` hook — a patch installs
+`pipeline_local.CONFIRM_STAGE(judge_turn, word, clue)`;
+`judge_turn(stage, system, protocol, schema)` runs one cached single-shot turn
+(per-turn schema explicit in `_call_key`; single-turn keys unchanged, so the
+whole existing cache still hits). Variant `variants/confirm_multiturn_v1.py`: 4
+fresh-conversation turns, verdict + ?-license + article carve-out all code-side.
+12 canned-field verdict checks pass; stock path replays byte-identical.
+
+**Rung-0 (CHECK flip + DUSK guard):** try 1 — both die via
+`substitution: referent` on one-line analyses; the turn committed the enum
+without performing the substitution. DUSK's truth turn passed the
+two-good-answers reading — ratified by user calibration #3 (non-pinning is a
+feature). Try 2 (structural): schema requires `sentence_with_answer` +
+`sentence_with_clue` before the shift fields, so the judgment conditions on
+visible evidence. Result: CHECK banks with a clean evidenced pair; DUSK dies
+fixable (`part_of_speech`, noun vs adverbial clause). Both agree with Fable.
+Fixed en route: battery `--patch` exec needed its own namespace (deferred
+functions from a patch crashed on name lookup).
+
+**Rung-1 (14-row set, 60 calls, 24.9 min):** flips 6/8 — WYE, DAISY
+"Petal-puller's target?", CHECK "Threaten the king", AMBER, ROBIN "Boy Wonder?",
+DAISY "Sun-watcher?" bank; NINE dies on economy ('full' flagged as padding),
+KARAOKE on a substitution article-frame artifact + economy flagging its vignette
+clause. Guards 4/6 by verdict, and label triage reassigns both misses: THREE "A
+hat trick's tally?" = flat fact + unearned ? + phantom trap (SCREEN territory —
+the screen banked it; feeds idea 11 and the trap gap); TEN "A strike in
+bowling?" = real confirm miss (marked-stretch too generous; Fable: "a strike
+isn't TEN itself"). False banks DAISY "Subject of a petal-plucking game?" and
+ROBIN "Sidekick to a Dark Knight?" are Fable "same-angle duplicate" —
+independence, structurally invisible per-clue (v2 false-banked ROBIN-dup too);
+discounted per calibration #4. Guard kills evidenced: THIRD economy, SIXTEEN
+register + 'Sweet', FELIX referent.
+
+**Try 3 (REVERTED):** economy redundancy rule + article-frame tolerance + "event
+is not its score" license bound. Net worse — wording whack-a-mole, stop rule
+invoked after 3 tries. THREE dies (fluke mechanism: `economy: tally`) but TEN
+still banks; THIRD + FELIX regress to bankable (license rewording flipped their
+marked-stretch judgment calls — jitter, not signal); NINE/KARAOKE still die, now
+as `bad` (common root: the substitution turn builds broken frames — NINE's pair
+reads "a full lineup on a baseball field on the field").
+
+**Rung-2 batch A (tuning + losses, 24 calls, 12.8 min):** verdict-gated economy
+first gave revises 21/21 but killed four Fable accepts on their FLAVOR words
+(GROSS "Stomach-turning"+"total" — the whole clue flagged; THIRTEEN "often" —
+deleting it makes the clue falser; POTS "that might be thrown" — the pun itself;
+NINE "full") — the isolated economy turn is blind to taste by design and
+prosecutes the words that earn the basis. Code-side fix, pre-registered and
+re-scored FREE from cached fields (0 calls): padding demoted to advisory
+(`advisories` in the log, never gates). Result vs baseline on tuning: accepts
+8/10 vs 4/10 (every screen-passed accept banks; remaining misses CENTURY/MURMUR
+are screen kills — idea 11), revises 18/21 = baseline (THIRD the sole
+regression; LARRY/ZERO were v2 false banks too), losses NINE recovered /
+FOURTEEN lost (substitution register technicality on an unmarked arithmetic
+clue). ZED/SIXTEEN keep substitution kills — idea 6's ZED goal holds without
+economy gating.
+
+**Rung-2 batch B (holdout + rejects + funcal, 36 calls, 18.1 min):** holdout
+accepts 3/7 (screen kills GRANT "Academic windfall?"/CHECK "Curb an
+impulse"/STOCK — idea 11; confirm gains DAISY "Sun-watcher?" + ROBIN "Boy
+Wonder?" vs v2, loses GRANT "Concede a point?" to frame WRECKAGE: "I will
+concede a point your request"), revises 6/10 raw → 6/8 with the calibration-#4
+dup discounts (false banks SCORE — v2 shared — and TABLE "Place to settle a
+debate?", new). Rejects 16/18 (v2's THOUSAND false bank now dies; THREE/TEN the
+known ?-taste banks). Funcal accepts 1/5: OREO banks, but SNOOZE (bad!) /
+KARAOKE / GLITTER die at the substitution turn on the same definite-description
+frame family as GRANT-concede — 4 Fable fun/aha accepts, one mechanism.
+
+**Try 4 (REJECTED):** frame repair ("rebuild an ungrammatical frame — a broken
+frame is your error, not the clue's flaw"). Won GRANT "Concede a
+point?"/FOURTEEN/NINE but globally softened shift-reporting: guards ZED and
+FELIX un-killed, POTS and OREO regressed, and the funcal vignette family it
+targeted didn't move. Reverted.
+
+**ADOPTED config:** sentence-pair substitution (try 2) + truth with non-pinning
+removed (user calibration #3) + economy advisory + sense; verdict
+
+- ?-license in code. Full-battery vs window-start baseline: tuning accepts 8/10
+  vs 4/10, revises 18/21 = baseline; holdout accepts 3/7 vs 2/7, revises 6/8
+  (disc.) vs 7/8; rejects 16/18 vs 17/18 (swap: THOUSAND killed, THREE/TEN
+  banked); losses NINE recovered; funcal 1/5 (OREO). Known residual:
+  definite-description vignettes die at substitution (SNOOZE/KARAOKE/GLITTER +
+  GRANT-concede) — attack AFTER `#eval-expansion` gives that family real sample
+  size. Production wiring deferred to end-of-window consolidation (needs a
+  difficulty source — the screen already assigns one).
+
+## User calibrations
+
+**#1 (2026-07-03):** GASP "Reaction to a jump scare" is borderline — acceptable
+judged either way. Its row discounts in all scorecards (a screen kill there is
+not a false kill). General rule: single borderline rows the user flags are soft
+labels — don't tune toward them, don't count them as defects.
+
+**#2 (2026-07-03):** NIL "Nothing on the scoreboard" leans PASS — the virtue is
+slight misdirection: "Nothing" reads first as absence and resolves to the posted
+score, with no immediate collapse to the dull paraphrase. NIL stays a live
+recall-loss target, the user's lean agreeing with Fable's accept.
+
+**#3 (2026-07-04):** Non-pinning is NOT a flaw — a true clue that also fits
+other answers is a strong clue: it forces cross-checking against crossing
+answers. "When shadows stretch" fitting DAWN as well as DUSK is a feature.
+Supersedes the idea-9 remark that v2's DUSK kill was legitimate on non-pinning
+grounds. Consequence: "leaves several answers fitting equally well is a flaw"
+language sits in BOTH production prompts (screen `_JUDGE_SYSTEM` and confirm
+`_CONFIRM_SYSTEM`) — a candidate cause of the screen-recall family (CENTURY,
+NIL, FIFTY are all under-determined-but-true surfaces). Queued as idea 11.
+
+**#4 (2026-07-04):** Same-angle duplicates banked for one word are intentionally
+FINE in the local run — the cloud judge's independence check controlled for
+laziness in the cloud setter, and the local structure has no analogous need
+(reevaluate at cleanup: `#angle-distinct` in tasks.md). Scoring consequence:
+holdout rows whose Fable revise reason is "same-angle duplicate" — DAISY
+"Subject of a petal-plucking game?" and ROBIN "Sidekick to a Dark Knight?" — are
+discounted in ALL scorecards (a local bank there is not a false bank).
+Requirements-alignment audit queued as `#judge-alignment`.
+
+## Machine coordination
+
+**Overnight 2026-07-03→04:** machine handed to the fine-tune thread ("12B
+overnight re-run at 5e-5"); resumed on lease release 08:37, per the user's green
+light.
+
+**Handoff 2026-07-04 13:26:** rung-2 batch A killed at launch (zero confirm
+calls made — the replay cache makes the re-run free) to yield to the fine-tune
+thread ("morning analyses", lease to 16:11). They finished in ~20 min; batch A
+re-ran 13:47. User will sort out the git branch divergence soon to ease
+cross-thread scheduling; their thread runs MAIN's lease script and cannot see
+this branch's waiter notes — coordinate via the user meanwhile. Standing user
+direction (15:0x): yield to the fine-tune thread after the current batch;
+released 15:2x after try 4.
+
+## Remaining queue
+
+Reordered 2026-07-04 (user priority): FIRST `#eval-expansion` — grow the labeled
+set to ~100 via one-off Fable generation (design in tasks.md; two detached
+calls,
+~$1-1.5 each; group 1 launched 15:5x). Then re-read v2 vs the
+idea-10 candidate on the expanded set before further tuning. Then idea 11 —
+drop non-pinning prosecution from the screen (variant of `_JUDGE_SYSTEM`; flip
+targets = the screen-killed Fable-accepts; guards = rejects-set precision,
+which the screen currently carries at 14/18 kills); screen-recall families
+(diagnose from cached analyses — free: CENTURY "Batsman's milestone", MURMUR
+"Low hum of a restless crowd", NIL "Nothing on the scoreboard", FIFTY "The
+denomination on a red bill" (dies screen-bad!), LATTE, GRANT "Academic
+windfall?", CHECK "Curb an impulse", STOCK "Simmering base for a stew"); K=3
+stability on GROSS + adopted-stack flips; sealed fresh-bank labeling at
+end-of-window (24 clues, `fresh_label_input.jsonl` version fresh-bank — still
+unlabeled, still sealed); judge-temperature decision; #taste-31b. Budget:
+$8.98
+of $10 remains (minus expansion generation, cost pending).
