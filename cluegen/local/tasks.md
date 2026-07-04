@@ -334,7 +334,22 @@ thread; the spec is self-contained.
       wait-queue when held. HARD STOP after step 5: write up recommended launch
       settings (batch size, learning-rate peak + schedule) and CHECK IN — the
       user launches the 15k overnight explicitly (user decision 2026-07-04; no
-      self-launch).
+      self-launch). Progress (2026-07-04, in flight): step 2 DONE —
+      `launch_train.py` wraps optiq's `train_lora` with a warmup/hold/cosine
+      schedule passed as a step→lr callable (MLX optimizers accept one;
+      `train_lora` feeds `config.learning_rate` straight to AdamW) plus resume
+      via a wrapper around the adapter-apply step; schedule shape and CLI
+      verified free of the machine, live validation rides window B. Step 5 DONE
+      — `data_stage1_15k/` built via a new `--output-dir` flag on the slice
+      builder (15,000 pairs, 5,184 answers vs 1,712 in the 5k, median year 2010,
+      1,382 valid pairs); the 5k slice stays untouched for comparisons. Steps
+      1+4 armed as detached window A (`window_a.sh`: strata_run + register_run
+      under one 50-min lease; waits FIFO behind the ceiling). Step 3 scripted as
+      window B (`window_b.sh`) with one deviation from the queued wording: batch
+      timing runs on the 12B directly (30 iters at batch 1/2/4) instead of e2b,
+      because the 15k recommendation needs the 12B's peak memory and throughput
+      at batch 4, which e2b cannot supply; loss-smoothness evidence comes from
+      the 80-iter scheduled range runs (5e-5 / 1e-4 / 2e-4 at batch 4).
 - [ ] Before the next 12B fine-tune run: rehearse the identical recipe on the
       cheap e2b variant first and sanity-check the outputs — generate a few
       clues and run the loss-gap gaps — before spending a 7-hour 12B night. The
