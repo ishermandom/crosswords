@@ -225,7 +225,11 @@ thread; the spec is self-contained.
       clues and run the loss-gap gaps — before spending a 7-hour 12B night. The
       overnight run's failure mode (degenerate generations, collapsed
       conditioning) would have shown up in minutes at e2b scale. Reminder only;
-      no action now (user request, 2026-07-03).
+      no action now (user request, 2026-07-03). While the rehearsal runs, also
+      validate the lease script's new process-table busy check against a live
+      MLX job (`compute_lease.py status` from a second shell; expect "model
+      workload running") — the check is unit-tested and live-checked against an
+      ollama runner, but not yet against MLX residency.
 - [ ] Hand-tagged quality bank (user-in-the-loop; queued 2026-07-03). User walks
       a sample of the data bank in a review UI and hand-tags examples on
       multiple quality dimensions, fast per item. Design TBD: possibly several
