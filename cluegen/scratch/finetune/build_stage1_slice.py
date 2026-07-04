@@ -156,6 +156,10 @@ def main() -> None:
                       help='target train-pair count (final value comes from '
                            'the 12B timing run)')
   parser.add_argument('--seed', type=int, default=20260702)
+  parser.add_argument('--output-dir', type=Path, default=OUTPUT_DIR,
+                      help='destination for train/valid jsonl; larger rungs '
+                           'get their own directory so the 5k slice stays '
+                           'intact for comparisons')
   args = parser.parse_args()
 
   funnel: collections.Counter = collections.Counter()
@@ -186,9 +190,9 @@ def main() -> None:
   assert all(r['bucket'] in ('easy', 'medium', 'hard')
              for r in train + valid)
 
-  OUTPUT_DIR.mkdir(exist_ok=True)
-  write_split(OUTPUT_DIR / 'train.jsonl', train)
-  write_split(OUTPUT_DIR / 'valid.jsonl', valid)
+  args.output_dir.mkdir(exist_ok=True)
+  write_split(args.output_dir / 'train.jsonl', train)
+  write_split(args.output_dir / 'valid.jsonl', valid)
 
   # Funnel report — the durable record of what the slice contained.
   print('--- funnel ---')
