@@ -279,6 +279,23 @@ thread; the spec is self-contained.
        equals). Val-based best/ keeper handles early best-val (5e-5 hit 2.72 by
        iter 200). Budget note: boxed-run budget stood at 2/4 used when the
        overnight was cleared.
+  - Done 2026-07-04 (overnight re-run at 5e-5, launched 01:22 via probe_run.sh
+    so the gen probe + loss gaps ran inside the lease; lease released by the
+    done-marker watcher on completion). All 5,000 iterations, no collapse: best
+    val 1.898 at iter 3399, late-run val oscillating 1.9–2.4 (noise, not
+    divergence). Final-adapter gaps (n=200): true 2.635, answer gap +1.790 (base
+    +0.59, run-2 +1.318 — conditioning kept strengthening), difficulty gap
+    +0.011 (still inert), register sep +0.372 (base −1.38 — crossed zero:
+    definitions now LESS likely than real clues), flat@hard +0.030 (headline bar
+    NOT met; base +0.84). Generations in clue register and varied: VIOLET →
+    'Color of the 1990s', 'Flower in a wreath', 'Periwinkle'; SCORE →
+    'Scoreboard' (invalid — contains the answer), 'Rating: Abbr.', 'Sporting
+    need'. Scorecard vs the overnight content bars: answer gap ✅, register sep
+    ✅, difficulty gap ❌, flat@hard ❌ — both misses are the known inert
+    difficulty token (stage-2 data/conditioning), not training health. Remaining
+    morning protocol (each needs a lease + user go-ahead): gaps on best/
+    (iter 3399) vs final, checkpoint decoupling trace, panel eval at medium,
+    steering spot-check, decision vs v9.
 - [ ] Before the next 12B fine-tune run: rehearse the identical recipe on the
       cheap e2b variant first and sanity-check the outputs — generate a few
       clues and run the loss-gap gaps — before spending a 7-hour 12B night. The
@@ -306,6 +323,18 @@ thread; the spec is self-contained.
       hold-then-decay adaptivity (decay from a held checkpoint when content
       metrics plateau) and longer boxed probes. Ideal-design rationale in the
       2026-07-04 session; importance ranking: peak ≫ warmup > decay shape.
+- [ ] Batch-size exploration (methodology; queued 2026-07-04). Today's runs use
+      `--batch-size 1`, and prompt masking means each step's gradient comes from
+      only ~8 response tokens — extremely noisy. A larger batch (2–8, or
+      gradient accumulation if the launcher path lands) averages that noise,
+      which may widen the stable-LR basin (the QAT 12B's 2e-4 cliff could be
+      partly noise-kicked) and should raise tokens/sec by amortizing
+      dequantize-in-backward across the batch — same lever the throughput task
+      points at. Constraints: 32 GB total RAM with 9.9 GB peak at batch 1, so
+      headroom is comfortable — still record peak memory per batch size; and LR
+      moves with batch size (linear-to-sqrt scaling), so run this WITH the LR
+      basin test, not before or after it. Cheap boxed e2b run: batch 1 vs 2 vs
+      4, compare tokens/sec, peak memory, and loss-vs-step smoothness.
 - [ ] Matched-pair register-preference instrument (queued 2026-07-04). For
       answers with both a flat and a lively human clue in the corpus (weekday as
       the liveliness proxy), score both under the SAME hard prompt and report
