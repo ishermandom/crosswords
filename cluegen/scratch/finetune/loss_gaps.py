@@ -143,6 +143,9 @@ def main() -> None:
   parser.add_argument('--model', default=MODEL_REPO,
                       help='model repo to score (e.g. the e2b variant)')
   parser.add_argument('--limit', type=int, default=200)
+  parser.add_argument('--definition-limit', type=int, default=None,
+                      help='cap the definition controls (deterministic prefix '
+                           'of the sorted-answer list) for cheap trace runs')
   parser.add_argument('--seed', type=int, default=20260702)
   args = parser.parse_args()
 
@@ -178,6 +181,8 @@ def main() -> None:
   for condition_label, difficulty in (('definition|easy', 'easy'),
                                       ('definition|hard', 'hard')):
     scored = definition_records(all_records, difficulty)
+    if args.definition_limit is not None:
+      scored = scored[:args.definition_limit]
     total_nll = 0.0
     total_tokens = 0
     for messages in scored:

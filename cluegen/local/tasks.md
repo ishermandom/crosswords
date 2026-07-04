@@ -296,6 +296,24 @@ thread; the spec is self-contained.
     morning protocol (each needs a lease + user go-ahead): gaps on best/
     (iter 3399) vs final, checkpoint decoupling trace, panel eval at medium,
     steering spot-check, decision vs v9.
+  - Done 2026-07-04 13:26–13:46 (morning analyses, 2 of the 4-task user budget;
+    driver morning_run.sh; lease waited behind the ceiling thread's stale 31b
+    until the user pinged that session to unload). Best-vs-final at full n=200:
+    statistically equivalent (best: true 2.621, answer gap +1.665, register sep
+    +0.397; final: 2.635 / +1.790 / +0.372) — carry the FINAL adapter forward;
+    the trainer's val-keeper preference for iter 3399 was 25-example noise.
+    Decoupling trace (n=40, matched subset, iters 400/1400/2400/5000): real-clue
+    loss fell monotonically 2.64 → 2.53 → 2.50 → 2.40 while definition loss held
+    flat at ~2.9–3.1 — the registers DID split, and register sep grew through
+    training (+0.22 → +0.55 → +0.51 → +0.64), still rising at the 1-epoch mark.
+    Reading: register preference is being learned and had not plateaued; more
+    data/epochs should push it further. flat@hard ≈0 at every checkpoint —
+    difficulty conditioning never engages at any point in training, cementing
+    the stage-2 diagnosis. Runs finished ~2× faster than the 25-min planning
+    estimate (~9 min for full-n gaps on an otherwise-empty machine); future
+    lease sizing can assume ~10 min per full-n gaps run plus load time.
+    Remaining (2 budget tasks): panel eval at medium + steering spot-check,
+    decision metric vs v9.
 - [ ] Before the next 12B fine-tune run: rehearse the identical recipe on the
       cheap e2b variant first and sanity-check the outputs — generate a few
       clues and run the loss-gap gaps — before spending a 7-hour 12B night. The
@@ -345,6 +363,21 @@ thread; the spec is self-contained.
       (within-model suppression) and the decoupling trace (training-dynamics
       view). Rationale: register sep ≈0 cannot distinguish "prefers lively" from
       "treats flat and lively as equals" — user discussion 2026-07-04.
+- [ ] Abbreviation-conditioning instrument (queued 2026-07-04; user-approved).
+      Measures whether the model binds abbreviated clue forms to abbreviated
+      answers — a conditional register rule with only ~40 exemplars in the
+      5,000-example stage-1 train set (0.8%), so expect it unlearned at one
+      epoch. Two views, sharing the matched-pair scoring machinery above: (a)
+      likelihood — score "Abbr."-marked clues from the bank (excluding train
+      examples; val has ~11, pull more bank-wide) under their true abbreviated
+      answers vs matched full-word answers, gap = answer-form conditioning; (b)
+      generation — sample clues for clearly full-word answers and compare the
+      abbreviation-marker rate against the 0.8% corpus base rate. Context:
+      overnight-5e-5 samples misapplied the convention (VIOLET → 'Chrys.
+      relative', SCORE → 'Rating: Abbr.'). If the rule is absent, remedies in
+      order: larger stage slice (more absolute exemplars), more epochs (weak —
+      memorizes the 40), explicit answer-form tag in the prompt (stage-2
+      conditioning design, with difficulty).
 - [ ] Hand-tagged quality bank (user-in-the-loop; queued 2026-07-03). User walks
       a sample of the data bank in a review UI and hand-tags examples on
       multiple quality dimensions, fast per item. Design TBD: possibly several
