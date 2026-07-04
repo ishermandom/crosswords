@@ -241,6 +241,27 @@ thread; the spec is self-contained.
     caffeinate wrapper lingered ~88 min after the script finished (leaked
     multiprocessing resource tracker), so the pid-keyed watcher released 88 min
     late; run-2+ watchers key on the driver log's `done` marker instead.
+  - Done 2026-07-04 (run 2/4, deadline-capped ~220 iters): LR-fragility
+    CONFIRMED — the QAT 12B at 5e-5 is the best model of the probe. True 3.162
+    (overnight-2e-4 best: 5.83), answer gap +1.318 (base +0.59 — conditioning
+    strengthened, not just preserved), register sep +0.007, val 2.719 at iter
+    200 (the 7-h overnight never beat 4.647). Generations coherent and on-answer
+    (SCORE → 'Win', 'Gamble', "Ringer's aim"). Verdict: 2e-4 sits past the
+    QAT-OptiQ 12B's stability cliff (e2b tolerates it; the QAT export doesn't);
+    base checkpoint exonerated; recipe salvageable by LR alone. Difficulty token
+    inert in every run — a stage-2 data/conditioning question, not an LR one.
+    Budget stopped at 2/4: without a trainer resume flag, a third boxed run
+    cannot exceed run 2's iteration horizon, and the remaining risk (delayed
+    collapse past ~220 iters) is covered by the overnight re-run itself —
+    checkpoints land every 100 iters, so the morning protocol adds a gap-trace
+    across them (evaluate `--adapter` on 3–4 checkpoint dirs) before trusting
+    the final adapter.
+  - Next (user-gated): re-run the overnight 12B train with
+    `--learning-rate 5e-5`, everything else per the pinned procedure (lease
+    sized worst-case, caffeinate, detached, done-marker watcher). Morning
+    protocol as recorded, plus the checkpoint gap-trace above. Consider fewer
+    iters: 5e-5 hit val 2.72 by iter 200, so best-val may arrive well before
+    5,000 — the val-based best/ keeper handles that.
 - [ ] Before the next 12B fine-tune run: rehearse the identical recipe on the
       cheap e2b variant first and sanity-check the outputs — generate a few
       clues and run the loss-gap gaps — before spending a 7-hour 12B night. The
