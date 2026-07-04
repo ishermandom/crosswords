@@ -285,40 +285,43 @@ released 15:2x after try 4.
 
 ## Expanded-set baseline (2026-07-04 afternoon, in progress)
 
-**v2 on the expanded set — the fruit the user predicted.** Slot 1 (gentune,
-93 calls, 31.8 min): accepts held 15/32, revises/rejects killed 31/32 (sole
-false bank SEVENTY "The lifespan Scripture allots"). Slot 2 (genhold, 40
-calls, 15.3 min): accepts held 5/14, kills 14/14. Combined: accepts 20/46
-(43%), kills 45/46 (98%) — near-perfect precision, and a recall crisis that is
-worse than the 81-row sets showed and now well-shaped: the killed accepts
-concentrate in prize-fact (SEVENTY "Years in the Psalmist's allotted
-lifespan", EIGHTY "Days Phileas Fogg allotted...", HONEY, OCTOPUS, PIANO,
-VIOLIN, BILLION, MILLION, BAMBOO, HUMMINGBIRD), elegance (THAW, CANOE,
-ORCHARD, GIFT, SPIDER, LIGHTHOUSE, WRAPS, HAMMER, CACTUS), and fun (SOCKS,
-YAWN, RAT, ALARM, TOUCHDOWN "Reason to spike the ball?", HAMMOCK). Screen
-kills outnumber confirm kills ~2:1 — the screen systematically under-rates
-vivid straight definitions and prize facts; what was anecdote (CENTURY,
-MURMUR, FIFTY, LATTE) is now a measured family with N≈16.
+**v2 on the expanded set — the fruit the user predicted.** Slot 1 (gentune, 93
+calls, 31.8 min): accepts held 15/32, revises/rejects killed 31/32 (sole false
+bank SEVENTY "The lifespan Scripture allots"). Slot 2 (genhold, 40 calls, 15.3
+min): accepts held 5/14, kills 14/14. Combined: accepts 20/46 (43%), kills 45/46
+(98%) — near-perfect precision, and a recall crisis that is worse than the
+81-row sets showed and now well-shaped: the killed accepts concentrate in
+prize-fact (SEVENTY "Years in the Psalmist's allotted lifespan", EIGHTY "Days
+Phileas Fogg allotted...", HONEY, OCTOPUS, PIANO, VIOLIN, BILLION, MILLION,
+BAMBOO, HUMMINGBIRD), elegance (THAW, CANOE, ORCHARD, GIFT, SPIDER, LIGHTHOUSE,
+WRAPS, HAMMER, CACTUS), and fun (SOCKS, YAWN, RAT, ALARM, TOUCHDOWN "Reason to
+spike the ball?", HAMMOCK). Screen kills outnumber confirm kills ~2:1 — the
+screen systematically under-rates vivid straight definitions and prize facts;
+what was anecdote (CENTURY, MURMUR, FIFTY, LATTE) is now a measured family with
+N≈16.
 
-**Slot 3a** (gentune under the ADOPTED multi-turn candidate, screens cached)
-was running at compact time — its delta vs slot 1 isolates the confirm
-redesign on ~24 fresh rows; early rows showed both EIGHTY clues dying at the
-substitution turn (watch: prize-fact "Days Phileas Fogg allotted..." is a
-flip target the candidate may ALSO miss — if so, the prize-fact family is a
-screen+confirm double miss). **Next: slot 3b** = same patch on genhold (~15
-min warm). Then the per-bucket v2-vs-candidate comparison read from the four
-expbase_* logs (free, no model calls) → decide the screen-side attack (idea
-11 non-pinning removal is one hypothesis; the prize-fact/elegance under-rating
-may need its own calibration idea, now testable at N≈16 with genhold guards).
+**Slot 3a** (gentune under the ADOPTED multi-turn candidate, screens cached) was
+running at compact time — its delta vs slot 1 isolates the confirm redesign on
+~24 fresh rows; early rows showed both EIGHTY clues dying at the substitution
+turn (watch: prize-fact "Days Phileas Fogg allotted..." is a flip target the
+candidate may ALSO miss — if so, the prize-fact family is a screen+confirm
+double miss). **Next: slot 3b** = same patch on genhold (~15 min warm). Then the
+per-bucket v2-vs-candidate comparison read from the four expbase_* logs (free,
+no model calls) → decide the screen-side attack (idea 11 non-pinning removal is
+one hypothesis; the prize-fact/elegance under-rating may need its own
+calibration idea, now testable at N≈16 with genhold guards).
 
-## Machine protocol (standing, 2026-07-04 evening)
+## Machine protocol (one-off for the 2026-07-04 evening handoff)
 
 After slot 3a: CEDE the machine to the fine-tune thread (auto-release armed in
-session background). Re-acquire ONLY after the lease measures free at T0, T15,
-and T30 — three checks, 15 min apart, all free (user rule; the fine-tune
-thread runs main's lease script and cannot see waiter notes). A background
-scan implementing exactly this is armed and will notify when clear; if the
-session restarts, re-arm the same scan before touching the lease.
+session background). For THIS handoff only (user direction — not a standing
+rule): re-acquire only after the lease measures free at T0, T15, and T30 — three
+checks, 15 min apart, all free (the fine-tune thread runs main's lease script
+and cannot see waiter notes). A background scan implementing exactly this is
+armed and will notify when clear; if the session restarts, re-arm the same scan
+before touching the lease. Once this handoff is done, cross-thread scheduling
+goes back to coordinating through the user until the lease-script fork
+reunifies.
 
 ## Remaining queue
 
@@ -336,9 +339,9 @@ slots:
 Read: v2 vs adopted candidate per bucket — bucket-level gaps are the
 lower-hanging-fruit signal the expansion exists to surface.
 
-Budget after expansion generation: $7.18 of $10. Reordered 2026-07-04 (user priority): FIRST `#eval-expansion` — grow the labeled
-set to ~100 via one-off Fable generation (design in tasks.md; two detached
-calls,
+Budget after expansion generation: $7.18 of $10. Reordered 2026-07-04 (user
+priority): FIRST `#eval-expansion` — grow the labeled set to ~100 via one-off
+Fable generation (design in tasks.md; two detached calls,
 ~$1-1.5 each; group 1 launched 15:5x). Then re-read v2 vs the
 idea-10 candidate on the expanded set before further tuning. Then idea 11 —
 drop non-pinning prosecution from the screen (variant of `_JUDGE_SYSTEM`; flip
