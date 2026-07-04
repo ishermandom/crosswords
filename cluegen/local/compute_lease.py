@@ -11,11 +11,12 @@ anyone else waits their turn. The protocol (agreed with the user 2026-07-02):
 
 - **Exclusive**: one model workload at a time, recorded in a lease file.
 - **Measured, not trusted**: acquiring requires that the machine *measures* idle
-  — ollama reports no loaded models and the kernel's memory-pressure level is
-  normal — in addition to the lease being free. A stale lease (dead holder PID
-  or past expiry) is broken only when the machine also measures idle; a dead
-  holder whose memory is still wired blocks acquisition — surface that to the
-  user rather than piling on.
+  — ollama reports no loaded models, the kernel's memory-pressure level is
+  normal, and no model-stack process (python / ollama / optiq / mlx) holds
+  multi-GB residency — in addition to the lease being free. A stale lease (dead
+  holder PID or past expiry) is broken only when the machine also measures idle;
+  a dead holder whose memory is still wired blocks acquisition — surface that to
+  the user rather than piling on.
 - **FIFO**: a blocked session runs `wait` (typically as a background watcher),
   then retries `acquire`; the file-creation race between two waiters has a
   single winner.
@@ -52,6 +53,7 @@ import enum
 import json
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -71,6 +73,15 @@ _PRESSURE_NORMAL = 1
 _EXPIRY_GRACE = 1.5
 
 _POLL_SECONDS = 15
+
+# Any process this large running one of the local model stacks is treated as a
+# model workload, whether or not a lease records it. MLX jobs are invisible to
+# the other two idle signals — they never appear in ollama, and ~10 GB on a 32
+# GB machine leaves the kernel pressure level at normal — so the process table
+# is the load-bearing check for them (incident: 2026-07-03 lease overlap).
+_WORKLOAD_COMMAND_PATTERN = re.compile(r'python|ollama|optiq|mlx',
+                                       re.IGNORECASE)
+_WORKLOAD_RSS_THRESHOLD_KIB = 2 * 1024 * 1024
 
 
 class ExitCode(enum.IntEnum):
@@ -136,6 +147,42 @@ def _memory_pressure_level() -> int:
   return int(result.stdout.strip())
 
 
+def model_workload_processes(ps_output: str) -> list[str]:
+  """Descriptions of processes that look like running model workloads.
+
+  `ps_output` is `ps axo pid=,rss=,command=` text: pid, resident set size in
+  KiB, then the full command line. A process counts as a model workload when its
+  command matches one of the local model stacks and its resident set exceeds the
+  threshold.
+  """
+  workloads: list[str] = []
+  for line in ps_output.splitlines():
+    fields = line.split(None, 2)
+    if len(fields) < 3:
+      continue
+    pid, rss_kib, command = fields
+    if not rss_kib.isdigit():
+      continue
+    if int(rss_kib) < _WORKLOAD_RSS_THRESHOLD_KIB:
+      continue
+    if not _WORKLOAD_COMMAND_PATTERN.search(command):
+      continue
+    rss_gib = int(rss_kib) / (1024 * 1024)
+    workloads.append(f'pid {pid} rss {rss_gib:.1f} GiB: {command[:80]}')
+  return workloads
+
+
+def _ps_output() -> str:
+  """`ps axo pid=,rss=,command=` output for every process on the machine."""
+  result = subprocess.run(
+    ['ps', 'axo', 'pid=,rss=,command='],
+    capture_output=True,
+    text=True,
+    check=True,
+  )
+  return result.stdout
+
+
 def _busy_reason() -> str | None:
   """Why the machine is not measurably idle, or None when it is."""
   models = _loaded_models()
@@ -144,6 +191,9 @@ def _busy_reason() -> str | None:
   pressure = _memory_pressure_level()
   if pressure != _PRESSURE_NORMAL:
     return f'kernel memory-pressure level is {pressure} (normal is 1)'
+  workloads = model_workload_processes(_ps_output())
+  if workloads:
+    return f'model workload running: {"; ".join(workloads)}'
   return None
 
 
