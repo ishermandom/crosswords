@@ -41,38 +41,52 @@ editors handle every other check, and the verdict is assembled outside
 this conversation. The costly error is waving a real flaw through.
 """
 
-_SUBSTITUTION_SYSTEM = _PANEL_PREAMBLE + """
+_SUBSTITUTION_SYSTEM = (
+  _PANEL_PREAMBLE
+  + """
 Your check — substitution: the clue could replace the answer in a
 sentence, with part of speech, tense, number, register, and referent
 all holding. Choose a sentence where the answer stands alone, so the
 definition swaps in without duplicating the sentence's own words.
 
-When the clue carries a '?', also judge whether the shift you found is
-exactly the stretched, figurative, or metonymic definition the ?
-marks, and whether that figurative reading still substitutes fairly.
-Report that judgment in its own field; report the literal shift itself
-regardless.
+A shift must be visible in the pair of sentences you write — when the
+clue's definition reads naturally in the answer's place, the shift is
+"none". When the clue carries a '?', also judge whether the shift you
+found is exactly the stretched, figurative, or metonymic definition
+the ? marks, and whether that figurative reading still substitutes
+fairly. Report that judgment in its own field; report the literal
+shift itself regardless.
 
 Calibration examples:
-- "One who delivers your letters" -> MAIL: shift "referent". Defines
+- "One who delivers your letters" -> MAIL: "She sorted the mail." ->
+  "She sorted the one who delivers your letters." — the sentences no
+  longer describe the same thing: shift "referent". The clue defines
   the mail CARRIER, not the answer itself.
-- "Nature's refrigerator?" -> CAVE: shift "referent", and the shift IS
-  the marked stretch — the ? declares the metaphor, and the metaphor
-  substitutes fairly.
-- "Current affairs?" -> EELS: shift "referent", and the shift is NOT
-  the marked stretch — "affairs" defines nothing about eels, so no
+- "Nature's refrigerator?" -> CAVE: "We stored the cheese in a cave."
+  -> "We stored the cheese in nature's refrigerator." — shift
+  "referent", and the shift IS the marked stretch: the ? declares the
+  metaphor, and the metaphor substitutes fairly.
+- "Current affairs?" -> EELS: "The eels swam upstream." -> "The
+  current affairs swam upstream." — shift "referent", and the shift is
+  NOT the marked stretch: "affairs" defines nothing about eels, so no
   figurative reading substitutes fairly."""
+)
 
 _SUBSTITUTION_PROMPT = (
-  'Check substitution for this one clue. In "analysis": write one '
-  'natural sentence where the answer stands alone in the clued sense, '
-  'substitute the clue for it, and say what holds and what shifts. '
-  'Then commit the fields.\n\n'
+  'Check substitution for this one clue. Fill the fields in order: in '
+  '"sentence_with_answer", write one natural sentence where the answer '
+  'stands alone in the clued sense. In "sentence_with_clue", rewrite '
+  "that exact sentence with the clue's definition in the answer's "
+  'place. In "analysis", compare the two sentences — say what holds '
+  'and what shifts, and for a ?-marked clue whether the shift is the '
+  'marked stretch reading fairly. Then commit the last two fields.\n\n'
 )
 
 _SUBSTITUTION_SCHEMA = {
   'type': 'object',
   'properties': {
+    'sentence_with_answer': {'type': 'string'},
+    'sentence_with_clue': {'type': 'string'},
     'analysis': {'type': 'string'},
     'shift': {
       'type': 'string',
@@ -87,10 +101,18 @@ _SUBSTITUTION_SCHEMA = {
     },
     'shift_is_the_marked_stretch': {'type': 'boolean'},
   },
-  'required': ['analysis', 'shift', 'shift_is_the_marked_stretch'],
+  'required': [
+    'sentence_with_answer',
+    'sentence_with_clue',
+    'analysis',
+    'shift',
+    'shift_is_the_marked_stretch',
+  ],
 }
 
-_TRUTH_SYSTEM = _PANEL_PREAMBLE + """
+_TRUTH_SYSTEM = (
+  _PANEL_PREAMBLE
+  + """
 Your check — literal truth: test every qualifier, comparative, and
 factual claim in the clue against the fact, one by one. A modifier
 that overclaims, falsely implies, or leaves several answers fitting
@@ -103,6 +125,7 @@ Calibration examples:
   several answers equally well; nothing pins BLUE.
 - "Nature's refrigerator?" -> CAVE: no failing qualifiers — the marked
   metaphor holds; caves genuinely keep things cold."""
+)
 
 _TRUTH_PROMPT = (
   'Check literal truth for this one clue. In "analysis", test each '
@@ -120,7 +143,9 @@ _TRUTH_SCHEMA = {
   'required': ['analysis', 'failing_qualifiers'],
 }
 
-_ECONOMY_SYSTEM = _PANEL_PREAMBLE + """
+_ECONOMY_SYSTEM = (
+  _PANEL_PREAMBLE
+  + """
 Your check — economy: apply a deletion test to each meaning-carrying
 word. If dropping a word leaves the definition just as complete and
 fair, that word is padding — name it even when the surface reads
@@ -132,6 +157,7 @@ Calibration examples:
   "Night watchman" carries the whole definition.
 - "Frozen rain" -> SLEET: no padding — dropping either word breaks
   the definition."""
+)
 
 _ECONOMY_PROMPT = (
   'Check economy for this one clue. In "analysis", run the deletion '
@@ -149,7 +175,9 @@ _ECONOMY_SCHEMA = {
   'required': ['analysis', 'padding_words'],
 }
 
-_SENSE_SYSTEM = _PANEL_PREAMBLE + """
+_SENSE_SYSTEM = (
+  _PANEL_PREAMBLE
+  + """
 Your check — sense ownership: the clued sense must be an English sense
 of the answer string. A secondary or archaic sense is fully
 legitimate; for a name, a famous bearer or a shared English word both
@@ -165,6 +193,7 @@ Calibration examples:
   inside the idiom WHITE ELEPHANT.
 - "Bread, in Bordeaux" -> PAIN: not owned — the clued sense is
   French; it is not an English sense of the string PAIN."""
+)
 
 _SENSE_PROMPT = (
   'Check sense ownership for this one clue. In "analysis", name the '
