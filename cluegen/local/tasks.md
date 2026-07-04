@@ -363,7 +363,23 @@ thread; the spec is self-contained.
       (within-model suppression) and the decoupling trace (training-dynamics
       view). Rationale: register sep ≈0 cannot distinguish "prefers lively" from
       "treats flat and lively as equals" — user discussion 2026-07-04.
-- [ ] Abbreviation-conditioning instrument (queued 2026-07-04; user-approved).
+- [ ] Panel eval vs v9 via a standalone bridge (queued 2026-07-04; user deferred
+      — "come back to it later"). The spec's stage-0 client adapter for the
+      harness was never built: ceiling's `pipeline_local.py` speaks only to
+      Ollama, and `optiq serve` is untrustworthy for generation (the 'An double'
+      sampling mystery). Bridge plan, touching nothing on the ceiling branch:
+      (1) batch-generate the 12 panel words × 3 runs at medium via direct
+      `mlx_lm.load` (~20 min); (2) screen with the 26B Ollama judge by COPYING
+      the screen-prompt text from ceiling's `pipeline_local.py`
+      (prototyping-independence rule), compute screen-bankable clues per
+      GPU-minute against v9's tier-1 numbers in ceiling's `evals/` (~25 min).
+      Panel-word exclusion from stage-1 train/valid data verified clean
+      2026-07-04. Tier-2 31b confirm + the <$2 Fable checkpoint on banked clues
+      follow as separately gated steps per the spec.
+- [ ] Abbreviation-conditioning instrument (ACTIVE 2026-07-04; user-prioritized
+      as a case study: a useful fine-tune must learn implicit semantic style
+      rules, not just surface structure — abbreviations are the quick metric for
+      NYT style-guide internalization overall, not the target themselves).
       Measures whether the model binds abbreviated clue forms to abbreviated
       answers — a conditional register rule with only ~40 exemplars in the
       5,000-example stage-1 train set (0.8%), so expect it unlearned at one
