@@ -55,23 +55,69 @@ MARKER_ANYWHERE = re.compile(r'\bAbbr\b')
 MOJIBAKE_MARKERS = ('â€', 'Â', '�')
 
 # Clue-frequent abbreviations whose expansion is unambiguous in either
-# direction. Deliberately omits ambiguous forms (St., Dr., Fr., No.).
+# direction, chosen from a bank-wide frequency survey of dotted words in
+# abbreviation-answer clues (2026-07-04). Deliberately omits: ambiguous forms
+# (St., Dr., Fr., No., Mo.) and content-level signals whose expansion still
+# announces an abbreviated answer ('abbr.', 'inits.').
 ABBREVIATION_EXPANSIONS = (
     ('Sci.', 'Science'),
     ('Univ.', 'University'),
     ('Dept.', 'Department'),
     ('Org.', 'Organization'),
+    ('Orgs.', 'Organizations'),
     ('Assn.', 'Association'),
     ('Natl.', 'National'),
     ('Amer.', 'American'),
     ('Corp.', 'Corporation'),
     ('Ave.', 'Avenue'),
     ('Mt.', 'Mount'),
+    ('Mts.', 'Mountains'),
     ('Hosp.', 'Hospital'),
     ('Mag.', 'Magazine'),
     ('Bldg.', 'Building'),
     ('Mil.', 'Military'),
+    ('Grp.', 'Group'),
+    ('Grps.', 'Groups'),
+    ('Sch.', 'School'),
+    ('Subj.', 'Subject'),
+    ('Fig.', 'Figure'),
+    ('Figs.', 'Figures'),
+    ('Agcy.', 'Agency'),
+    ('Govt.', 'Government'),
+    ('Meas.', 'Measure'),
+    ('Amt.', 'Amount'),
+    ('Amts.', 'Amounts'),
+    ('Hrs.', 'Hours'),
+    ('Med.', 'Medical'),
+    ('Deg.', 'Degree'),
+    ('Brit.', 'British'),
+    ('Coll.', 'College'),
+    ('Dir.', 'Direction'),
+    ('Inc.', 'Incorporated'),
 )
+
+
+def _form_pattern(word: str) -> re.Pattern:
+  """Word-boundary pattern for one lexicon form (dotted forms end at the
+  period).
+  """
+  boundary = r'\b' if word[-1] != '.' else ''
+  return re.compile(r'\b' + re.escape(word) + boundary, re.IGNORECASE)
+
+
+ABBREVIATED_PATTERNS = tuple(
+    _form_pattern(abbreviated) for abbreviated, _ in ABBREVIATION_EXPANSIONS)
+EXPANDED_PATTERNS = tuple(
+    _form_pattern(expanded) for _, expanded in ABBREVIATION_EXPANSIONS)
+
+
+def has_single_form(clue: str) -> bool:
+  """True if the clue's lexicon words are all abbreviated or all expanded — the
+  swap must flip the whole clue to the opposite form, not mix forms.
+  """
+  has_abbreviated = any(p.search(clue) for p in ABBREVIATED_PATTERNS)
+  has_expanded = any(p.search(clue) for p in EXPANDED_PATTERNS)
+  return has_abbreviated != has_expanded
 
 # Textual signals that mark an abbreviated answer without an abbreviated word.
 PHRASE_SIGNALS = re.compile(r'\bAbbr\b|for short|briefly|in brief',
@@ -138,10 +184,17 @@ def stage1_answers() -> set[str]:
   return answers
 
 
-def bank_clues() -> tuple[dict[str, tuple[datetime.date, str]], set[str]]:
-  """(most-recent clean clue per answer, answers ever tagged ': Abbr.')."""
+def bank_clues() -> tuple[dict[str, tuple[datetime.date, str]], set[str],
+                          dict[str, set[str]]]:
+  """(most-recent clean clue per answer, answers ever tagged ': Abbr.', every
+  distinct tag-stripped clue per tagged answer).
+
+  The pooled third element exists because tagged answers are rare: their swap
+  instrument needs every historical clue, not just the latest.
+  """
   latest: dict[str, tuple[datetime.date, str]] = {}
   tagged: set[str] = set()
+  pooled: dict[str, set[str]] = {}
   with CSV_PATH.open(encoding='latin-1') as file:
     for row in csv.DictReader(file):
       answer, clue = row['Word'].strip(), row['Clue'].strip()
@@ -154,7 +207,11 @@ def bank_clues() -> tuple[dict[str, tuple[datetime.date, str]], set[str]]:
       date = datetime.datetime.strptime(row['Date'], '%m/%d/%Y').date()
       if answer not in latest or date > latest[answer][0]:
         latest[answer] = (date, clue)
-  return latest, tagged
+      pooled.setdefault(answer, set()).add(
+          MARKER_SUFFIX.sub('', clue).strip())
+  pooled = {answer: clues for answer, clues in pooled.items()
+            if answer in tagged}
+  return latest, tagged, pooled
 
 
 def build_groups(group_size: int, seed: int) -> dict[str, dict[str, list]]:
@@ -166,11 +223,47 @@ def build_groups(group_size: int, seed: int) -> dict[str, dict[str, list]]:
   """
   wn.config.data_directory = WORDNET_DATA
   excluded = stage1_answers() | RESERVED_ANSWERS
-  latest, tagged = bank_clues()
+  latest, tagged, pooled = bank_clues()
+
+  def swap_item(answer: str, bare: str) -> dict | None:
+    """A swap candidate, or None if the clue can't host a clean swap.
+
+    Quoted clues are rejected: a lexicon word inside a title ("American Dad!")
+    can't change form without corrupting the reference.
+    """
+    if '"' in bare or MARKER_ANYWHERE.search(bare):
+      return None
+    if not has_single_form(bare):
+      return None
+    swapped = swap_forms(bare)
+    if swapped is None:
+      return None
+    # The expanded variant must be signal-free: any dotted word or phrase signal
+    # it still carries ('Geom. figure', 'Agency issuance, in brief') would sit
+    # in BOTH variants and dampen the swap contrast.
+    is_original_abbreviated = any(
+        pattern.search(bare) for pattern in ABBREVIATED_PATTERNS)
+    expanded_variant = swapped if is_original_abbreviated else bare
+    if is_signaled(expanded_variant):
+      return None
+    return {'answer': answer, 'original': bare, 'swapped': swapped}
+
   candidates: dict[str, dict[str, list]] = {
       'swap': {'abbreviation': [], 'full_word': []},
       'marker': {'abbreviation': [], 'full_word': []},
   }
+
+  # Abbreviation answers are rare, so their swap cell pools every historical
+  # clue, grouped per answer for distinct-answer-first sampling below.
+  swap_pool: dict[str, list[dict]] = {}
+  for answer, clues in pooled.items():
+    if answer in excluded or not answer.isalpha():
+      continue
+    items = [item for bare in sorted(clues)
+             if (item := swap_item(answer, bare)) is not None]
+    if items:
+      swap_pool[answer] = items
+
   for answer, (date, clue) in latest.items():
     if answer in excluded or not answer.isalpha():
       continue
@@ -180,20 +273,32 @@ def build_groups(group_size: int, seed: int) -> dict[str, dict[str, list]]:
     if not is_abbreviation and not is_full_word:
       continue
     group = 'abbreviation' if is_abbreviation else 'full_word'
-
-    # Swap instrument: needs a lexicon word, an untagged clue (so the in-clue
-    # word is the sole signal question), and signal-consistency elsewhere.
     bare = MARKER_SUFFIX.sub('', clue).strip()
-    if not MARKER_ANYWHERE.search(bare):
-      swapped = swap_forms(bare)
-      if swapped is not None:
-        item = {'answer': answer, 'original': bare, 'swapped': swapped}
-        candidates['swap'][group].append(item)
+
+    if is_full_word:
+      item = swap_item(answer, bare)
+      if item is not None:
+        candidates['swap']['full_word'].append(item)
 
     # Marker instrument: bare clue must carry no other signal, so the appended
     # tag is the only variable.
     if not is_signaled(bare) and ':' not in bare:
       candidates['marker'][group].append({'answer': answer, 'clue': bare})
+
+  # Distinct answers first; a second clue from the same answer only if the pool
+  # of answers runs out before group_size.
+  pool_rng = random.Random(seed)
+  answers_shuffled = sorted(swap_pool)
+  pool_rng.shuffle(answers_shuffled)
+  for round_index in range(2):
+    for answer in answers_shuffled:
+      if len(candidates['swap']['abbreviation']) >= group_size:
+        break
+      items = swap_pool[answer]
+      if round_index < len(items):
+        candidates['swap']['abbreviation'].append(
+            items[round_index] if round_index == 0
+            else pool_rng.choice(items[1:]))
 
   rng = random.Random(seed)
   groups: dict[str, dict[str, list]] = {}
@@ -217,8 +322,7 @@ def clue_messages(answer: str, clue: str) -> list[dict]:
 def abbreviated_first(item: dict) -> tuple[str, str]:
   """(abbreviated-form clue, expanded-form clue) for a swap item."""
   original_has_abbreviation = any(
-      re.search(re.escape(abbreviated), item['original'], re.IGNORECASE)
-      for abbreviated, _ in ABBREVIATION_EXPANSIONS)
+      pattern.search(item['original']) for pattern in ABBREVIATED_PATTERNS)
   if original_has_abbreviation:
     return item['original'], item['swapped']
   return item['swapped'], item['original']
@@ -308,6 +412,8 @@ def main() -> None:
   parser.add_argument('--samples', type=int, default=3)
   parser.add_argument('--seed', type=int, default=20260704)
   parser.add_argument('--skip-generate', action='store_true')
+  parser.add_argument('--swap-only', action='store_true',
+                      help='score only the swap instrument (rerun mode)')
   args = parser.parse_args()
 
   groups = build_groups(args.group_size, args.seed)
@@ -322,8 +428,9 @@ def main() -> None:
   print(f'model: {args.model}  adapter: {args.adapter or "base"}')
 
   score_swap_cost(model, tokenizer, groups['swap'])
-  score_marker_cost(model, tokenizer, groups['marker'])
-  if not args.skip_generate:
+  if not args.swap_only:
+    score_marker_cost(model, tokenizer, groups['marker'])
+  if not args.skip_generate and not args.swap_only:
     sample_generations(model, tokenizer, groups['marker'],
                        args.generate_count, args.samples)
 
