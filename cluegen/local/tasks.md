@@ -256,12 +256,29 @@ thread; the spec is self-contained.
     checkpoints land every 100 iters, so the morning protocol adds a gap-trace
     across them (evaluate `--adapter` on 3–4 checkpoint dirs) before trusting
     the final adapter.
-  - Next (user-gated): re-run the overnight 12B train with
-    `--learning-rate 5e-5`, everything else per the pinned procedure (lease
-    sized worst-case, caffeinate, detached, done-marker watcher). Morning
-    protocol as recorded, plus the checkpoint gap-trace above. Consider fewer
-    iters: 5e-5 hit val 2.72 by iter 200, so best-val may arrive well before
-    5,000 — the val-based best/ keeper handles that.
+  - Next — USER-CLEARED 2026-07-04 (green light given; launch is the next action
+    after the session compact). Overnight 12B re-run at 5e-5, from
+    `cluegen/scratch/finetune/` in the probe worktree:
+    1. `python cluegen/local/compute_lease.py acquire --holder finetune --task '12B overnight re-run at 5e-5' --minutes 600`
+       — sized for the full run plus eval-and-release slack; the ceiling thread
+       queues tasks behind this run, so release promptly on completion.
+    2. Launch detached under caffeinate (per project-detached-runs memory):
+       Popen(`['caffeinate', '-is', <venv>/bin/optiq, 'lora', 'train', 'mlx-community/gemma-4-12B-it-qat-OptiQ-4bit', '--data', 'data_stage1', '-o', 'adapters_12b_stage1_lr5e5', '--rank-scaling', 'constant', '--preset', 'default', '--batch-size', '1', '--iters', '5000', '--learning-rate', '5e-5']`,
+       stdout to `train_12b_lr5e5.log`, `start_new_session=True`), with
+       `HF_HUB_CACHE=/Users/Shared/models/mlx` in env.
+    3. Watcher keys on trainer pid AND releases the lease on exit (the trainer
+       process is the done signal here; for multi-step drivers use the log's
+       `done` marker — the caffeinate wrapper can linger after work ends, run-1
+       lesson). Re-attach on reaping. Morning protocol as recorded above, with
+       these updates from the register-preference discussion (2026-07-04):
+       flat-under-hard is a HEADLINE content bar (base +0.84; every adapter so
+       far ≈0 — recovery toward +0.84 = the model re-learning that flat text is
+       wrong under a hard prompt); add the checkpoint decoupling trace —
+       loss_gaps on 3–4 checkpoint dirs, watching for real-clue loss and
+       definition loss SPLITTING (falling together = still treating registers as
+       equals). Val-based best/ keeper handles early best-val (5e-5 hit 2.72 by
+       iter 200). Budget note: boxed-run budget stood at 2/4 used when the
+       overnight was cleared.
 - [ ] Before the next 12B fine-tune run: rehearse the identical recipe on the
       cheap e2b variant first and sanity-check the outputs — generate a few
       clues and run the loss-gap gaps — before spending a 7-hour 12B night. The
@@ -272,6 +289,33 @@ thread; the spec is self-contained.
       MLX job (`compute_lease.py status` from a second shell; expect "model
       workload running") — the check is unit-tested and live-checked against an
       ollama runner, but not yet against MLX residency.
+- [ ] Measure the learning-rate basin (methodology; queued 2026-07-04). One
+      short range-test run: ramp LR exponentially from ~1e-6 toward ~5e-4 over a
+      few hundred steps, log loss per step, plot loss vs LR. The usable basin is
+      where loss falls smoothly; the cliff is where it spikes. Current knowledge
+      is a two-point bracket (5e-5 stable, 2e-4 fatal on the QAT 12B; e2b
+      tolerates 2e-4). Sets a principled peak (⅓–½ of cliff) for any future
+      schedule. ~15 min boxed run; needs the trainer to accept a per-step LR
+      callback or the mlx-lm launcher below.
+- [ ] Adaptive learning-rate schedule via mlx-lm launcher (methodology; queued
+      2026-07-04). optiq's supervised path is constant-LR only (warmup/decay
+      wired for DPO alone). Write a ~30-line launcher that calls optiq's
+      `register()` shim then mlx-lm's tuner with an `lr_schedule` config: linear
+      warmup 0→peak over ~3–5% of steps, hold, cosine to ~10% of peak over the
+      final ~20–30%. mlx-lm also brings `--resume-adapter-file`, which unlocks
+      hold-then-decay adaptivity (decay from a held checkpoint when content
+      metrics plateau) and longer boxed probes. Ideal-design rationale in the
+      2026-07-04 session; importance ranking: peak ≫ warmup > decay shape.
+- [ ] Matched-pair register-preference instrument (queued 2026-07-04). For
+      answers with both a flat and a lively human clue in the corpus (weekday as
+      the liveliness proxy), score both under the SAME hard prompt and report
+      the lively member's sequence-level win rate and log-prob margin. Both
+      members are real clues, so the cross-register intrinsic-predictability
+      confound of the WordNet control cancels; sequence-level scoring tracks
+      sampling behavior better than per-token means. Complements flat@hard
+      (within-model suppression) and the decoupling trace (training-dynamics
+      view). Rationale: register sep ≈0 cannot distinguish "prefers lively" from
+      "treats flat and lively as equals" — user discussion 2026-07-04.
 - [ ] Hand-tagged quality bank (user-in-the-loop; queued 2026-07-03). User walks
       a sample of the data bank in a review UI and hand-tags examples on
       multiple quality dimensions, fast per item. Design TBD: possibly several
@@ -281,7 +325,11 @@ thread; the spec is self-contained.
       (per satisfaction taxonomy), dated/evergreen. Payoffs, in order:
       calibration set for the local judge; seed preference pairs for DPO;
       validation set for the judge-filtered-training knob; ground truth for any
-      future curation filter.
+      future curation filter. Priority raised 2026-07-04: the user wants a
+      golden set tuned to their taste — the register-preference discussion
+      showed "coherent" is far below "satisfying" ('Purple' for VIOLET is
+      coherent yet rates low), and satisfaction is what the corpus cannot define
+      on its own. First in line once a usable fine-tuned model exists.
 - [ ] Investigate training throughput (after the overnight run; needs the
       lease). The log's `Tokens/sec` ≈ 1.5–2.0 counts only trained (response)
       tokens — ~8/example under prompt masking — so it is not comparable to
