@@ -220,6 +220,27 @@ thread; the spec is self-contained.
     at ~15:08. Rule going forward: size lease estimates to worst case including
     model-load overhead per step, and make drivers self-terminate at lease
     expiry rather than trusting the estimate.
+  - Done 2026-07-03 (rehearsal run 1/4, e2b at LR 2e-4, deadline-capped at ~560
+    iters, best = 400): the collapse did NOT reproduce. e2b base: true 8.543,
+    answer gap +0.740, register sep −0.978. e2b tuned: true 3.669, answer gap
+    +0.630, difficulty gap −0.000, register sep +0.006; generations coherent and
+    on-answer (VIOLET → 'Purple', 'Berry blue'; flaws: greedy answer-echo
+    'Score' for SCORE, difficulty token still inert). Same data/trainer/LR/steps
+    as the 12B whose gap was +0.001 at iter 400 — so LR alone is not the killer,
+    e2b cannot proxy-clear 12B runs, and suspicion moves to the 12B QAT-OptiQ
+    path itself (QAT checkpoint × LoRA interaction, or the unified export's
+    gemma4_unified remap). Also suspicious: tuned e2b fits val clues at 3.67
+    nats vs the tuned 12B's 5.83. Side note: tuned e2b's ps RSS 4.4 GiB
+    validated the lease script's new process-table busy check against live MLX
+    (main's copy only — worktree copies gain it at their next merge-from-main).
+  - Run 2/4 launched 2026-07-04 00:05: 12B at LR 5e-5, 250 iters, evals on the
+    final adapter. Decision tree: healthy answer gap → the QAT 12B is
+    LR-fragile, train colder and the overnight recipe is salvageable; dead gap →
+    LR exonerated, the 12B base export is implicated and the next move is a
+    different base checkpoint, not more tuning. Mechanics fix from run 1: the
+    caffeinate wrapper lingered ~88 min after the script finished (leaked
+    multiprocessing resource tracker), so the pid-keyed watcher released 88 min
+    late; run-2+ watchers key on the driver log's `done` marker instead.
 - [ ] Before the next 12B fine-tune run: rehearse the identical recipe on the
       cheap e2b variant first and sanity-check the outputs — generate a few
       clues and run the loss-gap gaps — before spending a 7-hour 12B night. The
