@@ -342,17 +342,22 @@ thread; the spec is self-contained.
       senses, many-clue histories), compare false-signal rates. ~15 min boxed
       run on the tuned adapter.
 - [ ] Scaled-slice design (queued 2026-07-04; the corpus-as-supervision scaling
-      path from the style-rule discussion). Composition: sample answers
-      near-uniformly (coverage over answer types = rule-agnostic coverage over
-      style contexts), keeping recency/weekday weights only for choosing each
-      answer's representative clues; cap stays ≤4 per answer. Bank affords ~200k
-      examples post-dedup. Ladder, not a jump: 15k slice → one overnight → full
-      probe suite (abbreviation sensitivity, flat@hard, register sep, decoupling
-      trace, answer gap) → decide the ~50k rung by whether rule internalization
-      scales with exemplar count. Prefer fresh data over repeat epochs
-      (still-learning at 1×5k). Prerequisites: batch-size throughput win +
-      mlx-lm launcher resume (both queued above); at batch-4 throughput 15k ≈
-      one overnight, 50k ≈ 2–3 with resume.
+      path from the style-rule discussion). Composition finding (measured
+      2026-07-04): the recipe's weights are exonerated — the ': Abbr.' tag rate
+      drifted 0.76% (1990s) → 1.67% (2005–09) → 0.88% (2020–24), so the slice's
+      0.8% matches MODERN style; recency weighting reproduces current
+      conventions, which is the goal. Rare-rule starvation is rarity × slice
+      size, and at fixed size composition tweaks buy ≤2× (tagged answers are
+      1.7% of distinct answers vs 0.8% of examples) — SCALE is the lever. So:
+      keep the existing recipe, extend --size. Fresh-data-over-repeat-epochs
+      ADOPTED (user, 2026-07-04) — never re-epoch a small slice when a larger
+      one is available. Ladder gated by cheap instruments first (user,
+      2026-07-04): 15k slice → one overnight → probe suite (abbreviation
+      sensitivity, flat@hard, register sep, decoupling trace, answer gap) →
+      decide the ~50k rung by whether rule internalization scales with exemplar
+      count. Bank affords ~200k post-dedup. Prerequisites: batch-size throughput
+      win + mlx-lm launcher resume (both queued above); at batch-4 throughput
+      15k ≈ one overnight, 50k ≈ 2–3 with resume.
 - [ ] Adaptive learning-rate schedule via mlx-lm launcher (methodology; queued
       2026-07-04). optiq's supervised path is constant-LR only (warmup/decay
       wired for DPO alone). Write a ~30-line launcher that calls optiq's
