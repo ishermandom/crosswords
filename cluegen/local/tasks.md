@@ -161,12 +161,32 @@ done — see the log for the curve and the criteria re-analysis.
 - [ ] **Mechanism tagger: tighten the dominant-mechanism instruction** — it
       over-attributes frame-anchored clues to sense pivot (2026-07-02 audit);
       matters once bank-level angle passes consume the tags.
-- [ ] **Angle-distinct depth pass** — when banking multiple clues per word,
-      require distinct angles (checkpoint 2: Fable flagged a same-angle DAISY
-      paraphrase). Later pass by user direction; don't over-invest early.
+- [ ] **Align local vs cloud judge requirements** #judge-alignment — both judges
+      should enforce the same requirement set, each via methodology fitting the
+      model's strength (user direction 2026-07-04). Audit findings (window
+      session, 2026-07-04): (a) answer/root/cognate leakage — cloud has
+      mechanical `has_answer_leak` + stem soft-flags + a judge check with the
+      etymology exception; local has only setter self-check. The mechanical half
+      is pure code to copy local-side (copy, not import — prototyping
+      independence); the judgment half needs a home in the cascade. (b) The
+      local setter emits a required `trap` field no local judge reads — verify
+      it (cloud check #7: trap proportionate to difficulty) or stop emitting it.
+      (c) Non-pinning prosecution is a local-only invention absent from
+      CLUE_SPEC — removal in flight (window idea 11 + confirm at adoption). (d)
+      Cross-clue independence: intentionally out of local scope — see
+      #angle-distinct.
+  - Note: consider a requirements trace (each CLUE_SPEC §A2 invariant → where
+    the local cascade checks it) so this audit is mechanical next time; two
+    drift types showed up (a dropped requirement and an invented one).
+- [ ] **Angle-distinct: reevaluate at cleanup** #angle-distinct — cross-clue
+      angle distinctness is intentionally OUT OF SCOPE for the local run (user
+      direction 2026-07-04): multiple similar banked clues for one word are fine
+      in the meantime, and anticipated fine long-run — the cloud judge measured
+      independence to control for laziness in the cloud setter, and the local
+      structure has no analogous need. Reevaluate then rather than enforce now.
   - Note: sibling leak, cross-word rather than same-word — chunk 1 banked the
     "X's total/tally" template three times across different words. A per-clue
-    judge can't see either; both need a bank-level pass.
+    judge can't see it; part of the same reevaluation.
 - [x] **Satisfaction-mechanism taxonomy** — written as
       `cluegen/local/satisfaction.md` (local-ceiling branch, 2026-07-02): five
       bases of satisfaction (aha is not mandatory — user note), ten mechanisms,
