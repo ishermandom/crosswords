@@ -161,6 +161,20 @@ done — see the log for the curve and the criteria re-analysis.
 - [ ] **Mechanism tagger: tighten the dominant-mechanism instruction** — it
       over-attributes frame-anchored clues to sense pivot (2026-07-02 audit);
       matters once bank-level angle passes consume the tags.
+- [ ] **Expand the eval set to ~100 examples** #eval-expansion — user priority
+      (2026-07-04): the window's judge tuning steers by ~15 contested rows;
+      lower-hanging fruit should surface at scale. One-off Fable generation of
+      graded, labeled examples (verdict + basis + one-line reason), anchored in
+      the window's discovered failure taxonomy: definite-description vignettes
+      (SNOOZE family), ?-license earned vs apology, flavor words vs padding (ZED
+      vs THIRTEEN), count-metonymy fairness (NINE vs TEN), non-pinning-is- fine
+      rows, flat gloss vs prize-fact gradient, foreign/idiom sense. Pair
+      structure (accept + near-miss revise per word) as in funcal; exclude all
+      words in words.in, the eval sets, and the bank. Keep every existing
+      real-world set unchanged; add as new battery set(s) with a
+      generated-tune/generated-holdout split. Run as two detached Fable calls
+      (~45 rows each) with watchers — the 10-min Bash cap killed a big single
+      call once already.
 - [ ] **Align local vs cloud judge requirements** #judge-alignment — both judges
       should enforce the same requirement set, each via methodology fitting the
       model's strength (user direction 2026-07-04). Audit findings (window
