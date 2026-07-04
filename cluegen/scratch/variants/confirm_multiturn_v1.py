@@ -51,10 +51,15 @@ definition swaps in without duplicating the sentence's own words.
 
 A shift must be visible in the pair of sentences you write — when the
 clue's definition reads naturally in the answer's place, the shift is
-"none". When the clue carries a '?', also judge whether the shift you
-found is exactly the stretched, figurative, or metonymic definition
-the ? marks, and whether that figurative reading still substitutes
-fairly. Report that judgment in its own field; report the literal
+"none". Pick a sentence frame that fits both phrasings; needing to add
+or drop a bare article ("a", "an", "the") to keep the frame
+grammatical is not a shift. When the clue carries a '?', also judge
+whether the shift you found is exactly the stretched, figurative, or
+metonymic definition the ? marks, and whether that figurative reading
+still substitutes fairly. A ? licenses figurative distance that reads
+true; it does not make a near-miss equivalence right — an event is
+not its score, a container is not its contents, a cause is not its
+result. Report that judgment in its own field; report the literal
 shift itself regardless.
 
 Calibration examples:
@@ -152,16 +157,23 @@ _ECONOMY_SYSTEM = (
   _PANEL_PREAMBLE
   + """
 Your check — economy: apply a deletion test to each meaning-carrying
-word. If dropping a word leaves the definition just as complete and
-fair, that word is padding — name it even when the surface reads
-smoothly. Grammatical connective tissue the phrasing needs (articles,
-bare prepositions) is not padding; judge the words that carry meaning.
+word. If dropping a word leaves the definition just as complete, just
+as precise, and just as vivid, that word is padding — name it even
+when the surface reads smoothly. Padding RESTATES what the rest
+already implies; a word that adds precision, or paints something the
+rest does not already say, earns its place. Grammatical connective
+tissue the phrasing needs (articles, bare prepositions) is not
+padding; judge the words that carry meaning.
 
 Calibration examples:
-- "Night watchman on patrol" -> GUARD: "on patrol" is padding —
-  "Night watchman" carries the whole definition.
+- "Night watchman on patrol" -> GUARD: "on patrol" is padding — a
+  night watchman is by definition on patrol; the phrase restates the
+  definition.
 - "Frozen rain" -> SLEET: no padding — dropping either word breaks
-  the definition."""
+  the definition.
+- "Squeal of chalk on a blackboard" -> SCREECH: no padding — "of
+  chalk" and "on a blackboard" each paint the scene sharper; deleting
+  them leaves a duller clue, not a tighter one."""
 )
 
 _ECONOMY_PROMPT = (
