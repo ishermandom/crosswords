@@ -400,26 +400,31 @@ thread; the spec is self-contained.
     vs expanded form under the true answer, e.g. 'Bug grp.?' vs 'Bug group?' for
     CIA; diff-of-diffs across answer groups), marker cost (± ': Abbr.' suffix),
     generation signal rate. First run (swap n=15/40):
-    - BASE already has the general rule: swap diff-of-diffs +7.63 (abbreviated
-      form +5.3 nats on abbreviation answers vs +13.0 on full-word).
-    - Tuning ERODED it to +2.50 — mechanism: tuned model accepts abbreviated
-      forms much more everywhere (full-word cell 13.0 → 7.0) while the
-      abbreviation cell barely moved (5.3 → 4.6). Marginal "clues contain dotted
-      words" learning overwrote the base's conditional.
-    - Tuning STRENGTHENED the explicit tag rule: marker diff-of-diffs +1.27
-      (base) → +4.49 (tuned); the tag also became in-register overall (cost
-      −11.8 nats on abbreviation answers). The ~40 tag exemplars taught a
-      localized pattern conditionally; the diffuse form-agreement rule diluted.
-      Same signature as flat@hard erosion.
+    - Swap instrument, authoritative n=60 rerun (expanded 34-pair lexicon from
+      the bank survey — 635 tagged answers / 6,253 swappable clues; pooled
+      historical clues; quote + signal-purity filters): BASE diff-of-diffs
+      +3.03, TUNED +2.52 — the base model holds the general rule at modest
+      strength and tuning roughly PRESERVED it (neither taught nor erased; the
+      first run's dramatic "+7.63 base, eroded to +2.50" was an artifact of the
+      noisy n=15 cell plus residual-signal contamination in the old full-word
+      items — tuned was +2.50/+2.52 across both runs, base moved). Tuning's real
+      effect is common-mode: abbreviated forms ~3 nats cheaper everywhere
+      (in-register shift), conditional structure unchanged. Behaviorally the
+      rule is weak in both models: prefers-abbreviated only 20%→8% (abbreviation
+      answers) vs 13%→2% (full-word).
+    - Tuning STRENGTHENED the explicit tag rule (n=40 cells, first run): marker
+      diff-of-diffs +1.27 (base) → +4.49 (tuned); the tag also became
+      in-register overall (cost −11.8 nats on abbreviation answers). The ~40 tag
+      exemplars taught a localized pattern conditionally; the diffuse
+      form-agreement rule stayed flat — localized anchors learn from sparse
+      data, diffuse rules don't move.
     - Generation (tuned): 0/60 false signals on full-word answers (perfect
       specificity), 7/60 signaled on abbreviation answers (12% — severe
       under-signaling is the behavioral failure). OCT → 'Fall month: Abbr.'
       correct; EPISC → 'Totalitarian dictator: Abbr.' (form right, content
       wrong).
-    - n=60 swap rerun launched 15:05 (expanded 34-pair lexicon from the bank
-      survey — 635 tagged answers / 6,253 swappable clues; pooled historical
-      clues; quote + signal-purity filters). Logs: abbr_probe_{base,tuned}.log,
-      abbr_swap_{base,tuned}.log.
+    - Logs: abbr_probe_{base,tuned}.log (marker + generation, first-run swap
+      superseded), abbr_swap_{base,tuned}.log (authoritative swap).
 - [ ] Hand-tagged quality bank (user-in-the-loop; queued 2026-07-03). User walks
       a sample of the data bank in a review UI and hand-tags examples on
       multiple quality dimensions, fast per item. Design TBD: possibly several
