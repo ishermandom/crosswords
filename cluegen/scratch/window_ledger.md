@@ -285,6 +285,14 @@ released 15:2x after try 4.
 
 ## Remaining queue
 
+**Expanded-set baseline — PREPPED, machine use WAITS FOR USER GO (2026-07-04 ~16:00).** Sets built and committed (gentune 64 / genhold 28, $1.80). When cleared, run from `cluegen/scratch/` one lease slot at a time, releasing between slots:
+
+1. screens (~30 min): `battery.py --sets gentune,genhold --tag expbase_v2`
+2. v2 confirms ride the same run (packed confirm, 1 call per screen-bankable)
+3. candidate confirms (~60 min, split if needed): same sets with `--patch variants/confirm_multiturn_v1.py --tag expbase_mt` (screens replay from cache)
+
+Read: v2 vs adopted candidate per bucket — bucket-level gaps are the lower-hanging-fruit signal the expansion exists to surface.
+
 Reordered 2026-07-04 (user priority): FIRST `#eval-expansion` — grow the labeled
 set to ~100 via one-off Fable generation (design in tasks.md; two detached
 calls,
