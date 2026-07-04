@@ -394,6 +394,32 @@ thread; the spec is self-contained.
       order: larger stage slice (more absolute exemplars), more epochs (weak —
       memorizes the 40), explicit answer-form tag in the prompt (stage-2
       conditioning design, with difficulty).
+  - Built and run 2026-07-04 (abbr_probe.py; user generalized the target: any
+    abbreviated word in the clue is the signal, e.g. 'Sci.' cluing PHYS — the
+    tag is one special case). Instruments: swap cost (clue scored in abbreviated
+    vs expanded form under the true answer, e.g. 'Bug grp.?' vs 'Bug group?' for
+    CIA; diff-of-diffs across answer groups), marker cost (± ': Abbr.' suffix),
+    generation signal rate. First run (swap n=15/40):
+    - BASE already has the general rule: swap diff-of-diffs +7.63 (abbreviated
+      form +5.3 nats on abbreviation answers vs +13.0 on full-word).
+    - Tuning ERODED it to +2.50 — mechanism: tuned model accepts abbreviated
+      forms much more everywhere (full-word cell 13.0 → 7.0) while the
+      abbreviation cell barely moved (5.3 → 4.6). Marginal "clues contain dotted
+      words" learning overwrote the base's conditional.
+    - Tuning STRENGTHENED the explicit tag rule: marker diff-of-diffs +1.27
+      (base) → +4.49 (tuned); the tag also became in-register overall (cost
+      −11.8 nats on abbreviation answers). The ~40 tag exemplars taught a
+      localized pattern conditionally; the diffuse form-agreement rule diluted.
+      Same signature as flat@hard erosion.
+    - Generation (tuned): 0/60 false signals on full-word answers (perfect
+      specificity), 7/60 signaled on abbreviation answers (12% — severe
+      under-signaling is the behavioral failure). OCT → 'Fall month: Abbr.'
+      correct; EPISC → 'Totalitarian dictator: Abbr.' (form right, content
+      wrong).
+    - n=60 swap rerun launched 15:05 (expanded 34-pair lexicon from the bank
+      survey — 635 tagged answers / 6,253 swappable clues; pooled historical
+      clues; quote + signal-purity filters). Logs: abbr_probe_{base,tuned}.log,
+      abbr_swap_{base,tuned}.log.
 - [ ] Hand-tagged quality bank (user-in-the-loop; queued 2026-07-03). User walks
       a sample of the data bank in a review UI and hand-tags examples on
       multiple quality dimensions, fast per item. Design TBD: possibly several
