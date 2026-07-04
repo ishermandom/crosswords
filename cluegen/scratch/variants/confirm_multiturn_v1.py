@@ -56,15 +56,11 @@ definition swaps in without duplicating the sentence's own words.
 
 A shift must be visible in the pair of sentences you write — when the
 clue's definition reads naturally in the answer's place, the shift is
-"none". Substitute the clue as one complete phrase, adding an article
-if the frame needs it; if the substituted sentence comes out
-ungrammatical, rebuild the frame rather than reporting a shift — a
-broken frame is your error, not the clue's flaw. When the clue
-carries a '?', also judge whether the shift you found is exactly the
-stretched, figurative, or metonymic definition the ? marks, and
-whether that figurative reading still substitutes fairly. Report that
-judgment in its own field; report the literal shift itself
-regardless.
+"none". When the clue carries a '?', also judge whether the shift you
+found is exactly the stretched, figurative, or metonymic definition
+the ? marks, and whether that figurative reading still substitutes
+fairly. Report that judgment in its own field; report the literal
+shift itself regardless.
 
 Calibration examples:
 - "One who delivers your letters" -> MAIL: "She sorted the mail." ->
