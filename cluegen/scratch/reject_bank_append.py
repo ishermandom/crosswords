@@ -49,8 +49,9 @@ def main():
   parser.add_argument('results', type=pathlib.Path)
   parser.add_argument('--data', type=pathlib.Path, required=True)
   parser.add_argument('--source', required=True)
-  parser.add_argument('--contract', required=True,
-                      help='which judge contract produced the labels')
+  parser.add_argument(
+    '--contract', required=True, help='which judge contract produced the labels'
+  )
   args = parser.parse_args()
 
   clue_dicts = {}
@@ -74,8 +75,10 @@ def main():
         if key in banked:
           # A banked clue Fable now flags is a purge candidate, not a settled
           # reject; surface it instead of appending.
-          print(f'PURGE CANDIDATE (in bank): {verdict["word"]} '
-                f'"{verdict["clue"]}" — {verdict.get("reason")}')
+          print(
+            f'PURGE CANDIDATE (in bank): {verdict["word"]} '
+            f'"{verdict["clue"]}" — {verdict.get("reason")}'
+          )
           skipped_banked += 1
           continue
         if key in already_rejected:

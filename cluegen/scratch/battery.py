@@ -51,6 +51,9 @@ _SETS = {
   # Chunk-1 kills that Fable accepts — false-kill targets, probed explicitly
   # (not in the default sets).
   'losses': _SCRATCH / 'recall_loss_verdicts.jsonl',
+  # Fable-generated graded fun-vs-flat pairs (idea 8 probe set; invented
+  # clues, so usable for tuning without touching eval items).
+  'funcal': _SCRATCH / 'fun_calibration_verdicts.jsonl',
 }
 _CACHE_PATH = _SCRATCH / 'cache' / 'judge_cache.jsonl'
 _LOG_DIR = _SCRATCH / 'logs'
@@ -92,8 +95,9 @@ def _call_key(model, word, clue, sample, temperature, system, protocol):
   return hashlib.sha256(material.encode()).hexdigest()
 
 
-def _cached_judge(cache, stage, model, word, clue, sample, temperature,
-                  system, protocol):
+def _cached_judge(
+  cache, stage, model, word, clue, sample, temperature, system, protocol
+):
   """One judge verdict, from cache when the identical call was made before.
 
   Returns (verdict, was_cached).
@@ -104,8 +108,13 @@ def _cached_judge(cache, stage, model, word, clue, sample, temperature,
   pipeline_local.SCHEMA_TEMPERATURE = temperature
   started = time.time()
   verdict = pipeline_local._judge(
-    model, word, clue, lambda text: None, stage,
-    system=system, protocol=protocol,
+    model,
+    word,
+    clue,
+    lambda text: None,
+    stage,
+    system=system,
+    protocol=protocol,
   )
   record = {
     'key': key,
@@ -131,9 +140,7 @@ def _distribution(verdicts):
   counts = collections.Counter(
     verdict['verdict'] for verdict in verdicts if verdict
   )
-  return (
-    f'{counts["bankable"]}:{counts["fixable"]}:{counts["bad"]}'
-  )
+  return f'{counts["bankable"]}:{counts["fixable"]}:{counts["bad"]}'
 
 
 def _load_set(set_name):
@@ -154,9 +161,7 @@ def _load_set(set_name):
     record['eval_set'] = set_name
     records.append(record)
   if set_name == 'rejects':
-    tuning_keys = {
-      (r['word'], r['clue'].lower()) for r in _load_set('tuning')
-    }
+    tuning_keys = {(r['word'], r['clue'].lower()) for r in _load_set('tuning')}
     records = [
       r for r in records if (r['word'], r['clue'].lower()) not in tuning_keys
     ]
@@ -176,12 +181,17 @@ def main():
   parser.add_argument('--sets', default='tuning,holdout,rejects')
   parser.add_argument('--samples', type=int, default=1)
   parser.add_argument('--only', default=None, help='single word, rung-0 smoke')
-  parser.add_argument('--screen-temp', type=float,
-                      default=pipeline_local.SCHEMA_TEMPERATURE)
-  parser.add_argument('--confirm-temp', type=float,
-                      default=pipeline_local.SCHEMA_TEMPERATURE)
-  parser.add_argument('--patch', default=None,
-                      help='python file exec\'d to monkeypatch pipeline_local')
+  parser.add_argument(
+    '--screen-temp', type=float, default=pipeline_local.SCHEMA_TEMPERATURE
+  )
+  parser.add_argument(
+    '--confirm-temp', type=float, default=pipeline_local.SCHEMA_TEMPERATURE
+  )
+  parser.add_argument(
+    '--patch',
+    default=None,
+    help="python file exec'd to monkeypatch pipeline_local",
+  )
   parser.add_argument('--tag', default='battery')
   args = parser.parse_args()
 
@@ -209,8 +219,15 @@ def main():
     record['screens'] = []
     for sample in range(args.samples):
       verdict, was_cached = _cached_judge(
-        cache, 'screen', _SCREEN_MODEL, record['word'], record['clue'],
-        sample, args.screen_temp, screen_system, screen_protocol,
+        cache,
+        'screen',
+        _SCREEN_MODEL,
+        record['word'],
+        record['clue'],
+        sample,
+        args.screen_temp,
+        screen_system,
+        screen_protocol,
       )
       record['screens'].append(verdict)
       cache_hits += was_cached
@@ -232,8 +249,15 @@ def main():
         record['cascade'].append(record['screens'][sample]['verdict'])
         continue
       verdict, was_cached = _cached_judge(
-        cache, 'confirm', _CONFIRM_MODEL, record['word'], record['clue'],
-        sample, args.confirm_temp, confirm_system, confirm_protocol,
+        cache,
+        'confirm',
+        _CONFIRM_MODEL,
+        record['word'],
+        record['clue'],
+        sample,
+        args.confirm_temp,
+        confirm_system,
+        confirm_protocol,
       )
       record['confirms'].append(verdict)
       record['cascade'].append(verdict['verdict'])
