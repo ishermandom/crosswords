@@ -77,7 +77,7 @@ _OLD_STEP_ONE = (
 _NEW_STEP_ONE = (
   'write one '
   'natural sentence where the answer stands alone in the clued sense '
-  "(for a ?-marked clue, its intended figurative sense), substitute "
+  '(for a ?-marked clue, its intended figurative sense), substitute '
   "the clue's definition, and say whether part of speech, tense, "
   'number, or referent shifts beyond any stretch the ? marks'
 )
