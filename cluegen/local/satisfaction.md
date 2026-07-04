@@ -16,6 +16,19 @@ samples; this document maps the mechanism space, not their empirical
 distribution. Treat any one source — especially the cloud bank — as an input,
 never the standard.
 
+Why articulation matters (user, 2026-07-03): the ground-truth judges — the user
+and Fable alike — distinguish satisfying from unsatisfying clues partly by "I'll
+know it when I see it," which transfers to nobody. Progress on judge quality has
+come from converting that tacit sense into named dimensions with graded example
+pairs — a virtue named next to its near-miss (SNOOZE "Button smacked at 6:00,
+6:09, and 6:18" vs "Alarm clock button"). The space is genuinely
+multi-dimensional on both sides — many ways a clue earns its keep, many ways one
+tanks — so expect refinement to be perpetual: each misjudged cluster is a
+dimension not yet articulated, and the fix is naming the dimension, not
+adjusting a verdict. Generating fresh graded pairs from the stronger judge
+(cheap, avoids eval contamination) is the standing technique for pinning a fuzzy
+line.
+
 ## The bases of satisfaction
 
 There is no single thing a clue must do. A clue earns its keep on one or more of

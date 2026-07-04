@@ -37,9 +37,13 @@ CLI), so any job that might outlive that must not run as a plain in-session
 command:
 
 1. Acquire the lease.
-2. Launch the job detached, writing to a log file, e.g. `subprocess.Popen([...],
-   stdout=log_file, stderr=subprocess.STDOUT, start_new_session=True)` — its own
-   process group sits out of the group-kill's reach.
+2. Launch the job detached under `caffeinate`, writing to a log file, e.g.
+   `subprocess.Popen(['caffeinate', '-is', ...], stdout=log_file,
+   stderr=subprocess.STDOUT, start_new_session=True)` — its own process group
+   sits out of the group-kill's reach, and caffeinate keeps the machine from
+   sleeping. Without it, an unattended Mac drops into maintenance sleep with
+   ~45-second dark-wakes every ~17 minutes, and a 27-minute batch takes 141 wall
+   minutes (measured 2026-07-03; verify with `pmset -g log`).
 3. Attach an expendable background watcher — `until ! kill -0 <pid>; do sleep
    30; done`, then `release` — to wake the session and free the lease on
    completion. A reaped watcher is harmless: the job continues, a fresh watcher
@@ -201,9 +205,7 @@ def _write_waiters(waiters: list[Waiter]) -> None:
 
 def _set_waiting_note(holder: str, task: str) -> None:
   """Register `holder`'s I'm-waiting note, replacing any prior one."""
-  others = [
-    waiter for waiter in _read_waiters() if waiter.holder != holder
-  ]
+  others = [waiter for waiter in _read_waiters() if waiter.holder != holder]
   _write_waiters(others + [Waiter(holder=holder, task=task, since=time.time())])
 
 
