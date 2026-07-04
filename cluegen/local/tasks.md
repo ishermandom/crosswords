@@ -314,6 +314,27 @@ thread; the spec is self-contained.
     lease sizing can assume ~10 min per full-n gaps run plus load time.
     Remaining (2 budget tasks): panel eval at medium + steering spot-check,
     decision metric vs v9.
+- [ ] AUTONOMOUS STRETCH (granted 2026-07-04, pre-compact; user away). Execute
+      every queued task that precedes the 15k overnight rung, in this order: 1.
+      Stratified false-signal check (~15 min, tuned adapter). 2. mlx-lm launcher
+      build (code only). 3. One boxed session: batch-size exploration on e2b (1
+      vs 2 vs 4 — tokens/sec, peak memory, loss smoothness) + learning-rate
+      range test ON THE 12B via the launcher (user decision 2026-07-04: 12B
+      directly, overriding the e2b-rehearsal reminder for this ramp — the QAT
+      12B's cliff is the one that matters). 4. Matched-pair register-preference
+      instrument: build + run base vs tuned (pulled up 2026-07-04 to precede the
+      15k rung, so the ladder measures register preference from the start). 5.
+      Build the 15k slice (existing recipe, --size 15000; same methodology). The
+      rung will train FROM SCRATCH (user decision) and presumably batched, per
+      whatever the batch-size data says. Budget: the queued tasks plus up to 3
+      discovered tasks of comparable size. The grant explicitly covers the
+      training steps inside these tasks (e2b batch runs, 12B ramp) — do not
+      re-litigate the training gate for them. Machine: ceiling hands over at its
+      next natural pause; acquire per-session leases, release between sessions,
+      wait-queue when held. HARD STOP after step 5: write up recommended launch
+      settings (batch size, learning-rate peak + schedule) and CHECK IN — the
+      user launches the 15k overnight explicitly (user decision 2026-07-04; no
+      self-launch).
 - [ ] Before the next 12B fine-tune run: rehearse the identical recipe on the
       cheap e2b variant first and sanity-check the outputs — generate a few
       clues and run the loss-gap gaps — before spending a 7-hour 12B night. The
@@ -332,15 +353,22 @@ thread; the spec is self-contained.
       tolerates 2e-4). Sets a principled peak (⅓–½ of cliff) for any future
       schedule. ~15 min boxed run; needs the trainer to accept a per-step LR
       callback or the mlx-lm launcher below.
-- [ ] Stratified false-signal check (queued 2026-07-04; awaits a machine-time
-      grant). The probe's 0/60 false-signal rate used full-word answers whose
-      latest clue was terse and signal-free — an easy-to-clue population — while
-      the panel words that false-signaled (SCORE → 'Rating: Abbr.', VIOLET →
-      'Chrys. relative', 2 of 8 draws) are polysemous/number-sense answers where
+- [ ] Stratified false-signal check (in the autonomous-stretch scope, step 1).
+      The probe's 0/60 false-signal rate used full-word answers whose latest
+      clue was terse and signal-free — an easy-to-clue population — while the
+      panel words that false-signaled (SCORE → 'Rating: Abbr.', VIOLET → 'Chrys.
+      relative', 2 of 8 draws) are polysemous/number-sense answers where
       temp-1.0 sampling leaves the model's comfortable register. Test: 5 draws
-      each for ~20 easy-stratum vs ~20 polysemous-stratum answers (number
-      senses, many-clue histories), compare false-signal rates. ~15 min boxed
-      run on the tuned adapter.
+      each across three ~20-answer strata — easy (terse-clue population),
+      polysemous/number-sense (many distinct bank clues), and long-word-concept
+      (answers whose natural clue ideas contain long words, e.g. flower/genus,
+      occupation, nationality terms) — compare false-signal rates. The third
+      stratum tests the VIOLET collision theory: 'Chrys.' appears nowhere in the
+      bank (the model INVENTED the truncation), 'Chrysanthemum' once; the theory
+      is that the strongly-learned terseness rule beat the weakly-held (+2.5
+      nat) form-matching rule when the best clue idea needed a 13-letter word,
+      so false signals should cluster in this stratum. ~15 min boxed run on the
+      tuned adapter.
 - [ ] Scaled-slice design (queued 2026-07-04; the corpus-as-supervision scaling
       path from the style-rule discussion). Composition finding (measured
       2026-07-04): the recipe's weights are exonerated — the ': Abbr.' tag rate
@@ -379,16 +407,18 @@ thread; the spec is self-contained.
       moves with batch size (linear-to-sqrt scaling), so run this WITH the LR
       basin test, not before or after it. Cheap boxed e2b run: batch 1 vs 2 vs
       4, compare tokens/sec, peak memory, and loss-vs-step smoothness.
-- [ ] Matched-pair register-preference instrument (queued 2026-07-04). For
-      answers with both a flat and a lively human clue in the corpus (weekday as
-      the liveliness proxy), score both under the SAME hard prompt and report
-      the lively member's sequence-level win rate and log-prob margin. Both
-      members are real clues, so the cross-register intrinsic-predictability
-      confound of the WordNet control cancels; sequence-level scoring tracks
-      sampling behavior better than per-token means. Complements flat@hard
-      (within-model suppression) and the decoupling trace (training-dynamics
-      view). Rationale: register sep ≈0 cannot distinguish "prefers lively" from
-      "treats flat and lively as equals" — user discussion 2026-07-04.
+- [ ] Matched-pair register-preference instrument (queued 2026-07-04; pulled up
+      2026-07-04 into the autonomous stretch, step 4 — must precede the 15k rung
+      so the ladder measures register preference from the start). For answers
+      with both a flat and a lively human clue in the corpus (weekday as the
+      liveliness proxy), score both under the SAME hard prompt and report the
+      lively member's sequence-level win rate and log-prob margin. Both members
+      are real clues, so the cross-register intrinsic-predictability confound of
+      the WordNet control cancels; sequence-level scoring tracks sampling
+      behavior better than per-token means. Complements flat@hard (within-model
+      suppression) and the decoupling trace (training-dynamics view). Rationale:
+      register sep ≈0 cannot distinguish "prefers lively" from "treats flat and
+      lively as equals" — user discussion 2026-07-04.
 - [ ] Panel eval vs v9 via a standalone bridge (queued 2026-07-04; user deferred
       — "come back to it later"). The spec's stage-0 client adapter for the
       harness was never built: ceiling's `pipeline_local.py` speaks only to
