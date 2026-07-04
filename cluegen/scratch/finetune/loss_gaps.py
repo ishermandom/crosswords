@@ -140,13 +140,15 @@ def main() -> None:
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument('--adapter', default=None,
                       help='adapter directory; omit to score the base model')
+  parser.add_argument('--model', default=MODEL_REPO,
+                      help='model repo to score (e.g. the e2b variant)')
   parser.add_argument('--limit', type=int, default=200)
   parser.add_argument('--seed', type=int, default=20260702)
   args = parser.parse_args()
 
   register()
   from mlx_lm import load
-  model, tokenizer = load(MODEL_REPO, adapter_path=args.adapter)
+  model, tokenizer = load(args.model, adapter_path=args.adapter)
 
   rng = random.Random(args.seed)
   all_records = [json.loads(line) for line in VALID_PATH.open()]
@@ -154,7 +156,7 @@ def main() -> None:
   records = all_records[:args.limit]
 
   label = args.adapter or 'base'
-  print(f'model: {MODEL_REPO}  adapter: {label}  n={len(records)}')
+  print(f'model: {args.model}  adapter: {label}  n={len(records)}')
   results = {}
   for condition in ('true', 'answer-shuffle', 'difficulty-swap'):
     total_nll = 0.0
