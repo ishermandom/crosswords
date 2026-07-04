@@ -107,6 +107,14 @@ names a distinct way a clue can work.
     setting" (ELEVEN), "Warhol's allotment of fame, in minutes" (FIFTEEN), "Age
     of ABBA's dancing queen" (SEVENTEEN).
 
+A property that cuts across mechanisms: **under-determination is a virtue, not a
+flaw** (user calibration, 2026-07-04). A true clue that also fits other answers
+— "When shadows stretch" reads as DAWN as well as DUSK — is doing extra work: it
+forces the solver to cross-check against crossing answers, which is where a
+crossword's difficulty is supposed to live. Judges test truth, not uniqueness;
+prosecuting "several answers fit equally well" kills exactly the clues that
+resist longest.
+
 ## Failure modes, restated as missing pieces
 
 - **Flat gloss** — no leap and no other virtue; a thesaurus entry.
