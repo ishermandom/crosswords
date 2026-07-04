@@ -25,18 +25,18 @@ _NEW_GRADIENT_CLOSE = (
   '  surprise, or specificity — never the presence of common knowledge.\n'
   '  The fun line runs between an evoked moment and listed properties: a\n'
   '  surface that stages a specific lived scene or pins a precise\n'
-  '  cultural moment earns fun with no pivot; naming the answer\'s\n'
+  "  cultural moment earns fun with no pivot; naming the answer's\n"
   '  props, ingredients, or usual location does not.'
 )
 
 _OLD_DUCK_EXAMPLE = (
   '- "Heads down!" -> DUCK: bankable (easy; basis: fun). No pivot and no\n'
-  '  trap — the surface\'s own wit earns the bank. Fun or elegance in the\n'
+  "  trap — the surface's own wit earns the bank. Fun or elegance in the\n"
   '  image or register is a full basis, without misdirection.'
 )
 _NEW_DUCK_EXAMPLE = (
   '- "Heads down!" -> DUCK: bankable (easy; basis: fun). No pivot and no\n'
-  '  trap — the surface\'s own wit earns the bank. Fun or elegance in the\n'
+  "  trap — the surface's own wit earns the bank. Fun or elegance in the\n"
   '  image or register is a full basis, without misdirection.\n'
   '- "Button smacked at 6:00, 6:09, and 6:18" -> SNOOZE: bankable (easy;\n'
   '  basis: fun). The escalating timestamps stage a lived mini-scene —\n'

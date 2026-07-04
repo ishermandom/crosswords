@@ -180,7 +180,9 @@ def main():
   parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
   parser.add_argument('--sets', default='tuning,holdout,rejects')
   parser.add_argument('--samples', type=int, default=1)
-  parser.add_argument('--only', default=None, help='single word, rung-0 smoke')
+  parser.add_argument(
+    '--only', default=None, help='comma-separated words, rung-0/1 probes'
+  )
   parser.add_argument(
     '--screen-temp', type=float, default=pipeline_local.SCHEMA_TEMPERATURE
   )
@@ -202,9 +204,10 @@ def main():
   for set_name in args.sets.split(','):
     records.extend(_load_set(set_name))
   if args.only:
-    records = [r for r in records if r['word'] == args.only]
+    wanted = set(args.only.split(','))
+    records = [r for r in records if r['word'] in wanted]
     if not records:
-      sys.exit(f'no record for word {args.only!r}')
+      sys.exit(f'no records for words {args.only!r}')
 
   cache = _load_cache()
   screen_system = pipeline_local._JUDGE_SYSTEM
