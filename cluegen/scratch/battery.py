@@ -61,6 +61,12 @@ _SETS = {
   # Fable-generated graded fun-vs-flat pairs (idea 8 probe set; invented clues,
   # so usable for tuning without touching eval items).
   'funcal': _SCRATCH / 'fun_calibration_verdicts.jsonl',
+  # The ~92-row expanded set (`#eval-expansion`, expansion_gen.py): invented
+  # graded pairs over ten failure-taxonomy buckets, split pairs-atomic and
+  # bucket-stratified (seed 7). Tune freely on gentune; genhold is consulted at
+  # adoption decisions only, like holdout.
+  'gentune': _SCRATCH / 'expansion_tune_verdicts.jsonl',
+  'genhold': _SCRATCH / 'expansion_holdout_verdicts.jsonl',
 }
 _CACHE_PATH = _SCRATCH / 'cache' / 'judge_cache.jsonl'
 _LOG_DIR = _SCRATCH / 'logs'
