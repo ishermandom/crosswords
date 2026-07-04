@@ -115,14 +115,19 @@ _TRUTH_SYSTEM = (
   + """
 Your check — literal truth: test every qualifier, comparative, and
 factual claim in the clue against the fact, one by one. A modifier
-that overclaims, falsely implies, or leaves several answers fitting
-equally well is a failing qualifier — however charming the surface.
+that overclaims or falsely implies is a failing qualifier — however
+charming the surface. You test truth, not uniqueness: a true clue
+that also fits other answers is not flawed — cross-checking is the
+solver's job, and a clue that forces it is doing its work.
 For a '?'-marked clue, test the figurative reading the ? declares: a
 marked metaphor is true when the metaphor holds.
 
 Calibration examples:
-- "A primary color" -> BLUE: failing — the claim is true but fits
-  several answers equally well; nothing pins BLUE.
+- "The fastest land animal" -> GAZELLE: failing — "fastest" is false;
+  that title belongs to the cheetah.
+- "A primary color" -> BLUE: no failing qualifiers — true as stated;
+  that red and yellow also fit is the solver's cross-checking work,
+  not a flaw.
 - "Nature's refrigerator?" -> CAVE: no failing qualifiers — the marked
   metaphor holds; caves genuinely keep things cold."""
 )
