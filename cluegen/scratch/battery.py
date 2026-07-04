@@ -25,6 +25,12 @@ Usage: python battery.py [--sets tuning,holdout] [--samples K] [--only WORD]
 attributes — prompt variants without editing the pipeline). `--only` limits to
 one word for rung-0 smoke runs.
 
+A patch may also install `pipeline_local.CONFIRM_STAGE`, a callable
+`(judge_turn, word, clue) -> verdict dict`, replacing the single-turn confirm
+with a multi-turn procedure. `judge_turn(stage, system, protocol, schema)` runs
+one cached single-shot turn and returns its parsed fields; the returned verdict
+dict needs at least a `verdict` key.
+
 Verdict distributions print as b:f:x (bankable:fixable:bad) counts over the K
 samples. A clue scores as held/killed only on a strict majority; ties count
 against whichever success metric applies.
@@ -33,6 +39,7 @@ against whichever success metric applies.
 import argparse
 import collections
 import datetime
+import functools
 import hashlib
 import json
 import pathlib
@@ -51,8 +58,8 @@ _SETS = {
   # Chunk-1 kills that Fable accepts — false-kill targets, probed explicitly
   # (not in the default sets).
   'losses': _SCRATCH / 'recall_loss_verdicts.jsonl',
-  # Fable-generated graded fun-vs-flat pairs (idea 8 probe set; invented
-  # clues, so usable for tuning without touching eval items).
+  # Fable-generated graded fun-vs-flat pairs (idea 8 probe set; invented clues,
+  # so usable for tuning without touching eval items).
   'funcal': _SCRATCH / 'fun_calibration_verdicts.jsonl',
 }
 _CACHE_PATH = _SCRATCH / 'cache' / 'judge_cache.jsonl'
@@ -77,8 +84,15 @@ def _load_cache():
   return cache
 
 
-def _call_key(model, word, clue, sample, temperature, system, protocol):
-  """Hash of everything that determines a judge call's distribution."""
+def _call_key(
+  model, word, clue, sample, temperature, system, protocol, schema=None
+):
+  """Hash of everything that determines a judge call's distribution.
+
+  `schema` defaults to the shared judge schema so single-turn keys stay
+  byte-identical with the existing cache; multi-turn callers pass each turn's
+  own schema.
+  """
   material = json.dumps(
     {
       'model': model,
@@ -88,7 +102,7 @@ def _call_key(model, word, clue, sample, temperature, system, protocol):
       'temperature': temperature,
       'system': system,
       'protocol': protocol,
-      'schema': pipeline_local._JUDGE_SCHEMA,
+      'schema': pipeline_local._JUDGE_SCHEMA if schema is None else schema,
     },
     sort_keys=True,
   )
@@ -133,6 +147,68 @@ def _cached_judge(
     cache_file.write(json.dumps(record) + '\n')
   cache[key] = record
   return verdict, False
+
+
+def _cached_turn(
+  cache,
+  counts,
+  model,
+  word,
+  clue,
+  sample,
+  temperature,
+  stage,
+  system,
+  protocol,
+  schema,
+):
+  """One turn of a multi-turn stage: a fresh single-shot call, cached.
+
+  Unlike `_cached_judge`, the JSON schema is per-turn and the parsed reply is
+  returned whole — a turn reports fields for the caller to aggregate, not a
+  verdict. Cached under the same record shape, with the turn's fields in the
+  `verdict` slot and the turn name (e.g. `confirm.substitution`) as `stage`.
+
+  Parameter order puts the per-clue identity first so battery can bind it with
+  `functools.partial` and hand variants a `judge_turn(stage, system, protocol,
+  schema)` callable.
+  """
+  key = _call_key(
+    model, word, clue, sample, temperature, system, protocol, schema
+  )
+  if key in cache:
+    counts['hits'] += 1
+    return cache[key]['verdict']
+  pipeline_local.SCHEMA_TEMPERATURE = temperature
+  started = time.time()
+  prompt = protocol + json.dumps({'word': word, 'clue': clue})
+  reply = pipeline_local._chat(
+    model,
+    [
+      {'role': 'system', 'content': system},
+      {'role': 'user', 'content': prompt},
+    ],
+    schema=schema,
+  )
+  fields = json.loads(reply)
+  record = {
+    'key': key,
+    'stage': stage,
+    'model': model,
+    'word': word,
+    'clue': clue,
+    'sample': sample,
+    'temperature': temperature,
+    'seconds': round(time.time() - started, 1),
+    'ts': datetime.datetime.now(datetime.UTC).isoformat(timespec='seconds'),
+    'verdict': fields,
+  }
+  _CACHE_PATH.parent.mkdir(exist_ok=True)
+  with _CACHE_PATH.open('a') as cache_file:
+    cache_file.write(json.dumps(record) + '\n')
+  cache[key] = record
+  counts['calls'] += 1
+  return fields
 
 
 def _distribution(verdicts):
@@ -214,7 +290,8 @@ def main():
   screen_protocol = pipeline_local._SCREEN_PROMPT
   confirm_system = pipeline_local._CONFIRM_SYSTEM
   confirm_protocol = pipeline_local._CONFIRM_PROMPT
-  cache_hits = model_calls = 0
+  confirm_stage = getattr(pipeline_local, 'CONFIRM_STAGE', None)
+  counts = collections.Counter()
   started = time.time()
 
   # Pass 1 (26B): screen everything, K samples per clue.
@@ -233,8 +310,8 @@ def main():
         screen_protocol,
       )
       record['screens'].append(verdict)
-      cache_hits += was_cached
-      model_calls += not was_cached
+      counts['hits'] += was_cached
+      counts['calls'] += not was_cached
     print(
       f'screen {_distribution(record["screens"]):6s} '
       f'{record["word"]}: "{record["clue"]}"',
@@ -251,21 +328,34 @@ def main():
         record['confirms'].append(None)
         record['cascade'].append(record['screens'][sample]['verdict'])
         continue
-      verdict, was_cached = _cached_judge(
-        cache,
-        'confirm',
-        _CONFIRM_MODEL,
-        record['word'],
-        record['clue'],
-        sample,
-        args.confirm_temp,
-        confirm_system,
-        confirm_protocol,
-      )
+      if confirm_stage:
+        judge_turn = functools.partial(
+          _cached_turn,
+          cache,
+          counts,
+          _CONFIRM_MODEL,
+          record['word'],
+          record['clue'],
+          sample,
+          args.confirm_temp,
+        )
+        verdict = confirm_stage(judge_turn, record['word'], record['clue'])
+      else:
+        verdict, was_cached = _cached_judge(
+          cache,
+          'confirm',
+          _CONFIRM_MODEL,
+          record['word'],
+          record['clue'],
+          sample,
+          args.confirm_temp,
+          confirm_system,
+          confirm_protocol,
+        )
+        counts['hits'] += was_cached
+        counts['calls'] += not was_cached
       record['confirms'].append(verdict)
       record['cascade'].append(verdict['verdict'])
-      cache_hits += was_cached
-      model_calls += not was_cached
     if any(record['confirms']):
       print(
         f'confirm {_distribution(record["confirms"]):6s} '
@@ -320,7 +410,7 @@ def main():
 
   minutes = (time.time() - started) / 60
   print(
-    f'\n{model_calls} model calls, {cache_hits} cache hits, '
+    f'\n{counts["calls"]} model calls, {counts["hits"]} cache hits, '
     f'{minutes:.1f} min wall',
   )
   print(f'log: {log_path}', file=sys.stderr)
