@@ -274,7 +274,15 @@ def main():
   args = parser.parse_args()
 
   if args.patch:
-    exec(compile(pathlib.Path(args.patch).read_text(), args.patch, 'exec'))
+    # The patch runs in its own namespace: functions it defines (e.g. a
+    # CONFIRM_STAGE) then resolve the patch's module-level names through that
+    # namespace. A bare exec here would scatter them into main's locals, where
+    # deferred calls can't see them.
+    patch_namespace = {}
+    exec(
+      compile(pathlib.Path(args.patch).read_text(), args.patch, 'exec'),
+      patch_namespace,
+    )
 
   records = []
   for set_name in args.sets.split(','):
