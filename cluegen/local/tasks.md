@@ -332,6 +332,27 @@ thread; the spec is self-contained.
       tolerates 2e-4). Sets a principled peak (⅓–½ of cliff) for any future
       schedule. ~15 min boxed run; needs the trainer to accept a per-step LR
       callback or the mlx-lm launcher below.
+- [ ] Stratified false-signal check (queued 2026-07-04; awaits a machine-time
+      grant). The probe's 0/60 false-signal rate used full-word answers whose
+      latest clue was terse and signal-free — an easy-to-clue population — while
+      the panel words that false-signaled (SCORE → 'Rating: Abbr.', VIOLET →
+      'Chrys. relative', 2 of 8 draws) are polysemous/number-sense answers where
+      temp-1.0 sampling leaves the model's comfortable register. Test: 5 draws
+      each for ~20 easy-stratum vs ~20 polysemous-stratum answers (number
+      senses, many-clue histories), compare false-signal rates. ~15 min boxed
+      run on the tuned adapter.
+- [ ] Scaled-slice design (queued 2026-07-04; the corpus-as-supervision scaling
+      path from the style-rule discussion). Composition: sample answers
+      near-uniformly (coverage over answer types = rule-agnostic coverage over
+      style contexts), keeping recency/weekday weights only for choosing each
+      answer's representative clues; cap stays ≤4 per answer. Bank affords ~200k
+      examples post-dedup. Ladder, not a jump: 15k slice → one overnight → full
+      probe suite (abbreviation sensitivity, flat@hard, register sep, decoupling
+      trace, answer gap) → decide the ~50k rung by whether rule internalization
+      scales with exemplar count. Prefer fresh data over repeat epochs
+      (still-learning at 1×5k). Prerequisites: batch-size throughput win +
+      mlx-lm launcher resume (both queued above); at batch-4 throughput 15k ≈
+      one overnight, 50k ≈ 2–3 with resume.
 - [ ] Adaptive learning-rate schedule via mlx-lm launcher (methodology; queued
       2026-07-04). optiq's supervised path is constant-LR only (warmup/decay
       wired for DPO alone). Write a ~30-line launcher that calls optiq's
