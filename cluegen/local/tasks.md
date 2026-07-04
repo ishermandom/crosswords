@@ -181,27 +181,45 @@ thread; the spec is self-contained.
     weighting? subset?). No stage-1 verdict until the discrimination ladder
     (task below) separates "model really ignores the prompt" from "measurement
     artifact".
-- [ ] Conditioning-collapse discrimination ladder, cheapest rung first; stop at
-      the first rung that discriminates. (a) Free, no model: reconcile the
-      4.647-vs-5.830 val discrepancy from logs/code; read optiq's chat-format
-      dataset + prompt-masking path end-to-end and confirm the prompt tokens are
-      present in the training input (masked from loss only, not from attention).
-      (b) Generation probe (~10 min, lease + footprint OK): panel eval at medium
-      on the best checkpoint — if generated clues are topically related to their
-      answers, conditioning survives generation and the loss-gap collapse needs
-      a measurement explanation; if unrelated, the model genuinely ignores the
-      prompt. (c) Checkpoint trace (~25 min): loss_gaps on iters 400 / 1400 /
-      2799 — was the answer gap ever healthy mid-run, and when did it die?
-      Zero-from-the-start points mechanical; gradual decay points at training
-      dynamics (single fixed template teaching prompt-invariance). (d) If
-      dynamics: cheapest counters are prompt-template variety (several phrasings
-      of the same instruction) and LR decay; then the capacity-vs-data pair —
-      two short matched-wall-clock runs, rank 16 on the same 5k vs rank 8 on
-      10k, compared on val + gaps, which also answers the plateau-cause
-      question. (e) Loss anchor (footprint OK needed, 26B in memory):
-      prompted-26B response loss on the same val sample — anchors what a
-      known-good clue writer scores, i.e. how much of 5.8 is entropy floor vs
-      deficit.
+- [x] Conditioning-collapse discrimination ladder — resolved 2026-07-03 at rungs
+      (a)–(c); (d)/(e) fold into the next-run design below.
+  - Done (a): masking is loss-only (optiq delegates to mlx-lm ChatDataset;
+    prompt tokens stay in the input) — the model saw every answer. The
+    4.647-vs-5.830 val discrepancy is the trainer's 25-example in-file-order val
+    subset plus min-over-noisy-estimates selection bias; the script's
+    200-example seeded measurement is the trustworthy one. No mechanical
+    exoneration.
+  - Done (b): generation probe, two paths. Via `optiq serve`: the literal string
+    'An double' for every panel word, every difficulty, even at temperature 1.0
+    (4/4 identical — the server likely ignores sampling parameters; side
+    mystery, logged, not load-bearing). Via direct `mlx_lm.load` (the scorer's
+    path): greedy gives '"""s'; temperature 1.0 gives varied word salad with
+    malformed subwords ('Pickyt athletic car', 'Needrettitch'). Broad
+    distribution consistent with the 5.83-nat score; content degenerate. The
+    adapter is genuinely damaged, not mismeasured.
+  - Done (c, partial): iter 400 gaps: answer −0.001, difficulty +0.000 —
+    collapse complete by step 400 (vs +0.19 at 20 steps, +0.59 base). The 1400
+    point was killed mid-run during the lease-overlap incident (below) and is
+    not needed: 20 → 400 brackets the death.
+  - Verdict: training destroyed prompt-conditioning within ~400 steps and
+    autoregressive coherence along with it, while teacher-forced loss kept
+    improving — the signature of an over-hot update rate. Suspect #1: LR
+    2.000e-04 constant, batch 1, no warmup, no decay (the preset default, never
+    tuned for this). Amplifier: a single fixed prompt template, so every step
+    pushes the same pathway. Next-run design (rehearse on e2b first, per the
+    task below): LR sweep starting ~1e-5–5e-5 with warmup + cosine decay;
+    prompt-template variety (several phrasings); sanity-check generations + gaps
+    at step ~200 before committing to a long run. The capacity-vs-data pair and
+    the 26B loss anchor stay deferred until a non-degenerate run exists to
+    compare against.
+  - Incident (2026-07-03, lesson for every detached batch): the diagnostics
+    batch was leased for 50 min but overran (per-step model reloads + the
+    definition control running over all val answers); the lease expired at 15:03
+    mid-step, ceiling legitimately acquired at 15:04 and loaded 31b, and our
+    still-running step overlapped it — memory pressure until the step was killed
+    at ~15:08. Rule going forward: size lease estimates to worst case including
+    model-load overhead per step, and make drivers self-terminate at lease
+    expiry rather than trusting the estimate.
 - [ ] Before the next 12B fine-tune run: rehearse the identical recipe on the
       cheap e2b variant first and sanity-check the outputs — generate a few
       clues and run the loss-gap gaps — before spending a 7-hour 12B night. The
