@@ -60,10 +60,15 @@ done — see the log for the curve and the criteria re-analysis.
 - [~] **Autonomous iteration window** #window — user-granted ~5–10 h of
   self-directed iteration (2026-07-03) across judge quality, setter quality, and
   throughput, steered by apparent leverage. Protocol (validation ladder,
-  adoption methodology, budgets: $10 Fable, ≤45 min batches, ≤10 tries/task):
-  ceiling-log.md 2026-07-03 window entry. Per-idea record:
-  `scratch/window_ledger.md`. Yields compute to the fine-tune thread on its
-  I'm-waiting note.
+  adoption methodology, budgets: $10 Fable — $8.98 left, ≤45 min batches, ≤10
+  tries/task): ceiling-log.md 2026-07-03 window entry. Per-idea record with full
+  state and the morning queue: `scratch/window_ledger.md` — read it first on
+  resume. Paused overnight 2026-07-03→04: the fine-tune thread has the machine
+  for a large training run; NO local runs until morning. First morning task:
+  build idea 10 (multi-turn confirm, code-side verdict — user-directed) and run
+  its 14-row discrimination probe. Ollama server is DOWN — restart
+  `ollama serve` first. Acquire the lease via MAIN's copy of compute_lease.py
+  (process-scan fix edbfcc2); `wait` via this branch's copy.
 - [~] **Judge: satisfaction criterion** #judge-satisfaction — the cloud verify
   contract now carries it (criterion 6 + mandatory `basis` output field,
   2026-07-02): flags flat glosses with `basis: null`, validated on a held-out

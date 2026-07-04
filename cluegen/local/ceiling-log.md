@@ -1465,3 +1465,35 @@ variants, inversion, 26B-only, split-routing), wording gaps (padding, GASP fun),
 temperatures, fixer replay + variants, category ceilings (numbers,
 letter-names), eval infrastructure (battery harness, replay cache, fresh Fable
 labels), and code-only fillers (reject-bank wiring, tagger, template dedup).
+
+## 2026-07-04 — Window day 1: baseline exposes the confirm; wording iteration hits its ceiling
+
+Full state and morning queue: `scratch/window_ledger.md`. Headline findings:
+
+- **Window-start baseline (81 labeled rows)**: the redesigned cascade holds
+  accepts at only 4/11 (tuning) and 2/7 (holdout) while killing revises 18/21,
+  8/10, and rejects 17/18. Precision is strong; recall collapsed. The screen is
+  a good true-reject gate (14/18 rejects die there) and its fun line is fine
+  (banks 4/5 Fable-generated vivid accepts, kills 5/5 flat pairs); the CONFIRM
+  is the accept-killer — it prosecutes ?-marked metaphor/metonymy as
+  substitution failure (DAISY, AMBER, CHECK, WYE, NINE, ROBIN, SNOOZE,
+  KARAOKE).
+- **Wording fixes whiplash**: confirm v3 (?-licenses-the-stretch) flipped all
+  5 targets at rung-0, then rubber-stamped at rung-1 — it still NAMES the
+  flaws, then banks anyway; the license broke flaw→verdict coupling even on
+  no-? clues. Padding v1's deletion test killed its target (ZED) and its guard
+  (NINE's article). A packed single turn forces one global posture; every
+  wording change moves it wholesale.
+- **Structural answer (user-directed, queued as ledger idea 10)**: decompose
+  the confirm into one-check turns with schema'd fields and compute the
+  verdict IN CODE — flaw-named-but-banked becomes impossible, the ?-license
+  becomes a code rule, each check tunes independently. Discrimination probe
+  pre-registered.
+- **Infrastructure that made this cheap**: eval battery with a per-call replay
+  cache (changed stages re-run, unchanged stages replay — rung-0s cost 1–6
+  calls); reject bank grew 14 → 32 with independent Fable labels ($0.70);
+  `caffeinate -is` on detached drivers after diagnosing macOS maintenance
+  sleep (27-min batch → 141 wall minutes, pmset-confirmed); advisory waiter
+  notes in the lease script; the lease script is forked (main: process scan;
+  here: waiters + caffeinate docs) — reconciliation rides the queued landing
+  decision.
