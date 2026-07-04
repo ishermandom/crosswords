@@ -418,9 +418,12 @@ thread; the spec is self-contained.
       exemplars taught a localized pattern conditionally; the diffuse
       form-agreement rule stayed flat — localized anchors learn from sparse
       data, diffuse rules don't move.
-    - Generation (tuned): 0/60 false signals on full-word answers (perfect
-      specificity), 7/60 signaled on abbreviation answers (12% — severe
-      under-signaling is the behavioral failure). OCT → 'Fall month: Abbr.'
+    - Generation (tuned): 0/60 false signals on full-word answers — a LOW rate
+      (consistent with up to ~5%), not zero: the probe exists because the model
+      false-signaled on panel words ('Rating: Abbr.' for SCORE, 'Chrys.
+      relative' for VIOLET; 2 in 8 draws there), so the rate is likely
+      answer-dependent. 7/60 signaled on abbreviation answers (12% — severe
+      under-signaling is the dominant failure). OCT → 'Fall month: Abbr.'
       correct; EPISC → 'Totalitarian dictator: Abbr.' (form right, content
       wrong).
     - Logs: abbr_probe_{base,tuned}.log (marker + generation, first-run swap
