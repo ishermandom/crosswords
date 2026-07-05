@@ -270,6 +270,31 @@ TOUCHDOWN-"Six points?" kill, ALARM/THERMOSTAT kills, BAKER/EMBER/MAPLE/ IGLOO
 holds). Stop rule: same as idea 10 — ~3 wording tries with opposite-direction
 overshoots ends the attempt.
 
+**Rung 1 result** (92 calls, 54 min): accepts 12/16, kills 17/20. Hits: all six
+figurative/personification recoveries (RUST, SOCKS, YAWN, THAW, CRICKET,
+SEVENTY-Psalmist) + MOON banked WITHOUT the carve-out + BRAND-sword killed on
+obscurity + MIRAGE-revise killed on economy + every wrong-object and
+foreign-sense guard held. Misses, diagnosed from turn fields: SEVENTY-lifespan
+died to a junk truth flag (`['The']` — bare article); EIGHTY-days died
+grammar_mismatch (plural counted noun); EIGHTY-wager BANKED (guard broken — the
+turn reasoned "the value of the wager IS eighty", missing that the wager's value
+is £20,000); UMBRELLA + SCARECROW-sentry banked (economy turn praised their
+tails as "inherent identifying properties" — the MOLD example taught
+inherent-property too broadly).
+
+**Rung 2 (try 2, in flight):** four fixes — (a) code: truth flags get the same
+quote-validation as economy evidence (kills the junk-article flag, free); (b)
+substitution rule text: plural counted nouns are not grammar mismatches ("Keys
+on a grand piano" shape); (c) substitution value test: a quantity equation is
+fair only when the named quantity's own value IS the number — a bet/prize/event
+whose value is something else is other_object; (d) economy: "surplus fact" named
+as a bloat shape — once the definition is complete, one more literal fact is
+bloat unless it is genuine charm (STOOL fail example, BONFIRE poetry pass
+example). Only substitution + economy turns re-key (~46 fresh calls ≈ 25 min).
+Targets: the five rung-1 misses. Guards: all rung-1 hits — especially RUST's
+"slowly" (must stay earning under the surplus-fact language) and the six
+recoveries (substitution re-runs under the new text).
+
 ## User calibrations
 
 **#1 (2026-07-03):** GASP "Reaction to a jump scare" is borderline — acceptable

@@ -57,9 +57,15 @@ A definition still points at the answer when it works through metaphor
 or personification, playful hyperbole, the answer's role or
 consequence ("Excuse for a snow day" -> BLIZZARD), or a bare number
 equated with a quantity whose unit is obvious ("Retirement age, often"
--> SIXTYFIVE). None of those are reference failures — flag
-"other_object" only when the words, read fairly, describe a different
-specific thing, and name that thing.
+-> SIXTYFIVE). For a number answer, a plural counted noun is fine too
+— a clue shaped like "Keys on a grand piano" points at the count
+itself, not at the keys; that is not a grammar mismatch. None of
+those are reference failures — flag "other_object" only when the
+words, read fairly, describe a different specific thing, and name
+that thing. For quantities, apply the value test: the equation is
+fair only when the named quantity's own value IS the number. A bet,
+prize, or event merely associated with the number — one whose own
+value is something else — is a different thing.
 
 Separately report a grammar mismatch: right referent, but the
 definition cannot replace the answer in a sentence (part of speech,
@@ -163,21 +169,28 @@ _ECONOMY_SYSTEM = (
   _PANEL_PREAMBLE
   + """
 Your check — economy: does every meaning-carrying word earn its keep?
-A word earns its place by narrowing the definition OR by giving the
-solver a true, charming picture. Remember the answer is hidden from
-the solver: a word naming an inherent property of the answer can be a
-load-bearing hint even though it adds nothing to a dictionary
-definition. Scene-setting that charms is legal.
+A word earns its place by narrowing the definition, by naming an
+inherent property that helps the hidden answer emerge (a single word
+like "slowly" for something that always acts slowly), or by carrying
+genuine poetry.
 
-Bloat is what remains: words that restate what another word already
-said, and tails that neither define nor delight.
+Bloat is what remains, and it has three common shapes: words that
+restate what another word already said; dead tails that neither
+define nor delight; and the surplus fact — once the definition is
+already complete, one more literal fact about the answer is bloat,
+however true. Only genuine charm excuses words beyond a complete
+definition; a mechanical detail does not.
 
 Calibration examples:
 - "Green fuzz slowly claiming the forgotten loaf" -> MOLD: no bloat —
-  "slowly" is an inherent-property hint that helps the hidden answer
-  emerge, and the scene is fair.
+  "slowly" is an inherent-property hint, and the scene is the charm.
+- "Crackling tower of driftwood lighting the beach at midnight" ->
+  BONFIRE: no bloat — the scene is poetry elevating a plain gloss.
 - "Armored sentinel standing guard over the castle" -> KNIGHT:
   bloated — "standing guard" restates "sentinel".
+- "Four-legged seat pulled up to the bar and spun after last call" ->
+  STOOL: bloated — the definition is complete at "the bar"; the
+  spinning tail is one more fact, not poetry.
 - "Night watchman on patrol" -> GUARD: bloated — "on patrol" adds
   neither definition nor charm.
 - "Frozen rain" -> SLEET: no bloat — dropping either word breaks the
@@ -253,8 +266,8 @@ _WORD_PATTERN = re.compile(r"[a-z']+")
 _ARTICLES = {'a', 'an', 'the'}
 
 
-def _validated_bloat(clue, bloat_evidence):
-  """Bloat entries that quote real, non-article clue words.
+def _validated_quotes(clue, entries):
+  """Entries that quote real, non-article clue words.
 
   Same mechanic as v1's `_padding_flaws`: an entry counts only if it quotes at
   least one non-article word actually present in the clue, which drops both
@@ -262,7 +275,7 @@ def _validated_bloat(clue, bloat_evidence):
   """
   clue_words = set(_WORD_PATTERN.findall(clue.lower()))
   kept = []
-  for entry in bloat_evidence:
+  for entry in entries:
     entry_words = _WORD_PATTERN.findall(entry.lower())
     if any(
       word in clue_words and word not in _ARTICLES for word in entry_words
@@ -279,7 +292,6 @@ def _verdict_from_turns(clue, substitution, truth, economy, sense):
   (substitution), and a '?' licenses a truth stretch inside the truth turn's own
   rule — a wrong-object definition is unrepairable either way.
   """
-  del clue
   if not sense['is_usable_sense']:
     return 'bad', ['sense: not a usable sense of the answer'], []
   if substitution['points_at'] == 'other_object':
@@ -289,8 +301,11 @@ def _verdict_from_turns(clue, substitution, truth, economy, sense):
   advisories = []
   if substitution['points_at'] == 'grammar_mismatch':
     flaws.append('substitution: grammar mismatch')
+  # Truth entries get the same quote validation as economy evidence: rung 1
+  # killed an accept on the bare-article flag `['The']`.
   flaws.extend(
-    f'truth: {qualifier}' for qualifier in truth['failing_qualifiers']
+    f'truth: {qualifier}'
+    for qualifier in _validated_quotes(clue, truth['failing_qualifiers'])
   )
   if not sense['is_commonly_known']:
     flaws.append('sense: too obscure for a typical solver')
@@ -304,7 +319,7 @@ def _economy_verdict(clue, economy, verdict, flaws, advisories):
   survives quoting validation; evidence without the commit (or vice versa)
   demotes to advisory, so a hedging turn never kills alone.
   """
-  validated = _validated_bloat(clue, economy['bloat_evidence'])
+  validated = _validated_quotes(clue, economy['bloat_evidence'])
   if economy['is_bloated'] and validated:
     flaws = flaws + [f'economy: {entry}' for entry in validated]
     return 'fixable' if verdict == 'bankable' else verdict, flaws, advisories
