@@ -26,13 +26,16 @@ the cloud path (`prompts/verify.md`, `local/quality.py` conventions and scales,
 
 Moves as entries are reviewed; a decision is recorded the turn it lands.
 
-- Ratified: `paraphrase` is out of this rubric (bank dedup process, not a clue
-  tag); IF a flaw field survives, its mode is dominant-required +
-  others-allowed.
-- Under review: `satisfaction` (bucket count), `liveliness` (granularity;
-  relation to `basis`), fate of the `flaw` field, `difficulty` (keep as
-  weekday-proxy audit vs out).
-- Pending: `basis`, `mechanism`; the "dropped" list.
+- Ratified: `satisfaction` at three buckets (excellent / good / meh);
+  `liveliness` as a continuous scale; `difficulty` kept (weekday is a poor
+  per-clue proxy — good aggregate correlation, no per-clue guarantee); the
+  defect-flavored `flaw` field dropped in favor of an optional free-text `note`;
+  `paraphrase` out of this rubric (bank dedup process, not a clue tag).
+- Under review: `strengths` (new — the v0 defect axes inverted into strength
+  scales; which members earn a place), `basis`, `mechanism`; small
+  clarification: whether `satisfaction`'s three buckets should instead ride the
+  continuous-scale convention below.
+- Pending: the "dropped" list.
 
 Settled structure decisions (2026-07-04):
 
@@ -42,25 +45,30 @@ Settled structure decisions (2026-07-04):
   defect-centric rubric in the judge prompts.
 - Tag form decided per entry, leaning toward fewer labels; no global
   scales-vs-binaries rule.
+- Scale convention (user, 2026-07-04): graded axes are continuous 1.0-5.0 — any
+  value is legal (3.5 as acceptable as 2.0). Expressiveness beats inter-rater
+  stability: canned labels force hair-splitting; a continuum gives the model
+  breathing room.
 - Trap-proportionality derived, not labeled (was coupled to difficulty in v0;
   decoupled per user).
 
 ## Entries
 
-### 1. `satisfaction` — the primary verdict (bucket count under review)
+### 1. `satisfaction` — the primary verdict — RATIFIED 2026-07-04
 
-How much the clue earns its keep: `excellent` / `good` / `meh`, possibly more
-buckets. Replaces v0's bankable/fixable/bad, which presumed defects — wrong
-shape for a bank where nothing is truly bad (user, 2026-07-04). This is the tag
-the user most wants from the data.
+Three buckets: `excellent` / `good` / `meh` — how much the clue earns its keep.
+Replaces v0's bankable/fixable/bad, which presumed defects — wrong shape for a
+bank where nothing is truly bad (user, 2026-07-04). This is the tag the user
+most wants from the data. Open clarification: whether this too should ride the
+continuous 1.0-5.0 convention rather than three buckets.
 
-### 2. `liveliness` — flat-vs-lively scale (granularity under review)
+### 2. `liveliness` — flat-vs-lively — RATIFIED 2026-07-04 as continuous
 
-Explicitly wanted as a graded axis (user, 2026-07-04): from dictionary-flat
-gloss to fully alive. Distinct from `satisfaction` (a flat clue can still be a
-good bank citizen on a Monday; a lively one can underwhelm) and from `basis`
-(which names WHAT enlivens; this grades HOW MUCH). Relation to `basis=none` and
-point count to be settled.
+Continuous 1.0-5.0: 1.0 = dictionary-flat gloss, 5.0 = fully alive. Explicitly
+wanted as a graded axis (user, 2026-07-04). Distinct from `satisfaction` (a flat
+clue can still be a good bank citizen on a Monday; a lively one can underwhelm)
+and from `basis` (which names WHAT enlivens; this grades HOW MUCH). Soft
+consistency expectation: scores near 1.0 sit naturally with `basis=none`.
 
 ### 3. `basis` — enum: `aha` / `elegance` / `resistance` / `prize-fact` / `fun` / `none`
 
@@ -79,21 +87,34 @@ No judge currently emits this. It exists for the diversity audit (monoculture
 detection) and angle-distinct depth, both of which only work at bank scale —
 exactly what judge-emitted tags make affordable.
 
-### 5. `difficulty` — enum: `easy` / `medium` / `hard`
+### 5. `difficulty` — enum: `easy` / `medium` / `hard` — RATIFIED 2026-07-04
 
-The difficulty the text actually achieves. For bank clues the weekday already
-supplies a difficulty proxy — the training data's conditioning token derives
-from it — so the live question is whether an achieved- difficulty tag earns its
-keep as an AUDIT of that proxy (how noisy is weekday as a difficulty label?),
-which bears directly on how clean the fine-tune's conditioning signal is.
+The difficulty the text actually achieves. Kept (user, 2026-07-04): weekday is a
+poor per-clue proxy — the aggregate correlation is good, but no individual clue
+is guaranteed to match its day — so an achieved-difficulty tag audits the proxy
+the training data's conditioning token derives from, which bears directly on how
+clean the fine-tune's conditioning signal is.
 
-### 6. `flaw` — likely dropped for this rubric (decision pending)
+### 6. `note` — optional free text — RATIFIED 2026-07-04
 
-v0 carried a 12-member defect enum merged from the judge paths. For NYT bank
-data the user expects flaws to be rare enough that the field may not earn its
-place; if kept at all, it shrinks to the rare bank-specific defects (e.g.
-era-drifted conventions), with mode dominant-required + others-allowed. The full
-defect vocabulary remains the machine-clue rubric's concern.
+Replaces the v0 `flaw` enum. Catches the rare bank oddity (dated convention, era
+drift) without a structured field that would sit empty on nearly every clue. The
+full defect vocabulary remains the machine-clue rubric's concern.
+
+### 7. `strengths` — inverted defect axes (under review; members TBD)
+
+The v0 defect enum re-read from the opposite end (user, 2026-07-04): not flags
+for flaws, but graded strength scales on the continuous 1.0-5.0 convention.
+Candidate members, inverted from v0/judge checks:
+
+- `economy` — padded ... not a wasted word.
+- `surface` — stilted ... something a person would actually say.
+- `fairness` — trap collapses on re-read ... lands clean in retrospect (scored
+  only when misdirection exists).
+- `anchor` — needs a lookup to believe ... instantly checkable once seen.
+
+Which members earn a place — and whether four is already too many — is the next
+review question.
 
 ## Dropped, deliberately
 
