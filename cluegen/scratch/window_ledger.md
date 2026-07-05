@@ -352,6 +352,17 @@ Gentune re-scored free after the UMBRELLA flip (30 accepts / 34 revise-rejects;
 tags `expbase_{v2c2,mtc2,mt26c2}_gentune`): v2 13/30 + 31/34, mt-31B 12/30 +
 30/34, mt-26B 5/30 + 31/34. The v2-vs-31B parity and the 26B gap both hold.
 
+Genhold refreshed after the TOUCHDOWN text edit (10 fresh calls, ~3.5 min; 13
+accepts / 15 revise-rejects): v2 4/13 + 14/15, mt-31B 5/13 + 12/15, mt-26B
+1/13 + 15/15. **New defect isolated by the edit:** with the unearned '?' gone,
+both multi-turn configs now false-kill "Reason to spike the ball" (v2 still
+holds it) — the substitution turn labels definition-by-consequence a referent
+shift, and only the '?' carve-out had been saving it. Consequence/role
+definitions are not referent shifts; this goes into the carve-out redesign
+inside the economy-gate batch (queue item 1). Combined c2 totals (43 accepts /
+49 revise-rejects): v2 17 + 45, mt-31B 17 + 42, mt-26B 6 + 46 — v2 and the 31B
+candidate are now dead even on accepts and v2 leads on kills.
+
 ## Machine coordination
 
 **Overnight 2026-07-03→04:** machine handed to the fine-tune thread ("12B
