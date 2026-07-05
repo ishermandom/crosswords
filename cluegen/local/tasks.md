@@ -10,6 +10,11 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` done · `[-]` droppe
 **Goal:** Clean up local model storage once QAT models are validated as the
 preferred quantization.
 
+- [ ] **Push the finetune-probe branch** (user-run; noted 2026-07-05) — the
+      worktree sits ahead 152 / behind 29 of `origin-https/finetune-probe`; the
+      divergence needs the user's force-push (or a rebase decision), per the
+      user-run-force-push rule. All stretch/rubric/tagging work lives only
+      locally until then.
 - [ ] **Keep `cluegen/local/README.md` references up to date** — add links as
       good resources are found; remove ones that turn out not to be useful. Be
       selective: only include sources worth coming back to.
@@ -362,15 +367,22 @@ thread; the spec is self-contained.
       smooths the loss curve at no memory cost (10.5 vs 9.9 GB peak); the
       stable-LR basin does NOT widen at batch 4 (5e-5 clean, val 2.644; 1e-4
       marginal wobble, val 2.856; 2e-4 still toxic, loss stuck ~4+), so peak
-      stays 5e-5. Prelaunch checklist: (a) validate the launcher's resume path
-      on a tiny e2b run (~5 min, never live-exercised — training step, needs a
-      go-ahead); (b) note val losses are NOT comparable across rungs (each slice
-      has its own valid.jsonl) — cross-rung comparison rides the instrument
-      suite, not val loss. Incident note: pausing window A for the reframe edit
-      killed only the caffeinate leader, not its process group — the orphaned
-      zsh driver survived and raced the relaunched one for the lease (harmless
-      here: instruments ran exactly once, on the reframed scripts, and both
-      drivers exited). To pause a detached driver, kill the process group
+      stays 5e-5. LAUNCH PREP REQUESTED 2026-07-05 (user: "prepare for the
+      overnight run") — prep sequence: (a) validate the launcher's resume path
+      on a tiny e2b run (~5 min, never live-exercised — training step; the prep
+      request covers prep, confirm before running); (b) write night-1 driver
+      (lease-wrapped, boxed, detached; steps_per_save 100 caps loss at a
+      deadline stop); (c) CHECK IN with the assembled command for the explicit
+      go — no self-launch. Open question: peak 5e-5 (recommended, clean fixed
+      anchor, mid-basin per the window C map) vs 7e-5 (defensible upside, ⅓-½ of
+      the soft edge, but no fixed anchor of its own) — user has not chosen.
+      Note: val losses are NOT comparable across rungs (each slice has its own
+      valid.jsonl) — cross-rung comparison rides the instrument suite, not val
+      loss. Incident note: pausing window A for the reframe edit killed only the
+      caffeinate leader, not its process group — the orphaned zsh driver
+      survived and raced the relaunched one for the lease (harmless here:
+      instruments ran exactly once, on the reframed scripts, and both drivers
+      exited). To pause a detached driver, kill the process group
       (`kill -TERM -<pid>` / `os.killpg`), not the pid.
 - [ ] Before the next 12B fine-tune run: rehearse the identical recipe on the
       cheap e2b variant first and sanity-check the outputs — generate a few
@@ -559,19 +571,24 @@ thread; the spec is self-contained.
       for Haiku 4.5 vs 1,024 for Sonnet 5 and 512 for Fable; our trimmed prefix
       is ~3,800 Haiku tokens, just UNDER its floor, and below the floor the API
       silently skips caching. Confirmed on Sonnet 5: call 1 wrote 5,366 tokens
-      to cache, call 2 read all 5,366 (input collapsed to 2). If Haiku wins the
-      bake-off, pad the prompt over 4,096 with graded calibration examples —
-      padding that doubles as judge calibration. Other smoke findings: Haiku
-      burned ~8.6k output tokens on 2 clues (thinking-heavy;
-      $0.048 API-equivalent) while
-      Sonnet 5 used ~910 output tokens for the same clues (≈$0.01/clue,
-      currently CHEAPER than un-tuned Haiku at this shape) — so the bake-off
-      should test Haiku with a MAX_THINKING_TOKENS cap alongside per-scale
-      agreement. NEXT (user-gated): user finishes reading the rubric doc,
-      hand-labels the 126-clue slice, then Haiku-vs-Sonnet-5 bake-off over the
-      same slice (per-scale agreement with the user decides the cheap model
-      question). Payoffs unchanged: judge calibration, preference-pair seeds,
-      curation ground truth.
+      to cache, call 2 read all 5,366 (input collapsed to 2). MODEL DECIDED
+      2026-07-05: Sonnet 5 only, Haiku dropped (user) — Haiku burned ~8.6k
+      output tokens on 2 clues (thinking ~13x its visible answer;
+      $0.048
+      API-equivalent) vs Sonnet's ~910 (thinking ~0.7x visible, ~350-410
+      tokens/call; ≈$0.01/clue),
+      so Haiku's price edge evaporates and the cache-floor padding +
+      MAX_THINKING_TOKENS experiments are dropped with it; `tag_clues.py`
+      defaults to sonnet. Scope conclusion from the cost round (2026-07-05): tag
+      TRAINING SLICES, not the whole bank — the 15k slice ≈
+      $90 API-equivalent vs full bank ≈ $3k+ / ~6-14 exclusive weeks of the Max
+      20x budget; single-bill constraint rules out the batch API (Console =
+      separate bill); Sonnet 5 intro pricing (2/3 of standard) ends Aug 31. NEXT
+      (user-gated): user finishes reading the rubric doc, hand-labels the
+      126-clue slice (`calibration_clues.jsonl`), then one Sonnet 5 run over the
+      same slice — per-scale agreement with the user calibrates the judge (no
+      model contest anymore). Payoffs unchanged: judge calibration,
+      preference-pair seeds, curation ground truth.
 - [ ] Investigate training throughput (after the overnight run; needs the
       lease). The log's `Tokens/sec` ≈ 1.5–2.0 counts only trained (response)
       tokens — ~8/example under prompt masking — so it is not comparable to

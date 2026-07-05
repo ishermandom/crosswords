@@ -14,7 +14,7 @@ same keys plus the 27 rubric scales and "rationale"; already-tagged (answer,
 clue) pairs are skipped on rerun, so the run is resumable. Per-call token usage
 is appended to a usage log to ground cost estimates.
 
-Usage: python tag_clues.py --clues FILE [--model haiku] [--chunk-size 10]
+Usage: python tag_clues.py --clues FILE [--model sonnet] [--chunk-size 10]
 """
 
 import argparse
@@ -160,7 +160,9 @@ def main() -> None:
                       help='jsonl of {"answer", "clue"} to tag')
   parser.add_argument('--rubric', type=Path, default=RUBRIC_DEFAULT)
   parser.add_argument('--output', type=Path, default=Path('tags.jsonl'))
-  parser.add_argument('--model', default='haiku')
+  # Sonnet-only per user decision 2026-07-05: Haiku's thinking overhead (~13x
+  # visible output vs Sonnet's ~0.7x) erased its price advantage.
+  parser.add_argument('--model', default='sonnet')
   parser.add_argument('--chunk-size', type=int, default=10)
   parser.add_argument('--limit', type=int, default=None,
                       help='tag at most this many clues this run')
