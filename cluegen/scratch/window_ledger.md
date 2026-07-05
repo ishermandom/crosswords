@@ -451,7 +451,9 @@ actually pointing at a different thing (referent, bad). It held only accepts
 whose definitions are literal (HONEY, KETCHUP, BRAND, SCARECROW) or ?-licensed
 (MOON, DENTIST, SPIDER "Web developer?", BAKER, TOUCHDOWN accept). That
 shift-classification judgment is what the extra parameters buy; the protocol
-alone doesn't confer it.
+alone doesn't confer it — though the user (2026-07-04) suspects a reshaped
+prompt could close a single-flaw gap; queued as `#judge-26b-referent` in
+tasks.md, blocked on the user clarifying the target.
 
 Speed note that changes production math: 26B calls averaged ~5 s vs ~32 s for
 the 31B (10.0 min for the same 116 calls that took 61.9 at 31B). Even so, the
