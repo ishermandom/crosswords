@@ -397,36 +397,51 @@ before touching the lease. Once this handoff is done, cross-thread scheduling
 goes back to coordinating through the user until the lease-script fork
 reunifies.
 
+## In flight: 26B multi-turn measurement (user-approved 2026-07-04 ~22:00)
+
+**Question (supersedes #taste-31b and reframes idea 11): does the multi-turn
+protocol at 26B match it at 31B?** If yes, the 26B/31B divide dies and the
+architecture becomes one protocol with model size as a quality dial — the user's
+proposed design; my analysis agreed (the window's evidence says the wins came
+from decomposition + code verdict, not params: v3 failed single-turn ON 31B, and
+the screen's cached analyses show correct perception with wrong one-shot
+policy).
+
+Mechanics: `battery.py --confirm-model gemma4:26b-qat` (new flag) with the
+adopted patch, tags `expbase_mt26_{gentune,genhold}`; screens cached, so the
+same 41 screen-survivors reach confirm — a clean protocol-constant comparison.
+Driver detached (waits FIFO behind the fine-tune lease, caffeinate wraps only
+the model runs, releases when done); watcher reports scorecards.
+
+Pre-registered comparison, confirm stage only (screen survivors):
+
+| axis                   | 31B result | 26B parity bar |
+| ---------------------- | ---------- | -------------- |
+| accepts held (of 30)   | 23         | >= ~21         |
+| survivor kills (of 11) | 9          | >= 8           |
+
+At or above the bar → recommend the single-flow redesign (26B default, 31B as an
+escalation dial, e.g. a bank-time pass); clearly below → keep the dial design
+but 31B stays the default judge tier. Either way the screen's separate verdict
+policy is dead on the expanded-set evidence — the open screen question becomes
+cheap early-kill turn ordering, not a second policy (idea 11's non-pinning
+removal folds into the single-protocol design rather than a screen-prompt
+patch).
+
 ## Remaining queue
 
-**Expanded-set baseline — PREPPED, machine use WAITS FOR USER GO (2026-07-04
-~16:00).** Sets built and committed (gentune 64 / genhold 28, $1.80). When
-cleared, run from `cluegen/scratch/` one lease slot at a time, releasing between
-slots:
-
-1. screens (~30 min): `battery.py --sets gentune,genhold --tag expbase_v2`
-2. v2 confirms ride the same run (packed confirm, 1 call per screen-bankable)
-3. candidate confirms (~60 min, split if needed): same sets with
-   `--patch variants/confirm_multiturn_v1.py --tag expbase_mt` (screens replay
-   from cache)
-
-Read: v2 vs adopted candidate per bucket — bucket-level gaps are the
-lower-hanging-fruit signal the expansion exists to surface.
-
-Budget after expansion generation: $7.18 of $10. Reordered 2026-07-04 (user
-priority): FIRST `#eval-expansion` — grow the labeled set to ~100 via one-off
-Fable generation (design in tasks.md; two detached calls,
-~$1-1.5 each; group 1 launched 15:5x). Then re-read v2 vs the
-idea-10 candidate on the expanded set before further tuning. Then idea 11 —
-drop non-pinning prosecution from the screen (variant of `_JUDGE_SYSTEM`; flip
-targets = the screen-killed Fable-accepts; guards = rejects-set precision,
-which the screen currently carries at 14/18 kills); screen-recall families
-(diagnose from cached analyses — free: CENTURY "Batsman's milestone", MURMUR
-"Low hum of a restless crowd", NIL "Nothing on the scoreboard", FIFTY "The
-denomination on a red bill" (dies screen-bad!), LATTE, GRANT "Academic
-windfall?", CHECK "Curb an impulse", STOCK "Simmering base for a stew"); K=3
-stability on GROSS + adopted-stack flips; sealed fresh-bank labeling at
-end-of-window (24 clues, `fresh_label_input.jsonl` version fresh-bank — still
-unlabeled, still sealed); judge-temperature decision; #taste-31b. Budget:
-$8.98
-of $10 remains (minus expansion generation, cost pending).
+`#eval-expansion` DONE through the 2×2 (sets built
+$1.80; slots 1-3b above).
+Still queued: screen-recall family diagnosis on the ORIGINAL 81-row sets from
+cached analyses — free (CENTURY "Batsman's milestone", MURMUR "Low hum of a
+restless crowd", NIL "Nothing on the scoreboard", FIFTY "The denomination on a
+red bill" (dies screen-bad!), LATTE, GRANT "Academic windfall?", CHECK "Curb
+an impulse", STOCK "Simmering base for a stew") — now doubles as evidence for
+the single-flow turn-ordering design; K=3 stability on GROSS + adopted-stack
+flips; judge-temperature decision; sealed fresh-bank labeling at end-of-window
+(24 clues, `fresh_label_input.jsonl` version fresh-bank — still unlabeled,
+still sealed); end-of-window production wiring of the adopted confirm
+(difficulty source needed — the screen assigns it today; re-home it before any
+single-flow redesign lands). #taste-31b superseded by the in-flight 26B
+measurement. Budget: $7.18
+of $10 remains.

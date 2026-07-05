@@ -272,6 +272,11 @@ def main():
     '--confirm-temp', type=float, default=pipeline_local.SCHEMA_TEMPERATURE
   )
   parser.add_argument(
+    '--confirm-model',
+    default=_CONFIRM_MODEL,
+    help='ollama model for the confirm stage (size-vs-protocol experiments)',
+  )
+  parser.add_argument(
     '--patch',
     default=None,
     help="python file exec'd to monkeypatch pipeline_local",
@@ -347,7 +352,7 @@ def main():
           _cached_turn,
           cache,
           counts,
-          _CONFIRM_MODEL,
+          args.confirm_model,
           record['word'],
           record['clue'],
           sample,
@@ -358,7 +363,7 @@ def main():
         verdict, was_cached = _cached_judge(
           cache,
           'confirm',
-          _CONFIRM_MODEL,
+          args.confirm_model,
           record['word'],
           record['clue'],
           sample,
