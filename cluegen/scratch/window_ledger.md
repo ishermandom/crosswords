@@ -268,6 +268,13 @@ holdout rows whose Fable revise reason is "same-angle duplicate" — DAISY
 discounted in ALL scorecards (a local bank there is not a false bank).
 Requirements-alignment audit queued as `#judge-alignment`.
 
+**#5 (2026-07-04):** UMBRELLA "Canopy on a stick that a sudden gust turns inside
+out" (gentune fun accept, Fable-generated) is a soft label — the user reads it
+as low-efficiency, so per the #1 rule its row discounts in all scorecards: a
+kill there is not a false kill, and it counts as a borderline recovery for the
+register fix (tally: 6 solid + 1 borderline), not a clean one. Also not clean
+evidence against the 26B in the parity read.
+
 ## Machine coordination
 
 **Overnight 2026-07-03→04:** machine handed to the fine-tune thread ("12B
