@@ -321,35 +321,37 @@ thread; the spec is self-contained.
       vs 2 vs 4 — tokens/sec, peak memory, loss smoothness) + learning-rate
       range test ON THE 12B via the launcher (user decision 2026-07-04: 12B
       directly, overriding the e2b-rehearsal reminder for this ramp — the QAT
-      12B's cliff is the one that matters). 4. Matched-pair register-preference
-      instrument: build + run base vs tuned (pulled up 2026-07-04 to precede the
-      15k rung, so the ladder measures register preference from the start). 5.
-      Build the 15k slice (existing recipe, --size 15000; same methodology). The
-      rung will train FROM SCRATCH (user decision) and presumably batched, per
-      whatever the batch-size data says. Budget: the queued tasks plus up to 3
-      discovered tasks of comparable size. The grant explicitly covers the
-      training steps inside these tasks (e2b batch runs, 12B ramp) — do not
-      re-litigate the training gate for them. Machine: ceiling hands over at its
-      next natural pause; acquire per-session leases, release between sessions,
-      wait-queue when held. HARD STOP after step 5: write up recommended launch
-      settings (batch size, learning-rate peak + schedule) and CHECK IN — the
-      user launches the 15k overnight explicitly (user decision 2026-07-04; no
-      self-launch). Progress (2026-07-04, in flight): step 2 DONE —
-      `launch_train.py` wraps optiq's `train_lora` with a warmup/hold/cosine
-      schedule passed as a step→lr callable (MLX optimizers accept one;
-      `train_lora` feeds `config.learning_rate` straight to AdamW) plus resume
-      via a wrapper around the adapter-apply step; schedule shape and CLI
-      verified free of the machine, live validation rides window B. Step 5 DONE
-      — `data_stage1_15k/` built via a new `--output-dir` flag on the slice
-      builder (15,000 pairs, 5,184 answers vs 1,712 in the 5k, median year 2010,
-      1,382 valid pairs); the 5k slice stays untouched for comparisons. Steps
-      1+4 armed as detached window A (`window_a.sh`: strata_run + register_run
-      under one 50-min lease; waits FIFO behind the ceiling). Step 3 scripted as
-      window B (`window_b.sh`) with one deviation from the queued wording: batch
-      timing runs on the 12B directly (30 iters at batch 1/2/4) instead of e2b,
-      because the 15k recommendation needs the 12B's peak memory and throughput
-      at batch 4, which e2b cannot supply; loss-smoothness evidence comes from
-      the 80-iter scheduled range runs (5e-5 / 1e-4 / 2e-4 at batch 4).
+      12B's cliff is the one that matters). 4. Matched-pair
+      difficulty-preference instrument (reframed 2026-07-04: weekday proxies
+      difficulty, not liveliness): build + run base vs tuned (pulled up
+      2026-07-04 to precede the 15k rung, so the ladder measures difficulty
+      preference from the start). 5. Build the 15k slice (existing recipe,
+      --size 15000; same methodology). The rung will train FROM SCRATCH (user
+      decision) and presumably batched, per whatever the batch-size data says.
+      Budget: the queued tasks plus up to 3 discovered tasks of comparable size.
+      The grant explicitly covers the training steps inside these tasks (e2b
+      batch runs, 12B ramp) — do not re-litigate the training gate for them.
+      Machine: ceiling hands over at its next natural pause; acquire per-session
+      leases, release between sessions, wait-queue when held. HARD STOP after
+      step 5: write up recommended launch settings (batch size, learning-rate
+      peak + schedule) and CHECK IN — the user launches the 15k overnight
+      explicitly (user decision 2026-07-04; no self-launch). Progress
+      (2026-07-04, in flight): step 2 DONE — `launch_train.py` wraps optiq's
+      `train_lora` with a warmup/hold/cosine schedule passed as a step→lr
+      callable (MLX optimizers accept one; `train_lora` feeds
+      `config.learning_rate` straight to AdamW) plus resume via a wrapper around
+      the adapter-apply step; schedule shape and CLI verified free of the
+      machine, live validation rides window B. Step 5 DONE — `data_stage1_15k/`
+      built via a new `--output-dir` flag on the slice builder (15,000 pairs,
+      5,184 answers vs 1,712 in the 5k, median year 2010, 1,382 valid pairs);
+      the 5k slice stays untouched for comparisons. Steps 1+4 armed as detached
+      window A (`window_a.sh`: strata_run + register_run under one 50-min lease;
+      waits FIFO behind the ceiling). Step 3 scripted as window B
+      (`window_b.sh`) with one deviation from the queued wording: batch timing
+      runs on the 12B directly (30 iters at batch 1/2/4) instead of e2b, because
+      the 15k recommendation needs the 12B's peak memory and throughput at batch
+      4, which e2b cannot supply; loss-smoothness evidence comes from the
+      80-iter scheduled range runs (5e-5 / 1e-4 / 2e-4 at batch 4).
 - [ ] Before the next 12B fine-tune run: rehearse the identical recipe on the
       cheap e2b variant first and sanity-check the outputs — generate a few
       clues and run the loss-gap gaps — before spending a 7-hour 12B night. The
@@ -422,18 +424,25 @@ thread; the spec is self-contained.
       moves with batch size (linear-to-sqrt scaling), so run this WITH the LR
       basin test, not before or after it. Cheap boxed e2b run: batch 1 vs 2 vs
       4, compare tokens/sec, peak memory, and loss-vs-step smoothness.
-- [ ] Matched-pair register-preference instrument (queued 2026-07-04; pulled up
-      2026-07-04 into the autonomous stretch, step 4 — must precede the 15k rung
-      so the ladder measures register preference from the start). For answers
-      with both a flat and a lively human clue in the corpus (weekday as the
-      liveliness proxy), score both under the SAME hard prompt and report the
-      lively member's sequence-level win rate and log-prob margin. Both members
-      are real clues, so the cross-register intrinsic-predictability confound of
-      the WordNet control cancels; sequence-level scoring tracks sampling
-      behavior better than per-token means. Complements flat@hard (within-model
-      suppression) and the decoupling trace (training-dynamics view). Rationale:
-      register sep ≈0 cannot distinguish "prefers lively" from "treats flat and
-      lively as equals" — user discussion 2026-07-04.
+- [ ] Matched-pair difficulty-preference instrument (queued 2026-07-04; pulled
+      up 2026-07-04 into the autonomous stretch, step 4 — must precede the 15k
+      rung so the ladder measures difficulty preference from the start; REFRAMED
+      2026-07-04 per user: weekday is a difficulty proxy, NOT a liveliness one —
+      a Saturday clue is harder mostly through obscurity and terseness ('Blois
+      is on it' vs 'Longest river in France' for LOIRE: comparably flat
+      phrasings, different trivia depth), so results speak to difficulty
+      conditioning only; liveliness (wordplay, misdirection) needs its own
+      instrument, e.g. NYT's '?' wordplay-marker convention as a marker-cost
+      analogue — not queued). For answers with both a Monday and a Saturday clue
+      in the corpus, score both under the SAME hard prompt and report the
+      Saturday member's sequence-level win rate and log-prob margin. Both
+      members are real clues, so the cross-register intrinsic-predictability
+      confound of the WordNet control cancels; sequence-level scoring tracks
+      sampling behavior better than per-token means (per-token margin reported
+      alongside, since Saturday clues skew terse). Complements flat@hard
+      (within-model suppression) and the decoupling trace (training-dynamics
+      view). Rationale: register sep ≈0 cannot distinguish "prefers the hard
+      register" from "treats the two as equals" — user discussion 2026-07-04.
 - [ ] Panel eval vs v9 via a standalone bridge (queued 2026-07-04; user deferred
       — "come back to it later"). The spec's stage-0 client adapter for the
       harness was never built: ceiling's `pipeline_local.py` speaks only to

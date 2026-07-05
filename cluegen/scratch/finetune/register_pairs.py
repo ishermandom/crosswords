@@ -1,18 +1,23 @@
 # Copyright 2026 Ilya Sherman (ishermandom@)
 # SPDX-License-Identifier: MIT
-"""Matched-pair register preference: given one answer's flat (Monday) and lively
-(Saturday) real clues under the SAME hard prompt, which does the model prefer?
+"""Matched-pair difficulty preference: given one answer's Monday and Saturday
+real clues under the SAME hard prompt, which does the model prefer?
 
-The loss-gap register separation says the tuned model prices real clues below
-definitions, but that contrast confounds register with clue-ness. This
-instrument holds the answer fixed and varies only the register: both members are
-genuine NYT clues for the same answer, differing in weekday origin. A model that
-has internalized difficulty conditioning should, under the hard prompt, put more
-mass on the Saturday member.
+Weekday is a difficulty proxy, not a liveliness one: a Saturday clue is harder
+mostly through obscurity and terseness ('Blois is on it' for LOIRE vs Monday's
+'Longest river in France' — both flat phrasings, different trivia depth). So
+this instrument measures difficulty conditioning: a model that has internalized
+it should, under the hard prompt, put more mass on the Saturday member.
+Liveliness (wordplay, misdirection) is a separate axis and needs a separate
+instrument.
 
-Reported per model: the lively member's win rate on sequence-level NLL, the mean
-sequence-level margin, and the mean per-token margin (Saturday clues skew terse,
-so total NLL structurally favors them; per-token controls for length).
+Both members are genuine NYT clues for the same answer, so the cross-register
+intrinsic-predictability confound of the WordNet control cancels — the only
+thing that varies is where the clue sits on the difficulty axis.
+
+Reported per model: the Saturday member's win rate on sequence-level NLL, the
+mean sequence-level margin, and the mean per-token margin (Saturday clues skew
+terse, so total NLL structurally favors them; per-token controls for length).
 
 Usage: python register_pairs.py [--adapter DIR] [--dry-run]
 """
@@ -59,16 +64,16 @@ def bank_weekday_clues() -> dict[str, dict[int, tuple[datetime.date, str]]]:
 
 
 def build_pairs(count: int, seed: int) -> list[dict]:
-  """`count` sampled {answer, flat, lively} pairs with distinct members."""
+  """`count` sampled {answer, easy, hard} pairs with distinct members."""
   excluded = stage1_answers() | RESERVED_ANSWERS
   pairs = []
   for answer, slot in bank_weekday_clues().items():
     if answer in excluded or MONDAY not in slot or SATURDAY not in slot:
       continue
-    flat, lively = slot[MONDAY][1], slot[SATURDAY][1]
-    if flat == lively:
+    easy, hard = slot[MONDAY][1], slot[SATURDAY][1]
+    if easy == hard:
       continue
-    pairs.append({'answer': answer, 'flat': flat, 'lively': lively})
+    pairs.append({'answer': answer, 'easy': easy, 'hard': hard})
   print(f'{len(pairs)} matched pairs available')
   rng = random.Random(seed)
   return rng.sample(pairs, min(count, len(pairs)))
@@ -82,24 +87,25 @@ def hard_messages(answer: str, clue: str) -> list[dict]:
 
 
 def score_pairs(model, tokenizer, pairs: list[dict]) -> None:
-  """Win rate and margins for the lively member under the hard prompt."""
+  """Win rate and margins for the Saturday member under the hard prompt."""
   wins = 0
   margins = []
   per_token_margins = []
   for pair in pairs:
-    flat_nll, flat_tokens = response_loss(
-        model, tokenizer, hard_messages(pair['answer'], pair['flat']))
-    lively_nll, lively_tokens = response_loss(
-        model, tokenizer, hard_messages(pair['answer'], pair['lively']))
-    margins.append(flat_nll - lively_nll)
+    easy_nll, easy_tokens = response_loss(
+        model, tokenizer, hard_messages(pair['answer'], pair['easy']))
+    hard_nll, hard_tokens = response_loss(
+        model, tokenizer, hard_messages(pair['answer'], pair['hard']))
+    margins.append(easy_nll - hard_nll)
     per_token_margins.append(
-        flat_nll / flat_tokens - lively_nll / lively_tokens)
+        easy_nll / easy_tokens - hard_nll / hard_tokens)
     if margins[-1] > 0:
       wins += 1
   n = len(pairs)
-  print(f'lively win rate (sequence NLL): {wins}/{n} ({wins / n:.0%})')
+  print(f'Saturday-member win rate (sequence NLL): {wins}/{n} '
+        f'({wins / n:.0%})')
   print(f'mean sequence margin: {sum(margins) / n:+.3f} nats '
-        '(positive = prefers lively)')
+        '(positive = prefers the Saturday member)')
   print(f'mean per-token margin: {sum(per_token_margins) / n:+.3f} '
         'nats/token')
 
@@ -116,8 +122,8 @@ def main() -> None:
 
   pairs = build_pairs(args.pair_count, args.seed)
   for pair in pairs[:5]:
-    print(f'  {pair["answer"]}: flat {pair["flat"]!r} '
-          f'vs lively {pair["lively"]!r}')
+    print(f'  {pair["answer"]}: easy {pair["easy"]!r} '
+          f'vs hard {pair["hard"]!r}')
   if args.dry_run:
     return
 
