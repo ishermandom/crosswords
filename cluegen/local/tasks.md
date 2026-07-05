@@ -382,21 +382,21 @@ thread; the spec is self-contained.
       MLX job (`compute_lease.py status` from a second shell; expect "model
       workload running") — the check is unit-tested and live-checked against an
       ollama runner, but not yet against MLX residency.
-- [ ] Measure the learning-rate basin — PARTIAL 2026-07-04, label corrected per
-      user (the earlier "RESOLVED" was generous: window B ran a three-point
-      bracket, not a basin map). Known anchors at batch 4 on the 12B (80
-      scheduled iters per point, `range_lr*_b4.log`): 5e-5 clean (val 2.644),
-      1e-4 marginal (plateau/wobble, val 2.856), 2e-4 toxic (train loss stuck
-      4+); batching does not widen the bracket, and it sufficed for the 15k
-      recommendation (peak 5e-5). The actual mapping — the queued
-      exponential-ramp methodology — is IN FLIGHT as window C (user go
-      2026-07-04): 1e-6 → 5e-4 over 250 iters at batch 4, loss every 5 steps
-      (`--ramp-to` mode in `launch_train.py`, `ramp_b4.log`), ~15 points per
-      decade. Unknowns it resolves: where descent roughens between 5e-5 and
-      1e-4, and where wobble becomes cliff between 1e-4 and 2e-4 — the inputs a
-      ⅓–½-of-cliff peak rule needs. Caveat for reading: a ramp inherits
-      adaptation from lower rates, so its cliff reads slightly rosier than
-      fixed-LR training; cross-check against the three fixed anchors.
+- [x] Measure the learning-rate basin — MAPPED 2026-07-04 (window C exponential
+      ramp, 1e-6 → 5e-4 over 250 iters at batch 4 on the 12B, loss every 5
+      steps, `ramp_b4.log`; peak mem 10.63 GB). The curve, with batch-4 noise of
+      ±0.5 around any point: cold-start descent to ~7e-6; basin floor from ~1e-5
+      to ~1.4e-4 (loss bounces 2.0–3.2, best readings scattered across the whole
+      floor: 2.14 @ 1.3e-5, 1.99 @ 4.6e-5, 1.86 @ 1.4e-4 — no roughening at
+      5e-5); soft edge ~1.6e-4–3.8e-4 (loss stops improving and drifts up,
+      2.9–3.9); hard cliff ~4.3e-4 (7.2, blowup). Reconciliation with the fixed
+      anchors: sustained-from-scratch 1e-4 (window B) wobbled where the ramp's
+      1e-4 looked fine — the ramp inherits adaptation from lower rates, so its
+      floor reads wider than fixed-LR training supports; trust the fixed anchors
+      near the edge. Peak-rule readout: ⅓–½ of the ~1.6e-4 soft edge =
+      5e-5–8e-5. The 15k recommendation stays peak 5e-5 (comfortably mid-basin,
+      clean fixed anchor); 7e-5 is the defensible upside if the user wants mild
+      aggression, and 1e-4+ is contraindicated by the fixed-anchor wobble.
 - [x] Stratified false-signal check — DONE 2026-07-04 (stretch step 1;
       `strata_check.py`, `strata_tuned.log`; tuned adapter, 5 draws x 20 answers
       per stratum, medium prompt). Rates: long_word_concept 2/100 (ROUSSEAU →
