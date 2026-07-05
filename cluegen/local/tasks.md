@@ -344,14 +344,20 @@ thread; the spec is self-contained.
       machine, live validation rides window B. Step 5 DONE — `data_stage1_15k/`
       built via a new `--output-dir` flag on the slice builder (15,000 pairs,
       5,184 answers vs 1,712 in the 5k, median year 2010, 1,382 valid pairs);
-      the 5k slice stays untouched for comparisons. Steps 1+4 armed as detached
-      window A (`window_a.sh`: strata_run + register_run under one 50-min lease;
-      waits FIFO behind the ceiling). Step 3 scripted as window B
-      (`window_b.sh`) with one deviation from the queued wording: batch timing
-      runs on the 12B directly (30 iters at batch 1/2/4) instead of e2b, because
-      the 15k recommendation needs the 12B's peak memory and throughput at batch
-      4, which e2b cannot supply; loss-smoothness evidence comes from the
-      80-iter scheduled range runs (5e-5 / 1e-4 / 2e-4 at batch 4).
+      the 5k slice stays untouched for comparisons. Steps 1+4 DONE — window A
+      ran 17:11–17:22 on the ceiling's handoff; results on the two instrument
+      items below. Step 3 IN FLIGHT — window B (`window_b.sh`) launched 17:55,
+      one deviation from the queued wording: batch timing runs on the 12B
+      directly (30 iters at batch 1/2/4) instead of e2b, because the 15k
+      recommendation needs the 12B's peak memory and throughput at batch 4,
+      which e2b cannot supply; loss-smoothness evidence comes from the 80-iter
+      scheduled range runs (5e-5 / 1e-4 / 2e-4 at batch 4). Incident note:
+      pausing window A for the reframe edit killed only the caffeinate leader,
+      not its process group — the orphaned zsh driver survived and raced the
+      relaunched one for the lease (harmless here: instruments ran exactly once,
+      on the reframed scripts, and both drivers exited). To pause a detached
+      driver, kill the process group (`kill -TERM -<pid>` / `os.killpg`), not
+      the pid.
 - [ ] Before the next 12B fine-tune run: rehearse the identical recipe on the
       cheap e2b variant first and sanity-check the outputs — generate a few
       clues and run the loss-gap gaps — before spending a 7-hour 12B night. The
@@ -370,22 +376,22 @@ thread; the spec is self-contained.
       tolerates 2e-4). Sets a principled peak (⅓–½ of cliff) for any future
       schedule. ~15 min boxed run; needs the trainer to accept a per-step LR
       callback or the mlx-lm launcher below.
-- [ ] Stratified false-signal check (in the autonomous-stretch scope, step 1).
-      The probe's 0/60 false-signal rate used full-word answers whose latest
-      clue was terse and signal-free — an easy-to-clue population — while the
-      panel words that false-signaled (SCORE → 'Rating: Abbr.', VIOLET → 'Chrys.
-      relative', 2 of 8 draws) are polysemous/number-sense answers where
-      temp-1.0 sampling leaves the model's comfortable register. Test: 5 draws
-      each across three ~20-answer strata — easy (terse-clue population),
-      polysemous/number-sense (many distinct bank clues), and long-word-concept
-      (answers whose natural clue ideas contain long words, e.g. flower/genus,
-      occupation, nationality terms) — compare false-signal rates. The third
-      stratum tests the VIOLET collision theory: 'Chrys.' appears nowhere in the
-      bank (the model INVENTED the truncation), 'Chrysanthemum' once; the theory
-      is that the strongly-learned terseness rule beat the weakly-held (+2.5
-      nat) form-matching rule when the best clue idea needed a 13-letter word,
-      so false signals should cluster in this stratum. ~15 min boxed run on the
-      tuned adapter.
+- [x] Stratified false-signal check — DONE 2026-07-04 (stretch step 1;
+      `strata_check.py`, `strata_tuned.log`; tuned adapter, 5 draws x 20 answers
+      per stratum, medium prompt). Rates: long_word_concept 2/100 (ROUSSEAU →
+      'Swiss philosopher hon.', WELFARE → 'Human assistance, for short'),
+      polysemous 1/100 (RATE → 'Update, for short'), easy 1/100 (RAMI → 'Popular
+      Gen. Fred'). Findings: (1) the overall false-signal rate is ~1.3% (4/300),
+      consistent with the earlier 0/60 bound — false signals are rare
+      everywhere, and the SCORE/VIOLET 2-of-8 panel observation now reads as
+      small-sample noise on specific panel words, not a common failure; (2) the
+      VIOLET collision theory gets only weak, statistically insignificant
+      support (2 vs 1 hits — would need ~10x the draws to resolve a 2%-vs-1%
+      split), though both long-word hits rhyme with it (ROUSSEAU's invented
+      'hon.' truncation next to 'philosopher'); (3) under-signaling on
+      abbreviation answers (12%, prior probe) remains the dominant
+      abbreviation-rule failure by an order of magnitude. Original motivation
+      and theory preserved in git history (this item, prior revision).
 - [ ] Scaled-slice design (queued 2026-07-04; the corpus-as-supervision scaling
       path from the style-rule discussion). Composition finding (measured
       2026-07-04): the recipe's weights are exonerated — the ': Abbr.' tag rate
@@ -424,25 +430,29 @@ thread; the spec is self-contained.
       moves with batch size (linear-to-sqrt scaling), so run this WITH the LR
       basin test, not before or after it. Cheap boxed e2b run: batch 1 vs 2 vs
       4, compare tokens/sec, peak memory, and loss-vs-step smoothness.
-- [ ] Matched-pair difficulty-preference instrument (queued 2026-07-04; pulled
-      up 2026-07-04 into the autonomous stretch, step 4 — must precede the 15k
-      rung so the ladder measures difficulty preference from the start; REFRAMED
-      2026-07-04 per user: weekday is a difficulty proxy, NOT a liveliness one —
-      a Saturday clue is harder mostly through obscurity and terseness ('Blois
-      is on it' vs 'Longest river in France' for LOIRE: comparably flat
-      phrasings, different trivia depth), so results speak to difficulty
-      conditioning only; liveliness (wordplay, misdirection) needs its own
-      instrument, e.g. NYT's '?' wordplay-marker convention as a marker-cost
-      analogue — not queued). For answers with both a Monday and a Saturday clue
-      in the corpus, score both under the SAME hard prompt and report the
-      Saturday member's sequence-level win rate and log-prob margin. Both
-      members are real clues, so the cross-register intrinsic-predictability
-      confound of the WordNet control cancels; sequence-level scoring tracks
-      sampling behavior better than per-token means (per-token margin reported
-      alongside, since Saturday clues skew terse). Complements flat@hard
-      (within-model suppression) and the decoupling trace (training-dynamics
-      view). Rationale: register sep ≈0 cannot distinguish "prefers the hard
-      register" from "treats the two as equals" — user discussion 2026-07-04.
+- [x] Matched-pair difficulty-preference instrument — DONE 2026-07-04 (stretch
+      step 4; `register_pairs.py`, `register_pairs_{base,tuned}.log`; 100
+      Monday/Saturday pairs, same answer, both members scored under the hard
+      prompt; REFRAMED 2026-07-04 per user: weekday proxies difficulty through
+      obscurity/terseness, NOT liveliness — 'Blois is on it' vs 'Longest river
+      in France' for LOIRE are comparably flat phrasings with different trivia
+      depth; liveliness (wordplay, misdirection) needs its own instrument, e.g.
+      NYT's '?' wordplay-marker convention as a marker-cost analogue — not
+      queued). Results: base — Saturday win rate 57/100, sequence margin +2.44
+      nats, per-token margin −1.01 nats/token; tuned — 41/100, −2.90, −0.71.
+      Reading: (1) neither model prefers the hard member per-token under the
+      hard prompt (both margins negative); (2) tuning moved per-token pricing
+      TOWARD the Saturday member by +0.30 nats/token (−1.01 → −0.71) — the
+      diffuse difficulty-conditioning rule moved a little, in the right
+      direction; (3) the sequence-level swing the other way (+2.44 → −2.90) is a
+      length artifact of the common-mode register shift: tuning cheapens
+      real-clue tokens across the board, and total-NLL gains scale with token
+      count, favoring the longer Monday members — so the per-token margin is
+      this instrument's headline number, tracked per rung (base −1.01 → 5k −0.71
+      → 15k ?). Same shape as the abbreviation finding: common-mode shift large,
+      conditional rule small — the 15k rung tests whether exemplar count scales
+      the conditional part. Complements flat@hard (within-model suppression) and
+      the decoupling trace (training-dynamics view).
 - [ ] Panel eval vs v9 via a standalone bridge (queued 2026-07-04; user deferred
       — "come back to it later"). The spec's stage-0 client adapter for the
       harness was never built: ceiling's `pipeline_local.py` speaks only to
