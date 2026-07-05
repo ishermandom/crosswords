@@ -47,6 +47,23 @@ def build_lr_schedule(peak: float, iters: int, warmup_fraction: float,
       [warmup, hold, cosine], [warmup_steps, iters - decay_steps])
 
 
+def build_ramp_schedule(start: float, end: float, iters: int):
+  """Step->lr callable rising exponentially from `start` to `end` — the
+  learning-rate range test: loss vs step maps loss vs lr in one run.
+  """
+  import math
+
+  import mlx.core as mx
+
+  log_ratio = math.log(end / start)
+
+  def ramp(step):
+    fraction = mx.minimum(step / iters, 1.0)
+    return start * mx.exp(fraction * log_ratio)
+
+  return ramp
+
+
 def install_resume(resume_file: str) -> None:
   """Load `resume_file` into the model right after LoRA layers are applied."""
   from optiq.lora import apply as apply_module
@@ -77,6 +94,10 @@ def main() -> None:
   parser.add_argument('--constant-lr', action='store_true',
                       help='skip the schedule (matches optiq CLI behavior; '
                            'for apples-to-apples short probes)')
+  parser.add_argument('--ramp-to', type=float, default=None,
+                      help='basin mapping: exponential LR ramp from '
+                           '--peak-lr up to this value over --iters, '
+                           'reported every 5 steps; overrides the schedule')
   parser.add_argument('--resume-adapter-file', default=None)
   args = parser.parse_args()
 
@@ -84,16 +105,25 @@ def main() -> None:
   from optiq.lora.config import OptiqLoraConfig
   from optiq.lora.trainer import train_lora
 
-  learning_rate = (args.peak_lr if args.constant_lr else build_lr_schedule(
-      args.peak_lr, args.iters, args.warmup_fraction, args.decay_fraction,
-      args.floor_fraction))
+  if args.ramp_to is not None:
+    learning_rate = build_ramp_schedule(args.peak_lr, args.ramp_to,
+                                        args.iters)
+  elif args.constant_lr:
+    learning_rate = args.peak_lr
+  else:
+    learning_rate = build_lr_schedule(
+        args.peak_lr, args.iters, args.warmup_fraction, args.decay_fraction,
+        args.floor_fraction)
   if args.resume_adapter_file:
     install_resume(args.resume_adapter_file)
 
+  # Ramp mode wants a fine loss trace and no mid-run validation pauses.
+  reporting = ({'steps_per_report': 5, 'steps_per_eval': 1_000_000}
+               if args.ramp_to is not None else {})
   config = OptiqLoraConfig(
       rank=8, scale=1.0, rank_scaling='constant',
       batch_size=args.batch_size, iters=args.iters,
-      learning_rate=learning_rate, adapter_path=args.output)
+      learning_rate=learning_rate, adapter_path=args.output, **reporting)
   result = train_lora(args.model, args.data, config)
   print(f'[launcher] done: {result}')
 
