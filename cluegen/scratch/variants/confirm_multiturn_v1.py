@@ -21,8 +21,10 @@ Turns (each a fresh conversation with its own schema):
 
 Verdict rule: not an English sense -> bad; unlicensed referent shift -> bad
 (licensed = the clue actually carries a '?' AND the substitution turn judged the
-shift to be the marked stretch, reading fairly); any other unlicensed shift or
-failing qualifier -> fixable; else bankable. Padding is ADVISORY only (rung-2
+shift to be the marked stretch, reading fairly); unlicensed register shift ->
+advisory only (the judge pins that label on figurative or playful framing, which
+is legal without a '?' — see `_verdict_from_turns`); any other unlicensed shift
+or failing qualifier -> fixable; else bankable. Padding is ADVISORY only (rung-2
 batch A: the isolated economy turn, blind to taste by design, prosecutes the
 very words that earn the clue its basis — "Stomach-turning", "often", "that
 might be thrown"; gating on it traded four Fable accepts for three kills the
@@ -247,24 +249,33 @@ def _padding_flaws(clue, padding_words):
 def _verdict_from_turns(clue, substitution, truth, economy, sense):
   """Code-side verdict: the aggregation the model is never asked to do.
 
-  Returns `(verdict, flaws)`. The ?-license is a code rule — v3 showed the model
-  cannot hold that rule as text without it bleeding into every other check.
+  Returns `(verdict, flaws, advisories)`. The ?-license is a code rule — v3
+  showed the model cannot hold that rule as text without it bleeding into every
+  other check.
   """
   if not sense['is_english_sense']:
-    return 'bad', ['sense: not an English sense of the answer']
+    return 'bad', ['sense: not an English sense of the answer'], []
   flaws = []
+  advisories = []
   shift = substitution['shift']
   is_licensed = '?' in clue and substitution['shift_is_the_marked_stretch']
   if shift != 'none' and not is_licensed:
     if shift == 'referent':
-      return 'bad', ['substitution: unlicensed referent shift']
-    flaws.append(f'substitution: unlicensed {shift} shift')
+      return 'bad', ['substitution: unlicensed referent shift'], []
+    if shift == 'register':
+      # Advisory, never gating: the judge labels figurative or playful framing a
+      # register shift, but playfulness is legal without a '?'. Expanded-set
+      # gentune: gating here killed 7 clean accepts (FOG, HONEY, KETCHUP, ...)
+      # while 0 revise/reject kills depended on it.
+      advisories.append('substitution: register shift')
+    else:
+      flaws.append(f'substitution: unlicensed {shift} shift')
   flaws.extend(
     f'truth: {qualifier}' for qualifier in truth['failing_qualifiers']
   )
   if flaws:
-    return 'fixable', flaws
-  return 'bankable', []
+    return 'fixable', flaws, advisories
+  return 'bankable', [], advisories
 
 
 def _multi_turn_confirm(judge_turn, word, clue):
@@ -289,13 +300,14 @@ def _multi_turn_confirm(judge_turn, word, clue):
   sense = judge_turn(
     'confirm.sense', _SENSE_SYSTEM, _SENSE_PROMPT, _SENSE_SCHEMA
   )
-  verdict, flaws = _verdict_from_turns(
+  verdict, flaws, advisories = _verdict_from_turns(
     clue, substitution, truth, economy, sense
   )
   return {
     'verdict': verdict,
     'flaws': flaws,
-    'advisories': [
+    'advisories': advisories
+    + [
       f'economy: {padding}'
       for padding in _padding_flaws(clue, economy['padding_words'])
     ],

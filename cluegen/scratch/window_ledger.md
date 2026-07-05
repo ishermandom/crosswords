@@ -300,16 +300,44 @@ screen systematically under-rates vivid straight definitions and prize facts;
 what was anecdote (CENTURY, MURMUR, FIFTY, LATTE) is now a measured family with
 N≈16.
 
-**Slot 3a** (gentune under the ADOPTED multi-turn candidate, screens cached) was
-running at compact time — its delta vs slot 1 isolates the confirm redesign on
-~24 fresh rows; early rows showed both EIGHTY clues dying at the substitution
-turn (watch: prize-fact "Days Phileas Fogg allotted..." is a flip target the
-candidate may ALSO miss — if so, the prize-fact family is a screen+confirm
-double miss). **Next: slot 3b** = same patch on genhold (~15 min warm). Then the
-per-bucket v2-vs-candidate comparison read from the four expbase_* logs (free,
-no model calls) → decide the screen-side attack (idea 11 non-pinning removal is
-one hypothesis; the prize-fact/elegance under-rating may need its own
-calibration idea, now testable at N≈16 with genhold guards).
+**Slot 3a result (gentune under the adopted candidate, 116 calls, 61.9 min):
+accepts held 8/32 — a big regression vs v2's 15/32 — kills 31/32 (false bank
+moved to MIRAGE revise; SEVENTY revise now killed; MOON "Night light?" recovered
+via the ?-carve-out).** Turn-level read from the JSONL: every one of the 14
+confirm-stage accept kills came from the substitution turn (plus one truth
+co-flag), and 8/14 carried the label "unlicensed register shift" — the judge
+pins "register" on figurative or playful framing (FOG "Gray breath that swallows
+streetlamps whole", CRICKET "Tiny violinist of the summer grass", GARLIC,
+PILLOW, UMBRELLA, BRAND "Sword, in old verse", HONEY, KETCHUP), which the
+schema's forced shift enum invites. The original 81-row sets had too few
+figurative accepts for this to show — exactly the small-set blind spot the
+expansion was built to expose.
+
+**Fix applied (code-side, free): register shift is now advisory, never gating**
+— `_verdict_from_turns` in the variant routes it to `advisories`; referent stays
+bad, other shifts stay fixable. Counterfactual re-score from cached turn fields:
+recovers 7/8 register kills (CRICKET keeps a truth flaw), loses 0 revise/reject
+kills → gentune becomes accepts 15/32, kills 31/32 — parity with v2 on generated
+rows while keeping the candidate's real-world wins (8/10 vs 4/10 tuning accepts)
+and the MOON recovery. Offline verdict-rule checks updated and green (scratchpad
+`test_confirm_multiturn.py`).
+
+Remaining candidate-vs-v2 gentune deltas after the fix: candidate still kills
+SEVENTY (number shift), EIGHTY + RUST + SOCKS + YAWN (referent shift on
+personification/metonymy — same family, harsher verdict "bad"), THAW
+(part-of-speech). Watch: referent-shift-on-personification may be register's
+sibling problem, but referent gating carries the count-metonymy kills — do NOT
+soften it without checking which kills depend on it.
+
+**Next: slot 3b** = updated patch on genhold (~15 min warm; screens cached),
+gated on the T0/T15/T30 free scan. Pre-registered: v2 genhold held 5/14 accepts,
+14/14 kills; expect candidate ≥ 5/14 with kills held at 14/14 — any lost kill
+indicts the register fix. Also replay gentune under the updated patch (0 model
+calls, all turns cached) for the official re-scored log. Then the per-bucket
+v2-vs-candidate comparison read from the four expbase_* logs → decide the
+screen-side attack (screen kills 10/32 gentune accepts before confirm ever sees
+them — still the bigger recall hole; idea 11 non-pinning removal is one
+hypothesis).
 
 ## Machine protocol (one-off for the 2026-07-04 evening handoff)
 
