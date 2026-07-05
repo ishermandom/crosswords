@@ -20,7 +20,7 @@ status; the narrative lives in the sections.
 | 9   | confirm v3                   | REJECTED           |
 | 10  | multi-turn confirm           | ADOPTED-IN-BATTERY |
 | 11  | screen non-pinning removal   | QUEUED             |
-| 12  | confirm v2: calibrated turns | RUNG 1 IN FLIGHT   |
+| 12  | confirm v2: calibrated turns | PAUSED, try 3 next |
 
 ## Idea 1 — battery harness (BUILT)
 
@@ -239,7 +239,7 @@ removed (user calibration #3) + economy advisory + sense; verdict
   size. Production wiring deferred to end-of-window consolidation (needs a
   difficulty source — the screen already assigns one).
 
-## Idea 12 — confirm v2: calibrated turn semantics (RUNG 1 IN FLIGHT)
+## Idea 12 — confirm v2: calibrated turn semantics (PAUSED, try 3 designed)
 
 `variants/confirm_multiturn_v2.py`, user-approved batch train 2026-07-05
 ("proceed with the next few batches"). All four turns redesigned per
@@ -282,7 +282,7 @@ is £20,000); UMBRELLA + SCARECROW-sentry banked (economy turn praised their
 tails as "inherent identifying properties" — the MOLD example taught
 inherent-property too broadly).
 
-**Rung 2 (try 2, in flight):** four fixes — (a) code: truth flags get the same
+**Rung 2 (try 2):** four fixes — (a) code: truth flags get the same
 quote-validation as economy evidence (kills the junk-article flag, free); (b)
 substitution rule text: plural counted nouns are not grammar mismatches ("Keys
 on a grand piano" shape); (c) substitution value test: a quantity equation is
@@ -294,6 +294,29 @@ example). Only substitution + economy turns re-key (~46 fresh calls ≈ 25 min).
 Targets: the five rung-1 misses. Guards: all rung-1 hits — especially RUST's
 "slowly" (must stay earning under the surplus-fact language) and the six
 recoveries (substitution re-runs under the new text).
+
+**Rung 2 result** (46 calls, 31 min): kills PERFECT 20/20 — EIGHTY-wager killed
+by the value test, UMBRELLA and SCARECROW-sentry killed by the surplus-fact
+shape, every kill guard held. But accepts 10/16 — the classic opposite-direction
+overshoot (try 1 economy under-fired; try 2 over-fires). SEVENTY-lifespan
+recovered (junk-flag code fix worked); regressions, all economy, all "surplus
+fact" prosecutions of tails that ARE the clue's point: GARLIC "that also repels
+first dates" (the joke), ESCALATOR "whether or not you step aboard" (the
+paradox), SEVENTY-Psalmist "allotted" (single inherent-property modifier —
+exactly the RUST-"slowly" family the MOLD example should protect), EIGHTY-days
+"for going around the world" (the recognizability that makes the fact a prize).
+Substitution side fully clean: all four regressed rows have points_at=answer.
+
+**Try 3 design (NOT RUN — batch train paused for the 2026-07-05 overnight
+fine-tune handoff).** One economy wording change: define the tail test by the
+clue's POINT — a tail that delivers the clue's joke, paradox, poetry, or
+prize-fact recognizability IS the point, never bloat (add a wit pass example
+shaped like GARLIC's); a tail appended after the point is already delivered is
+bloat (UMBRELLA's gust-inversion after "canopy on a stick", STOOL's spin after
+"bar"). Also reinforce the single-modifier protection (allotted/slowly family).
+Cost: economy turns only, ~23 calls ≈ 12 min. This is the third and final
+wording try under the stop rule: if it seesaws again, stop, adopt the best cell
+(likely rung-2 kills + rung-1 economy), and surface the tradeoff.
 
 ## User calibrations
 
@@ -537,17 +560,20 @@ Two mechanisms, both mirrors of flaws already fixed on the confirm side:
 - Idea 11 (non-pinning removal) is orthogonal and untested; the flatness
   mechanism above explains the measured family without it.
 
-## Machine protocol (one-off for the 2026-07-04 evening handoff)
+## Machine protocol (per-handoff one-offs, never a standing rule)
 
-After slot 3a: CEDE the machine to the fine-tune thread (auto-release armed in
-session background). For THIS handoff only (user direction — not a standing
-rule): re-acquire only after the lease measures free at T0, T15, and T30 — three
-checks, 15 min apart, all free (the fine-tune thread runs main's lease script
-and cannot see waiter notes). A background scan implementing exactly this is
-armed and will notify when clear; if the session restarts, re-arm the same scan
-before touching the lease. Once this handoff is done, cross-thread scheduling
-goes back to coordinating through the user until the lease-script fork
-reunifies.
+**2026-07-04 evening handoff (done):** ceded after slot 3a; re-acquired after
+the user's direct go superseded the scan.
+
+**2026-07-05 overnight handoff (ACTIVE):** batch train paused after idea-12 rung
+2 (user direction); the machine goes to the fine-tune thread for an overnight
+training run. T0/T15/T30 protocol REINSTATED for this handoff only (user
+re-confirmed: a one-off, not a standing rule): a background scan first waits to
+OBSERVE the fine-tune lease, then after any release requires the lease free at
+T0, T15, and T30 (15 min apart) before declaring it clear to re-acquire for
+idea-12 rung 3. If the session restarts, re-arm the same scan before touching
+the lease. Once this handoff is done, cross-thread scheduling goes back to
+coordinating through the user until the lease-script fork reunifies.
 
 ## In flight: 26B multi-turn measurement (user-approved 2026-07-04 ~22:00)
 
