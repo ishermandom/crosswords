@@ -435,6 +435,36 @@ cheap early-kill turn ordering, not a second policy (idea 11's non-pinning
 removal folds into the single-protocol design rather than a screen-prompt
 patch).
 
+### Result (2026-07-04 ~23:40): clearly below the accept bar — 31B stays
+
+Survivor accepts held: **9 of 30 vs the 31B's 23 (bar was >= ~21)**; survivor
+kills 10/11 vs the 31B's 9 (it correctly killed TOUCHDOWN "Six points?", which
+the 31B banks; it banked MIRAGE's revise, the same miss the 31B makes). Genhold
+accepts 2/14, gentune 7/32. UMBRELLA discounts per calibration #5; the verdict
+is unchanged with or without it.
+
+Single mechanism, verified from turn fields: **all 21 accept kills carry exactly
+one flaw, "substitution: unlicensed referent shift" → bad.** The 26B labels
+every figurative framing a referent shift — it cannot hold the distinction the
+31B draws between playful framing of the right referent (register, advisory) and
+actually pointing at a different thing (referent, bad). It held only accepts
+whose definitions are literal (HONEY, KETCHUP, BRAND, SCARECROW) or ?-licensed
+(MOON, DENTIST, SPIDER "Web developer?", BAKER, TOUCHDOWN accept). That
+shift-classification judgment is what the extra parameters buy; the protocol
+alone doesn't confer it.
+
+Speed note that changes production math: 26B calls averaged ~5 s vs ~32 s for
+the 31B (10.0 min for the same 116 calls that took 61.9 at 31B). Even so, the
+26B has no rescuable judge role: its survivor-kill precision is 10/31 (it kills
+21 true accepts), so its kills can't gate; its banks are 9/10 precise but a
+pass-through-only stage saves almost nothing.
+
+Design consequence: single flow, one protocol, **31B as the only judge tier**;
+26B leaves the judge path entirely (screen policy already dead; 26B multi-turn
+now measured worse). Production cost control comes from substitution-first
+short-circuit (~1 turn ≈ 30 s per junk clue), not from a smaller model.
+Difficulty assignment still needs re-homing out of the screen.
+
 ## Remaining queue
 
 `#eval-expansion` DONE through the 2×2 (sets built
