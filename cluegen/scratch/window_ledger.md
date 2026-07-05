@@ -323,9 +323,34 @@ deliberately soft-pedals (padding advisory, register advisory). The v2 screen's
 flatness/padding gating, which false-kills FOG-grade accepts, is ALSO what
 correctly kills these. Lesson: economy and hyperbole need a calibrated gate, not
 advisory status and not the screen's blanket prosecution — the FOG/RUST vs
-THERMOSTAT/ALARM line is the threshold to learn, and the user's pending suspect
-rulings (RUST, CANOE, HAMMOCK, SOCKS, UMBRELLA) will define it. 26B verdict
-unchanged: still clearly below on accepts.
+THERMOSTAT/ALARM line is the threshold to learn. 26B verdict unchanged: still
+clearly below on accepts.
+
+**#7 (2026-07-05, suspects batch):** rulings that draw the economy threshold:
+
+- RUST stays accept — "slowly" being inherent to rust's eating is part of what
+  makes the clue work: the answer is not in the clue, so inherent-property words
+  are load-bearing hints, and the deletion-test padding standard does not
+  transfer mechanically from rows like IGLOO's "frozen snow" (where the defined
+  word IS present in spirit). "Abandoned" isn't required either — an in-use
+  tractor can rust.
+- CANOE stays accept — "glassy lake at dawn" is legitimate scene-setting; not
+  comparable to THERMOSTAT's demotion (explicit taste ruling).
+- SOCKS stays accept ("a keeper") — hyperbole mapping to a true phenomenon sits
+  on the FOG side of the accuracy line.
+- HAMMOCK stays accept but SOFT (`soft: true` in the row) — borderline on
+  economy, "a bit charming as a scene"; discount in scorecard readings.
+- UMBRELLA accept → revise on economy — supersedes calibration #5's soft-label
+  treatment.
+- TOUCHDOWN accept's clue text amended to drop the unearned '?' ("Reason to
+  spike the ball") — NOTE: this re-keys that clue's replay cache, so genhold
+  scorecards need ~11 fresh calls (screen + confirms across the three configs)
+  next time genhold runs; genhold numbers above predate the text edit and are
+  stale for that one row.
+
+Gentune re-scored free after the UMBRELLA flip (30 accepts / 34 revise-rejects;
+tags `expbase_{v2c2,mtc2,mt26c2}_gentune`): v2 13/30 + 31/34, mt-31B 12/30 +
+30/34, mt-26B 5/30 + 31/34. The v2-vs-31B parity and the 26B gap both hold.
 
 ## Machine coordination
 
