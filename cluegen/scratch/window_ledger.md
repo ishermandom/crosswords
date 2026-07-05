@@ -275,6 +275,58 @@ kill there is not a false kill, and it counts as a borderline recovery for the
 register fix (tally: 6 solid + 1 borderline), not a clean one. Also not clean
 evidence against the 26B in the parity read.
 
+**#6 (2026-07-05, NYT-corpus-grounded batch):** the user fetched primary sources
+(`/Users/Shared/data/nyt_style/`, Kaggle corpus at
+`/Users/Shared/data/kaggle-nyt/`); rulings and the resulting eval-label edits
+(all rows carry `calibrated: 2026-07-05`):
+
+- **Implicit units are fine when the noun is quantity-valued** (lifespan,
+  jackpot, age, speed limit — attested: SEVENTY as "Stalin's age", "Common
+  highway speed limit"). SEVENTY "The lifespan Scripture allots" and MILLION
+  "The jackpot Regis dangled" flip revise → accept.
+- **The '?' means wordplay, specifically** — not "almost a good clue", and not a
+  repair for a false equivalence with no wordplay in it. TOUCHDOWN "Six points?"
+  STAYS revise (NYT bar: corpus has zero bare six-points equations; the NYT
+  writes "Six-pt. plays"). Design implication: the ?-carve-out in the multi-turn
+  confirm over-licenses — it should license pun/misdirection, not bare metonymy.
+  Fold into judge tuning.
+- **Archaic senses are lame per obscurity** — BRAND "Sword, in old verse" accept
+  → revise ("believable but feels random").
+- **Unmarked hyperbole fails accuracy** — ALARM "crime scene" accept → revise
+  ("a question mark is automatic if your clue stretches the truth or can't be
+  taken as fact" — constructor guide). **Economy demotions**: THERMOSTAT "Wall
+  dial nudged upward..." and SCARECROW "Straw-stuffed sentry standing watch..."
+  accept → revise.
+- Foreign-word rule refinement (for the judges, labels unchanged): foreign
+  vocabulary is fine when signposted AND well-known to a typical English speaker
+  (MERCI "Thanks, in Paris" grade); the sense-ownership turn's binary
+  English-only test would wrongly kill those. GIFT/BRAND foreign rejects stay —
+  false-friend homographs are nowhere near the bar (and are essentially
+  unattested in 28 years of NYT corpus).
+
+### Calibrated re-score (2026-07-05, all from cache, 0 model calls)
+
+Totals across both sets — 44 accepts, 48 revise/rejects after calibration (tags
+`expbase_{v2c,mtc,mt26c}_*`):
+
+| config      | accepts held | kills |
+| ----------- | ------------ | ----- |
+| v2 baseline | 18/44        | 45/48 |
+| mt 31B      | 19/44        | 42/48 |
+| mt 26B      | 7/44         | 45/48 |
+
+The calibration collapses the 31B candidate's lead over v2 to parity (+1 accept,
+−3 kills): its five new kill misses are exactly the demoted rows (ALARM,
+THERMOSTAT, SCARECROW, BRAND + the standing TOUCHDOWN/MIRAGE), i.e.
+economy/hyperbole/obscurity flaws — the dimensions the multi-turn confirm
+deliberately soft-pedals (padding advisory, register advisory). The v2 screen's
+flatness/padding gating, which false-kills FOG-grade accepts, is ALSO what
+correctly kills these. Lesson: economy and hyperbole need a calibrated gate, not
+advisory status and not the screen's blanket prosecution — the FOG/RUST vs
+THERMOSTAT/ALARM line is the threshold to learn, and the user's pending suspect
+rulings (RUST, CANOE, HAMMOCK, SOCKS, UMBRELLA) will define it. 26B verdict
+unchanged: still clearly below on accepts.
+
 ## Machine coordination
 
 **Overnight 2026-07-03→04:** machine handed to the fine-tune thread ("12B
