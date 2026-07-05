@@ -540,20 +540,29 @@ thread; the spec is self-contained.
       wrong).
     - Logs: abbr_probe_{base,tuned}.log (marker + generation, first-run swap
       superseded), abbr_swap_{base,tuned}.log (authoritative swap).
-- [ ] Hand-tagged quality bank (user-in-the-loop; queued 2026-07-03). User walks
-      a sample of the data bank in a review UI and hand-tags examples on
-      multiple quality dimensions, fast per item. Design TBD: possibly several
-      single-dimension passes rather than one heavy pass; UI should make tagging
-      a few seconds per clue (keyboard-driven, batched). Dimensions worth
-      considering: bankable yes/no, difficulty read, register/flavor, mechanism
-      (per satisfaction taxonomy), dated/evergreen. Payoffs, in order:
-      calibration set for the local judge; seed preference pairs for DPO;
-      validation set for the judge-filtered-training knob; ground truth for any
-      future curation filter. Priority raised 2026-07-04: the user wants a
-      golden set tuned to their taste — the register-preference discussion
-      showed "coherent" is far below "satisfying" ('Purple' for VIOLET is
-      coherent yet rates low), and satisfaction is what the corpus cannot define
-      on its own. First in line once a usable fine-tuned model exists.
+- [ ] Hand-tagged quality bank — REDESIGNED 2026-07-04/05 (superseding the
+      2026-07-03 UI-first sketch): hand-labeling everything doesn't scale, so
+      the plan is now rubric + judges at scale + a small hand-labeled
+      calibration slice. DONE so far: (a) the tag rubric, ratified through 7
+      review rounds — `cluegen/local/quality_rubric.md`, 27 continuous 1.0-5.0
+      scales (4 holistic, 23 breakdown) + required rationale; (b) headless
+      tagging runner on the user's subscription (`scratch/tagging/tag_clues.py`:
+      `claude -p` with the rubric's marker-extracted scales as the ENTIRE system
+      prompt, tools/settings stripped, resumable, per-call usage log; NOTE
+      `--bare` breaks subscription auth — use `--setting-sources ''`); (c)
+      stratified 126-clue calibration sample (`sample_calibration.py`, 9 era x
+      difficulty cells, seed 20260705); (d) two-clue Haiku smoke run PASSED —
+      all 27 scales + sane rationales. Smoke usage findings: no prompt caching
+      occurs with a custom system prompt (cache_creation = 0; input is only ~2k
+      tokens so this is minor), and output ran ~8.6k tokens for 2 clues —
+      headless Haiku spends heavily on thinking; $0.048 API-equivalent for the
+      call. Cost per clue therefore hinges on chunk size and a thinking-budget
+      knob (MAX_THINKING_TOKENS) — measure both in the bake-off before
+      re-estimating big runs. NEXT (user-gated): user finishes reading the
+      rubric doc, hand-labels the 126-clue slice, then Haiku-vs-Sonnet-5
+      bake-off over the same slice (per-scale agreement with the user decides
+      the cheap model question). Payoffs unchanged: judge calibration,
+      preference-pair seeds, curation ground truth.
 - [ ] Investigate training throughput (after the overnight run; needs the
       lease). The log's `Tokens/sec` ≈ 1.5–2.0 counts only trained (response)
       tokens — ~8/example under prompt masking — so it is not comparable to

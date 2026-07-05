@@ -77,12 +77,37 @@ def load_done(output_path: Path) -> set[tuple[str, str]]:
   return done
 
 
+TAGGING_BEGIN = '<!-- tagging-scales-begin'
+TAGGING_END = '<!-- tagging-scales-end -->'
+
+PROMPT_HEADER = """\
+# Clue quality rubric — scale definitions
+
+You grade New York Times crossword clues on continuous 1.0-5.0 scales.
+"""
+
+
+def extract_scales(rubric_text: str) -> str:
+  """The scale definitions between the rubric's tagging markers; the
+  meta-sections (ratification pointer, addenda, accounting) stay out of the
+  prompt.
+  """
+  if TAGGING_BEGIN not in rubric_text or TAGGING_END not in rubric_text:
+    sys.exit('rubric is missing the tagging-scales-begin/-end markers the '
+             'prompt extraction relies on')
+  after_begin = rubric_text.split(TAGGING_BEGIN, 1)[1]
+  # The begin marker is a multi-line comment; drop through its close.
+  after_begin = after_begin.split('-->', 1)[1]
+  return after_begin.split(TAGGING_END, 1)[0].strip()
+
+
 def assemble_system_prompt(rubric_path: Path, run_dir: Path) -> Path:
-  """Rubric + instructions written once per run; identical bytes across calls
+  """Scales + instructions written once per run; identical bytes across calls
   keep the prompt cache warm.
   """
   prompt_path = run_dir / 'system_prompt.md'
-  prompt_path.write_text(rubric_path.read_text() + INSTRUCTIONS)
+  scales = extract_scales(rubric_path.read_text())
+  prompt_path.write_text(PROMPT_HEADER + '\n' + scales + INSTRUCTIONS)
   return prompt_path
 
 
@@ -96,8 +121,10 @@ def call_claude(prompt_path: Path, chunk: list[dict], model: str) -> dict:
       'claude', '-p', f'Tag these clues:\n{clue_lines}',
       '--model', model,
       '--system-prompt-file', str(prompt_path),
+      # Not --bare: it also skips credential loading, which silently breaks
+      # subscription auth in headless runs (observed 2026-07-05).
       '--tools', '',
-      '--bare',
+      '--setting-sources', '',
       '--no-session-persistence',
       '--max-turns', '1',
       '--output-format', 'json',

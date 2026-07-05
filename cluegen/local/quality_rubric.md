@@ -53,6 +53,12 @@ Settled structure decisions (2026-07-04):
 - Tag form decided per entry; no global scales-vs-binaries rule.
 - Trap-proportionality derived, not labeled.
 
+<!-- tagging-scales-begin: everything until tagging-scales-end is what the
+     headless tagging runs feed the model (scratch/tagging/tag_clues.py
+     extracts by these markers — keep them around the scale definitions
+     through whatever reorganizations; the meta-sections outside them stay
+     out of the prompt). -->
+
 ## Holistic scales (summary statistics)
 
 ### `satisfaction`
@@ -160,6 +166,8 @@ proxy. Matters for training data drawn preferentially from recent eras.
 One or two sentences justifying the scores — the audit trail for whether a
 decision is valid or bogus. Bank oddities (era-drifted conventions) fold in
 here.
+
+<!-- tagging-scales-end -->
 
 ## Where the cloud path's seven 1-5 scales went (accounting, round 6)
 
