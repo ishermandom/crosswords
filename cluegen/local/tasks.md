@@ -552,17 +552,26 @@ thread; the spec is self-contained.
       `--bare` breaks subscription auth — use `--setting-sources ''`); (c)
       stratified 126-clue calibration sample (`sample_calibration.py`, 9 era x
       difficulty cells, seed 20260705); (d) two-clue Haiku smoke run PASSED —
-      all 27 scales + sane rationales. Smoke usage findings: no prompt caching
-      occurs with a custom system prompt (cache_creation = 0; input is only ~2k
-      tokens so this is minor), and output ran ~8.6k tokens for 2 clues —
-      headless Haiku spends heavily on thinking; $0.048 API-equivalent for the
-      call. Cost per clue therefore hinges on chunk size and a thinking-budget
-      knob (MAX_THINKING_TOKENS) — measure both in the bake-off before
-      re-estimating big runs. NEXT (user-gated): user finishes reading the
-      rubric doc, hand-labels the 126-clue slice, then Haiku-vs-Sonnet-5
-      bake-off over the same slice (per-scale agreement with the user decides
-      the cheap model question). Payoffs unchanged: judge calibration,
-      preference-pair seeds, curation ground truth.
+      all 27 scales + sane rationales. Caching RESOLVED 2026-07-05 (user
+      prompted the comparison with the cloud wrapper, which caches fine on
+      Fable): custom system prompts DO cache — the Haiku smoke's
+      cache_creation=0 was the per-model minimum cacheable length, 4,096 tokens
+      for Haiku 4.5 vs 1,024 for Sonnet 5 and 512 for Fable; our trimmed prefix
+      is ~3,800 Haiku tokens, just UNDER its floor, and below the floor the API
+      silently skips caching. Confirmed on Sonnet 5: call 1 wrote 5,366 tokens
+      to cache, call 2 read all 5,366 (input collapsed to 2). If Haiku wins the
+      bake-off, pad the prompt over 4,096 with graded calibration examples —
+      padding that doubles as judge calibration. Other smoke findings: Haiku
+      burned ~8.6k output tokens on 2 clues (thinking-heavy;
+      $0.048 API-equivalent) while
+      Sonnet 5 used ~910 output tokens for the same clues (≈$0.01/clue,
+      currently CHEAPER than un-tuned Haiku at this shape) — so the bake-off
+      should test Haiku with a MAX_THINKING_TOKENS cap alongside per-scale
+      agreement. NEXT (user-gated): user finishes reading the rubric doc,
+      hand-labels the 126-clue slice, then Haiku-vs-Sonnet-5 bake-off over the
+      same slice (per-scale agreement with the user decides the cheap model
+      question). Payoffs unchanged: judge calibration, preference-pair seeds,
+      curation ground truth.
 - [ ] Investigate training throughput (after the overnight run; needs the
       lease). The log's `Tokens/sec` ≈ 1.5–2.0 counts only trained (response)
       tokens — ~8/example under prompt masking — so it is not comparable to
