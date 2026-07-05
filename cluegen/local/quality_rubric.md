@@ -26,15 +26,16 @@ the cloud path (`prompts/verify.md`, `local/quality.py` conventions and scales,
 
 Moves as entries are reviewed; a decision is recorded the turn it lands.
 
-- Ratified: `satisfaction` continuous (2026-07-04 round 3 — supersedes the
-  round-2 three-bucket answer; excellent/good/meh survive as prose anchors, not
-  buckets); `liveliness` continuous; `difficulty` kept (weekday is a poor
-  per-clue proxy — good aggregate correlation, no per-clue guarantee); the
-  defect-flavored `flaw` field dropped in favor of an optional free-text `note`;
-  `paraphrase` out of this rubric (bank dedup process, not a clue tag).
-- Under review: `strengths` membership; `basis` mode; `mechanism` mode;
-  `difficulty` form under the all-scales convention (enum vs continuous).
-- Pending: the "dropped" list.
+- Ratified (rounds 1-4, 2026-07-04): every entry — `satisfaction`, `liveliness`,
+  and `difficulty` continuous; `basis` as five per-member scales and `mechanism`
+  as ten (dominant implicit; `none` / `plain-definition` are all-low profiles);
+  all four `strengths` (economy, surface, fairness, anchor); optional free-text
+  `note`; `flaw` and `paraphrase` out. 22 scales + note per clue.
+- Under review: the "dropped" list (below) — never explicitly ratified.
+- Open follow-ups, not blocking the rubric itself: judge-schema migration (the
+  judges' single `basis` enum becomes argmax-with-floor over the basis scales);
+  calibration-slice sizing under the 22-scale labeling cost (~1-2 min/clue for a
+  human, so a slice of ~100-200 clues, stratified).
 
 Settled structure decisions (2026-07-04):
 
@@ -71,30 +72,45 @@ clue can still be a good bank citizen on a Monday; a lively one can underwhelm)
 and from `basis` (which names WHAT enlivens; this grades HOW MUCH). Soft
 consistency expectation: scores near 1.0 sit naturally with `basis=none`.
 
-### 3. `basis` — enum: `aha` / `elegance` / `resistance` / `prize-fact` / `fun` / `none`
+### 3. `basis` scales — RATIFIED 2026-07-04 as five per-member scales
 
-Names what the clue makes a solver feel — the enum both judge schemas already
-emit. The anti-inflation gradients live in rubric prose: recognition is not fun;
-a fact earns its keep by surprise or specificity; a relation to another quantity
-needs a pivot; a vivid straight definition is elegance, not `none`.
+Each basis rated 1.0-5.0 for how strongly the clue delivers it: `aha`,
+`elegance`, `resistance`, `prize_fact`, `fun`. No enum and no `none` value — the
+dominant basis is implicit (the highest scale), and a flat gloss is simply an
+all-low profile (consistent with `liveliness` near 1.0). Composite clues (a
+funny aha) stop being a forced choice. The anti-inflation gradients live in
+rubric prose: recognition is not fun; a fact earns its keep by surprise or
+specificity; a relation to another quantity needs a pivot; a vivid straight
+definition scores on `elegance`, not nowhere.
 
-### 4. `mechanism` — enum, dominant mechanism
+Migration note: the judge schemas' single `basis` enum derives from these scales
+(argmax, with a floor below which the answer is "none") — schema change needed
+when judges adopt the rubric.
 
-The satisfaction.md ten plus `plain-definition`: sense pivot, frame anchor,
-count/role metonymy, definition-by-example, double definition, conceptual
-reframe, metaphor-as-definition, vignette, relational pivot, prize fact.
+### 4. `mechanism` scales — RATIFIED 2026-07-04 as ten per-member scales
+
+Each satisfaction.md mechanism rated 1.0-5.0 for how much it does the clue's
+work: sense pivot, frame anchor, count/role metonymy, definition-by-example,
+double definition, conceptual reframe, metaphor-as-definition, vignette,
+relational pivot, prize fact. Composition ("a sense pivot inside a frame") is
+two elevated scales — the thing the dominant-only enum could not express.
+`plain-definition` is not a member: an all-low profile IS a plain definition
+(same implicit-aggregate logic as `basis`). In practice most clues sit at 1.0 on
+most mechanisms; the sparse profile is fast to emit.
 
 No judge currently emits this. It exists for the diversity audit (monoculture
 detection) and angle-distinct depth, both of which only work at bank scale —
 exactly what judge-emitted tags make affordable.
 
-### 5. `difficulty` — enum: `easy` / `medium` / `hard` — RATIFIED 2026-07-04
+### 5. `difficulty` — RATIFIED 2026-07-04 as continuous
 
-The difficulty the text actually achieves. Kept (user, 2026-07-04): weekday is a
-poor per-clue proxy — the aggregate correlation is good, but no individual clue
-is guaranteed to match its day — so an achieved-difficulty tag audits the proxy
-the training data's conditioning token derives from, which bears directly on how
-clean the fine-tune's conditioning signal is.
+Continuous 1.0-5.0, the difficulty the text actually achieves: 1.0 =
+Monday-direct, 3.0 = midweek twist (less-first sense, mild ambiguity), 5.0 =
+Saturday-grade active misdirection. Kept because weekday is a poor per-clue
+proxy — good aggregate correlation, no per-clue guarantee — so this audits the
+proxy the training data's conditioning token derives from. Bucket comparisons
+for conditioning audits derive by thresholds chosen at analysis time (and
+declared there).
 
 ### 6. `note` — optional free text — RATIFIED 2026-07-04
 
@@ -102,20 +118,17 @@ Replaces the v0 `flaw` enum. Catches the rare bank oddity (dated convention, era
 drift) without a structured field that would sit empty on nearly every clue. The
 full defect vocabulary remains the machine-clue rubric's concern.
 
-### 7. `strengths` — inverted defect axes (under review; members TBD)
+### 7. `strengths` — RATIFIED 2026-07-04, all four members
 
-The v0 defect enum re-read from the opposite end (user, 2026-07-04): not flags
-for flaws, but graded strength scales on the continuous 1.0-5.0 convention.
-Candidate members, inverted from v0/judge checks:
+The v0 defect enum re-read from the opposite end (user, 2026-07-04): graded
+strength scales, continuous 1.0-5.0:
 
 - `economy` — padded ... not a wasted word.
 - `surface` — stilted ... something a person would actually say.
 - `fairness` — trap collapses on re-read ... lands clean in retrospect (scored
-  only when misdirection exists).
+  only when misdirection exists; no misdirection = leave at the neutral default,
+  matching quality.py's defaults-to-5 precedent).
 - `anchor` — needs a lookup to believe ... instantly checkable once seen.
-
-Which members earn a place — and whether four is already too many — is the next
-review question.
 
 ## Dropped, deliberately
 
