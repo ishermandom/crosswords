@@ -382,15 +382,21 @@ thread; the spec is self-contained.
       MLX job (`compute_lease.py status` from a second shell; expect "model
       workload running") — the check is unit-tested and live-checked against an
       ollama runner, but not yet against MLX residency.
-- [x] Measure the learning-rate basin — RESOLVED 2026-07-04 by window B's
-      three-point test at batch 4 on the 12B (80 scheduled iters per point,
-      `range_lr*_b4.log`): 5e-5 clean (val 2.644), 1e-4 marginal
-      (plateau/wobble, val 2.856), 2e-4 still toxic (train loss stuck 4+).
-      Batching does NOT widen the basin; peak stays 5e-5 for the 15k rung. The
-      original exponential-ramp methodology (continuous loss-vs-LR curve,
-      principled ⅓–½-of-cliff peak) remains available via the launcher's
-      schedule hook if a finer answer is ever needed — the three-point bracket
-      was decision-sufficient here.
+- [ ] Measure the learning-rate basin — PARTIAL 2026-07-04, label corrected per
+      user (the earlier "RESOLVED" was generous: window B ran a three-point
+      bracket, not a basin map). Known anchors at batch 4 on the 12B (80
+      scheduled iters per point, `range_lr*_b4.log`): 5e-5 clean (val 2.644),
+      1e-4 marginal (plateau/wobble, val 2.856), 2e-4 toxic (train loss stuck
+      4+); batching does not widen the bracket, and it sufficed for the 15k
+      recommendation (peak 5e-5). The actual mapping — the queued
+      exponential-ramp methodology — is IN FLIGHT as window C (user go
+      2026-07-04): 1e-6 → 5e-4 over 250 iters at batch 4, loss every 5 steps
+      (`--ramp-to` mode in `launch_train.py`, `ramp_b4.log`), ~15 points per
+      decade. Unknowns it resolves: where descent roughens between 5e-5 and
+      1e-4, and where wobble becomes cliff between 1e-4 and 2e-4 — the inputs a
+      ⅓–½-of-cliff peak rule needs. Caveat for reading: a ramp inherits
+      adaptation from lower rates, so its cliff reads slightly rosier than
+      fixed-LR training; cross-check against the three fixed anchors.
 - [x] Stratified false-signal check — DONE 2026-07-04 (stretch step 1;
       `strata_check.py`, `strata_tuned.log`; tuned adapter, 5 draws x 20 answers
       per stratum, medium prompt). Rates: long_word_concept 2/100 (ROUSSEAU →

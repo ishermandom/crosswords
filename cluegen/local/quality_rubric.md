@@ -26,15 +26,14 @@ the cloud path (`prompts/verify.md`, `local/quality.py` conventions and scales,
 
 Moves as entries are reviewed; a decision is recorded the turn it lands.
 
-- Ratified: `satisfaction` at three buckets (excellent / good / meh);
-  `liveliness` as a continuous scale; `difficulty` kept (weekday is a poor
+- Ratified: `satisfaction` continuous (2026-07-04 round 3 — supersedes the
+  round-2 three-bucket answer; excellent/good/meh survive as prose anchors, not
+  buckets); `liveliness` continuous; `difficulty` kept (weekday is a poor
   per-clue proxy — good aggregate correlation, no per-clue guarantee); the
   defect-flavored `flaw` field dropped in favor of an optional free-text `note`;
   `paraphrase` out of this rubric (bank dedup process, not a clue tag).
-- Under review: `strengths` (new — the v0 defect axes inverted into strength
-  scales; which members earn a place), `basis`, `mechanism`; small
-  clarification: whether `satisfaction`'s three buckets should instead ride the
-  continuous-scale convention below.
+- Under review: `strengths` membership; `basis` mode; `mechanism` mode;
+  `difficulty` form under the all-scales convention (enum vs continuous).
 - Pending: the "dropped" list.
 
 Settled structure decisions (2026-07-04):
@@ -45,22 +44,24 @@ Settled structure decisions (2026-07-04):
   defect-centric rubric in the judge prompts.
 - Tag form decided per entry, leaning toward fewer labels; no global
   scales-vs-binaries rule.
-- Scale convention (user, 2026-07-04): graded axes are continuous 1.0-5.0 — any
-  value is legal (3.5 as acceptable as 2.0). Expressiveness beats inter-rater
-  stability: canned labels force hair-splitting; a continuum gives the model
-  breathing room.
+- Scale convention (user, 2026-07-04): ALL graded axes share one aligned
+  normalization, continuous 1.0-5.0 — any value is legal (3.5 as acceptable as
+  2.0). The normalization itself is arbitrary (0-100 would do); what matters is
+  that every scale aligns and leaves enough degrees of freedom that a model
+  never has to flip a coin between adjacent buckets that both feel a bit wrong.
+  Expressiveness beats inter-rater stability.
 - Trap-proportionality derived, not labeled (was coupled to difficulty in v0;
   decoupled per user).
 
 ## Entries
 
-### 1. `satisfaction` — the primary verdict — RATIFIED 2026-07-04
+### 1. `satisfaction` — the primary verdict — RATIFIED 2026-07-04 as continuous
 
-Three buckets: `excellent` / `good` / `meh` — how much the clue earns its keep.
-Replaces v0's bankable/fixable/bad, which presumed defects — wrong shape for a
-bank where nothing is truly bad (user, 2026-07-04). This is the tag the user
-most wants from the data. Open clarification: whether this too should ride the
-continuous 1.0-5.0 convention rather than three buckets.
+Continuous 1.0-5.0: how much the clue earns its keep. Prose anchors from the
+round-2 buckets: ~5.0 excellent (showcase), ~3.0 good (solid bank citizen), ~1.5
+meh. Replaces v0's bankable/fixable/bad, which presumed defects — wrong shape
+for a bank where nothing is truly bad (user, 2026-07-04). This is the tag the
+user most wants from the data.
 
 ### 2. `liveliness` — flat-vs-lively — RATIFIED 2026-07-04 as continuous
 
