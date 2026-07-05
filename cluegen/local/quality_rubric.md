@@ -32,10 +32,12 @@ Moves as entries are reviewed; a decision is recorded the turn it lands.
   all four `strengths` (economy, surface, fairness, anchor); optional free-text
   `note`; `flaw` and `paraphrase` out. 22 scales + note per clue.
 - Under review: the "dropped" list (below) — never explicitly ratified.
-- Open follow-ups, not blocking the rubric itself: judge-schema migration (the
-  judges' single `basis` enum becomes argmax-with-floor over the basis scales);
-  calibration-slice sizing under the 22-scale labeling cost (~1-2 min/clue for a
-  human, so a slice of ~100-200 clues, stratified).
+- Out of scope (user, 2026-07-04): the existing judges (screen/confirm, cloud
+  verify) do NOT adopt this rubric — it defines a separate tagging path over the
+  bank; their schemas stay as they are.
+- Open follow-up, not blocking: calibration-slice sizing under the 22-scale
+  labeling cost (~1-2 min/clue for a human, so a slice of ~100-200 clues,
+  stratified).
 
 Settled structure decisions (2026-07-04):
 
