@@ -329,15 +329,61 @@ personification/metonymy — same family, harsher verdict "bad"), THAW
 sibling problem, but referent gating carries the count-metonymy kills — do NOT
 soften it without checking which kills depend on it.
 
-**Next: slot 3b** = updated patch on genhold (~15 min warm; screens cached),
-gated on the T0/T15/T30 free scan. Pre-registered: v2 genhold held 5/14 accepts,
-14/14 kills; expect candidate ≥ 5/14 with kills held at 14/14 — any lost kill
-indicts the register fix. Also replay gentune under the updated patch (0 model
-calls, all turns cached) for the official re-scored log. Then the per-bucket
-v2-vs-candidate comparison read from the four expbase_* logs → decide the
-screen-side attack (screen kills 10/32 gentune accepts before confirm ever sees
-them — still the bigger recall hole; idea 11 non-pinning removal is one
-hypothesis).
+**Slot 3b result (genhold under register-advisory candidate, 48 calls, 22.9
+min): accepts held 8/14 vs v2's 5/14; kills 13/14 vs 14/14.** The gentune replay
+logged the official re-score: 15/32, 31/32, 0 model calls. The lost genhold kill
+is TOUCHDOWN revise "Six points?" — verified from turn fields that it did NOT
+hinge on the register fix: the substitution turn correctly found a referent
+shift (event → its score) but judged it the marked stretch of the '?', so the
+code-side ?-license carve-out banked it. Fable's label reason: "the ? cannot
+repair a false equivalence." Residual, N=1, and the label itself is debatable
+(US convention accepts "Six points" for TOUCHDOWN); the same carve-out delivers
+the MOON and TOUCHDOWN-accept recoveries. Verdict: register fix vindicated on
+fresh data; ?-license false-equivalence boundary goes on the watch list.
+
+### The 2×2, complete (expanded set, post-fix)
+
+| set     | v2 accepts | cand accepts | v2 kills | cand kills |
+| ------- | ---------- | ------------ | -------- | ---------- |
+| gentune | 15/32      | 15/32        | 31/32    | 31/32      |
+| genhold | 5/14       | 8/14         | 14/14    | 13/14      |
+
+Candidate confirm now holds 23 of the 30 accepts that reach it (genhold 8/8);
+the screen kills 16/46 accepts (35%) before confirm ever sees them — the recall
+crisis is now almost entirely the screen.
+
+### Screen-kill diagnosis (from cached screen analyses, free read)
+
+Two mechanisms, both mirrors of flaws already fixed on the confirm side:
+
+- **"Dictionary-flat / lacks pivot" downgrades.** The screen treats a missing
+  shift/misdirection as a flaw and marks vivid straight definitions and prize
+  facts fixable: OCTOPUS "three hearts and blue blood", VIOLIN, PIANO, SPIDER,
+  WRAPS, BAMBOO, BILLION, RAT, CANOE. Its analyses literally say "no flaws, but
+  it lacks liveliness" → fixable. The screen's basis taxonomy doesn't credit
+  prize-fact/elegance/fun as redeeming bases.
+- **Padding gating on the words that carry the basis.** CANOE "gliding across a
+  glassy lake at dawn", ORCHARD "planted for the picking", LIGHTHOUSE, HAMMER,
+  CACTUS, HAMMOCK, PIANO "most of them white" — the exact economy failure the
+  confirm side demoted to advisory (idea 10 rung 2); the screen still gates on
+  it.
+- One accuracy case: HUMMINGBIRD "Only bird that can fly backward" — screen
+  prosecutes "Only" as an overclaim; Fable labeled it a prize-fact accept.
+
+### Screen attack options (decision pending — ask the user)
+
+- (a) **Prompt fix**: teach the screen's system prompt to credit
+  prize-fact/elegance/fun bases and demote padding to advisory. Invalidates the
+  screen cache (new system text → new keys): ~64 fresh 26B calls ≈ 20 min per
+  set-pair, plus wording-iteration risk (the confirm side needed a code-side
+  rule, not prompt text, to hold a carve-out).
+- (b) **Cascade fix**: stop trusting screen "fixable" as a kill — route
+  screen-fixable clues to confirm and let the multi-turn verdict decide; screen
+  kills only on "bad". Code-side, screen cache intact, no wording iteration;
+  cost is 4 × 31B turns for every screen-fixable clue (all true revises
+  included, so battery wall time roughly doubles vs the cascade).
+- Idea 11 (non-pinning removal) is orthogonal and untested; the flatness
+  mechanism above explains the measured family without it.
 
 ## Machine protocol (one-off for the 2026-07-04 evening handoff)
 
