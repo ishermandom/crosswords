@@ -346,18 +346,32 @@ thread; the spec is self-contained.
       5,184 answers vs 1,712 in the 5k, median year 2010, 1,382 valid pairs);
       the 5k slice stays untouched for comparisons. Steps 1+4 DONE — window A
       ran 17:11–17:22 on the ceiling's handoff; results on the two instrument
-      items below. Step 3 IN FLIGHT — window B (`window_b.sh`) launched 17:55,
-      one deviation from the queued wording: batch timing runs on the 12B
-      directly (30 iters at batch 1/2/4) instead of e2b, because the 15k
-      recommendation needs the 12B's peak memory and throughput at batch 4,
-      which e2b cannot supply; loss-smoothness evidence comes from the 80-iter
-      scheduled range runs (5e-5 / 1e-4 / 2e-4 at batch 4). Incident note:
-      pausing window A for the reframe edit killed only the caffeinate leader,
-      not its process group — the orphaned zsh driver survived and raced the
-      relaunched one for the lease (harmless here: instruments ran exactly once,
-      on the reframed scripts, and both drivers exited). To pause a detached
-      driver, kill the process group (`kill -TERM -<pid>` / `os.killpg`), not
-      the pid.
+      items below. Step 3 DONE — window B ran 19:19–~21:10 (deviation: batch
+      timing on the 12B directly, not e2b — the 15k recommendation needs the
+      12B's own memory/throughput numbers). Results on the three methodology
+      items below. HARD STOP REACHED 2026-07-04 — RECOMMENDED 15k LAUNCH
+      SETTINGS (user launches explicitly): batch 4, peak LR 5e-5,
+      warmup→hold→cosine to a 10% floor, 3,750 iters total, TWO NIGHTS with
+      resume — night 1
+      `launch_train.py <12B> --data data_stage1_15k     --output adapters_12b_15k --iters 2250 --batch-size 4 --peak-lr 5e-5     --warmup-fraction 0.05 --decay-fraction 0.01`
+      (warmup+hold, ~10 h); night 2 same but
+      `--iters 1500 --resume-adapter-file     adapters_12b_15k/adapters.safetensors --warmup-fraction 0.01     --decay-fraction 0.6`
+      (hold, then cosine over the final ~900 iters ≈ 24% of the 3,750 total).
+      Basis: batch 4 buys only ~20% throughput (~905 vs ~760 examples/hr; 15k ≈
+      16.5 h at batch 4, 19.8 h at batch 1 — either way over one night) but
+      smooths the loss curve at no memory cost (10.5 vs 9.9 GB peak); the
+      stable-LR basin does NOT widen at batch 4 (5e-5 clean, val 2.644; 1e-4
+      marginal wobble, val 2.856; 2e-4 still toxic, loss stuck ~4+), so peak
+      stays 5e-5. Prelaunch checklist: (a) validate the launcher's resume path
+      on a tiny e2b run (~5 min, never live-exercised — training step, needs a
+      go-ahead); (b) note val losses are NOT comparable across rungs (each slice
+      has its own valid.jsonl) — cross-rung comparison rides the instrument
+      suite, not val loss. Incident note: pausing window A for the reframe edit
+      killed only the caffeinate leader, not its process group — the orphaned
+      zsh driver survived and raced the relaunched one for the lease (harmless
+      here: instruments ran exactly once, on the reframed scripts, and both
+      drivers exited). To pause a detached driver, kill the process group
+      (`kill -TERM -<pid>` / `os.killpg`), not the pid.
 - [ ] Before the next 12B fine-tune run: rehearse the identical recipe on the
       cheap e2b variant first and sanity-check the outputs — generate a few
       clues and run the loss-gap gaps — before spending a 7-hour 12B night. The
@@ -368,14 +382,15 @@ thread; the spec is self-contained.
       MLX job (`compute_lease.py status` from a second shell; expect "model
       workload running") — the check is unit-tested and live-checked against an
       ollama runner, but not yet against MLX residency.
-- [ ] Measure the learning-rate basin (methodology; queued 2026-07-04). One
-      short range-test run: ramp LR exponentially from ~1e-6 toward ~5e-4 over a
-      few hundred steps, log loss per step, plot loss vs LR. The usable basin is
-      where loss falls smoothly; the cliff is where it spikes. Current knowledge
-      is a two-point bracket (5e-5 stable, 2e-4 fatal on the QAT 12B; e2b
-      tolerates 2e-4). Sets a principled peak (⅓–½ of cliff) for any future
-      schedule. ~15 min boxed run; needs the trainer to accept a per-step LR
-      callback or the mlx-lm launcher below.
+- [x] Measure the learning-rate basin — RESOLVED 2026-07-04 by window B's
+      three-point test at batch 4 on the 12B (80 scheduled iters per point,
+      `range_lr*_b4.log`): 5e-5 clean (val 2.644), 1e-4 marginal
+      (plateau/wobble, val 2.856), 2e-4 still toxic (train loss stuck 4+).
+      Batching does NOT widen the basin; peak stays 5e-5 for the 15k rung. The
+      original exponential-ramp methodology (continuous loss-vs-LR curve,
+      principled ⅓–½-of-cliff peak) remains available via the launcher's
+      schedule hook if a finer answer is ever needed — the three-point bracket
+      was decision-sufficient here.
 - [x] Stratified false-signal check — DONE 2026-07-04 (stretch step 1;
       `strata_check.py`, `strata_tuned.log`; tuned adapter, 5 draws x 20 answers
       per stratum, medium prompt). Rates: long_word_concept 2/100 (ROUSSEAU →
@@ -409,27 +424,28 @@ thread; the spec is self-contained.
       count. Bank affords ~200k post-dedup. Prerequisites: batch-size throughput
       win + mlx-lm launcher resume (both queued above); at batch-4 throughput
       15k ≈ one overnight, 50k ≈ 2–3 with resume.
-- [ ] Adaptive learning-rate schedule via mlx-lm launcher (methodology; queued
-      2026-07-04). optiq's supervised path is constant-LR only (warmup/decay
-      wired for DPO alone). Write a ~30-line launcher that calls optiq's
-      `register()` shim then mlx-lm's tuner with an `lr_schedule` config: linear
-      warmup 0→peak over ~3–5% of steps, hold, cosine to ~10% of peak over the
-      final ~20–30%. mlx-lm also brings `--resume-adapter-file`, which unlocks
-      hold-then-decay adaptivity (decay from a held checkpoint when content
-      metrics plateau) and longer boxed probes. Ideal-design rationale in the
-      2026-07-04 session; importance ranking: peak ≫ warmup > decay shape.
-- [ ] Batch-size exploration (methodology; queued 2026-07-04). Today's runs use
-      `--batch-size 1`, and prompt masking means each step's gradient comes from
-      only ~8 response tokens — extremely noisy. A larger batch (2–8, or
-      gradient accumulation if the launcher path lands) averages that noise,
-      which may widen the stable-LR basin (the QAT 12B's 2e-4 cliff could be
-      partly noise-kicked) and should raise tokens/sec by amortizing
-      dequantize-in-backward across the batch — same lever the throughput task
-      points at. Constraints: 32 GB total RAM with 9.9 GB peak at batch 1, so
-      headroom is comfortable — still record peak memory per batch size; and LR
-      moves with batch size (linear-to-sqrt scaling), so run this WITH the LR
-      basin test, not before or after it. Cheap boxed e2b run: batch 1 vs 2 vs
-      4, compare tokens/sec, peak memory, and loss-vs-step smoothness.
+- [x] Adaptive learning-rate schedule via mlx-lm launcher — DONE 2026-07-04
+      (stretch step 2; `launch_train.py`). Implementation differs from the
+      queued sketch, same effect: rather than mlx-lm's `lr_schedule` config
+      (whose builder supports only warmup + one named schedule, no hold), the
+      launcher reuses optiq's `train_lora` whole — OptiQ quant handling,
+      best-adapter snapshots, flash attention — and passes a warmup→hold→cosine
+      step→lr callable straight through `config.learning_rate` into AdamW (MLX
+      optimizers accept callables). Resume via a wrapper around the
+      adapter-apply step (`--resume-adapter-file`). Schedule VALIDATED LIVE in
+      window B (log shows the decay firing on cue); the resume path is built but
+      never live-exercised — validate on a tiny e2b run before the two-night 15k
+      plan relies on it.
+- [x] Batch-size exploration — RESOLVED 2026-07-04 by window B, on the 12B
+      directly rather than e2b (the 15k recommendation needs the 12B's own
+      numbers; `timing_batch{1,2,4}.log`). Throughput ~760 / ~820 / ~905
+      examples/hr at batch 1 / 2 / 4; peak memory 9.88 / 9.98 / 10.49 GB. The
+      hoped-for dequantize amortization mostly doesn't materialize — batch 4
+      buys only ~20% — and the stable-LR basin does NOT widen (the 2e-4 cliff is
+      not noise-kicked; see the basin item). Batch 4 still recommended for the
+      15k rung: modest throughput win, visibly smoother loss, negligible memory
+      cost. Gradient accumulation not pursued — it adds the smoothing without
+      the (small) speed win.
 - [x] Matched-pair difficulty-preference instrument — DONE 2026-07-04 (stretch
       step 4; `register_pairs.py`, `register_pairs_{base,tuned}.log`; 100
       Monday/Saturday pairs, same answer, both members scored under the hard
