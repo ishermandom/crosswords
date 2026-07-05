@@ -267,8 +267,9 @@ calls ≈ 50 min), targets vs mt-31B c2 behavior:
 
 Genhold consulted only at adoption (expect there: TOUCHDOWN-spike recovery,
 TOUCHDOWN-"Six points?" kill, ALARM/THERMOSTAT kills, BAKER/EMBER/MAPLE/ IGLOO
-holds). Stop rule: same as idea 10 — ~3 wording tries with opposite-direction
-overshoots ends the attempt.
+holds). Stop rule: 6 wording tries with opposite-direction overshoots ends the
+attempt (user raised from the ~3 idea-10 used, 2026-07-05; each try still
+requires a turn-field diagnosis before the next).
 
 **Rung 1 result** (92 calls, 54 min): accepts 12/16, kills 17/20. Hits: all six
 figurative/personification recoveries (RUST, SOCKS, YAWN, THAW, CRICKET,
@@ -314,9 +315,11 @@ prize-fact recognizability IS the point, never bloat (add a wit pass example
 shaped like GARLIC's); a tail appended after the point is already delivered is
 bloat (UMBRELLA's gust-inversion after "canopy on a stick", STOOL's spin after
 "bar"). Also reinforce the single-modifier protection (allotted/slowly family).
-Cost: economy turns only, ~23 calls ≈ 12 min. This is the third and final
-wording try under the stop rule: if it seesaws again, stop, adopt the best cell
-(likely rung-2 kills + rung-1 economy), and surface the tradeoff.
+Cost: economy turns only, ~23 calls ≈ 12 min. This is wording try 3 of the 6 the
+stop rule allows (user raised the budget from ~3, 2026-07-05); tries 4-6 remain
+if it seesaws, each gated on a fresh turn-field diagnosis, with the best cell so
+far (rung-2 kills + rung-1 economy) as the fallback adoption if the budget runs
+out.
 
 ## User calibrations
 
