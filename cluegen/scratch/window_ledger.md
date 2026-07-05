@@ -20,6 +20,7 @@ status; the narrative lives in the sections.
 | 9   | confirm v3                   | REJECTED           |
 | 10  | multi-turn confirm           | ADOPTED-IN-BATTERY |
 | 11  | screen non-pinning removal   | QUEUED             |
+| 12  | confirm v2: calibrated turns | RUNG 1 IN FLIGHT   |
 
 ## Idea 1 — battery harness (BUILT)
 
@@ -237,6 +238,37 @@ removed (user calibration #3) + economy advisory + sense; verdict
   GRANT-concede) — attack AFTER `#eval-expansion` gives that family real sample
   size. Production wiring deferred to end-of-window consolidation (needs a
   difficulty source — the screen already assigns one).
+
+## Idea 12 — confirm v2: calibrated turn semantics (RUNG 1 IN FLIGHT)
+
+`variants/confirm_multiturn_v2.py`, user-approved batch train 2026-07-05
+("proceed with the next few batches"). All four turns redesigned per
+calibrations #6/#7; verdict stays code-side. Mechanisms: (1) substitution asks
+what the definition POINTS AT (answer, through metaphor/role/implicit-unit, vs a
+named other object) — replaces the shift enum and the ?-carve-out entirely; (2)
+truth gains the hyperbole rule (figurative claims judged by factual core;
+unmarked no-core exaggeration fails); (3) economy becomes a calibrated gate
+(inherent-property hints and charming scenes earn keep; restatement and dead
+tails are bloat; gates only on committed `is_bloated` + quoting evidence); (4)
+sense splits usability (signposted well-known foreign OK — MERCI grade) from
+common knowledge (archaic = obscure = fixable). Offline verdict-rule checks
+green (`test_confirm_multiturn_v2.py`).
+
+Pre-registered rung 1 (gentune probe, 18 words, ~23 confirm rows, ~92 fresh 31B
+calls ≈ 50 min), targets vs mt-31B c2 behavior:
+
+- **Accept recoveries** (now false-killed): SEVENTY both rows, EIGHTY "Days
+  Phileas Fogg allotted...", RUST, SOCKS, YAWN, THAW, CRICKET.
+- **New kills** (now false-banked): SCARECROW-sentry + UMBRELLA (economy),
+  BRAND-sword (obscurity), MIRAGE-revise "hot desert heat" (economy).
+- **Guards**: FOG, GARLIC, TOASTER, ESCALATOR, MOON, MIRAGE-accept stay banked;
+  VIOLIN-bow, SCARECROW-foil, EIGHTY-wager, GIFT-Munich, BRAND-Amsterdam stay
+  killed.
+
+Genhold consulted only at adoption (expect there: TOUCHDOWN-spike recovery,
+TOUCHDOWN-"Six points?" kill, ALARM/THERMOSTAT kills, BAKER/EMBER/MAPLE/ IGLOO
+holds). Stop rule: same as idea 10 — ~3 wording tries with opposite-direction
+overshoots ends the attempt.
 
 ## User calibrations
 
