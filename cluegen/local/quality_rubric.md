@@ -29,9 +29,12 @@ Moves as entries are reviewed; a decision is recorded the turn it lands.
 - Ratified (rounds 1-4, 2026-07-04): every entry — `satisfaction`, `liveliness`,
   and `difficulty` continuous; `basis` as five per-member scales and `mechanism`
   as ten (dominant implicit; `none` / `plain-definition` are all-low profiles);
-  all four `strengths` (economy, surface, fairness, anchor); optional free-text
-  `note`; `flaw` and `paraphrase` out. 22 scales + note per clue.
-- Under review: the "dropped" list (below) — never explicitly ratified.
+  five `strengths` (economy, surface, fairness, anchor, cross_check — reinstated
+  round 5); required free-text `rationale` (round 5, supersedes the optional
+  note); `flaw` and `paraphrase` out; convention binaries and day profiles out
+  (round 5, with the accounting and addendum sections below). 23 scales +
+  rationale per clue.
+- Under review: nothing — all entries and the dropped list are ratified.
 - Out of scope (user, 2026-07-04): the existing judges (screen/confirm, cloud
   verify) do NOT adopt this rubric — it defines a separate tagging path over the
   bank; their schemas stay as they are.
@@ -114,13 +117,14 @@ proxy the training data's conditioning token derives from. Bucket comparisons
 for conditioning audits derive by thresholds chosen at analysis time (and
 declared there).
 
-### 6. `note` — optional free text — RATIFIED 2026-07-04
+### 6. `rationale` — required free text — RATIFIED 2026-07-04 (round 5)
 
-Replaces the v0 `flaw` enum. Catches the rare bank oddity (dated convention, era
-drift) without a structured field that would sit empty on nearly every clue. The
-full defect vocabulary remains the machine-clue rubric's concern.
+One or two sentences justifying the scores — the audit trail for whether a
+decision is valid or bogus (user, 2026-07-04; supersedes the round-2 "optional
+note": the extra labeling cost is accepted, and bank oddities like era-drifted
+conventions fold in here rather than a separate field).
 
-### 7. `strengths` — RATIFIED 2026-07-04, all four members
+### 7. `strengths` — RATIFIED 2026-07-04, five members
 
 The v0 defect enum re-read from the opposite end (user, 2026-07-04): graded
 strength scales, continuous 1.0-5.0:
@@ -131,20 +135,52 @@ strength scales, continuous 1.0-5.0:
   only when misdirection exists; no misdirection = leave at the neutral default,
   matching quality.py's defaults-to-5 precedent).
 - `anchor` — needs a lookup to believe ... instantly checkable once seen.
+- `cross_check` — clue alone pins the answer ... several plausible fills,
+  collapsed only by crossing answers. Reinstated (user, 2026-07-04): the rubric
+  quantifies virtues, and under-determination is one ("When shadows stretch"
+  fitting both DUSK and DAWN is doing extra work). Not redundant with
+  `difficulty`: a hard clue can pin a unique answer through deep misdirection,
+  and an easy flat clue ("Compass point") can under-determine — the two scales
+  move independently.
+
+## Where the cloud path's seven 1-5 scales went (accounting, 2026-07-04)
+
+- Remapped one-to-one: `surface_coherence` → `strengths.surface`;
+  `fairness_of_deception` → `strengths.fairness` (including its
+  neutral-default-without-misdirection behavior); `cross_check_payoff` →
+  `strengths.cross_check` (reinstated in round 5).
+- Remapped with a shift: `reference_accessibility` (breadth of audience knowing
+  the referent) → `strengths.anchor` (checkability in retrospect) — the
+  fairness-relevant part survives; the audience-breadth part is
+  difficulty-through-obscurity and reads off `difficulty`.
+- Absorbed into `difficulty`: `misdirection` (its top band is the 5.0 end) and
+  `elasticity` (ambiguity breadth is the midband); the HOW lives in the
+  mechanism profile.
+- Absorbed without a dedicated axis: `angle_craft` (deliberateness of the chosen
+  angle) — read jointly off `satisfaction`, `liveliness`, and the mechanism
+  profile; an all-low mechanism profile is the "obvious default angle".
+- Retired outright: the day profiles (per-weekday acceptance ranges + quality
+  floors) — gating logic for admitting new clues, not grading tags for clues
+  already in the bank.
+
+## Addendum: convention binaries (dropped; ratified 2026-07-04)
+
+Correctness gates from `quality.py`, true by construction on bank data — the NYT
+bank is the source of these conventions — so as bank tags they carry ~zero
+information. They remain gates for machine-generated clues in the existing
+pipeline. Era-drifted exceptions land in `rationale`.
+
+- `has_tense_agreement` — clue's grammatical form matches the answer.
+- `has_wordplay_indicator` — ? present iff misdirection/wordplay.
+- `is_abbreviation_signaled` — abbreviated answer flagged in the clue.
+- `uses_fill_format` — fill-in-the-blank rendered as ___.
+- `has_genuine_alternatives` — claimed alternatives are real candidates.
 
 ## Dropped, deliberately
 
-- `paraphrase` / angle-distinctness — the bank's dedup process, not a
-  clue-quality tag (ratified 2026-07-04).
-- The 1-5 scales (angle craft, misdirection, elasticity, reference
-  accessibility, surface coherence, fairness of deception, cross-check payoff)
-  and their day profiles — the local path abandoned scales for enums + named
-  flaws; the one graded axis this rubric wants back is `liveliness`, on its own
-  terms.
-- Separate convention binaries (tense agreement, wordplay indicator,
-  abbreviation signaled, fill format, genuine alternatives) — correctness checks
-  for machine clues, not grading axes for human ones.
-- Cross-check payoff as a tag — under-determination is a virtue, not a dimension
-  to police (satisfaction.md, user calibration 2026-07-04).
-- Required free-text rationale — judges emit analysis anyway; optional for human
-  labels.
+- `paraphrase` / angle-distinctness — a property of a clue PAIR, not one clue;
+  the bank's dedup process owns it (ratified 2026-07-04). Residual coverage:
+  near-identical mechanism profiles on the same answer flag paraphrase
+  candidates.
+- The day profiles and convention binaries — see the accounting and addendum
+  sections above (ratified 2026-07-04).
