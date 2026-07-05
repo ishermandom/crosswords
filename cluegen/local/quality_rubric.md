@@ -25,16 +25,14 @@ the cloud path (`prompts/verify.md`, `local/quality.py` conventions and scales,
 
 Moves as entries are reviewed; a decision is recorded the turn it lands.
 
-- Ratified (rounds 1-6, 2026-07-04): the two-tier architecture below; all four
+- Ratified (rounds 1-7, 2026-07-04): the two-tier architecture below; all four
   holistic scales (`satisfaction`, `difficulty`, `craft`, `liveliness`);
   breakdown scales — `basis` x5, `mechanism` x10, `economy`, `surface`,
-  `fairness`, `anchor`, `cross_check`, plus round 6's `obscurity` and
-  `misdirection`; required `rationale`; `flaw`, `paraphrase`, convention
-  binaries, and day profiles out. 26 scales + rationale per clue.
-- Under review (candidate breakdowns, user call pending): `elasticity` (examples
-  presented 2026-07-04), `freshness` (chestnut ... novel angle), `currency`
-  (dated ... current referent).
-- Open follow-up, not blocking: calibration-slice sizing under the 26-scale
+  `fairness`, `anchor`, `cross_check`, `obscurity`, `misdirection`, and round
+  7's `currency`; required `rationale`; `flaw`, `paraphrase`, convention
+  binaries, and day profiles out; `elasticity` and `freshness` ruled out
+  (close-calls addendum). 27 scales + rationale per clue. Nothing under review.
+- Open follow-up, not blocking: calibration-slice sizing under the 27-scale
   labeling cost (~2-3 min/clue with rationale, so ~75-150 clues, stratified).
 
 Settled structure decisions (2026-07-04):
@@ -148,6 +146,15 @@ the answer, 5.0 = full trap). Graded separately (user, 2026-07-04): it feeds
 `satisfaction` as well as `difficulty`, and not all difficult clues rely on it —
 obscurity-hard clues sit low here.
 
+### `currency` — added round 7
+
+Dated referent ... current one (1.0 = bakes in an assumption the world has moved
+past, e.g. a 1994 "Palm handheld"; 5.0 = reads as written today). Distinct from
+`obscurity`: a dated referent was universal in its day. Graded per clue rather
+than proxied by the puzzle's year (user, 2026-07-04): most old clues are still
+current — few actually bake in dated assumptions — so year alone is a poor
+proxy. Matters for training data drawn preferentially from recent eras.
+
 ## `rationale` — required free text
 
 One or two sentences justifying the scores — the audit trail for whether a
@@ -163,11 +170,29 @@ here.
   restored it as a holistic).
 - Split in two: `reference_accessibility` → `obscurity` (audience breadth,
   inverted) + `anchor` (checkability in retrospect).
-- Pending user call: `elasticity` (multiple coherent readings of the surface) —
-  candidate breakdown, examples presented 2026-07-04.
+- Ruled out after review: `elasticity` — see the close-calls addendum.
 - Retired outright: the day profiles (per-weekday acceptance ranges + quality
   floors) — gating logic for admitting new clues, not grading tags for clues
   already in the bank.
+
+## Addendum: close calls (considered and ruled out, 2026-07-04)
+
+Candidate scales that nearly made the rubric; kept here so the reasoning
+survives the next "are there others lurking?" pass.
+
+- `elasticity` — how many coherent readings the surface sustains (1 = "Longest
+  river in France", single reading; ~3 = "Curb an impulse" for CHECK, noun/verb
+  hover with several senses live; 5 = "Round number?" or "Current affairs?",
+  rich reinterpretation space). Ruled out: an ingredient in several dimensions
+  (`difficulty`, `misdirection`, `satisfaction`) but hard to measure on its own
+  — raters disagree on what counts as a coherent alternative reading — and
+  probably not worth the effort. Distinct from `cross_check` (readings of the
+  text vs answers that fit), which stays.
+- `freshness` — chestnut ... novel angle ("Bank deposit?" for SILT was brilliant
+  once; a 2023 reuse is a different object). Ruled out: not important for
+  training a fine-tuned model (the hope), and raw repetition frequency is
+  mechanically computable from the bank when the diversity audit needs it —
+  perceived staleness adds little over that count.
 
 ## Addendum: convention binaries (dropped; ratified 2026-07-04)
 
