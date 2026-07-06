@@ -557,6 +557,16 @@ inside the economy-gate batch (queue item 1). Combined c2 totals (43 accepts /
 49 revise-rejects): v2 17 + 45, mt-31B 17 + 42, mt-26B 6 + 46 — v2 and the 31B
 candidate are now dead even on accepts and v2 leads on kills.
 
+**#8 (2026-07-06):** PILLOW "Nightly recipient of drool deposits" stays an
+accept, LOW PRIORITY — a real false kill but not worth tuning toward. EMBER
+"Orange eye winking in the ash long after the flames give up" demoted to revise
+("feels pretty bloated / inelegant") — the unanimous economy panel called it
+correctly, so the idea-12 watch item dissolves and the adopted v2e re-scores to
+**25/42 accepts + 49/50 kills** (genhold 6/12 + 16/16, from cache). Approved
+next: the screen-off measurement (v2e alone on all rows, ~51 first-look rows,
+user go for the multi-hour run), then the single-flow consolidation design, then
+the 26B rehab measurement.
+
 ## Machine coordination
 
 **Overnight 2026-07-03→04:** machine handed to the fine-tune thread ("12B
