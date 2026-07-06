@@ -12,18 +12,18 @@ scored every economy-sensitive probe row correctly except UMBRELLA (the accepted
 taste miss) — the jitter integrates out.
 
 So v2e runs the economy check three times, once per wording, and gates in code
-only on a UNANIMOUS panel of (is_bloated AND quote-validated evidence).
-Dissent leaves the clue unbloated; minority votes are logged as advisories.
+only on a UNANIMOUS panel of (is_bloated AND quote-validated evidence). Dissent
+leaves the clue unbloated; minority votes are logged as advisories.
 
 Panel composition (frozen after exhaustive offline evaluation of all cached
 compositions and thresholds on the full gentune survivors): the deletion-test
-siblings t3 and t4 plus the trimming-editor framing, unanimity required —
-19/20 accepts and 8/9 kills at the confirm stage, the Pareto front of every
-rule tried; the strict members carry the kills and the editor's dissent
-protects prize-fact specifics (KETCHUP "in the 1830s"). Known residuals:
-PILLOW (3 of 4 wordings vote its tail bloated) and UMBRELLA (accepted taste
-miss). Member texts are byte-identical to their rungs, so their calls replay
-from cache, as do substitution, truth, and sense (v2 at 9f2eb99).
+siblings t3 and t4 plus the trimming-editor framing, unanimity required — 19/20
+accepts and 8/9 kills at the confirm stage, the Pareto front of every rule
+tried; the strict members carry the kills and the editor's dissent protects
+prize-fact specifics (KETCHUP "in the 1830s"). Known residuals: PILLOW (3 of 4
+wordings vote its tail bloated) and UMBRELLA (accepted taste miss). Member texts
+are byte-identical to their rungs, so their calls replay from cache, as do
+substitution, truth, and sense (v2 at 9f2eb99).
 
 Production cost: +2 economy calls per clue reaching confirm.
 """
@@ -56,10 +56,15 @@ equated with a quantity whose unit is obvious ("Retirement age, often"
 itself, not at the keys; that is not a grammar mismatch. None of
 those are reference failures — flag "other_object" only when the
 words, read fairly, describe a different specific thing, and name
-that thing. For quantities, apply the value test: the equation is
-fair only when the named quantity's own value IS the number. A bet,
-prize, or event merely associated with the number — one whose own
-value is something else — is a different thing.
+that thing. For a number answer, apply the value test to the thing
+the clue names: an amount, duration, age, score, or prize whose value
+IS the number points at the answer — a jackpot of a million IS a
+million; an age of seventy IS seventy. A thing whose own value is
+something else is a different thing, however strongly the number is
+associated with it. For an event or deed answer, the reverse also
+fails: an event is never its bare point value — a clue reading "Six
+points" describes the score, not the scoring play that earns it; flag
+"other_object" and name the value.
 
 Separately report a grammar mismatch: right referent, but the
 definition cannot replace the answer in a sentence (part of speech,

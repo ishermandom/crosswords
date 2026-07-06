@@ -367,15 +367,46 @@ kills; the editor's dissent protects prize-fact specifics. v2e updated: panel
 deposits" (3 of 4 wordings vote its tail bloated — flagged for a user ruling,
 cf. UMBRELLA/HAMMOCK) and UMBRELLA (accepted).
 
-**Genhold adoption run (in flight, ~72 fresh calls ≈ 40 min):** first unseal of
-genhold for all of v2. Pre-registered: every confirm-reaching accept holds
-(MILLION "Dollars in the top prize" AND "The jackpot Regis dangled" via the
-value test, TOUCHDOWN "Reason to spike the ball" via consequence framing, EMBER,
-MAPLE, IGLOO, BAKER); kills include TOUCHDOWN "Six points?" (value test), ALARM
-(unmarked hyperbole, truth), THERMOSTAT "Wall dial..." (economy panel),
-THERMOSTAT-thermometer (other_object), WRAPS "Secrecy?" (idiom sense). HAMMOCK
-is soft — discounts either way. Adoption bar vs the c2 table (v1 genhold: 5/13 +
-12/15): clearly better on both axes, no new failure family.
+**Genhold adoption run (~72 fresh calls ≈ 40 min):** first unseal of genhold for
+all of v2. Pre-registered: every confirm-reaching accept holds (MILLION "Dollars
+in the top prize" AND "The jackpot Regis dangled" via the value test, TOUCHDOWN
+"Reason to spike the ball" via consequence framing, EMBER, MAPLE, IGLOO, BAKER);
+kills include TOUCHDOWN "Six points?" (value test), ALARM (unmarked hyperbole,
+truth), THERMOSTAT "Wall dial..." (economy panel), THERMOSTAT-thermometer
+(other_object), WRAPS "Secrecy?" (idiom sense). HAMMOCK is soft — discounts
+either way. Adoption bar vs the c2 table (v1 genhold: 5/13 + 12/15): clearly
+better on both axes, no new failure family.
+
+**Genhold result** (72 calls, 38 min; plus the free gentune replay under the
+frozen panel: 19/30 + 33/34): genhold accepts 5/13, kills 14/15 → v2e totals
+24/43 + 47/49 vs v1's 17/43 + 42/49 — decisively better on both axes.
+Pre-registration hits: TOUCHDOWN-spike recovered, ALARM and both THERMOSTAT rows
+and WRAPS-secrecy killed, MILLION-dollars/MAPLE/IGLOO/BAKER held. Misses, all
+three diagnosed from fields:
+
+- MILLION "The jackpot Regis dangled" false-killed: the turn derived "Value of
+  Jackpot = Million" and STILL flagged other_object — the value-test sentence's
+  "bet, prize, or event" list planted prize as an other_object cue. Wording
+  defect, ours.
+- TOUCHDOWN "Six points?" banked: the value test as written LICENSES event-value
+  equations ("the thing worth six points is the touchdown itself"). Scope
+  defect, ours.
+- EMBER false-killed by a UNANIMOUS economy panel on "long after the flames give
+  up" — arguably the defining behavior (an ember is what glows after the fire).
+  First unanimous panel miss; single row; WATCH, no economy try.
+
+**Try 6 of 6 (rung 7, in flight): value-test rewrite.** Both substitution misses
+encode failures against the user's pre-genhold rulings (calibration #6/#7 named
+both rows), so this is finishing the encoding, not holdout mining. New text:
+amount/duration/age/score/prize whose value IS the number points at the answer
+(jackpot of a million IS a million); a thing whose own value is something else
+is a different thing; and an event is never its bare point value in either
+direction ("Six points" describes the score, not the play). Substitution
+re-keys: gentune ~29 + genhold ~12 calls ≈ 25 min. Targets: jackpot holds, "Six
+points?" dies. Guards: SEVENTY both rows, EIGHTY both dispositions,
+TOUCHDOWN-spike, MILLION-dollars, all wrong-object kills, the personification
+family. If guards regress, fall back to the pre-try-6 v2e (7032ad3) and adopt it
+as-is.
 
 **Try 4 (superseded mid-flight by the rung-5 read):** two changes, and one scope
 cut. (a) The deletion test runs on clauses and phrases, never single words. (b)
