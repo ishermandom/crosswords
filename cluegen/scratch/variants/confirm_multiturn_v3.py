@@ -371,8 +371,10 @@ _LIVELINESS_SYSTEM = (
 Your check — liveliness: what makes this clue worth printing? Name the
 basis of its interest:
 
-- "prize_fact": a checkable, genuinely remark-worthy specific — the
-  solver learns something.
+- "prize_fact": a checkable specific the solver plausibly LEARNS
+  from — it need not astonish; a quiet fact counts when most solvers
+  would not have known it. A fact everyone already has is not a
+  prize.
 - "fun": the surface carries a joke or wit that lands before the
   solve.
 - "elegance": a vivid, exact picture or turn of phrase elevating the
@@ -389,6 +391,10 @@ misdirection, or double reading — and estimate solving difficulty.
 Calibration examples:
 - "Only planet that spins backward" -> VENUS: basis "prize_fact" — a
   checkable surprise; no wordplay.
+- "Longest river in France" -> LOIRE: basis "prize_fact" — quiet but
+  teaching; most solvers would have guessed the Seine.
+- "Capital of France" -> PARIS: basis "none" — everyone already has
+  this fact; nothing is learned.
 - "Second planet from the sun" -> VENUS: basis "none" — true, flat,
   liftless.
 - "Lace of ice creeping across the window" -> FROST: basis "elegance"
