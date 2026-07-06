@@ -705,12 +705,12 @@ lease-script fork reunifies (git divergence still on the user's list).
 ## 26B single-flow close-out (2026-07-06)
 
 Final word on the cheap tier: under adopted v2e on the full sets
-(`mt26_screenoff_*`), the 26B holds **37/42 accepts** — the v1 referent
-flaw is fully cured, vindicating the user's promptability bet — but swings
-lenient on kills: **32/50** (banks a third of revise/rejects). Gentune
-29/30 + 22/34; genhold 8/12 + 10/16. High-recall/low-precision has no slot
-in the judge path; #judge-26b-referent closed in tasks.md. Speed for the
-record: the 552-call sweep took 54 min (~5.9 s/call).
+(`mt26_screenoff_*`), the 26B holds **37/42 accepts** — the v1 referent flaw is
+fully cured, vindicating the user's promptability bet — but swings lenient on
+kills: **32/50** (banks a third of revise/rejects). Gentune 29/30 + 22/34;
+genhold 8/12 + 10/16. High-recall/low-precision has no slot in the judge path;
+#judge-26b-referent closed in tasks.md. Speed for the record: the 552-call sweep
+took 54 min (~5.9 s/call).
 
 ## 26B multi-turn measurement (user-approved 2026-07-04 ~22:00)
 
@@ -824,6 +824,18 @@ to the setter-vs-judge decision. **Setter-vs-judge decided by the user
 (2026-07-06): after the idea-13 update, move to setter-side issues — the
 residual judge misses (the definitional-completeness economy family,
 HUMMINGBIRD-"Only") are mostly unimportant; PARK them, no idea 14.**
+
+**Calibration #9 (2026-07-06, false-reject taste details):** HAMMER is "rather
+flat" — "for driving nails" is a DIFFICULTY MODIFIER, not charm or essential
+definition; with "nails" present the clue turns trivial ("Claw-backed tool"
+already suffices). The RAT/ORCHARD/CACTUS/PIANO tails read the same way:
+difficulty dials, not quality. GIFT "Inborn knack, as for languages" is a
+reasonable clue (the panel's kill there is a real miss). WRAPS is fine either
+way. Label surgery kept minimal per the diminishing-returns call: HAMMER and
+WRAPS → soft; others unchanged. **Durable concept for the setter work: tails can
+be difficulty modifiers — a legitimate dial the SETTER should control
+deliberately (targeting a difficulty) rather than a flaw the judge prosecutes;
+the liveliness turn's difficulty field is the natural consumer.**
 
 **Rung 1 (queued FIFO behind the 26B measurement):** `confirm_multiturn_v3 .py`
 = adopted v2e + liveliness turn (basis enum prize_fact/fun/elegance/ aha/none +
