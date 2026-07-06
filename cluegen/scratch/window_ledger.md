@@ -348,16 +348,34 @@ on fresh rows, not independent wordings — the probe couldn't show this because
 each wording was tuned against it. The date is the prize-fact's teeth and the
 joke's furniture is not bloat; a diverse third opinion protects both.
 
-**Rung 6 (panel v2, in flight; uses wording try 5 of 6 on the new member):** t4
-swapped out for a trimming-editor framing with its own examples (TROLLEY/ LIME
-cuts, WATCH/BEAVER keeps; "never cut the joke, the paradox, the poetry, or the
-specific that gives a fact its teeth — a date, a place, a number"). Panel = t1 +
-t3 + editor, 2-of-3 unchanged. Fresh cost: editor wording × ~29 survivors ≈ 15
-min; everything else replays. Predictions: KETCHUP and PILLOW recover → accepts
-20/30; kills 32-33/34 — EIGHTY-wager's kill leaned on the t3+t4 agreement and
-may bank; if it does, that is a substitution value-test to-do (its true flaw),
-not a panel failure, and it goes to the watch list rather than another economy
-try.
+**Rung 6 (panel v2; wording try 5 of 6 on the new member):** t4 swapped out for
+a trimming-editor framing with its own examples (TROLLEY/LIME cuts, WATCH/BEAVER
+keeps). Panel = t1 + t3 + editor, 2-of-3 unchanged. Result (29 calls, 14.5 min):
+accepts 17/30, kills 33/34 — KETCHUP recovered and EIGHTY-wager's kill held, but
+the editor proved strict on prize specifics: HONEY "3,000-year-old Egyptian
+tombs" and TOASTER died to t3+editor majorities; PILLOW died again.
+
+**Panel frozen by exhaustive offline evaluation (free, all cached votes).** With
+four wordings' votes on all 29 gentune survivors, every composition × threshold
+was scored. The Pareto front: **unanimous (t3 + t4 + editor) = 19/20
+confirm-stage accepts + 8/9 kills** (3-of-4 over the quad ties it at one more
+call). All 2-of-3 rules cap at 18/20; unanimity over t1-containing triples
+reaches 20/20 accepts but drops to 7/9 kills. The strict members carry the
+kills; the editor's dissent protects prize-fact specifics. v2e updated: panel
+(t3, t4, editor), gate on unanimity, docstrings and offline checks updated
+(green). Residual misses, both label-suspect: PILLOW "Nightly recipient of drool
+deposits" (3 of 4 wordings vote its tail bloated — flagged for a user ruling,
+cf. UMBRELLA/HAMMOCK) and UMBRELLA (accepted).
+
+**Genhold adoption run (in flight, ~72 fresh calls ≈ 40 min):** first unseal of
+genhold for all of v2. Pre-registered: every confirm-reaching accept holds
+(MILLION "Dollars in the top prize" AND "The jackpot Regis dangled" via the
+value test, TOUCHDOWN "Reason to spike the ball" via consequence framing, EMBER,
+MAPLE, IGLOO, BAKER); kills include TOUCHDOWN "Six points?" (value test), ALARM
+(unmarked hyperbole, truth), THERMOSTAT "Wall dial..." (economy panel),
+THERMOSTAT-thermometer (other_object), WRAPS "Secrecy?" (idiom sense). HAMMOCK
+is soft — discounts either way. Adoption bar vs the c2 table (v1 genhold: 5/13 +
+12/15): clearly better on both axes, no new failure family.
 
 **Try 4 (superseded mid-flight by the rung-5 read):** two changes, and one scope
 cut. (a) The deletion test runs on clauses and phrases, never single words. (b)

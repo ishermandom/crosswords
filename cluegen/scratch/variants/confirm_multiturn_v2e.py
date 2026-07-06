@@ -12,15 +12,18 @@ scored every economy-sensitive probe row correctly except UMBRELLA (the accepted
 taste miss) — the jitter integrates out.
 
 So v2e runs the economy check three times, once per wording, and gates in code
-on a 2-of-3 majority of (is_bloated AND quote-validated evidence). Minority
-votes are logged as advisories.
+only on a UNANIMOUS panel of (is_bloated AND quote-validated evidence).
+Dissent leaves the clue unbloated; minority votes are logged as advisories.
 
-Panel composition note: the first panel (tries 1/3/4) failed its fresh-row test
-— t4 is a direct edit of t3, and the sibling pair outvoted t1 on KETCHUP "in the
-1830s" and PILLOW's joke furniture. Diversity is the point of a panel, so the
-third member is now a trimming-editor framing with its own examples; t1 and t3
-stay byte-identical to their rungs (those calls replay from cache), as do
-substitution, truth, and sense (v2 at 9f2eb99).
+Panel composition (frozen after exhaustive offline evaluation of all cached
+compositions and thresholds on the full gentune survivors): the deletion-test
+siblings t3 and t4 plus the trimming-editor framing, unanimity required —
+19/20 accepts and 8/9 kills at the confirm stage, the Pareto front of every
+rule tried; the strict members carry the kills and the editor's dissent
+protects prize-fact specifics (KETCHUP "in the 1830s"). Known residuals:
+PILLOW (3 of 4 wordings vote its tail bloated) and UMBRELLA (accepted taste
+miss). Member texts are byte-identical to their rungs, so their calls replay
+from cache, as do substitution, truth, and sense (v2 at 9f2eb99).
 
 Production cost: +2 economy calls per clue reaching confirm.
 """
@@ -156,39 +159,6 @@ _TRUTH_SCHEMA = {
   'required': ['analysis', 'failing_qualifiers'],
 }
 
-_ECONOMY_SYSTEM_T1 = (
-  _PANEL_PREAMBLE
-  + """
-Your check — economy: does every meaning-carrying word earn its keep?
-A word earns its place by narrowing the definition OR by giving the
-solver a true, charming picture. Remember the answer is hidden from
-the solver: a word naming an inherent property of the answer can be a
-load-bearing hint even though it adds nothing to a dictionary
-definition. Scene-setting that charms is legal.
-
-Bloat is what remains: words that restate what another word already
-said, and tails that neither define nor delight.
-
-Calibration examples:
-- "Green fuzz slowly claiming the forgotten loaf" -> MOLD: no bloat —
-  "slowly" is an inherent-property hint that helps the hidden answer
-  emerge, and the scene is fair.
-- "Armored sentinel standing guard over the castle" -> KNIGHT:
-  bloated — "standing guard" restates "sentinel".
-- "Night watchman on patrol" -> GUARD: bloated — "on patrol" adds
-  neither definition nor charm.
-- "Frozen rain" -> SLEET: no bloat — dropping either word breaks the
-  definition."""
-)
-
-_ECONOMY_PROMPT_T1 = (
-  'Check economy for this one clue. In "analysis", weigh each '
-  'meaning-carrying word: does it narrow the definition or carry true '
-  'charm? In "bloat_evidence", quote every phrase that does neither, '
-  "using the clue's own words (empty list if none). Then commit "
-  '"is_bloated".\n\n'
-)
-
 _ECONOMY_SYSTEM_T3 = (
   _PANEL_PREAMBLE
   + """
@@ -227,6 +197,55 @@ Calibration examples:
 )
 
 _ECONOMY_PROMPT_T3 = (
+  'Check economy for this one clue. In "analysis", run the deletion '
+  'test on each suspect phrase: name what the clue loses without it — '
+  'its point, or only a literal detail. In "bloat_evidence", quote '
+  'every phrase whose deletion costs only a detail, using the '
+  "clue's own words (empty list if none). Then commit "
+  '"is_bloated".\n\n'
+)
+
+_ECONOMY_SYSTEM_T4 = (
+  _PANEL_PREAMBLE
+  + """
+Your check — economy: does every meaning-carrying word earn its keep?
+Run the deletion test on clauses and phrases, never on single words.
+If deleting a phrase costs the clue its point — its joke, its
+paradox, its poetry, or the surprising specific that makes a fact
+worth banking — the phrase IS the point and earns its place. If the
+deletion costs only a literal detail, the phrase is bloat, however
+true or familiar the detail.
+
+Two rules for modifiers. A modifier that REPEATS content already in
+the clue is restatement — bloat at any length ("hot" before "heat";
+"standing guard" after "sentinel"). A modifier adding sensory
+texture or scene — a color, a season, a place on the counter — is
+charm, never bloat: the answer is hidden, and texture is how it
+emerges.
+
+Calibration examples:
+- "Feathered alarm clock with no snooze button" -> ROOSTER: no bloat
+  — delete "with no snooze button" and the joke dies; the tail is the
+  point.
+- "Green fuzz slowly claiming the forgotten loaf" -> MOLD: no bloat —
+  "slowly" and "forgotten" are texture; the scene is the charm.
+- "Crackling tower of driftwood lighting the beach at midnight" ->
+  BONFIRE: no bloat — the scene is poetry elevating a plain gloss.
+- "Armored sentinel standing guard over the castle" -> KNIGHT:
+  bloated — "standing guard" restates "sentinel".
+- "Sticky glue that adheres" -> PASTE: bloated — "that adheres"
+  repeats what "Sticky" and "glue" already say.
+- "Four-legged seat pulled up to the bar and spun after last call" ->
+  STOOL: bloated — the definition and its character are complete at
+  "the bar"; the spin is a true, even amusing detail, but the point
+  was already made.
+- "Night watchman on patrol" -> GUARD: bloated — "on patrol" adds
+  neither definition nor charm.
+- "Frozen rain" -> SLEET: no bloat — dropping either word breaks the
+  definition."""
+)
+
+_ECONOMY_PROMPT_T4 = (
   'Check economy for this one clue. In "analysis", run the deletion '
   'test on each suspect phrase: name what the clue loses without it — '
   'its point, or only a literal detail. In "bloat_evidence", quote '
@@ -390,7 +409,7 @@ def _economy_panel_verdict(clue, panel, verdict, flaws, advisories):
       evidence_union.extend(
         entry for entry in validated if entry not in evidence_union
       )
-  if gate_votes >= 2:
+  if gate_votes == len(panel):
     flaws = flaws + [f'economy: {entry}' for entry in evidence_union]
     return 'fixable' if verdict == 'bankable' else verdict, flaws, advisories
   if gate_votes:
@@ -401,8 +420,8 @@ def _economy_panel_verdict(clue, panel, verdict, flaws, advisories):
 
 
 _ECONOMY_PANEL = (
-  (_ECONOMY_SYSTEM_T1, _ECONOMY_PROMPT_T1),
   (_ECONOMY_SYSTEM_T3, _ECONOMY_PROMPT_T3),
+  (_ECONOMY_SYSTEM_T4, _ECONOMY_PROMPT_T4),
   (_ECONOMY_SYSTEM_ED, _ECONOMY_PROMPT_ED),
 )
 
@@ -444,8 +463,8 @@ def _multi_turn_confirm(judge_turn, word, clue):
     'turns': {
       'substitution': substitution,
       'truth': truth,
-      'economy_t1': panel[0],
-      'economy_t3': panel[1],
+      'economy_t3': panel[0],
+      'economy_t4': panel[1],
       'economy_ed': panel[2],
       'sense': sense,
     },
