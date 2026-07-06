@@ -689,15 +689,17 @@ Two mechanisms, both mirrors of flaws already fixed on the confirm side:
 **2026-07-04 evening handoff (done):** ceded after slot 3a; re-acquired after
 the user's direct go superseded the scan.
 
-**2026-07-05 overnight handoff (ACTIVE):** batch train paused after idea-12 rung
-2 (user direction); the machine goes to the fine-tune thread for an overnight
-training run. T0/T15/T30 protocol REINSTATED for this handoff only (user
-re-confirmed: a one-off, not a standing rule): a background scan first waits to
-OBSERVE the fine-tune lease, then after any release requires the lease free at
-T0, T15, and T30 (15 min apart) before declaring it clear to re-acquire for
-idea-12 rung 3. If the session restarts, re-arm the same scan before touching
-the lease. Once this handoff is done, cross-thread scheduling goes back to
-coordinating through the user until the lease-script fork reunifies.
+**2026-07-05 overnight handoff (done):** batch train paused after idea-12 rung
+2; T0/T15/T30 scan (one-off) cleared 07-05 ~15:18 and the ladder resumed.
+
+**2026-07-06 overnight handoff (ACTIVE):** fine-tune thread runs overnight ("15k
+rung night 2", lease to ~10:09). Per user, ANOTHER one-off cadence — never a
+standing rule; the cadence is user-specified per handoff: batch runs may start
+once the lease measures free at **T0, T5, and T10** (10 free minutes with a
+midpoint check). The screen-off driver (pid 79773) implements exactly this gate,
+loops back to waiting if any check finds the lease held, and releases when its
+runs finish. Cross-thread scheduling otherwise goes through the user until the
+lease-script fork reunifies (git divergence still on the user's list).
 
 ## In flight: 26B multi-turn measurement (user-approved 2026-07-04 ~22:00)
 
