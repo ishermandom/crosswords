@@ -952,6 +952,35 @@ craft pushing vivid-but-substitutable shapes; editor treating flatness as fatal
 at KEEP; and the difficulty-modifier dial (calibration #9) as an explicit
 draft-stage control.
 
+## Setter redesign — user framing + design round 1 (2026-07-06)
+
+**User framing (verbatim intent):** the setter optimizes for expansiveness — if
+unsure, keep; the judge scores. The goal is to send the best clues the setter
+can generate (multiple per word is fine, up to a fixed cap), not to pre-filter.
+No baking the judge into the setter. The setter needs brainstorm GUIDANCE
+(unguided candidate generation yields exclusively poor clues): aim for a high
+probability of at least a couple of interesting clues per word, even for the
+hardest inputs. "Interesting" ≈ satisfying for the solver. The engineering
+surface is both single prompts and the SEQUENCE of prompts that guides the
+setter's thinking.
+
+**Design-round rulings:**
+
+- **Satisfaction is the target, not difficulty** (calibration #10). Difficulty
+  was only ever a proxy — early drafts were unsatisfying by being far too easy,
+  and difficulty is one component of satisfaction, far from the only one. Even
+  satisfaction-as-target is worth validating before heavy investment.
+- **Ranking owner and early-stop policy: undecided by design.** Postulate
+  hypotheses, run the cheapest experiments that give an early signal, prioritize
+  by expected value; more detailed signal only when worth it vs testing other
+  ideas.
+- **Setter `confidence` measures nothing usable**: the prompt says only
+  `"confidence" (honest)` — referent unspecified — and all-CUT fallbacks are
+  stamped low, so it entangles editor-survival. No free ranking-validity check
+  exists; H2 (below) replaces it.
+- **Self-editor fate: open**, pending the tradeoff walkthrough (kill authority
+  vs reflection value vs metadata production vs ranker-repurposing).
+
 ## Remaining queue
 
 `#eval-expansion` DONE through the 2×2 (sets built
