@@ -923,6 +923,35 @@ Overlap check: the queue's screen-recall examples CENTURY, CHECK "Curb an
 impulse", and STOCK "Simmering base for a stew" all flagged here too; MURMUR
 "Low hum of a restless crowd" passed.
 
+## Setter funnel evidence (2026-07-06, free transcript analysis)
+
+`setter_draft_inventory.py` parses the July-1/2 `pipeline_*.log` transcripts
+(the bank's provenance) into per-word funnel rows —
+`logs/setter_draft_inventory.jsonl`. Funnel shape: 338 word runs over 150 words
+→ 1391 drafts → 193 editor KEEPs (14%) → ~348 judge submissions (299 harvested +
+49 single-picks) → 75 banked.
+
+Qualitative read of the six flagged bank words that join cleanly to their runs
+(the other 17 need a fuzzier join — clue text drifts between harvest and bank):
+
+- **The self-editor already prosecutes flatness in its CUT rationales** ("lacks
+  the required liveliness", "dictionary-flat", "flat and repetitive") — yet what
+  it KEEPs is often still flat. Its liveliness bar diverges from the v3 judge's.
+- **ASIDE is the clean smoking gun**: the editor CUT "Spoken directly to the
+  gallery?" (vivid theater angle) and KEPT "Brief detour in a conversation" (now
+  flagged flat). Substitution safety appears to outrank charm at KEEP time.
+- **COURT shows the other failure shape**: every vivid draft genuinely failed
+  the substitution test (part-of-speech mismatches); the flat double definition
+  was the only survivor. There the draft pool, not the editor, is the shortage —
+  vivid _and_ substitution-safe drafts are scarce.
+
+Working hypothesis for `#setter-tuning`: liveliness and substitution safety
+trade off in the draft pool; the editor's KEEP gate is substitution-first, so
+flat-but-safe wins. Fix directions to design (user round pending): draft-stage
+craft pushing vivid-but-substitutable shapes; editor treating flatness as fatal
+at KEEP; and the difficulty-modifier dial (calibration #9) as an explicit
+draft-stage control.
+
 ## Remaining queue
 
 `#eval-expansion` DONE through the 2×2 (sets built
