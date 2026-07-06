@@ -67,6 +67,10 @@ _SETS = {
   # adoption decisions only, like holdout.
   'gentune': _SCRATCH / 'expansion_tune_verdicts.jsonl',
   'genhold': _SCRATCH / 'expansion_holdout_verdicts.jsonl',
+  # The production clue bank, for audits: every row is already banked, so the
+  # reference verdict is accept and each NO row is an audit flag — a banked clue
+  # the current judge would no longer bank.
+  'bank': _SCRATCH.parent / 'local' / 'clue_bank.jsonl',
 }
 _CACHE_PATH = _SCRATCH / 'cache' / 'judge_cache.jsonl'
 _LOG_DIR = _SCRATCH / 'logs'
@@ -239,6 +243,14 @@ def _load_set(set_name):
         'verdict': record['label']['verdict'],
         'basis': record['label']['basis'],
         'source': record['source'],
+      }
+    if set_name == 'bank':
+      # Banked rows carry no label; audit them against 'accept' so every judge
+      # disagreement surfaces as a NO flag.
+      record = {
+        'word': record['word'],
+        'clue': record['clue']['clue'],
+        'verdict': 'accept',
       }
     record['eval_set'] = set_name
     records.append(record)
