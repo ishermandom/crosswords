@@ -277,6 +277,12 @@ def main():
     help='ollama model for the confirm stage (size-vs-protocol experiments)',
   )
   parser.add_argument(
+    '--confirm-all',
+    action='store_true',
+    help='run the confirm on every row and score it alone, ignoring screen '
+    'verdicts (single-flow measurements)',
+  )
+  parser.add_argument(
     '--patch',
     default=None,
     help="python file exec'd to monkeypatch pipeline_local",
@@ -338,12 +344,17 @@ def main():
     )
 
   # Pass 2 (31B): confirm sample i only where screen sample i was bankable, as
-  # production routes.
+  # production routes — unless `--confirm-all`, which runs the confirm on every
+  # row and scores it alone (screen verdicts recorded but ignored), for
+  # single-flow measurements.
   for record in records:
     record['confirms'] = []
     record['cascade'] = []
     for sample in range(args.samples):
-      if record['screens'][sample]['verdict'] != 'bankable':
+      if (
+        not args.confirm_all
+        and record['screens'][sample]['verdict'] != 'bankable'
+      ):
         record['confirms'].append(None)
         record['cascade'].append(record['screens'][sample]['verdict'])
         continue
