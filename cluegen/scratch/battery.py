@@ -251,6 +251,7 @@ def _load_set(set_name):
         'word': record['word'],
         'clue': record['clue']['clue'],
         'verdict': 'accept',
+        'basis': None,
       }
     record['eval_set'] = set_name
     records.append(record)
