@@ -901,6 +901,28 @@ economy family plus GIFT-"Inborn knack, as for languages" and RAT-"Informer who
 turns on accomplices" (real misses, user-ruled diminishing returns). Runs:
 `idea13_adopt_gentune` / `idea13_adopt_genhold` logs, 62 fresh calls, ~34 min.
 
+## Bank audit (2026-07-06, flag-and-report — nothing deleted)
+
+Adopted v3 judge over the 75-row `local/clue_bank.jsonl`, run cheap per the
+user's cheaper-tests guideline: a 10-row spread full-protocol probe (~40 min)
+found every flag came from the liveliness flat-gate — zero substitution, truth,
+or economy-unanimous flags — so the remaining 65 rows ran the liveliness turn
+only (1 call/row instead of 7; `bank_liveliness_audit.py`, cache-key-compatible
+with a future full-protocol pass).
+
+**Result: 23/75 flagged** — 22 flat-gloss (`basis: none`) + 1 unearned '?'
+(DAISY "Subject of a petal-plucking game?"). Full list in
+`logs/bank_liveliness_audit.log`. Reading: the bank predates the liveliness
+gate, and about a third of it is flat-but-correct — evidence that the setter's
+shortage is charm at generation time, not judge leniency; feeds
+`#setter-tuning`. Caveat: several flags look like judge taste, not defects —
+MELODY "Whistleable earworm", SELDOM "Once in a blue moon", ZED "That last
+character, overseas", COURT "Royal residence or tennis arena" (double
+definition, a legitimate form) — so the true flat rate is somewhat below 23/75.
+Overlap check: the queue's screen-recall examples CENTURY, CHECK "Curb an
+impulse", and STOCK "Simmering base for a stew" all flagged here too; MURMUR
+"Low hum of a restless crowd" passed.
+
 ## Remaining queue
 
 `#eval-expansion` DONE through the 2×2 (sets built

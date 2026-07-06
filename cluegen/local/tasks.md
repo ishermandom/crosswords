@@ -201,7 +201,15 @@ done — see the log for the curve and the criteria re-analysis.
       liveliness turn's difficulty field is the consumer. Inputs before
       designing: the banked-clue audit (adopted judge over ~75 banked clues,
       flag-and-report) and the setter-output distribution (what fraction of
-      candidates are flat glosses vs charm shapes).
+      candidates are flat glosses vs charm shapes). Note: bank audit DONE
+      2026-07-06 (flag-and-report, nothing deleted): 23/75 rows flagged, 22
+      flat-gloss + 1 unearned '?', zero substitution/truth/economy-unanimous
+      flags in the 10-row full-protocol probe. Read: about a third of what the
+      old pipeline banked is flat-but-correct — the shortage is charm at
+      generation, not judge strictness. Some flags are judge taste, not defects
+      (MELODY "Whistleable earworm", SELDOM "Once in a blue moon", ZED "That
+      last character, overseas", COURT double definition). Full list:
+      `scratch/logs/bank_liveliness_audit.log`; ledger "Bank audit" section.
 - [ ] **Align local vs cloud judge requirements** #judge-alignment — both judges
       should enforce the same requirement set, each via methodology fitting the
       model's strength (user direction 2026-07-04). DEPRIORITIZED behind
