@@ -810,7 +810,10 @@ runs, no banking runs are scheduled, and the judge stack is still moving; the
 trigger is the first consumer (a scheduled banking run, or a stabilized stack).
 Pulled forward instead, as measurement: run the adopted judge over the ~75
 banked clues to FLAG purge candidates and REPORT them — no deletions — as input
-to the setter-vs-judge decision.
+to the setter-vs-judge decision. **Setter-vs-judge decided by the user
+(2026-07-06): after the idea-13 update, move to setter-side issues — the
+residual judge misses (the definitional-completeness economy family,
+HUMMINGBIRD-"Only") are mostly unimportant; PARK them, no idea 14.**
 
 **Rung 1 (queued FIFO behind the 26B measurement):** `confirm_multiturn_v3 .py`
 = adopted v2e + liveliness turn (basis enum prize_fact/fun/elegance/ aha/none +
