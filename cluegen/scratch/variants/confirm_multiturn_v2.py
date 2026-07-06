@@ -169,19 +169,23 @@ _ECONOMY_SYSTEM = (
   _PANEL_PREAMBLE
   + """
 Your check — economy: does every meaning-carrying word earn its keep?
-A word earns its place by narrowing the definition, by naming an
-inherent property that helps the hidden answer emerge (a single word
-like "slowly" for something that always acts slowly), or by carrying
-genuine poetry.
+Judge a suspect phrase by deleting it and asking what the clue LOSES.
+If the deletion costs the clue its point — its joke, its paradox, its
+poetry, or the surprising specific that makes a fact worth banking —
+the phrase IS the point and earns its place. If the deletion costs
+only a literal detail, the phrase is bloat, however true or familiar
+the detail. A single word naming an inherent property ("slowly" for
+something that always acts slowly) is a hint that helps the hidden
+answer emerge — never flag a lone modifier as a surplus fact.
 
-Bloat is what remains, and it has three common shapes: words that
-restate what another word already said; dead tails that neither
-define nor delight; and the surplus fact — once the definition is
-already complete, one more literal fact about the answer is bloat,
-however true. Only genuine charm excuses words beyond a complete
-definition; a mechanical detail does not.
+Bloat's common shapes: words that restate what another word already
+said; dead tails that neither define nor delight; and the trailing
+fact appended after the clue's point has already been made.
 
 Calibration examples:
+- "Feathered alarm clock with no snooze button" -> ROOSTER: no bloat
+  — delete "with no snooze button" and the joke dies; the tail is the
+  point.
 - "Green fuzz slowly claiming the forgotten loaf" -> MOLD: no bloat —
   "slowly" is an inherent-property hint, and the scene is the charm.
 - "Crackling tower of driftwood lighting the beach at midnight" ->
@@ -189,8 +193,9 @@ Calibration examples:
 - "Armored sentinel standing guard over the castle" -> KNIGHT:
   bloated — "standing guard" restates "sentinel".
 - "Four-legged seat pulled up to the bar and spun after last call" ->
-  STOOL: bloated — the definition is complete at "the bar"; the
-  spinning tail is one more fact, not poetry.
+  STOOL: bloated — the definition and its character are complete at
+  "the bar"; the spin is a true, even amusing detail, but the point
+  was already made.
 - "Night watchman on patrol" -> GUARD: bloated — "on patrol" adds
   neither definition nor charm.
 - "Frozen rain" -> SLEET: no bloat — dropping either word breaks the
@@ -198,10 +203,11 @@ Calibration examples:
 )
 
 _ECONOMY_PROMPT = (
-  'Check economy for this one clue. In "analysis", weigh each '
-  'meaning-carrying word: does it narrow the definition or carry true '
-  'charm? In "bloat_evidence", quote every phrase that does neither, '
-  "using the clue's own words (empty list if none). Then commit "
+  'Check economy for this one clue. In "analysis", run the deletion '
+  'test on each suspect phrase: name what the clue loses without it — '
+  'its point, or only a literal detail. In "bloat_evidence", quote '
+  'every phrase whose deletion costs only a detail, using the '
+  "clue's own words (empty list if none). Then commit "
   '"is_bloated".\n\n'
 )
 
