@@ -769,11 +769,14 @@ the 31B (10.0 min for the same 116 calls that took 61.9 at 31B). Even so, the
 21 true accepts), so its kills can't gate; its banks are 9/10 precise but a
 pass-through-only stage saves almost nothing.
 
-Design consequence: single flow, one protocol, **31B as the only judge tier**;
-26B leaves the judge path entirely (screen policy already dead; 26B multi-turn
-now measured worse). Production cost control comes from substitution-first
-short-circuit (~1 turn ≈ 30 s per junk clue), not from a smaller model.
-Difficulty assignment still needs re-homing out of the screen.
+Design consequence: single flow, one protocol, **31B as the only judge tier for
+now**; the 26B leaves the judge path (screen policy already dead; 26B multi-turn
+measured lenient) but stays on the backburner, not closed — user 2026-07-06: the
+depths aren't mined; only one protocol variant was ever tried on the 26B, and
+its ~6× speed keeps the prize large. See `#judge-26b-backburner` in tasks.md.
+Production cost control meanwhile comes from substitution-first short-circuit
+(~1 turn ≈ 30 s per junk clue), not from a smaller model. Difficulty assignment
+still needs re-homing out of the screen.
 
 ## Idea 13 — single-flow consolidation (DESIGN DRAFT, awaiting user review)
 

@@ -181,10 +181,18 @@ done — see the log for the curve and the criteria re-analysis.
       protocol (which redesigned exactly what this task proposed), the 26B holds
       37/42 accepts (was 7/43) — the user's promptability bet was right — but
       the same protocol swings it lenient: 32/50 kills (banks a third of
-      revise/rejects). High-recall/low-precision has no slot in the judge path;
-      the cheap-tier question is closed unless a future design wants a
-      recall-side pre-filter. Data: `mt26_screenoff_*` logs; ledger 26B
-      sections.
+      revise/rejects). High-recall/low-precision has no slot in the current
+      judge path, so not promising for now — but parked, not closed (user
+      2026-07-06): only one protocol variant has been tried on the 26B, and its
+      speed (~5 s/call vs ~32 s) keeps the prize large. Follow-up:
+      #judge-26b-backburner. Data: `mt26_screenoff_*` logs; ledger 26B sections.
+- [ ] **26B judge tier, second look** #judge-26b-backburner — backburner, no
+      urgency. The v2e protocol cured the referent flaw but left the 26B lenient
+      (32/50 kills). Unexplored: strictness-targeted prompt iteration for the
+      26B (the 31B got seven rungs; the 26B got zero), a recall-side pre-filter
+      role, or a 26B-screens/31B-confirms cascade under the single-flow
+      protocol. Revisit when judge-path cost matters or the current stack
+      stabilizes.
 - [ ] **Setter-side tuning** #setter-tuning — the next front after idea 13 (user
       direction 2026-07-06: judge misses are at diminishing returns). First
       thread: the difficulty-modifier concept (calibration #9 in the window
