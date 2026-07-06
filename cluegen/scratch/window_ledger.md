@@ -308,18 +308,26 @@ exactly the RUST-"slowly" family the MOLD example should protect), EIGHTY-days
 "for going around the world" (the recognizability that makes the fact a prize).
 Substitution side fully clean: all four regressed rows have points_at=answer.
 
-**Try 3 design (NOT RUN — batch train paused for the 2026-07-05 overnight
-fine-tune handoff).** One economy wording change: define the tail test by the
-clue's POINT — a tail that delivers the clue's joke, paradox, poetry, or
-prize-fact recognizability IS the point, never bloat (add a wit pass example
-shaped like GARLIC's); a tail appended after the point is already delivered is
-bloat (UMBRELLA's gust-inversion after "canopy on a stick", STOOL's spin after
-"bar"). Also reinforce the single-modifier protection (allotted/slowly family).
-Cost: economy turns only, ~23 calls ≈ 12 min. This is wording try 3 of the 6 the
-stop rule allows (user raised the budget from ~3, 2026-07-05); tries 4-6 remain
-if it seesaws, each gated on a fresh turn-field diagnosis, with the best cell so
-far (rung-2 kills + rung-1 economy) as the fallback adoption if the budget runs
-out.
+**Try 3 (point-vs-appendage test):** ran after the overnight handoff cleared (23
+calls, 11 min). Accepts 11/16, kills 19/20. All four try-2 regressions recovered
+(GARLIC, ESCALATOR, SEVENTY-Psalmist, EIGHTY-days) and SCARECROW-sentry STAYS
+killed — the point-test holds wit tails while killing restatement. New misses,
+all at word granularity: FOG killed for 'Gray', TOASTER for 'Countertop',
+CRICKET for 'of the summer grass' (the deletion test prosecuting atmosphere),
+and UMBRELLA un-killed (the model stably reads its gust tail as vivid charm in
+every wording except try-2's blunt one).
+
+**Try 4 (in flight; wording try 4 of 6):** two changes, and one scope cut. (a)
+The deletion test runs on clauses and phrases, never single words. (b) Modifier
+rules: repetition of content already in the clue is restatement — bloat at any
+length ('hot' before "heat", PASTE "that adheres" example); sensory texture — a
+color, a season, a place — is charm, never bloat (the answer is hidden; texture
+is how it emerges). (c) **UMBRELLA is now an accepted miss, not a target**: the
+user called this boundary a matter of taste, HAMMOCK (same family) is
+soft-labeled, and chasing it is what broke FOG twice. Predictions:
+FOG/CRICKET/TOASTER recover as texture, MIRAGE-revise 'hot' still dies as
+repetition, SCARECROW stays killed, all try-3 recoveries hold. Fallback adoption
+if tries run out: best cell so far.
 
 ## User calibrations
 

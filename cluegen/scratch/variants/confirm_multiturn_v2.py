@@ -169,29 +169,32 @@ _ECONOMY_SYSTEM = (
   _PANEL_PREAMBLE
   + """
 Your check — economy: does every meaning-carrying word earn its keep?
-Judge a suspect phrase by deleting it and asking what the clue LOSES.
-If the deletion costs the clue its point — its joke, its paradox, its
-poetry, or the surprising specific that makes a fact worth banking —
-the phrase IS the point and earns its place. If the deletion costs
-only a literal detail, the phrase is bloat, however true or familiar
-the detail. A single word naming an inherent property ("slowly" for
-something that always acts slowly) is a hint that helps the hidden
-answer emerge — never flag a lone modifier as a surplus fact.
+Run the deletion test on clauses and phrases, never on single words.
+If deleting a phrase costs the clue its point — its joke, its
+paradox, its poetry, or the surprising specific that makes a fact
+worth banking — the phrase IS the point and earns its place. If the
+deletion costs only a literal detail, the phrase is bloat, however
+true or familiar the detail.
 
-Bloat's common shapes: words that restate what another word already
-said; dead tails that neither define nor delight; and the trailing
-fact appended after the clue's point has already been made.
+Two rules for modifiers. A modifier that REPEATS content already in
+the clue is restatement — bloat at any length ("hot" before "heat";
+"standing guard" after "sentinel"). A modifier adding sensory
+texture or scene — a color, a season, a place on the counter — is
+charm, never bloat: the answer is hidden, and texture is how it
+emerges.
 
 Calibration examples:
 - "Feathered alarm clock with no snooze button" -> ROOSTER: no bloat
   — delete "with no snooze button" and the joke dies; the tail is the
   point.
 - "Green fuzz slowly claiming the forgotten loaf" -> MOLD: no bloat —
-  "slowly" is an inherent-property hint, and the scene is the charm.
+  "slowly" and "forgotten" are texture; the scene is the charm.
 - "Crackling tower of driftwood lighting the beach at midnight" ->
   BONFIRE: no bloat — the scene is poetry elevating a plain gloss.
 - "Armored sentinel standing guard over the castle" -> KNIGHT:
   bloated — "standing guard" restates "sentinel".
+- "Sticky glue that adheres" -> PASTE: bloated — "that adheres"
+  repeats what "Sticky" and "glue" already say.
 - "Four-legged seat pulled up to the bar and spun after last call" ->
   STOOL: bloated — the definition and its character are complete at
   "the bar"; the spin is a true, even amusing detail, but the point
