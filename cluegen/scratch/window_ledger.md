@@ -20,7 +20,7 @@ status; the narrative lives in the sections.
 | 9   | confirm v3                   | REJECTED           |
 | 10  | multi-turn confirm           | ADOPTED-IN-BATTERY |
 | 11  | screen non-pinning removal   | QUEUED             |
-| 12  | confirm v2: calibrated turns | PAUSED, try 3 next |
+| 12  | confirm v2e: turns + panel   | ADOPTED-IN-BATTERY |
 
 ## Idea 1 — battery harness (BUILT)
 
@@ -239,7 +239,7 @@ removed (user calibration #3) + economy advisory + sense; verdict
   size. Production wiring deferred to end-of-window consolidation (needs a
   difficulty source — the screen already assigns one).
 
-## Idea 12 — confirm v2: calibrated turn semantics (PAUSED, try 3 designed)
+## Idea 12 — confirm v2e: calibrated turns + economy panel (ADOPTED)
 
 `variants/confirm_multiturn_v2.py`, user-approved batch train 2026-07-05
 ("proceed with the next few batches"). All four turns redesigned per
@@ -407,6 +407,18 @@ points?" dies. Guards: SEVENTY both rows, EIGHTY both dispositions,
 TOUCHDOWN-spike, MILLION-dollars, all wrong-object kills, the personification
 family. If guards regress, fall back to the pre-try-6 v2e (7032ad3) and adopt it
 as-is.
+
+**Rung 7 result — ADOPTED (cb32390 is the adopted config).** Both targets
+flipped with zero guard movement: genhold 6/13 accepts + 15/15 kills
+(MILLION-jackpot holds, "Six points?" dies), gentune unchanged at 19/30 + 33/34.
+**Final v2e: 25/43 accepts + 48/49 kills, vs idea-10 v1's 17/43 + 42/49 and the
+single-turn v2 baseline's 17/43 + 45/49.** Wording budget closed at 6/6.
+Residual misses, all named: 16 accepts die at the SCREEN (queue item 2's
+territory — the confirm never sees them); PILLOW (label-suspect, user ruling
+pending); UMBRELLA (accepted taste miss, the sole kill miss); EMBER (unanimous
+economy-panel false kill on the defining tail — watch item, no economy budget
+spent). v2e supersedes v1 as the battery confirm; production wiring still needs
+the difficulty re-homing (end-of-window consolidation).
 
 **Try 4 (superseded mid-flight by the rung-5 read):** two changes, and one scope
 cut. (a) The deletion test runs on clauses and phrases, never single words. (b)
