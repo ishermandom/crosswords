@@ -1476,24 +1476,21 @@ Full state and morning queue: `scratch/window_ledger.md`. Headline findings:
   a good true-reject gate (14/18 rejects die there) and its fun line is fine
   (banks 4/5 Fable-generated vivid accepts, kills 5/5 flat pairs); the CONFIRM
   is the accept-killer — it prosecutes ?-marked metaphor/metonymy as
-  substitution failure (DAISY, AMBER, CHECK, WYE, NINE, ROBIN, SNOOZE,
-  KARAOKE).
-- **Wording fixes whiplash**: confirm v3 (?-licenses-the-stretch) flipped all
-  5 targets at rung-0, then rubber-stamped at rung-1 — it still NAMES the
-  flaws, then banks anyway; the license broke flaw→verdict coupling even on
-  no-? clues. Padding v1's deletion test killed its target (ZED) and its guard
-  (NINE's article). A packed single turn forces one global posture; every
-  wording change moves it wholesale.
-- **Structural answer (user-directed, queued as ledger idea 10)**: decompose
-  the confirm into one-check turns with schema'd fields and compute the
-  verdict IN CODE — flaw-named-but-banked becomes impossible, the ?-license
-  becomes a code rule, each check tunes independently. Discrimination probe
-  pre-registered.
+  substitution failure (DAISY, AMBER, CHECK, WYE, NINE, ROBIN, SNOOZE, KARAOKE).
+- **Wording fixes whiplash**: confirm v3 (?-licenses-the-stretch) flipped all 5
+  targets at rung-0, then rubber-stamped at rung-1 — it still NAMES the flaws,
+  then banks anyway; the license broke flaw→verdict coupling even on no-? clues.
+  Padding v1's deletion test killed its target (ZED) and its guard (NINE's
+  article). A packed single turn forces one global posture; every wording change
+  moves it wholesale.
+- **Structural answer (user-directed, queued as ledger idea 10)**: decompose the
+  confirm into one-check turns with schema'd fields and compute the verdict IN
+  CODE — flaw-named-but-banked becomes impossible, the ?-license becomes a code
+  rule, each check tunes independently. Discrimination probe pre-registered.
 - **Infrastructure that made this cheap**: eval battery with a per-call replay
   cache (changed stages re-run, unchanged stages replay — rung-0s cost 1–6
   calls); reject bank grew 14 → 32 with independent Fable labels ($0.70);
-  `caffeinate -is` on detached drivers after diagnosing macOS maintenance
-  sleep (27-min batch → 141 wall minutes, pmset-confirmed); advisory waiter
-  notes in the lease script; the lease script is forked (main: process scan;
-  here: waiters + caffeinate docs) — reconciliation rides the queued landing
-  decision.
+  `caffeinate -is` on detached drivers after diagnosing macOS maintenance sleep
+  (27-min batch → 141 wall minutes, pmset-confirmed); advisory waiter notes in
+  the lease script; the lease script is forked (main: process scan; here:
+  waiters + caffeinate docs) — reconciliation rides the queued landing decision.

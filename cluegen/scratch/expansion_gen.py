@@ -53,7 +53,10 @@ _EVAL_FILES = [
   _HERE.parent / 'local' / 'reject_bank.jsonl',
   _HERE.parent / 'local' / 'clue_bank.jsonl',
 ]
-_PROMPT_FILES = [_HERE / 'pipeline_local.py', *sorted((_HERE / 'variants').glob('*.py'))]
+_PROMPT_FILES = [
+  _HERE / 'pipeline_local.py',
+  *sorted((_HERE / 'variants').glob('*.py')),
+]
 _EXAMPLE_WORD_PATTERN = re.compile(r'-> ([A-Z]+)')
 
 # Each bucket: (name, pair count, instruction). Pair = accept + near-miss.
@@ -67,7 +70,7 @@ _GROUPS = {
       'defines the answer (accept, basis fun or elegance), paired with a '
       'same-style near-miss whose description actually fits something '
       'adjacent to the answer rather than the answer itself (revise). The '
-      'accepts must substitute fairly despite their length.'
+      'accepts must substitute fairly despite their length.',
     ),
     (
       'question_mark',
@@ -75,8 +78,8 @@ _GROUPS = {
       "Question-mark license: an earned '?' — a stretched, figurative, or "
       'metonymic definition the ? marks, and the figurative reading is true '
       '(accept), paired with either a straight fact wearing an apologetic ? '
-      "(revise) or a ?-marked near-miss equivalence where the stretch does "
-      'not read true, e.g. an event equated with its score (revise).'
+      '(revise) or a ?-marked near-miss equivalence where the stretch does '
+      'not read true, e.g. an event equated with its score (revise).',
     ),
     (
       'count_metonymy',
@@ -85,7 +88,7 @@ _GROUPS = {
       'the clue names the counted thing exactly (accept), paired with an '
       'unfair version where the clue names an event or object merely '
       'associated with the number rather than the thing counted (revise). '
-      'Number words are allowed here when not on the exclusion list.'
+      'Number words are allowed here when not on the exclusion list.',
     ),
     (
       'sense_ownership',
@@ -93,7 +96,7 @@ _GROUPS = {
       'Sense ownership: a legitimate secondary, archaic, or famous-bearer '
       'sense (accept), paired with a sense English does not own — a '
       'homograph in another language, or a sense that exists only inside a '
-      'longer idiom (reject).'
+      'longer idiom (reject).',
     ),
     (
       'padding',
@@ -102,7 +105,7 @@ _GROUPS = {
       'misdirection the definition needs (accept), paired with a version '
       'carrying genuine padding: a word or phrase whose deletion leaves the '
       'definition just as complete, precise, and vivid (revise, and the '
-      'reason must quote the padding).'
+      'reason must quote the padding).',
     ),
   ],
   2: [
@@ -112,7 +115,7 @@ _GROUPS = {
       'Prize-fact gradient: a straight clue carried by a remark-worthy, '
       'checkable, specific fact (accept, basis prize-fact), paired with the '
       'same mechanism at its flat end — an accurate fact everyone already '
-      'knows, plainly stated (revise).'
+      'knows, plainly stated (revise).',
     ),
     (
       'fun_gradient',
@@ -120,15 +123,15 @@ _GROUPS = {
       'Fun gradient: a surface with its own wit — a joke, image, or turn of '
       'phrase enjoyable before solving (accept, basis fun), paired with '
       'recognition dressed as fun: stock associations of the answer fused '
-      'into a breezy surface (revise).'
+      'into a breezy surface (revise).',
     ),
     (
       'elegance',
       4,
       'Elegance: a vivid straight definition — a precise sensory scene or '
-      'evocative picture of the answer\'s ordinary sense (accept, basis '
+      "evocative picture of the answer's ordinary sense (accept, basis "
       'elegance), paired with a plain dictionary gloss of the same answer '
-      '(revise).'
+      '(revise).',
     ),
     (
       'non_pinning',
@@ -137,8 +140,8 @@ _GROUPS = {
       'answers — the solver disambiguates from crossings (accept; pick any '
       'earned basis), paired with a clue that fails not by fitting several '
       'answers but by being actually false or overclaiming for this answer '
-      '(revise). The accept\'s reason must note that fitting several answers '
-      'is fine.'
+      "(revise). The accept's reason must note that fitting several answers "
+      'is fine.',
     ),
     (
       'truth',
@@ -146,7 +149,7 @@ _GROUPS = {
       'Literal truth and referent: a clue whose qualifiers all pin and hold '
       '(accept), paired with either a modifier that overclaims or falsely '
       'implies (revise), or a clue that defines a person or thing merely '
-      'associated with the answer — the referent shifts (reject).'
+      'associated with the answer — the referent shifts (reject).',
     ),
   ],
 }
