@@ -317,14 +317,36 @@ CRICKET for 'of the summer grass' (the deletion test prosecuting atmosphere),
 and UMBRELLA un-killed (the model stably reads its gust tail as vivid charm in
 every wording except try-2's blunt one).
 
-**Try 4 (in flight; wording try 4 of 6):** two changes, and one scope cut. (a)
-The deletion test runs on clauses and phrases, never single words. (b) Modifier
-rules: repetition of content already in the clue is restatement — bloat at any
-length ('hot' before "heat", PASTE "that adheres" example); sensory texture — a
-color, a season, a place — is charm, never bloat (the answer is hidden; texture
-is how it emerges). (c) **UMBRELLA is now an accepted miss, not a target**: the
-user called this boundary a matter of taste, HAMMOCK (same family) is
-soft-labeled, and chasing it is what broke FOG twice. Predictions:
+**Try 4 result** (23 calls, 10.5 min): accepts 11/16, kills 19/20 — same totals
+as try 3, different composition. Texture rule recovered FOG/CRICKET/TOASTER and
+MIRAGE/SCARECROW kills held, but fresh jitter rotated in: SOCKS and YAWN (held
+in every previous try) now die, EIGHTY-days flipped back. **Diagnosis: not
+directional overshoot but per-wording jitter — each rewording moves ~2-3
+borderline taste rows at random.** More wording rotates the noise; it does not
+converge.
+
+**Rung 5 (STRUCTURAL, in flight): economy as a 3-wording majority panel
+(`confirm_multiturn_v2e.py`).** Free cached-vote analysis across tries 1/3/4
+scored every economy-sensitive probe row correctly except UMBRELLA (the accepted
+miss): all 14 borderline accepts held, MIRAGE-revise 3/3, SCARECROW-sentry 2/3,
+EIGHTY-wager 2/3 killed. v2e runs all three wordings per clue (byte-identical to
+their rungs, so probe calls replay) and gates in code on 2-of-3 (is_bloated AND
+quote-validated evidence); lone votes are advisories. Cost: +2 economy calls per
+confirm clue. Rung 5 = FULL gentune (~36 fresh calls for the six never-probed
+survivors: HONEY, KETCHUP, PILLOW, LEMON, DENTIST, SPIDER-webdev — all predicted
+to hold as accepts). Pre-registered prediction: gentune accepts 20/30 (all 20
+confirm-reaching accepts held; the 10 screen kills unchanged), kills 33/34
+(UMBRELLA the sole miss). Then genhold for the adoption read. Wording-try budget
+state: 4 of 6 used; the panel is a structural change, not a wording try.
+
+**Try 4 (superseded mid-flight by the rung-5 read):** two changes, and one scope
+cut. (a) The deletion test runs on clauses and phrases, never single words. (b)
+Modifier rules: repetition of content already in the clue is restatement — bloat
+at any length ('hot' before "heat", PASTE "that adheres" example); sensory
+texture — a color, a season, a place — is charm, never bloat (the answer is
+hidden; texture is how it emerges). (c) **UMBRELLA is now an accepted miss, not
+a target**: the user called this boundary a matter of taste, HAMMOCK (same
+family) is soft-labeled, and chasing it is what broke FOG twice. Predictions:
 FOG/CRICKET/TOASTER recover as texture, MIRAGE-revise 'hot' still dies as
 repetition, SCARECROW stays killed, all try-3 recoveries hold. Fallback adoption
 if tries run out: best cell so far.
