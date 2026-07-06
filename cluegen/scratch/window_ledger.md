@@ -21,6 +21,7 @@ status; the narrative lives in the sections.
 | 10  | multi-turn confirm           | ADOPTED-IN-BATTERY |
 | 11  | screen non-pinning removal   | QUEUED             |
 | 12  | confirm v2e: turns + panel   | ADOPTED-IN-BATTERY |
+| 13  | single-flow consolidation    | DESIGN DRAFTED     |
 
 ## Idea 1 — battery harness (BUILT)
 
@@ -763,6 +764,46 @@ Design consequence: single flow, one protocol, **31B as the only judge tier**;
 now measured worse). Production cost control comes from substitution-first
 short-circuit (~1 turn ≈ 30 s per junk clue), not from a smaller model.
 Difficulty assignment still needs re-homing out of the screen.
+
+## Idea 13 — single-flow consolidation (DESIGN DRAFT, awaiting user review)
+
+Goal: one judge protocol — the adopted v2e plus one new turn — replacing the
+screen's separate verdict policy entirely; the screen's two legitimate functions
+move inside the protocol.
+
+Evidence base (screen-off measurement, 2026-07-06): v2e alone scores 31/42
+accepts + 40/50 kills vs the cascade's 25/42 + 49/50. The screen's whole
+remaining value is nine kills in exactly two families v2e was designed not to
+judge: flat glosses (6: "Sweet stuff that bees make" family) and unearned
+question marks (3: "Tooth doctor?" family). Its whole remaining cost is six
+false kills of user-ratified vivid definitions (OCTOPUS "three hearts", VIOLIN,
+SPIDER-spinner, CANOE, LIGHTHOUSE, BAMBOO).
+
+Design:
+
+- **New liveliness turn** (the screen's taste call, calibrated): judges whether
+  the clue's interest has a basis — prize fact, fun, elegance, aha — or is a
+  flat gloss. Fields: `analysis`, `basis` (enum incl. `none`), `has_wordplay`
+  (bool), `difficulty` (re-homing the screen's assignment — same judgment
+  locus). Calibration examples are fresh-crafted graded pairs in the eval
+  buckets' shapes (tomb-fact vs bees-gloss), never eval rows.
+- **Verdict rule additions (code)**: `basis: none` → fixable (flat); '?' in clue
+  AND not `has_wordplay` → fixable (unearned mark, calibration #7). Wordplay
+  without '?' stays legal (late-week convention).
+- **Ordering**: battery keeps all-turns-always; production short-circuits with
+  liveliness FIRST — one ~30s call kills flat junk at the same price point as
+  the old screen, and the rest of the protocol runs on survivors.
+- **Jitter posture**: start single-wording; if rungs show borderline-taste
+  rotation (the economy lesson), promote to a panel — the mechanism is already
+  built.
+- **Cost**: worst case 7 calls ≈ 3.7 min/clue at 31B; flat junk ~30s. Net
+  comparable to the cascade for junk-heavy setter streams.
+
+Validation plan: rung ladder on gentune — targets are the nine lost kills;
+guards are the six recovered accepts plus every current v2e verdict — then
+genhold at adoption, then a user checkpoint BEFORE any production wiring (spec
+updates, difficulty consumers, pipeline_local surgery). Wording budget 6 tries,
+per the standing user direction.
 
 ## Remaining queue
 
