@@ -21,7 +21,7 @@ status; the narrative lives in the sections.
 | 10  | multi-turn confirm           | ADOPTED-IN-BATTERY |
 | 11  | screen non-pinning removal   | QUEUED             |
 | 12  | confirm v2e: turns + panel   | ADOPTED-IN-BATTERY |
-| 13  | single-flow consolidation    | RUNG 1 QUEUED      |
+| 13  | single-flow consolidation    | ADOPTED-IN-BATTERY |
 
 ## Idea 1 — battery harness (BUILT)
 
@@ -887,6 +887,19 @@ losses. Residual misses unchanged and low-priority: BILLION, PILLOW, ORCHARD
 (parked economy family), SPIDER-spinner (accepted loss). Liveliness category
 CLOSED at 2 of the 6-try budget; `confirm_multiturn_v3.py` as-is is the adoption
 candidate.
+
+**Adoption read (full gentune + genhold, --confirm-all): ADOPTED.** v3
+single-flow scores **29/42 accepts + 49/50 kills**, vs 25/42 + 49/50 for the v2e
+cascade: four accepts gained, kills identical, and the one kill miss is the SAME
+clue (UMBRELLA gust-tail, the long-standing accepted miss). Strictly better, and
+it retires the screen's separate verdict policy entirely — the idea-13 goal.
+Split: gentune 23/30 + 33/34; genhold 6/12 + 16/16. Genhold misses: three soft
+rows (HAMMER, WRAPS, HAMMOCK), HUMMINGBIRD-"Only" (parked), CACTUS
+(difficulty-modifier tail — setter-side, calibration #9), and MILLION-"The
+jackpot Regis dangled" (real miss). Gentune misses are the known residual
+economy family plus GIFT-"Inborn knack, as for languages" and RAT-"Informer who
+turns on accomplices" (real misses, user-ruled diminishing returns). Runs:
+`idea13_adopt_gentune` / `idea13_adopt_genhold` logs, 62 fresh calls, ~34 min.
 
 ## Remaining queue
 
