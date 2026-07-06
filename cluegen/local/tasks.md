@@ -185,20 +185,31 @@ done — see the log for the curve and the criteria re-analysis.
       the cheap-tier question is closed unless a future design wants a
       recall-side pre-filter. Data: `mt26_screenoff_*` logs; ledger 26B
       sections.
+- [ ] **Setter-side tuning** #setter-tuning — the next front after idea 13 (user
+      direction 2026-07-06: judge misses are at diminishing returns). First
+      thread: the difficulty-modifier concept (calibration #9 in the window
+      ledger) — tails like "for driving nails" are difficulty dials the setter
+      should place deliberately when targeting a difficulty, not accidents; the
+      liveliness turn's difficulty field is the consumer. Inputs before
+      designing: the banked-clue audit (adopted judge over ~75 banked clues,
+      flag-and-report) and the setter-output distribution (what fraction of
+      candidates are flat glosses vs charm shapes).
 - [ ] **Align local vs cloud judge requirements** #judge-alignment — both judges
       should enforce the same requirement set, each via methodology fitting the
-      model's strength (user direction 2026-07-04). Audit findings (window
-      session, 2026-07-04): (a) answer/root/cognate leakage — cloud has
-      mechanical `has_answer_leak` + stem soft-flags + a judge check with the
-      etymology exception; local has only setter self-check. The mechanical half
-      is pure code to copy local-side (copy, not import — prototyping
-      independence); the judgment half needs a home in the cascade. (b) The
-      local setter emits a required `trap` field no local judge reads — verify
-      it (cloud check #7: trap proportionate to difficulty) or stop emitting it.
-      (c) Non-pinning prosecution is a local-only invention absent from
-      CLUE_SPEC — removal in flight (window idea 11 + confirm at adoption). (d)
-      Cross-clue independence: intentionally out of local scope — see
-      #angle-distinct.
+      model's strength (user direction 2026-07-04). DEPRIORITIZED behind
+      #setter-tuning (user pivot 2026-07-06). Audit findings (window session,
+      2026-07-04): (a) answer/root/cognate leakage — cloud has mechanical
+      `has_answer_leak` + stem soft-flags + a judge check with the etymology
+      exception; local has only setter self-check. The mechanical half is pure
+      code to copy local-side (copy, not import — prototyping independence); the
+      judgment half needs a home in the cascade. (b) The local setter emits a
+      required `trap` field no local judge reads — verify it (cloud check #7:
+      trap proportionate to difficulty) or stop emitting it — note this
+      dovetails with #setter-tuning's difficulty thread. (c) Non-pinning
+      prosecution is a local-only invention absent from CLUE_SPEC — removal
+      COMPLETE for the confirm side (ideas 10/12: judges test truth, not
+      uniqueness); the screen retires with idea 13. (d) Cross-clue independence:
+      intentionally out of local scope — see #angle-distinct.
   - Note: consider a requirements trace (each CLUE_SPEC §A2 invariant → where
     the local cascade checks it) so this audit is mechanical next time; two
     drift types showed up (a dropped requirement and an invented one).

@@ -854,6 +854,31 @@ genhold at adoption, then a user checkpoint BEFORE any production wiring (spec
 updates, difficulty consumers, pipeline_local surgery). Wording budget 6 tries,
 per the standing user direction.
 
+**Rung 1 result** (30 calls, 15 min): kills PERFECT 15/15 — all four screen
+families die (HONEY-bees, OCTOPUS-eight-armed, DENTIST "Tooth doctor?", SPIDER
+"Eight-legged web spinner?") and every kill guard held. Accepts 10/15: the
+flat-gate re-killed VIOLIN "Smallest instrument in a standard string quartet"
+and SPIDER "Eight-legged spinner of silk" (`basis: none` — the double-tax risk
+from the pre-registration), while MOON/SPIDER-"Web developer?" held with
+has_wordplay true. BILLION/PILLOW/ORCHARD are the parked economy family,
+unchanged.
+
+**Rung 2 (RUNNING at compact time; driver pid 13831, acquired 12:01, scorecard
+lands in `logs/idea13_rung2_driver.log` + `idea13_rung2_*.jsonl` — NO watcher
+attached, read the log directly).** ONE wording try only (user
+diminishing-returns signal): prize_fact gains the learn test ("the solver
+plausibly LEARNS from it; a fact everyone already has is not a prize" +
+LOIRE/PARIS example pair). Target: VIOLIN recovers. SPIDER-spinner is an
+accepted loss unless it flips free. Guards: the four kills + all rung-1 holds.
+**Decision rule: if rung 2 seesaws (any kill guard breaks or ≥2 new accept
+losses), fall back to the rung-1 wording — no further tries in this category.**
+Then, with the better config: full gentune (--confirm-all) + genhold adoption
+read; adopt if clearly better than the v2e cascade's 25/42
+
+- 49/50 on totals; then the banked-clue audit (flag and report, no deletions);
+  then the SETTER pivot, first thread = the difficulty-modifier concept
+  (calibration #9).
+
 ## Remaining queue
 
 `#eval-expansion` DONE through the 2×2 (sets built
