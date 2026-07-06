@@ -799,23 +799,29 @@ Design:
 - **Cost**: worst case 7 calls ≈ 3.7 min/clue at 31B; flat junk ~30s. Net
   comparable to the cascade for junk-heavy setter streams.
 
-**Stretch grants (2026-07-06, user):** full idea-13 ladder through the
-genhold adoption read, brief reports, no per-batch check-ins; plain FIFO
-lease coordination for this stretch (one-off); after idea 13, Claude decides
-setter-vs-judge for the next low-hanging fruit and proceeds; sealed
-fresh-bank labeling at Claude's discretion; Fable budget refreshed to $10.
-Production wiring stays user-gated.
+**Stretch grants (2026-07-06, user):** full idea-13 ladder through the genhold
+adoption read, brief reports, no per-batch check-ins; plain FIFO lease
+coordination for this stretch (one-off); after idea 13, Claude decides
+setter-vs-judge for the next low-hanging fruit and proceeds; sealed fresh-bank
+labeling at Claude's discretion; Fable budget refreshed to $10. Pipeline wiring
+is DEFERRED entirely (user discussion 2026-07-06): integrating now was
+checklist-completion, not a reasoned trigger — the pipeline only matters when it
+runs, no banking runs are scheduled, and the judge stack is still moving; the
+trigger is the first consumer (a scheduled banking run, or a stabilized stack).
+Pulled forward instead, as measurement: run the adopted judge over the ~75
+banked clues to FLAG purge candidates and REPORT them — no deletions — as input
+to the setter-vs-judge decision.
 
-**Rung 1 (queued FIFO behind the 26B measurement):** `confirm_multiturn_v3
-.py` = adopted v2e + liveliness turn (basis enum prize_fact/fun/elegance/
-aha/none + has_wordplay + difficulty easy/medium/hard, matching the bank's
-scale; VENUS/FROST/BARK/WINDMILL fresh example pairs). Code gates: basis
-none → fixable; '?' AND no wordplay → fixable. Offline checks green. Probe:
-gentune --confirm-all --only on 14 words (~27 rows, only liveliness calls
-fresh ≈ 15 min). Targets: HONEY-bees, OCTOPUS-eight-armed, DENTIST-"Tooth
-doctor?", SPIDER-"Eight-legged web spinner?" all die. Guards: every accept
-in the probe holds — especially the six screen-recovery accepts and MOON
-"Night light?" (has_wordplay must come back true); PILLOW is low-priority.
+**Rung 1 (queued FIFO behind the 26B measurement):** `confirm_multiturn_v3 .py`
+= adopted v2e + liveliness turn (basis enum prize_fact/fun/elegance/ aha/none +
+has_wordplay + difficulty easy/medium/hard, matching the bank's scale;
+VENUS/FROST/BARK/WINDMILL fresh example pairs). Code gates: basis none →
+fixable; '?' AND no wordplay → fixable. Offline checks green. Probe: gentune
+--confirm-all --only on 14 words (~27 rows, only liveliness calls fresh ≈ 15
+min). Targets: HONEY-bees, OCTOPUS-eight-armed, DENTIST-"Tooth doctor?",
+SPIDER-"Eight-legged web spinner?" all die. Guards: every accept in the probe
+holds — especially the six screen-recovery accepts and MOON "Night light?"
+(has_wordplay must come back true); PILLOW is low-priority.
 
 Validation plan: rung ladder on gentune — targets are the nine lost kills;
 guards are the six recovered accepts plus every current v2e verdict — then
