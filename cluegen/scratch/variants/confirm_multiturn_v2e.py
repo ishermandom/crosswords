@@ -3,20 +3,24 @@
 
 """Multi-turn confirm v2e: v2 with the economy check as a 3-wording panel.
 
-Idea-12 rungs 1-4 showed that single-wording economy judgments carry ~2-3
-rows of per-wording jitter on borderline taste calls: each rewording fixed
-its targets and rotated fresh false verdicts onto rows every other wording
-got right (FOG died only under try 3, SOCKS/YAWN only under try 4, GARLIC/
-ESCALATOR only under try 2). A majority vote across the three viable
-wordings (tries 1, 3, 4) scored every economy-sensitive probe row correctly
-except UMBRELLA (the accepted taste miss) — the jitter integrates out.
+Idea-12 rungs 1-4 showed that single-wording economy judgments carry ~2-3 rows
+of per-wording jitter on borderline taste calls: each rewording fixed its
+targets and rotated fresh false verdicts onto rows every other wording got right
+(FOG died only under try 3, SOCKS/YAWN only under try 4, GARLIC/ ESCALATOR only
+under try 2). A majority vote across the three viable wordings (tries 1, 3, 4)
+scored every economy-sensitive probe row correctly except UMBRELLA (the accepted
+taste miss) — the jitter integrates out.
 
-So v2e runs the economy check three times, once per wording, and gates in
-code on a 2-of-3 majority of (is_bloated AND quote-validated evidence).
-Minority votes are logged as advisories. Substitution, truth, and sense are
-byte-identical to confirm_multiturn_v2 at 9f2eb99 (their calls replay from
-cache); each economy wording is byte-identical to its rung, so probe-word
-panel calls replay too.
+So v2e runs the economy check three times, once per wording, and gates in code
+on a 2-of-3 majority of (is_bloated AND quote-validated evidence). Minority
+votes are logged as advisories.
+
+Panel composition note: the first panel (tries 1/3/4) failed its fresh-row test
+— t4 is a direct edit of t3, and the sibling pair outvoted t1 on KETCHUP "in the
+1830s" and PILLOW's joke furniture. Diversity is the point of a panel, so the
+third member is now a trimming-editor framing with its own examples; t1 and t3
+stay byte-identical to their rungs (those calls replay from cache), as do
+substitution, truth, and sense (v2 at 9f2eb99).
 
 Production cost: +2 economy calls per clue reaching confirm.
 """
@@ -231,53 +235,39 @@ _ECONOMY_PROMPT_T3 = (
   '"is_bloated".\n\n'
 )
 
-_ECONOMY_SYSTEM_T4 = (
+_ECONOMY_SYSTEM_ED = (
   _PANEL_PREAMBLE
   + """
-Your check — economy: does every meaning-carrying word earn its keep?
-Run the deletion test on clauses and phrases, never on single words.
-If deleting a phrase costs the clue its point — its joke, its
-paradox, its poetry, or the surprising specific that makes a fact
-worth banking — the phrase IS the point and earns its place. If the
-deletion costs only a literal detail, the phrase is bloat, however
-true or familiar the detail.
+Your check — economy, as the trimming editor: the clue is going to
+print and column inches are precious. Mark exactly the words a
+veteran editor would cut, knowing the cut must cost the solver
+nothing: neither definition, nor fairness, nor the clue's charm.
 
-Two rules for modifiers. A modifier that REPEATS content already in
-the clue is restatement — bloat at any length ("hot" before "heat";
-"standing guard" after "sentinel"). A modifier adding sensory
-texture or scene — a color, a season, a place on the counter — is
-charm, never bloat: the answer is hidden, and texture is how it
-emerges.
+An editor never cuts the point — the joke, the paradox, the poetry,
+or the specific that gives a fact its teeth (a date, a place, a
+number that makes the claim checkable). An editor does cut
+redundancy, dead connective tails, and details no solver needs.
 
 Calibration examples:
-- "Feathered alarm clock with no snooze button" -> ROOSTER: no bloat
-  — delete "with no snooze button" and the joke dies; the tail is the
-  point.
-- "Green fuzz slowly claiming the forgotten loaf" -> MOLD: no bloat —
-  "slowly" and "forgotten" are texture; the scene is the charm.
-- "Crackling tower of driftwood lighting the beach at midnight" ->
-  BONFIRE: no bloat — the scene is poetry elevating a plain gloss.
-- "Armored sentinel standing guard over the castle" -> KNIGHT:
-  bloated — "standing guard" restates "sentinel".
-- "Sticky glue that adheres" -> PASTE: bloated — "that adheres"
-  repeats what "Sticky" and "glue" already say.
-- "Four-legged seat pulled up to the bar and spun after last call" ->
-  STOOL: bloated — the definition and its character are complete at
-  "the bar"; the spin is a true, even amusing detail, but the point
-  was already made.
-- "Night watchman on patrol" -> GUARD: bloated — "on patrol" adds
-  neither definition nor charm.
-- "Frozen rain" -> SLEET: no bloat — dropping either word breaks the
-  definition."""
+- "Wheeled cart pushed along supermarket aisles while shopping" ->
+  TROLLEY: cut "while shopping" — the aisles already said it.
+- "Sour green citrus with acidic juice" -> LIME: cut "with acidic
+  juice" — "Sour" said it.
+- "Grandfather's pocket ticker, wound each night" -> WATCH: nothing
+  to cut — the nightly winding is period charm that places the
+  object.
+- "Patient beaver damming the creek by moonlight" -> BEAVER: nothing
+  to cut — patience and moonlight are the picture, and the picture is
+  the point."""
 )
 
-_ECONOMY_PROMPT_T4 = (
-  'Check economy for this one clue. In "analysis", run the deletion '
-  'test on each suspect phrase: name what the clue loses without it — '
-  'its point, or only a literal detail. In "bloat_evidence", quote '
-  'every phrase whose deletion costs only a detail, using the '
-  "clue's own words (empty list if none). Then commit "
-  '"is_bloated".\n\n'
+_ECONOMY_PROMPT_ED = (
+  'Trim this one clue. In "analysis", go through it as the editor: '
+  'name what each candidate cut would cost the solver. In '
+  '"bloat_evidence", quote exactly the words you would cut, using '
+  "the clue's own words (empty list if you would print it as is). "
+  'Then commit "is_bloated" (true only if you would actually cut '
+  'something).\n\n'
 )
 
 _ECONOMY_SCHEMA = {
@@ -387,10 +377,9 @@ def _verdict_from_turns(clue, substitution, truth, sense):
 def _economy_panel_verdict(clue, panel, verdict, flaws, advisories):
   """Fold the 3-wording economy panel into the verdict by majority.
 
-  A wording votes to gate when it commits `is_bloated` AND at least one
-  evidence entry survives quote validation. Two votes gate (flaws carry the
-  union of the gating wordings' validated evidence); a lone vote is logged
-  as an advisory.
+  A wording votes to gate when it commits `is_bloated` AND at least one evidence
+  entry survives quote validation. Two votes gate (flaws carry the union of the
+  gating wordings' validated evidence); a lone vote is logged as an advisory.
   """
   gate_votes = 0
   evidence_union = []
@@ -414,7 +403,7 @@ def _economy_panel_verdict(clue, panel, verdict, flaws, advisories):
 _ECONOMY_PANEL = (
   (_ECONOMY_SYSTEM_T1, _ECONOMY_PROMPT_T1),
   (_ECONOMY_SYSTEM_T3, _ECONOMY_PROMPT_T3),
-  (_ECONOMY_SYSTEM_T4, _ECONOMY_PROMPT_T4),
+  (_ECONOMY_SYSTEM_ED, _ECONOMY_PROMPT_ED),
 )
 
 
@@ -457,7 +446,7 @@ def _multi_turn_confirm(judge_turn, word, clue):
       'truth': truth,
       'economy_t1': panel[0],
       'economy_t3': panel[1],
-      'economy_t4': panel[2],
+      'economy_ed': panel[2],
       'sense': sense,
     },
   }

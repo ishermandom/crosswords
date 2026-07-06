@@ -339,6 +339,26 @@ confirm-reaching accepts held; the 10 screen kills unchanged), kills 33/34
 (UMBRELLA the sole miss). Then genhold for the adoption read. Wording-try budget
 state: 4 of 6 used; the panel is a structural change, not a wording try.
 
+**Rung 5 result** (36 calls, 17 min): accepts 18/30, kills 33/34 — kills exactly
+as pre-registered (UMBRELLA sole miss), accepts two short. The two misses (both
+never-probed rows): KETCHUP killed for "in the 1830s", PILLOW for
+"Nightly"/"deposits" — each on a **t3+t4 majority with t1 dissenting**.
+Diagnosis: t4 is a direct edit of t3, so the pair votes as correlated siblings
+on fresh rows, not independent wordings — the probe couldn't show this because
+each wording was tuned against it. The date is the prize-fact's teeth and the
+joke's furniture is not bloat; a diverse third opinion protects both.
+
+**Rung 6 (panel v2, in flight; uses wording try 5 of 6 on the new member):** t4
+swapped out for a trimming-editor framing with its own examples (TROLLEY/ LIME
+cuts, WATCH/BEAVER keeps; "never cut the joke, the paradox, the poetry, or the
+specific that gives a fact its teeth — a date, a place, a number"). Panel = t1 +
+t3 + editor, 2-of-3 unchanged. Fresh cost: editor wording × ~29 survivors ≈ 15
+min; everything else replays. Predictions: KETCHUP and PILLOW recover → accepts
+20/30; kills 32-33/34 — EIGHTY-wager's kill leaned on the t3+t4 agreement and
+may bank; if it does, that is a substitution value-test to-do (its true flaw),
+not a panel failure, and it goes to the watch list rather than another economy
+try.
+
 **Try 4 (superseded mid-flight by the rung-5 read):** two changes, and one scope
 cut. (a) The deletion test runs on clauses and phrases, never single words. (b)
 Modifier rules: repetition of content already in the clue is restatement — bloat
