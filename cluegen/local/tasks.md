@@ -175,24 +175,16 @@ done — see the log for the curve and the criteria re-analysis.
       generated-tune/generated-holdout split. Run as two detached Fable calls
       (~45 rows each) with watchers — the 10-min Bash cap killed a big single
       call once already.
-- [ ] **26B substitution turn: prompt-engineer the referent/register split**
-      #judge-26b-referent — BLOCKED on the user clarifying the target before any
-      work starts (user direction 2026-07-04). The 26B multi-turn measurement
-      failed the accept parity bar on exactly one flaw: all 21 accept kills were
-      "unlicensed referent shift" — the 26B labels every figurative framing of
-      the RIGHT referent a referent shift (FOG, ALARM, EMBER, MAPLE...), while
-      its literal-definition and ?-licensed verdicts track the 31B closely and
-      its survivor kills beat it (10/11).
-  - Rationale: a single dominating flaw is the most promptable kind of failure —
-    the window's precedent is that structure/code fixes beat wording, but this
-    one may yield to a reshaped question (e.g. separate "does the definition
-    point at a different object?" from "is the framing figurative?", or a
-    two-example contrast pinning ALARM-style hyperbole against
-    THERMOSTAT-thermometer-style wrong-object). Stakes: 26B calls measured ~5 s
-    vs ~32 s at 31B, so a rehabilitated 26B is a 6x cheaper default tier in the
-    single-flow design.
-  - Note: evidence and per-row data in `scratch/window_ledger.md` (26B
-    measurement section); logs `expbase_mt26_*`.
+- [x] **26B substitution turn: prompt-engineer the referent/register split**
+      #judge-26b-referent — RESOLVED 2026-07-06, outcome: the referent flaw is
+      fully fixed but the tier is still not viable. Under the adopted v2e
+      protocol (which redesigned exactly what this task proposed), the 26B holds
+      37/42 accepts (was 7/43) — the user's promptability bet was right — but
+      the same protocol swings it lenient: 32/50 kills (banks a third of
+      revise/rejects). High-recall/low-precision has no slot in the judge path;
+      the cheap-tier question is closed unless a future design wants a
+      recall-side pre-filter. Data: `mt26_screenoff_*` logs; ledger 26B
+      sections.
 - [ ] **Align local vs cloud judge requirements** #judge-alignment — both judges
       should enforce the same requirement set, each via methodology fitting the
       model's strength (user direction 2026-07-04). Audit findings (window

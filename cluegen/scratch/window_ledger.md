@@ -702,7 +702,17 @@ loops back to waiting if any check finds the lease held, and releases when its
 runs finish. Cross-thread scheduling otherwise goes through the user until the
 lease-script fork reunifies (git divergence still on the user's list).
 
-## In flight: 26B multi-turn measurement (user-approved 2026-07-04 ~22:00)
+## 26B single-flow close-out (2026-07-06)
+
+Final word on the cheap tier: under adopted v2e on the full sets
+(`mt26_screenoff_*`), the 26B holds **37/42 accepts** — the v1 referent
+flaw is fully cured, vindicating the user's promptability bet — but swings
+lenient on kills: **32/50** (banks a third of revise/rejects). Gentune
+29/30 + 22/34; genhold 8/12 + 10/16. High-recall/low-precision has no slot
+in the judge path; #judge-26b-referent closed in tasks.md. Speed for the
+record: the 552-call sweep took 54 min (~5.9 s/call).
+
+## 26B multi-turn measurement (user-approved 2026-07-04 ~22:00)
 
 **Question (supersedes #taste-31b and reframes idea 11): does the multi-turn
 protocol at 26B match it at 31B?** If yes, the 26B/31B divide dies and the
