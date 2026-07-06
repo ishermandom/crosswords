@@ -40,6 +40,8 @@ integration — is aspirational at best and stays unscoped until that check-in.
   the difficulty dial.
 - **Reference material:** `cluegen/cloud/` is a read-only reference throughout —
   its prompts and spec are read and rendered by scratch harnesses, never edited.
+- **Setter redesign:** the generation side's design — expansive setter, ranked
+  candidates, judge as sole gate — is specified in `setter.md`.
 
 ## Quality yardstick
 
