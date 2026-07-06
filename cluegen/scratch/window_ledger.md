@@ -873,11 +873,17 @@ accepted loss unless it flips free. Guards: the four kills + all rung-1 holds.
 **Decision rule: if rung 2 seesaws (any kill guard breaks or ≥2 new accept
 losses), fall back to the rung-1 wording — no further tries in this category.**
 Then, with the better config: full gentune (--confirm-all) + genhold adoption
-read; adopt if clearly better than the v2e cascade's 25/42
+read; adopt if clearly better than the v2e cascade's 25/42 + 49/50 on totals;
+then the banked-clue audit (flag and report, no deletions); then the SETTER
+pivot, first thread = the difficulty-modifier concept (calibration #9).
 
-- 49/50 on totals; then the banked-clue audit (flag and report, no deletions);
-  then the SETTER pivot, first thread = the difficulty-modifier concept
-  (calibration #9).
+**Rung 2 result** (30 calls, 16.5 min): WIN — rung-2 wording adopted. Kills
+15/15, all four guards held. Accepts 11/15: VIOLIN "Smallest instrument in a
+standard string quartet" recovered via the learn test (basis prize_fact), no new
+losses. Residual misses unchanged and low-priority: BILLION, PILLOW, ORCHARD
+(parked economy family), SPIDER-spinner (accepted loss). Liveliness category
+CLOSED at 2 of the 6-try budget; `confirm_multiturn_v3.py` as-is is the adoption
+candidate.
 
 ## Remaining queue
 
