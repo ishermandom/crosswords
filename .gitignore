@@ -10,6 +10,7 @@ logs/
 # Fine-tuning slices: generated data; the build_*slice scripts regenerate
 # them.
 cluegen/scratch/finetune/data/
-cluegen/scratch/finetune/data_stage1/
 # Trained LoRA adapters: multi-MB binaries, regenerable from data + config.
-cluegen/scratch/finetune/adapters*/
+cluegen/scratch/finetune/adapters/
+# Intermediate probe/sweep checkpoints: regenerable, not the final adapters.
+cluegen/scratch/finetune/checkpoints/

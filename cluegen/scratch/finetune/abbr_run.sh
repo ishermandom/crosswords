@@ -24,7 +24,7 @@ except subprocess.TimeoutExpired:
 
 boxed 1200 $PY abbr_probe.py --skip-generate \
     > abbr_probe_base.log 2>&1
-boxed 1800 $PY abbr_probe.py --adapter adapters_12b_stage1_lr5e5 \
+boxed 1800 $PY abbr_probe.py --adapter adapters/adapters_12b_stage1_lr5e5 \
     > abbr_probe_tuned.log 2>&1
 
 echo done

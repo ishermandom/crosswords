@@ -38,7 +38,7 @@ import wn
 from prompts import PROMPT_TEMPLATE
 
 MODEL_REPO = 'mlx-community/gemma-4-12B-it-qat-OptiQ-4bit'
-VALID_PATH = Path(__file__).parent / 'data_stage1' / 'valid.jsonl'
+VALID_PATH = Path(__file__).parent / 'data' / 'data_stage1' / 'valid.jsonl'
 WORDNET_DATA = '/Users/Shared/data/wordnet'
 
 # Above this, a gloss reads as prose rather than a clue — it would score badly

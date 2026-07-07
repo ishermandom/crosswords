@@ -23,7 +23,7 @@ try:
     subprocess.run(sys.argv[2:], timeout=float(sys.argv[1]), check=True)
 except subprocess.TimeoutExpired:
     print('train step hit the deadline; continuing to evals')
-" $DEADLINE $OPTIQ lora train $MODEL --data data_stage1 -o $OUT \
+" $DEADLINE $OPTIQ lora train $MODEL --data data/data_stage1 -o $OUT \
     --rank-scaling constant --preset default --batch-size 1 \
     --iters $ITERS --learning-rate $LR > train_${OUT}.log 2>&1
 

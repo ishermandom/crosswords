@@ -26,7 +26,7 @@ from pathlib import Path
 from prompts import PROMPT_TEMPLATE
 
 CSV_PATH = Path('/Users/Shared/data/kaggle-nyt/nytcrosswords.csv')
-OUTPUT_DIR = Path(__file__).parent / 'data_stage1'
+OUTPUT_DIR = Path(__file__).parent / 'data' / 'data_stage1'
 
 # Weekday sampling weights, Monday..Sunday (user-set, spec "Sampling weights"):
 # Thursday is the top target difficulty, Sunday sits with it.

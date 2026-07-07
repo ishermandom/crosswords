@@ -30,8 +30,8 @@ $PY $LEASE acquire --holder finetune --minutes 90 \
     --task 'window C: learning-rate basin ramp, 12B batch 4' \
     || { echo 'lease acquire failed'; exit 1 }
 
-boxed 4500 $PY launch_train.py $MODEL --data data_stage1_15k \
-    --output probe_ramp_b4 --iters 250 --batch-size 4 \
+boxed 4500 $PY launch_train.py $MODEL --data data/data_stage1_15k \
+    --output checkpoints/probe_ramp_b4 --iters 250 --batch-size 4 \
     --peak-lr 1e-6 --ramp-to 5e-4 > ramp_b4.log 2>&1
 
 $PY $LEASE release --holder finetune

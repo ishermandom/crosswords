@@ -10,7 +10,7 @@ set -u
 cd /Users/Shared/code/crosswords-finetune-probe/cluegen/scratch/finetune
 export HF_HUB_CACHE=/Users/Shared/models/mlx
 PY=$HOME/.venvs/default/bin/python
-ADAPTERS=adapters_12b_stage1_lr5e5
+ADAPTERS=adapters/adapters_12b_stage1_lr5e5
 
 boxed() {
   local deadline=$1

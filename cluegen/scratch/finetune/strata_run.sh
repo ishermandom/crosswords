@@ -21,7 +21,7 @@ except subprocess.TimeoutExpired:
 " $deadline "$@"
 }
 
-boxed 1800 $PY strata_check.py --adapter adapters_12b_stage1_lr5e5 \
+boxed 1800 $PY strata_check.py --adapter adapters/adapters_12b_stage1_lr5e5 \
     > strata_tuned.log 2>&1
 
 echo done

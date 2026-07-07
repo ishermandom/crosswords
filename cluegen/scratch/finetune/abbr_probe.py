@@ -47,7 +47,7 @@ from optiq.mlx_lm_patches._register import register
 from prompts import PROMPT_TEMPLATE
 
 CSV_PATH = Path('/Users/Shared/data/kaggle-nyt/nytcrosswords.csv')
-DATA_DIR = Path(__file__).parent / 'data_stage1'
+DATA_DIR = Path(__file__).parent / 'data' / 'data_stage1'
 
 MARKER = ': Abbr.'
 MARKER_SUFFIX = re.compile(r':\s*Abbr\.$', re.IGNORECASE)

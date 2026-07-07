@@ -25,7 +25,7 @@ except subprocess.TimeoutExpired:
 boxed 1200 $PY abbr_probe.py --swap-only --group-size 60 \
     > abbr_swap_base.log 2>&1
 boxed 1200 $PY abbr_probe.py --swap-only --group-size 60 \
-    --adapter adapters_12b_stage1_lr5e5 \
+    --adapter adapters/adapters_12b_stage1_lr5e5 \
     > abbr_swap_tuned.log 2>&1
 
 echo done

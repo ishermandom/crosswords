@@ -18,7 +18,7 @@ import random
 from pathlib import Path
 
 XD_CLUES_PATH = Path('/Users/Shared/data/xd/clues.tsv')
-OUTPUT_DIR = Path(__file__).parent / 'data'
+OUTPUT_DIR = Path(__file__).parent / 'data' / 'data_stage0'
 
 # Answers the eval harness reserves: the 12-word iteration panel
 # (scratch/eval_panel.py) and the 8 held-out words (ceiling-log.md). Training

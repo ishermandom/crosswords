@@ -33,14 +33,14 @@ $PY $LEASE acquire --holder finetune --minutes 100 \
     || { echo 'lease acquire failed'; exit 1 }
 
 for BATCH in 1 2 4; do
-  boxed 900 $PY launch_train.py $MODEL --data data_stage1_15k \
-      --output probe_batch${BATCH} --iters 30 --batch-size $BATCH \
+  boxed 900 $PY launch_train.py $MODEL --data data/data_stage1_15k \
+      --output checkpoints/probe_batch${BATCH} --iters 30 --batch-size $BATCH \
       --constant-lr --peak-lr 5e-5 > timing_batch${BATCH}.log 2>&1
 done
 
 for LR in 5e-5 1e-4 2e-4; do
-  boxed 1500 $PY launch_train.py $MODEL --data data_stage1_15k \
-      --output probe_lr${LR}_b4 --iters 80 --batch-size 4 \
+  boxed 1500 $PY launch_train.py $MODEL --data data/data_stage1_15k \
+      --output checkpoints/probe_lr${LR}_b4 --iters 80 --batch-size 4 \
       --peak-lr $LR --warmup-fraction 0.1 --decay-fraction 0.2 \
       > range_lr${LR}_b4.log 2>&1
 done

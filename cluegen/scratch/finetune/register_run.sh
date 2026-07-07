@@ -22,7 +22,7 @@ except subprocess.TimeoutExpired:
 }
 
 boxed 900 $PY register_pairs.py > register_pairs_base.log 2>&1
-boxed 900 $PY register_pairs.py --adapter adapters_12b_stage1_lr5e5 \
+boxed 900 $PY register_pairs.py --adapter adapters/adapters_12b_stage1_lr5e5 \
     > register_pairs_tuned.log 2>&1
 
 echo done

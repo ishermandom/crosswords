@@ -22,7 +22,7 @@ def main() -> None:
   from mlx_lm import load, generate
   from mlx_lm.sample_utils import make_sampler
 
-  adapter = sys.argv[1] if len(sys.argv) > 1 else 'adapters_12b_stage1/best'
+  adapter = sys.argv[1] if len(sys.argv) > 1 else 'adapters/adapters_12b_stage1/best'
   model_repo = (sys.argv[2] if len(sys.argv) > 2
                 else 'mlx-community/gemma-4-12B-it-qat-OptiQ-4bit')
   model, tokenizer = load(model_repo, adapter_path=adapter)
