@@ -6,8 +6,8 @@
 _Scope: the design for the clue-generation (setter) side of the local pipeline —
 its goal, operating rules, standing principles, and the hypotheses under test.
 This document states the platonic ideal; how to achieve it is implementation
-work, tracked in the window ledger and `tasks.md`. Campaign-level goals live in
-`ceiling.md`._
+work, tracked in the window ledger and `tasks-local-ceiling.md`. Campaign-level
+goals live in `ceiling.md`._
 
 ## Goal
 
@@ -154,7 +154,7 @@ Per principle 8, none of this metadata is visible to the judge.
 ## Hypotheses
 
 Untested; each gets a smallest-sufficient experiment per principle 5. Results
-and mechanics live in the window ledger and `tasks.md`, not here.
+and mechanics live in the window ledger and `tasks-local-ceiling.md`, not here.
 
 - **H1a — satisfaction-seeded width**: a brainstorm seeded by satisfaction type
   (one angle per basis) produces more non-flat drafts per word than
