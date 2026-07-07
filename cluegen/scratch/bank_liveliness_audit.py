@@ -6,10 +6,16 @@ The chunk-1 full-protocol probe flagged bank clues only via the liveliness
 flat-gate, so this covers the whole bank with just that turn — one call per row
 instead of seven. Cache keys match battery.py's v3 runs exactly, so any later
 full-protocol audit reuses every call made here.
+
+With a JSONL path argument (rows of `{"word", "clue"}`), audits that file
+instead of the bank — the same instrument over any candidate pool, so flat-rates
+compare directly against the bank's.
 """
 
 import collections
+import json
 import pathlib
+import sys
 
 import battery
 import pipeline_local
@@ -30,7 +36,12 @@ def main() -> None:
   cache = battery._load_cache()
   counts: collections.Counter[str] = collections.Counter()
   flags = []
-  rows = battery._load_set('bank')
+  if len(sys.argv) > 1:
+    source = pathlib.Path(sys.argv[1])
+    rows = [json.loads(line) for line in source.read_text().splitlines()]
+  else:
+    source = pathlib.Path('bank')
+    rows = battery._load_set('bank')
   for row in rows:
     turn = battery._cached_turn(
       cache,
@@ -57,7 +68,7 @@ def main() -> None:
     if row_flags:
       flags.append((row['word'], row['clue'], row_flags))
 
-  print(f'\nbank: {len(flags)}/{len(rows)} rows flagged')
+  print(f'\n{source.name}: {len(flags)}/{len(rows)} rows flagged')
   for word, clue, row_flags in flags:
     print(f'  FLAG {word}: "{clue}" — {"; ".join(row_flags)}')
   print(f'{counts["calls"]} model calls, {counts["hits"]} cache hits')

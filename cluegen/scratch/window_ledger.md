@@ -1046,6 +1046,52 @@ SELDOM + MELODY (banked-but-flagged-flat), NIL + LILY (words.in categories).
 Compare per-word against inventory baseline drafts; grade liveliness in-session
 (layer 3); judge scoring deferred to rung 2.
 
+## H1 rungs 1–2 (2026-07-06) — three-turn funnel across 13 words
+
+Rung 1 (vivid arm, 6 words): nouns clearly lift — ASIDE "A brief remark
+whispered while others are frozen" beats its banked flat clue; SCORE "A
+cinematic swell of violins?". Bonus width find: the material turn surfaced NIL's
+modern name-image-likeness sense, absent from every baseline. Clean failure: the
+adverb — every SELDOM draft was a scene-sentence that cannot substitute for an
+adverb. Vivid material exists; the cast into part of speech is the missing step
+— direct evidence for H3.
+
+Casting arms on the two problem words:
+
+- **cast** (single-turn: sentence-first substitution frame merged into the draft
+  turn): traded vividness for legality — SELDOM gained adverbial openers but
+  kept illegal scene tails; SCORE went flat ("Remarkable achievement"). The
+  liveliness/legality tension can't be resolved in one turn.
+- **develop** (three turns: vivid material → vivid drafts → dedicated re-cast
+  turn, image held fixed): WIN on both. SELDOM produced "As infrequently as snow
+  falls in the Sahara" — vivid AND adverbially legal; the simile shape is the
+  natural adverbial cast. SCORE's re-cast turn did real verification (sentence,
+  fail, re-cast) and trimmed toward economy while keeping images ("Tailor's
+  marks for cutting cloth").
+
+Rung 2 generation (develop arm, prompts unchanged, 13 words total: the six
+rung-1 words + TWELVE THRICE GROSS FRANK CHASE VIOLET; ~12 s/word warm on 26B).
+Layer-3 grade of the final lists:
+
+- **Strong pools** (vivid + mostly legal): MELODY ("A staircase of pitches
+  climbed by a singer"), ASIDE, COURT ("Where rubber soles squeak during play"),
+  CHASE (verbs work: "Tail a scent trail through the brush"), SCORE, SELDOM.
+- **Weak pools**: TWELVE regressed to enumeration + one answer leak ("Twelve
+  inches in a foot" survived to the final list); GROSS regressed to flat glosses
+  at re-cast; THRICE still shaky (adverb #2); FRANK missed the frankfurter sense
+  entirely and confabulated biography in material.
+- **Systematic weaknesses**: (a) the PICK step is the weakest link — for TWELVE
+  it chose eggs/inches/months over apostles/jurors/clock-face material; (b)
+  material confabulates facts (a "176-item" gross — it's 144); (c) re-cast
+  sometimes mangles (VIOLET's awkward "…pigment color" casts) and passed a
+  number mismatch ("Spring blossoms" plural for singular VIOLET).
+
+Rung 2 measurement (in flight): top-2 finals per word (26 clues,
+`h1_finals.jsonl`) through the v3 liveliness turn on 31B —
+`bank_liveliness_audit.py` generalized to take a JSONL argument, cache-key
+compatible — for a flat-rate directly comparable to the bank audit's 23/75. Log:
+`logs/h1_finals_liveliness.log`.
+
 ## Remaining queue
 
 `#eval-expansion` DONE through the 2×2 (sets built
