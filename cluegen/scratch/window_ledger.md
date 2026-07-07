@@ -1365,3 +1365,23 @@ still sealed); end-of-window production wiring of the adopted confirm
 single-flow redesign lands). #taste-31b superseded by the in-flight 26B
 measurement. Budget: $7.18
 of $10 remains.
+
+### Overnight run (launched 2026-07-07 01:38, user directive: ranking + breadth)
+
+A/B closed first: calibrated 5/16 survivors vs conventions 5/16 — a TIE on
+survival (one fewer substitution kill), so prompt wording is at a plateau
+and the calibrated stack is FROZEN for its encoded user calibrations.
+Variance and ranking now dominate — hence this run.
+
+`overnight_driver.py` detached (driver log `logs/overnight_driver.log`):
+K=3 samples × 21 baselined words + K=2 × 30 breadth words on 26B with the
+schema'd extract turn pooling to `h1_pool.jsonl`; fresh-context 26B ranker
+per word (`h1_rankings.jsonl`); then 31B liveliness over ranker-top-4 and
+substitution over the passers (`logs/h1_overnight_*.log`). Deadline
+self-termination at ~6.5 h; lease self-released (held to 11:35).
+
+Morning read, in order: (1) per-word success-rate variance from the pool +
+audits (the reliability number); (2) ranker quality — does ranker-top-2
+contain a survivor where ANY candidate survives (coverage@2 vs oracle);
+(3) breadth word-class table; (4) full protocol on survivors (fresh 31B
+spend, size after seeing counts); (5) H4 early-stop from the deeper pools.
