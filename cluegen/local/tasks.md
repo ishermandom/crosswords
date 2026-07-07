@@ -212,11 +212,14 @@ done — see the log for the curve and the criteria re-analysis.
   prompts unchanged and solves FRANK by width ("Ancestor of the French"). Parked
   gap: neither model uses the shortening convention ("briefly") even when
   modeled. Tonight's stack: `senses` material → `conventions` pick → re-cast
-  (ledger "Conversion rung"). Next step: full-protocol 31B adoption run over a
-  fresh word slice with this stack (feeds H4; sealed-set spend allowed at that
-  moment), then H1b at equal compute, then H2 ranker validation off the adoption
-  run's verdicts, then a user taste round on judge liveliness divergences. The
-  user launches stretches with a /goal prompt that points at
+  (ledger "Conversion rung"). Next step: the adoption-measurement ladder
+  (re-planned after a skipped adversarial check; ledger "Adoption measurement"
+  list is authoritative): (1) substitution-turn-only pass over the existing 26
+  finals (~20 min, legality is the known risk), (2) full protocol on the
+  survivors only (~1 h, feeds H4 + H2), (3) fresh-slice full protocol PARKED
+  behind 1–2 — generalization only, sized after H4 data. Then H1b at equal
+  compute, and a user taste round on judge liveliness divergences. The user
+  launches stretches with a /goal prompt that points at
   setter.md/ceiling.md/ledger/tasks.md. Note: bank audit DONE 2026-07-06
   (flag-and-report, nothing deleted): 23/75 rows flagged, 22 flat-gloss + 1
   unearned '?', zero substitution/truth/economy-unanimous flags in the 10-row

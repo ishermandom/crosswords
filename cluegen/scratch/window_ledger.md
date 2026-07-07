@@ -1164,14 +1164,29 @@ frames; examples from non-test words):
 
 Day's arc closed. The prompt stack as of tonight: sense-inventory material turn
 → diverse pick with conventions block → re-cast turn (`h1a_probe.py` arms
-`senses`/`conventions`). Next stretch, in EV order: (1) full-protocol 31B
-adoption run over a fresh word slice with this stack (feeds H4; sealed-set spend
-allowed at that moment per setter.md); (2) H1b iterated expansion vs the single
-material pass at equal compute; (3) H2 ranker validation against the
-full-protocol verdicts from (1); (4) user taste round on judge liveliness
-divergences (it flagged "Midnight's hour" and "Stage speech meant only for the
-audience" flat, passed "Three times for an out?" — setter.md open question on
-fine-grained ordering).
+`senses`/`conventions`).
+
+Adoption measurement, as a ladder (re-planned 2026-07-06 after the user caught a
+skipped adversarial check — the original plan queued a multi-hour fresh-slice
+full-protocol batch as the first rung; the review showed it is the LAST):
+
+1. **Substitution-turn-only pass over the existing 26 finals** (~26 calls, ~20
+   min on 31B, cache-compatible): measures the #1 known risk — legality — which
+   the liveliness pass skipped (re-cast mangling, the passed plural mismatch,
+   "Three times for an out?").
+2. **Full protocol on the survivors only** (~10–15 clues, ~1 h): the adoption
+   verdict on the tuning words, reusing every cached turn from rung 1 and the
+   liveliness audit. Feeds H4 early-stop data and gives H2 the verdicts to
+   validate a ranker against.
+3. **Fresh word slice, full protocol** — parked behind rungs 1–2. It only tests
+   generalization beyond the 13 tuning words, and H4 data from rung 2 may shrink
+   it well below the multi-hour sketch. Sealed-set spend at that moment per
+   setter.md.
+
+Also queued: H1b iterated expansion vs the single material pass at equal
+compute; user taste round on judge liveliness divergences (it flagged
+"Midnight's hour" and "Stage speech meant only for the audience" flat, passed
+"Three times for an out?" — setter.md open question on fine-grained ordering).
 
 ## Remaining queue
 
