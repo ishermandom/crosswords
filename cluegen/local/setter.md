@@ -11,9 +11,10 @@ work, tracked in the window ledger and `tasks.md`. Campaign-level goals live in
 
 ## Goal
 
-Maximize the number of solver-satisfying clues the setter produces per answer
-word. The setter must be able to generate at least one satisfying clue for each
-of the hardest words in the input set. More is better.
+Maximize the setter's throughput of producing solver-satisfying clues. The
+setter must be able to generate at least one satisfying clue for each target
+answer word, including for each of the hardest words in the input set. More is
+better.
 
 ## Autonomous operation
 
