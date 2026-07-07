@@ -981,6 +981,20 @@ setter's thinking.
 - **Self-editor fate: open**, pending the tradeoff walkthrough (kill authority
   vs reflection value vs metadata production vs ranker-repurposing).
 
+**Design SETTLED 2026-07-06 — `cluegen/local/setter.md` governs from here; this
+section is history.** Rounds 2-3 outcomes now live in that document: the
+setter-judge boundary principle ("let the setter set and the judge judge"; light
+judging inside setting OK, boundary open space), rank-by-satisfaction with
+diversity (never-veto dissolved into the boundary question), goal restated as
+throughput of satisfying clues (experiments exempt, principle 7),
+autonomous-operation rules (blocker-only check-ins, $10 Fable/window, relaxed
+gates: local batches self-launch, setter wording free, sealed spends at
+adoption; training still gated), judge referenced via battery indirection,
+setter-output properties (why-satisfying note; judge never sees metadata),
+portfolio + cache-reuse + opportunistic-capture principles, and hypotheses
+H1a/H1b/H2/H3/H4. Standing beliefs + self-served quota readings recorded in
+`ceiling.md` (2026-07-06). Next: H1a 5-minute sanity check.
+
 ## Remaining queue
 
 `#eval-expansion` DONE through the 2×2 (sets built

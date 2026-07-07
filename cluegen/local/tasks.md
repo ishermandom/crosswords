@@ -193,23 +193,24 @@ done — see the log for the curve and the criteria re-analysis.
       role, or a 26B-screens/31B-confirms cascade under the single-flow
       protocol. Revisit when judge-path cost matters or the current stack
       stabilizes.
-- [ ] **Setter-side tuning** #setter-tuning — the next front after idea 13 (user
-      direction 2026-07-06: judge misses are at diminishing returns). First
-      thread: the difficulty-modifier concept (calibration #9 in the window
-      ledger) — tails like "for driving nails" are difficulty dials the setter
-      should place deliberately when targeting a difficulty, not accidents; the
-      liveliness turn's difficulty field is the consumer. Inputs before
-      designing: the banked-clue audit (adopted judge over ~75 banked clues,
-      flag-and-report) and the setter-output distribution (what fraction of
-      candidates are flat glosses vs charm shapes). Note: bank audit DONE
-      2026-07-06 (flag-and-report, nothing deleted): 23/75 rows flagged, 22
-      flat-gloss + 1 unearned '?', zero substitution/truth/economy-unanimous
-      flags in the 10-row full-protocol probe. Read: about a third of what the
-      old pipeline banked is flat-but-correct — the shortage is charm at
-      generation, not judge strictness. Some flags are judge taste, not defects
-      (MELODY "Whistleable earworm", SELDOM "Once in a blue moon", ZED "That
-      last character, overseas", COURT double definition). Full list:
-      `scratch/logs/bank_liveliness_audit.log`; ledger "Bank audit" section.
+- [~] **Setter-side tuning** #setter-tuning — the front after idea 13 (user
+  pivot 2026-07-06). DESIGN SETTLED 2026-07-06: `setter.md` governs (goal,
+  autonomous-operation rules, ten standing principles, hypotheses H1a/H1b/
+  H2/H3/H4) — written through two user design rounds; don't re-derive its
+  decisions. Satisfaction replaced difficulty as the target (difficulty was a
+  proxy; the modifier-dial idea from calibration #9 survives inside principle 4
+  and H-ladder work). Next step: H1a 5-minute sanity check (satisfaction-seeded
+  brainstorm, one word, eyeball drafts), then the ladder per setter.md
+  principle 5. The user launches stretches with a /goal prompt that points at
+  setter.md/ceiling.md/ledger/tasks.md. Note: bank audit DONE 2026-07-06
+  (flag-and-report, nothing deleted): 23/75 rows flagged, 22 flat-gloss + 1
+  unearned '?', zero substitution/truth/economy-unanimous flags in the 10-row
+  full-protocol probe. Read: about a third of what the old pipeline banked is
+  flat-but-correct — the shortage is charm at generation, not judge strictness.
+  Some flags are judge taste, not defects (MELODY "Whistleable earworm", SELDOM
+  "Once in a blue moon", ZED "That last character, overseas", COURT double
+  definition). Full list: `scratch/logs/bank_liveliness_audit.log`; ledger "Bank
+  audit" section.
 - [ ] **Align local vs cloud judge requirements** #judge-alignment — both judges
       should enforce the same requirement set, each via methodology fitting the
       model's strength (user direction 2026-07-04). DEPRIORITIZED behind
