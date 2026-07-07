@@ -127,6 +127,9 @@ marginal cost is low.
   unit costs of prior checkpoints, never from percent-of-quota intuition.
 - In-session review manages its own cost by sample size and format, per layer 3
   above.
+- Quota readings are self-served (user update, 2026-07-06): Claude takes
+  before/after dollar-spend readings itself and reports them; no user-taken
+  baseline is needed around measured runs.
 
 ## Autonomy rules
 
@@ -151,6 +154,20 @@ marginal cost is low.
   slow iteration. Wrap unattended runs in `caffeinate -i` so the machine doesn't
   sleep mid-run. Record the cost–benefit call in the campaign log before
   starting one.
+
+**Standing beliefs** (reviewed with the user 2026-07-06; this list, not Claude's
+memory, is the source of truth):
+
+- The compute lease (`compute_lease.py`) guards the shared machine: acquire
+  before any local model run, cooperate FIFO with the fine-tune thread, and
+  release promptly.
+- Durable downloads and installs beyond models (packages, data files) are run by
+  the user from a shopping list; Claude's subagents may make small ephemeral
+  research downloads that they clean up.
+- Drain signals: "after pending X concludes, I want Y" means stop starting new X
+  — confirm rather than riding an earlier green light.
+- Fine-tune training of any size stays gated (also listed under ask-first
+  above).
 
 **Server management:** Claude runs the Ollama server itself as needed —
 `/opt/homebrew/bin/ollama serve` (validated 2026-07-02; the model path comes
