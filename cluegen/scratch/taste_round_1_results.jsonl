@@ -1,0 +1,20 @@
+{"word": "COURT", "clue": "Where rubber soles squeak during play", "user": "satisfying", "judge": "ok (elegance); fixable economy", "claude": "satisfying"}
+{"word": "POUND", "clue": "A shelter for strays", "user": "flat", "judge": "flat gloss", "claude": "satisfying-ish"}
+{"word": "TWELVE", "clue": "Midnight's hour", "user": "flat", "judge": "flat gloss", "claude": "okay-plus"}
+{"word": "OSCAR", "clue": "Phonetic \"O\"", "user": "okay", "judge": "flat gloss", "claude": "satisfying"}
+{"word": "MELODY", "clue": "A staircase of pitches climbed by a singer", "user": "vivid but not factually accurate; don't overoptimize vividness; variety of clue types is the goal", "judge": "ok (elegance); bankable", "claude": "satisfying"}
+{"word": "ROBIN", "clue": "Gotham sidekick", "user": "okay", "judge": "flat gloss", "claude": "okay"}
+{"word": "SELDOM", "clue": "As infrequently as snow falls in the Sahara", "user": "satisfying", "judge": "ok (elegance); bankable", "claude": "satisfying"}
+{"word": "SIXTY", "clue": "Triple twenty", "user": "flat", "judge": "flat gloss", "claude": "satisfying if darts frame lands"}
+{"word": "ASIDE", "clue": "Stage speech meant only for the audience", "user": "flat", "judge": "flat gloss", "claude": "okay-plus"}
+{"word": "BOW", "clue": "Front of a vessel?", "user": "okay WITHOUT the question mark; the mark is against convention here", "judge": "flat gloss + unearned question mark", "claude": "okay, defended the mark"}
+{"word": "NIL", "clue": "An athlete's endorsement deal", "user": "incomprehensible (does not know the name-image-likeness sense)", "judge": "ok (aha); bankable", "claude": "satisfying, fresh sense"}
+{"word": "TWELVE", "clue": "The number of months in a year", "user": "flat", "judge": "flat gloss", "claude": "flat"}
+{"word": "ROBIN", "clue": "Red-breasted singer", "user": "okay", "judge": "flat gloss", "claude": "okay"}
+{"word": "THRICE", "clue": "As often as a charm works", "user": "okay", "judge": "ok (aha); bankable", "claude": "shaky accuracy, cute"}
+{"word": "FRANK", "clue": "Without sugarcoating", "user": "okay", "judge": "flat gloss + grammar_mismatch", "claude": "flat and illegal"}
+{"word": "GROSS", "clue": "Unpleasant and pungent, like a landfill in summer", "user": "okay", "judge": "ok (elegance); bankable", "claude": "okay"}
+{"word": "SCORE", "clue": "Tailor's marks for cutting cloth", "user": "okay", "judge": "flat gloss", "claude": "okay-plus"}
+{"word": "TWICE", "clue": "Not just once?", "user": "flat", "judge": "flat gloss + unearned question mark", "claude": "okay"}
+{"word": "LILY", "clue": "Easter bouquet centerpiece", "user": "okay", "judge": "flat gloss", "claude": "okay"}
+{"word": "WIDOW", "clue": "A single stray line at the top of a page", "user": "likes it (typography fondness); at the outer acceptable edge of obscurity", "judge": "fixable: sense too obscure + economy", "claude": "satisfying, prize fact"}

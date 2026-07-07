@@ -70,7 +70,11 @@ Claude iterates on this design autonomously, under these rules:
    as its basis enum (prize fact, fun, elegance, aha). Not all satisfying-enough
    clues are created equal — some are more compelling than others.
    `satisfaction.md` gives ways to meet the minimum bar; the setter's goal is to
-   maximize satisfaction, not just meet the bar.
+   maximize satisfaction, not just meet the bar. Satisfaction is not any single
+   ingredient (user calibration, 2026-07-07): vividness in particular is one
+   component, not the target — a vivid but inaccurate clue is not satisfying,
+   and accuracy comes first. The aim is satisfying clues across the variety of
+   clue types, never a bias toward one kind.
 
 3. **Guide the brainstorm, don't gate it.** Unguided candidate generation tends
    to yield poor clues, so the engineering effort goes into the prompt sequence

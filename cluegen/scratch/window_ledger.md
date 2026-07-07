@@ -1291,6 +1291,65 @@ Claude, the judge liveliness turn needs a design round before any more
 optimization against it. Until graded, further prompt iteration is Goodhart risk
 — prefer other threads (H1b, ranker validation prep).
 
+### Taste round 1 results (2026-07-07, via AskUserQuestion; full grades in `taste_round_1_results.jsonl`)
+
+**Headline: the judge's flatness taste is vindicated; Claude's grading was the
+lenient outlier.** No judge-flagged clue earned a user "Satisfying"; the user
+upheld the kills outright on POUND ("A shelter for strays"), ASIDE ("Stage
+speech meant only for the audience"), SIXTY ("Triple twenty"), both TWELVE
+clues, and TWICE — and rated the remaining disputed flags merely "Okay" (OSCAR,
+ROBIN ×2, SCORE tailor, LILY, FRANK sugarcoating), defensible kills under
+maximize-satisfaction. Both user "Satisfying" grades (COURT squeak, SELDOM
+Sahara) were judge-passed.
+
+**The judge's actual leak is substance, not strictness — it BANKED two clues the
+user rejects:** MELODY "A staircase of pitches climbed by a singer" (vivid but
+factually inaccurate) and NIL "An athlete's endorsement deal" (sense
+incomprehensible to the user — an obscurity miss scored as aha). WIDOW's
+typography clue: user likes it but places it at the outer acceptable edge of
+obscurity — the judge's "too obscure" fixable was directionally right.
+
+**User calibrations captured:**
+
+- Don't overoptimize vividness; accuracy comes first; satisfying clues across a
+  VARIETY of clue types, no bias toward one kind → now in setter.md principle 2
+  (user-instructed edit, 2026-07-07).
+- '?' conventions are strict: BOW "Front of a vessel?" is okay WITHOUT the mark,
+  wrong with it — a heteronym alone doesn't earn '?'. (The judge already flagged
+  exactly this.)
+- Obscurity dial: WIDOW-typography ≈ outer edge; NIL name-image-likeness beyond
+  it.
+
+**Consequences:** (1) the Goodhart worry dissolves — setter tuning against the
+liveliness gate is UN-gated; the fresh-word losses were mostly real flatness.
+(2) The setter's pick step must stop selecting on vividness alone — revise
+toward varied-satisfaction selection with accuracy first (sanctioned prompt
+work, next lever). (3) Judge design-round items re-prioritized: the accuracy
+leak (MELODY staircase bankable) and obscurity calibration (NIL aha) are now the
+top judge items; the liveliness turn stands. (4) Claude's in-session grades
+should not be treated as a satisfaction ground truth — lean on the judge + user
+rounds.
+
+### Repair-pass probe (2026-07-07) — 2/4 converted; limits mapped
+
+Judge-directed repairs of the 4 fixables via one repair turn each on 26B
+(`repair_probe.py`, exact minimal trims). Full re-judge on 31B
+(`logs/h1repair_20260707-010514.jsonl`, 32 calls, 14.9 min):
+
+- CONVERTED: COURT "Where rubber soles squeak" and SCORE "Cinematic swell during
+  a chase scene" — both bankable. Pure-wordiness fixables convert cleanly;
+  tuning-word coverage rises to 9/9 words with a bankable clue.
+- NOT converted, informatively: MELODY's trim removed the words that carried the
+  charm — "The part of a song people whistle" now flags FLAT. Economy and
+  liveliness were in tension on this clue; the loop caught the over-trim because
+  repairs are re-judged in full. WIDOW's obscurity persists (the repair ADDED a
+  '?', which fixes nothing and conflicts with the user's strict-'?'
+  calibration).
+
+Loop verdict: the fixable→repair→re-judge cycle works end-to-end for economy
+flaws and correctly refuses sense/obscurity cases. Production repair should
+decline flaws outside the economy family rather than attempt them.
+
 `#eval-expansion` DONE through the 2×2 (sets built
 $1.80; slots 1-3b above).
 Still queued: screen-recall family diagnosis on the ORIGINAL 81-row sets from
