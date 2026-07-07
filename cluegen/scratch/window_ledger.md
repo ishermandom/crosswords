@@ -995,6 +995,57 @@ portfolio + cache-reuse + opportunistic-capture principles, and hypotheses
 H1a/H1b/H2/H3/H4. Standing beliefs + self-served quota readings recorded in
 `ceiling.md` (2026-07-06). Next: H1a 5-minute sanity check.
 
+## H1a sanity check (2026-07-06, rung 0) — taxonomy seeding NO, material-first YES
+
+Probe: `scratch/h1a_probe.py`, gemma4:26b-qat, word COURT (the known
+draft-pool-shortage word), two turns (seed then pick-and-draft), baseline = the
+4 COURT runs / 16 drafts in `logs/setter_draft_inventory.jsonl`. Footprint: 26B
+resident, 6 short runs, ~15 min wall, lease held throughout.
+
+Arms, in order (all transcripts in `logs/h1a_probe_COURT_*`):
+
+- **basis** (H1a as written: one angle per satisfaction basis, ×2 samples):
+  NEGATIVE. The model fills the rubric with the same four shallow senses
+  (legal/tennis/royal/wooing) and labels them; "prize trivia" angles contain
+  zero facts; two drafts duplicate known-flat baseline drafts verbatim ("Site of
+  a lawsuit?").
+- **mechanism** (one angle per `satisfaction.md` mechanism, whole list with
+  examples): NEGATIVE. One-line vague angles; the "prize fact" leaked the answer
+  ("Venue where the Supreme Court meets"). Same four senses.
+- **micro-probe** (one-off: "list 8 pieces of vivid raw material — facts, tiny
+  concrete scenes, frames, surprising senses"): the model produced genuinely
+  vivid scenes ("the heavy rhythmic squeak of sneakers on polished hardwood").
+  The vivid material EXISTS at 26B; angle rubrics suppress it.
+- **material** (material turn + build-from-material drafts): mixed-negative, but
+  diagnostic — the material turn regressed toward sense coverage, and the PICK
+  step chose the four flattest pieces (same safety-first pathology as the old
+  self-editor's KEEP gate). Vividness dies at selection and development, not
+  only at generation.
+- **vivid** (try 6: exact micro-probe wording for turn 1 + pick "most VIVID,
+  generic sense description is an automatic skip" + printed clue must keep the
+  material's image): WIN. Drafts: "Where rubber soles squeak on hardwood",
+  "Where a gavel strikes a sound block", "Where nobles gather around a throne",
+  "Where an umpire makes a call" — the liveliest COURT drafts of the campaign
+  (bank's COURT entry is a flat double definition).
+
+Read: H1a's premise was wrong in an instructive way — satisfaction taxonomy
+labels are qualities to BE, not moves to MAKE, and seeding with them changes
+labels, not content. The working formula is material-first: elicit concrete
+material directly, select by vividness explicitly, and require the image to
+survive into print. This dissolves H1a into a reformed H1 ("material-first
+width") and connects to H1b (the material turn is the natural first expansion
+round) and H3 (develop-from-material is a casting step).
+
+Residual: all four winning drafts share a "Where X" shape — location-noun
+monotony. Candidate refinement for after rung 1; not touched during replication
+(clean comparison first).
+
+Rung 1 (~30 min): the vivid arm, prompts UNCHANGED, across 6 words mixing
+failure shapes — ASIDE (editor smoking-gun), SCORE (parse-missing hard word),
+SELDOM + MELODY (banked-but-flagged-flat), NIL + LILY (words.in categories).
+Compare per-word against inventory baseline drafts; grade liveliness in-session
+(layer 3); judge scoring deferred to rung 2.
+
 ## Remaining queue
 
 `#eval-expansion` DONE through the 2×2 (sets built
