@@ -1424,49 +1424,63 @@ kinship material diagnosis.
 ### Morning block results (2026-07-07, full protocol + 31B ranker)
 
 Full v3 protocol over the 47 top-2 survivors
-(`logs/h1night_20260707-073842.jsonl`, 282 calls / 94 cache hits, 119 min):
-**37 bankable / 8 fixable / 2 bad.** The two-turn pre-filter has real
-precision: 79% of its survivors are bankable and only 2/47 are bad — one
-of them the predicted WIDOW idiom fragment ("V-shaped hairline feature"),
-correctly killed.
+(`logs/h1night_20260707-073842.jsonl`, 282 calls / 94 cache hits, 119 min): **37
+bankable / 8 fixable / 2 bad.** The two-turn pre-filter has real precision: 79%
+of its survivors are bankable and only 2/47 are bad — one of them the predicted
+WIDOW idiom fragment ("V-shaped hairline feature"), correctly killed.
 
 **End-to-end coverage: 25/51 words (49%) now hold at least one
-full-protocol-bankable clue from one overnight pass at K=2–3.** Capture
-list written with provenance: `h1_capture.jsonl` (37 rows; per principle
-10 a running list, deliberately NOT merged into clue_bank.jsonl).
+full-protocol-bankable clue from one overnight pass at K=2–3.** Capture list
+written with provenance: `h1_capture.jsonl` (37 rows; per principle 10 a running
+list, deliberately NOT merged into clue_bank.jsonl).
 
 **Ranker model comparison (H2):** 26B and 31B rankers agree on 16 of 21
-comparable words, 26B uniquely wins 1, 31B uniquely wins 0. The cheap
-ranker is not the bottleneck — fresh-context 26B ranking ADOPTED for the
-funnel; no reason to pay the 31B swap for ranking.
+comparable words, 26B uniquely wins 1, 31B uniquely wins 0. The cheap ranker is
+not the bottleneck — fresh-context 26B ranking ADOPTED for the funnel; no reason
+to pay the 31B swap for ranking.
 
-Open threads by expected value after this block: (1) economy-family
-repairs on the 8 new fixables (validated loop, direct bankable gain); (2)
-kinship-class material diagnosis (UNCLE/BRIDE/HEIR uncovered); (3) the
-20 uncovered words — deeper sampling vs material changes; (4) H4 offline
-read; (5) judge design-round prep (accuracy + obscurity leaks). Fable
-window untouched: $10 of $10.
+Open threads by expected value after this block: (1) economy-family repairs on
+the 8 new fixables (validated loop, direct bankable gain); (2) kinship-class
+material diagnosis (UNCLE/BRIDE/HEIR uncovered); (3) the 20 uncovered words —
+deeper sampling vs material changes; (4) H4 offline read; (5) judge design-round
+prep (accuracy + obscurity leaks). Fable window untouched: $10 of $10.
 
 ### Kinship diagnosis + economy repairs (2026-07-07 morning)
 
 Kinship's weakness decomposes into two mechanisms, neither "bad pools":
 
-- **Monosemy defeats sense-width**: HEIR's pool is three phrasings of one
-  sense — the inventory step multiplies nothing for single-sense words.
-  They need frame/fact width instead (UNCLE found "Sam's title" and
-  "Taps out?" because idiom frames exist; HEIR found none). Candidate
-  lever: a material-turn line for single-sense words — idioms, famous
-  bearers, cultural fixtures — cheap to test.
+- **Monosemy defeats sense-width**: HEIR's pool is three phrasings of one sense
+  — the inventory step multiplies nothing for single-sense words. They need
+  frame/fact width instead (UNCLE found "Sam's title" and "Taps out?" because
+  idiom frames exist; HEIR found none). Candidate lever: a material-turn line
+  for single-sense words — idioms, famous bearers, cultural fixtures — cheap to
+  test.
 - **The substitution turn prosecutes '?'-licensed conventional stretches**:
-  UNCLE "Taps out?" scored aha at liveliness, then died as other_object
-  (the act, not the word). Same family as the name-word rejection and
-  the removed "for short" signal — judge design-round item #3:
-  conventions the substitution turn should honor when '?' is present.
-  BRIDE's aisle aha died on sentence shape — that one is legitimately
-  recastable, a funnel matter.
+  UNCLE "Taps out?" scored aha at liveliness, then died as other_object (the
+  act, not the word). Same family as the name-word rejection and the removed
+  "for short" signal — judge design-round item #3: conventions the substitution
+  turn should honor when '?' is present. BRIDE's aisle aha died on sentence
+  shape — that one is legitimately recastable, a funnel matter.
 
-Economy repairs on the overnight fixables: 5 repaired (3 correctly
-declined: COURT truth, ORPHAN obscurity ×2). Watch-items: the repair turn
-ADDED a '?' to CRANE (repair prompt lacks the strict-'?' rule) and
-stripped NIL's "for short" signal — if the re-judge banks it anyway,
-that's the judge missing a required convention signal, filed with item #3.
+Economy repairs on the overnight fixables: 5 repaired (3 correctly declined:
+COURT truth, ORPHAN obscurity ×2). Watch-items: the repair turn ADDED a '?' to
+CRANE (repair prompt lacks the strict-'?' rule) and stripped NIL's "for short"
+signal — if the re-judge banks it anyway, that's the judge missing a required
+convention signal, filed with item #3.
+
+### Repair round 2 + H4 read (2026-07-07 ~08:50)
+
+Economy repairs re-judged: 3/5 converted (CRANE "Stretch to see better?",
+NIL "College athlete's brand rights", TWICE "JYP sensation"); LILY was
+over-trimmed ("Tiger variety" lost its specificity), REED still fixable.
+Cumulative economy-repair conversion 5/9; capture list now 40 bankables.
+Two judge-gap CONFIRMATIONS: NIL banked without its "for short" signal;
+CRANE banked with the repair-added '?' — the judge checks neither
+convention. Both filed in the design-round brief (item #3 family).
+
+**H4 read (decision-grade): SUPPORTED.** Of 16 words with two judged
+candidates, the ranker-first was bankable for 13; the second candidate
+rescued word coverage exactly once. M=1 early stop saves ~27% of judge
+time at ~zero coverage cost — right default for breadth-mode runs;
+depth-mode re-judging stays available later per ceiling.md's
+breadth-before-depth rule.
