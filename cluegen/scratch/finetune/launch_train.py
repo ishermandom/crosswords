@@ -29,22 +29,29 @@ import argparse
 from optiq.mlx_lm_patches._register import register
 
 
-def build_lr_schedule(peak: float, iters: int, warmup_fraction: float,
-                      decay_fraction: float, floor_fraction: float):
+def build_lr_schedule(
+  peak: float,
+  iters: int,
+  warmup_fraction: float,
+  decay_fraction: float,
+  floor_fraction: float,
+):
   """Step->lr callable: warmup to `peak`, hold, cosine decay to the floor."""
   import mlx.optimizers as optim
 
   warmup_steps = max(1, round(iters * warmup_fraction))
   decay_steps = max(1, round(iters * decay_fraction))
   warmup = optim.schedulers.linear_schedule(0.0, peak, warmup_steps)
-  cosine = optim.schedulers.cosine_decay(peak, decay_steps,
-                                         peak * floor_fraction)
+  cosine = optim.schedulers.cosine_decay(
+    peak, decay_steps, peak * floor_fraction
+  )
 
   def hold(_step) -> float:
     return peak
 
   return optim.schedulers.join_schedules(
-      [warmup, hold, cosine], [warmup_steps, iters - decay_steps])
+    [warmup, hold, cosine], [warmup_steps, iters - decay_steps]
+  )
 
 
 def build_ramp_schedule(start: float, end: float, iters: int):
@@ -89,15 +96,26 @@ def main() -> None:
   parser.add_argument('--batch-size', type=int, default=1)
   parser.add_argument('--warmup-fraction', type=float, default=0.04)
   parser.add_argument('--decay-fraction', type=float, default=0.25)
-  parser.add_argument('--floor-fraction', type=float, default=0.10,
-                      help='final lr as a fraction of peak')
-  parser.add_argument('--constant-lr', action='store_true',
-                      help='skip the schedule (matches optiq CLI behavior; '
-                           'for apples-to-apples short probes)')
-  parser.add_argument('--ramp-to', type=float, default=None,
-                      help='basin mapping: exponential LR ramp from '
-                           '--peak-lr up to this value over --iters, '
-                           'reported every 5 steps; overrides the schedule')
+  parser.add_argument(
+    '--floor-fraction',
+    type=float,
+    default=0.10,
+    help='final lr as a fraction of peak',
+  )
+  parser.add_argument(
+    '--constant-lr',
+    action='store_true',
+    help='skip the schedule (matches optiq CLI behavior; '
+    'for apples-to-apples short probes)',
+  )
+  parser.add_argument(
+    '--ramp-to',
+    type=float,
+    default=None,
+    help='basin mapping: exponential LR ramp from '
+    '--peak-lr up to this value over --iters, '
+    'reported every 5 steps; overrides the schedule',
+  )
   parser.add_argument('--resume-adapter-file', default=None)
   args = parser.parse_args()
 
@@ -106,24 +124,36 @@ def main() -> None:
   from optiq.lora.trainer import train_lora
 
   if args.ramp_to is not None:
-    learning_rate = build_ramp_schedule(args.peak_lr, args.ramp_to,
-                                        args.iters)
+    learning_rate = build_ramp_schedule(args.peak_lr, args.ramp_to, args.iters)
   elif args.constant_lr:
     learning_rate = args.peak_lr
   else:
     learning_rate = build_lr_schedule(
-        args.peak_lr, args.iters, args.warmup_fraction, args.decay_fraction,
-        args.floor_fraction)
+      args.peak_lr,
+      args.iters,
+      args.warmup_fraction,
+      args.decay_fraction,
+      args.floor_fraction,
+    )
   if args.resume_adapter_file:
     install_resume(args.resume_adapter_file)
 
   # Ramp mode wants a fine loss trace and no mid-run validation pauses.
-  reporting = ({'steps_per_report': 5, 'steps_per_eval': 1_000_000}
-               if args.ramp_to is not None else {})
+  reporting = (
+    {'steps_per_report': 5, 'steps_per_eval': 1_000_000}
+    if args.ramp_to is not None
+    else {}
+  )
   config = OptiqLoraConfig(
-      rank=8, scale=1.0, rank_scaling='constant',
-      batch_size=args.batch_size, iters=args.iters,
-      learning_rate=learning_rate, adapter_path=args.output, **reporting)
+    rank=8,
+    scale=1.0,
+    rank_scaling='constant',
+    batch_size=args.batch_size,
+    iters=args.iters,
+    learning_rate=learning_rate,
+    adapter_path=args.output,
+    **reporting,
+  )
   result = train_lora(args.model, args.data, config)
   print(f'[launcher] done: {result}')
 

@@ -34,7 +34,6 @@ from pathlib import Path
 
 import mlx.core as mx
 import wn
-
 from prompts import PROMPT_TEMPLATE
 
 MODEL_REPO = 'mlx-community/gemma-4-12B-it-qat-OptiQ-4bit'
@@ -81,46 +80,53 @@ def terse_gloss(word: str) -> str | None:
   return best[0].upper() + best[1:]
 
 
-def definition_records(records: list[dict],
-                       difficulty: str) -> list[list[dict]]:
+def definition_records(
+  records: list[dict], difficulty: str
+) -> list[list[dict]]:
   """Flat-definition controls: gloss as the response, one per answer."""
-  answers = sorted({parse_prompt(r['messages'][0]['content'])[1]
-                    for r in records})
+  answers = sorted(
+    {parse_prompt(r['messages'][0]['content'])[1] for r in records}
+  )
   conditioned = []
   for answer in answers:
     gloss = terse_gloss(answer)
     if gloss is None:
       continue
     content = PROMPT_TEMPLATE.format(difficulty=difficulty, answer=answer)
-    conditioned.append([
+    conditioned.append(
+      [
         {'role': 'user', 'content': content},
         {'role': 'assistant', 'content': gloss},
-    ])
+      ]
+    )
   return conditioned
 
 
 def response_loss(model, tokenizer, messages: list[dict]) -> tuple[float, int]:
   """Per-token negative log-likelihood over the assistant response tokens."""
   prompt_ids = tokenizer.apply_chat_template(
-      messages[:-1], add_generation_prompt=True)
+    messages[:-1], add_generation_prompt=True
+  )
   full_ids = tokenizer.apply_chat_template(messages)
-  assert full_ids[:len(prompt_ids)] == prompt_ids, 'template prefix broke'
+  assert full_ids[: len(prompt_ids)] == prompt_ids, 'template prefix broke'
 
   logits = model(mx.array(full_ids)[None]).astype(mx.float32)
   logprobs = logits - mx.logsumexp(logits, axis=-1, keepdims=True)
   targets = mx.array(full_ids[1:])
   per_token = logprobs[0, mx.arange(len(full_ids) - 1), targets]
-  response_logprobs = per_token[len(prompt_ids) - 1:]
+  response_logprobs = per_token[len(prompt_ids) - 1 :]
   negative_ll = -response_logprobs.sum()
   mx.eval(negative_ll)
   return float(negative_ll), int(response_logprobs.shape[0])
 
 
-def condition_records(records: list[dict], condition: str,
-                      rng: random.Random) -> list[list[dict]]:
+def condition_records(
+  records: list[dict], condition: str, rng: random.Random
+) -> list[list[dict]]:
   """Build the messages lists for one scoring condition."""
-  answers = sorted({parse_prompt(r['messages'][0]['content'])[1]
-                    for r in records})
+  answers = sorted(
+    {parse_prompt(r['messages'][0]['content'])[1] for r in records}
+  )
   conditioned = []
   for record in records:
     difficulty, answer = parse_prompt(record['messages'][0]['content'])
@@ -129,34 +135,47 @@ def condition_records(records: list[dict], condition: str,
     elif condition == 'difficulty-swap':
       difficulty = DIFFICULTY_SWAP[difficulty]
     content = PROMPT_TEMPLATE.format(difficulty=difficulty, answer=answer)
-    conditioned.append([
+    conditioned.append(
+      [
         {'role': 'user', 'content': content},
         record['messages'][1],
-    ])
+      ]
+    )
   return conditioned
 
 
 def main() -> None:
   parser = argparse.ArgumentParser(description=__doc__)
-  parser.add_argument('--adapter', default=None,
-                      help='adapter directory; omit to score the base model')
-  parser.add_argument('--model', default=MODEL_REPO,
-                      help='model repo to score (e.g. the e2b variant)')
+  parser.add_argument(
+    '--adapter',
+    default=None,
+    help='adapter directory; omit to score the base model',
+  )
+  parser.add_argument(
+    '--model',
+    default=MODEL_REPO,
+    help='model repo to score (e.g. the e2b variant)',
+  )
   parser.add_argument('--limit', type=int, default=200)
-  parser.add_argument('--definition-limit', type=int, default=None,
-                      help='cap the definition controls (deterministic prefix '
-                           'of the sorted-answer list) for cheap trace runs')
+  parser.add_argument(
+    '--definition-limit',
+    type=int,
+    default=None,
+    help='cap the definition controls (deterministic prefix '
+    'of the sorted-answer list) for cheap trace runs',
+  )
   parser.add_argument('--seed', type=int, default=20260702)
   args = parser.parse_args()
 
   register()
   from mlx_lm import load
+
   model, tokenizer = load(args.model, adapter_path=args.adapter)
 
   rng = random.Random(args.seed)
   all_records = [json.loads(line) for line in VALID_PATH.open()]
   rng.shuffle(all_records)
-  records = all_records[:args.limit]
+  records = all_records[: args.limit]
 
   label = args.adapter or 'base'
   print(f'model: {args.model}  adapter: {label}  n={len(records)}')
@@ -170,19 +189,24 @@ def main() -> None:
       total_tokens += token_count
     results[condition] = total_nll / total_tokens
     print(f'{condition:>16}: {results[condition]:.3f}')
-  print(f'{"answer gap":>16}: '
-        f'{results["answer-shuffle"] - results["true"]:+.3f}')
-  print(f'{"difficulty gap":>16}: '
-        f'{results["difficulty-swap"] - results["true"]:+.3f}')
+  print(
+    f'{"answer gap":>16}: {results["answer-shuffle"] - results["true"]:+.3f}'
+  )
+  print(
+    f'{"difficulty gap":>16}: '
+    f'{results["difficulty-swap"] - results["true"]:+.3f}'
+  )
 
   # Definition controls run over every val answer with a terse gloss — coverage
   # is ~20%, so subsampling by --limit would starve them.
   wn.config.data_directory = WORDNET_DATA
-  for condition_label, difficulty in (('definition|easy', 'easy'),
-                                      ('definition|hard', 'hard')):
+  for condition_label, difficulty in (
+    ('definition|easy', 'easy'),
+    ('definition|hard', 'hard'),
+  ):
     scored = definition_records(all_records, difficulty)
     if args.definition_limit is not None:
-      scored = scored[:args.definition_limit]
+      scored = scored[: args.definition_limit]
     total_nll = 0.0
     total_tokens = 0
     for messages in scored:
@@ -190,13 +214,18 @@ def main() -> None:
       total_nll += nll
       total_tokens += token_count
     results[condition_label] = total_nll / total_tokens
-    print(f'{condition_label:>16}: {results[condition_label]:.3f} '
-          f'(n={len(scored)})')
-  print(f'{"register sep":>16}: '
-        f'{results["definition|easy"] - results["true"]:+.3f} '
-        '(definitions minus real clues; growth across models = quality)')
-  print(f'{"flat@hard penalty":>17}: '
-        f'{results["definition|hard"] - results["definition|easy"]:+.3f}')
+    print(
+      f'{condition_label:>16}: {results[condition_label]:.3f} (n={len(scored)})'
+    )
+  print(
+    f'{"register sep":>16}: '
+    f'{results["definition|easy"] - results["true"]:+.3f} '
+    '(definitions minus real clues; growth across models = quality)'
+  )
+  print(
+    f'{"flat@hard penalty":>17}: '
+    f'{results["definition|hard"] - results["definition|easy"]:+.3f}'
+  )
 
 
 if __name__ == '__main__':

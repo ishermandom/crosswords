@@ -34,15 +34,31 @@ WEEKDAY_WEIGHTS = (1.0, 1.5, 2.0, 4.0, 3.0, 2.0, 4.0)
 
 # Weekday -> difficulty bucket for the conditioning token (spec "Difficulty
 # conditioning"): Mon-Tue easy, Wed-Thu medium, Fri-Sat hard, Sun medium.
-WEEKDAY_BUCKETS = ('easy', 'easy', 'medium', 'medium', 'hard', 'hard',
-                   'medium')
+WEEKDAY_BUCKETS = ('easy', 'easy', 'medium', 'medium', 'hard', 'hard', 'medium')
 
 # Answers the eval harness reserves: the 12-word iteration panel and the 8
 # held-out words. Training must never see them.
 EXCLUDED_ANSWERS = {
-    'SCORE', 'DAISY', 'GRANT', 'CHECK', 'GASP', 'AMBER',
-    'TWENTY', 'GROSS', 'PAIR', 'VIOLET', 'ROBIN', 'STOCK',
-    'COURT', 'SUE', 'HAZEL', 'SECOND', 'ZED', 'FORTY', 'DOZEN', 'NINETEEN',
+  'SCORE',
+  'DAISY',
+  'GRANT',
+  'CHECK',
+  'GASP',
+  'AMBER',
+  'TWENTY',
+  'GROSS',
+  'PAIR',
+  'VIOLET',
+  'ROBIN',
+  'STOCK',
+  'COURT',
+  'SUE',
+  'HAZEL',
+  'SECOND',
+  'ZED',
+  'FORTY',
+  'DOZEN',
+  'NINETEEN',
 }
 
 CLUES_PER_ANSWER_CAP = 4
@@ -67,8 +83,9 @@ def normalized_clue(clue: str) -> str:
   return re.sub(r'[^a-z0-9]+', '', clue.lower())
 
 
-def weighted_picks(candidates: list[dict], count: int,
-                   rng: random.Random) -> list[dict]:
+def weighted_picks(
+  candidates: list[dict], count: int, rng: random.Random
+) -> list[dict]:
   """Draw up to `count` candidates by weight, without replacement."""
   pool = list(candidates)
   picks = []
@@ -96,8 +113,7 @@ def load_pool(funnel: collections.Counter) -> dict[str, list[dict]]:
         continue
       answer = (row['Word'] or '').strip().upper()
       clue = (row['Clue'] or '').strip()
-      if not (answer.isalpha() and answer.isascii()
-              and 3 <= len(answer) <= 15):
+      if not (answer.isalpha() and answer.isascii() and 3 <= len(answer) <= 15):
         funnel['answer shape'] += 1
         continue
       if answer in EXCLUDED_ANSWERS:
@@ -121,12 +137,13 @@ def load_pool(funnel: collections.Counter) -> dict[str, list[dict]]:
       kept = latest.get(key)
       if kept is None or date > kept['date']:
         latest[key] = {
-            'answer': answer,
-            'clue': clue,
-            'date': date,
-            'bucket': WEEKDAY_BUCKETS[date.weekday()],
-            'weight': (WEEKDAY_WEIGHTS[date.weekday()]
-                       * recency_weight(date.year)),
+          'answer': answer,
+          'clue': clue,
+          'date': date,
+          'bucket': WEEKDAY_BUCKETS[date.weekday()],
+          'weight': (
+            WEEKDAY_WEIGHTS[date.weekday()] * recency_weight(date.year)
+          ),
         }
   funnel['after dedup'] = len(latest)
 
@@ -141,25 +158,37 @@ def write_split(path: Path, records: list[dict]) -> None:
   """Write one JSONL split in mlx-lm chat format."""
   with path.open('w', encoding='utf-8') as file:
     for record in records:
-      message_pair = {'messages': [
-          {'role': 'user',
-           'content': PROMPT_TEMPLATE.format(difficulty=record['bucket'],
-                                             answer=record['answer'])},
+      message_pair = {
+        'messages': [
+          {
+            'role': 'user',
+            'content': PROMPT_TEMPLATE.format(
+              difficulty=record['bucket'], answer=record['answer']
+            ),
+          },
           {'role': 'assistant', 'content': record['clue']},
-      ]}
+        ]
+      }
       file.write(json.dumps(message_pair, ensure_ascii=False) + '\n')
 
 
 def main() -> None:
   parser = argparse.ArgumentParser(description=__doc__)
-  parser.add_argument('--size', type=int, default=10_000,
-                      help='target train-pair count (final value comes from '
-                           'the 12B timing run)')
+  parser.add_argument(
+    '--size',
+    type=int,
+    default=10_000,
+    help='target train-pair count (final value comes from the 12B timing run)',
+  )
   parser.add_argument('--seed', type=int, default=20260702)
-  parser.add_argument('--output-dir', type=Path, default=OUTPUT_DIR,
-                      help='destination for train/valid jsonl; larger rungs '
-                           'get their own directory so the 5k slice stays '
-                           'intact for comparisons')
+  parser.add_argument(
+    '--output-dir',
+    type=Path,
+    default=OUTPUT_DIR,
+    help='destination for train/valid jsonl; larger rungs '
+    'get their own directory so the 5k slice stays '
+    'intact for comparisons',
+  )
   args = parser.parse_args()
 
   funnel: collections.Counter = collections.Counter()
@@ -180,15 +209,13 @@ def main() -> None:
       valid.extend(picks)
     elif len(train) < args.size:
       train.extend(picks)
-  train = train[:args.size]
+  train = train[: args.size]
 
   # Hard guarantees the training run relies on.
   train_answers = {r['answer'] for r in train}
   assert not train_answers & {r['answer'] for r in valid}
-  assert not (train_answers | {r['answer'] for r in valid}) \
-      & EXCLUDED_ANSWERS
-  assert all(r['bucket'] in ('easy', 'medium', 'hard')
-             for r in train + valid)
+  assert not (train_answers | {r['answer'] for r in valid}) & EXCLUDED_ANSWERS
+  assert all(r['bucket'] in ('easy', 'medium', 'hard') for r in train + valid)
 
   args.output_dir.mkdir(exist_ok=True)
   write_split(args.output_dir / 'train.jsonl', train)
@@ -208,12 +235,15 @@ def main() -> None:
   for record in train:
     buckets_by_answer[record['answer']].add(record['bucket'])
   contrast_answers = sum(
-      1 for buckets in buckets_by_answer.values() if len(buckets) > 1)
+    1 for buckets in buckets_by_answer.values() if len(buckets) > 1
+  )
   print(f'{"contrast answers":>18}: {contrast_answers}')
   years = sorted(r['date'].year for r in train)
   print(f'{"median year":>18}: {years[len(years) // 2]}')
-  print(f'{"valid pairs":>18}: {len(valid)} '
-        f'({len({r["answer"] for r in valid})} answers)')
+  print(
+    f'{"valid pairs":>18}: {len(valid)} '
+    f'({len({r["answer"] for r in valid})} answers)'
+  )
 
 
 if __name__ == '__main__':

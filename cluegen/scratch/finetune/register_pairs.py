@@ -82,8 +82,10 @@ def build_pairs(count: int, seed: int) -> list[dict]:
 def hard_messages(answer: str, clue: str) -> list[dict]:
   """Prompt/response pair in the training shape, at hard difficulty."""
   content = PROMPT_TEMPLATE.format(difficulty='hard', answer=answer)
-  return [{'role': 'user', 'content': content},
-          {'role': 'assistant', 'content': clue}]
+  return [
+    {'role': 'user', 'content': content},
+    {'role': 'assistant', 'content': clue},
+  ]
 
 
 def score_pairs(model, tokenizer, pairs: list[dict]) -> None:
@@ -93,21 +95,22 @@ def score_pairs(model, tokenizer, pairs: list[dict]) -> None:
   per_token_margins = []
   for pair in pairs:
     easy_nll, easy_tokens = response_loss(
-        model, tokenizer, hard_messages(pair['answer'], pair['easy']))
+      model, tokenizer, hard_messages(pair['answer'], pair['easy'])
+    )
     hard_nll, hard_tokens = response_loss(
-        model, tokenizer, hard_messages(pair['answer'], pair['hard']))
+      model, tokenizer, hard_messages(pair['answer'], pair['hard'])
+    )
     margins.append(easy_nll - hard_nll)
-    per_token_margins.append(
-        easy_nll / easy_tokens - hard_nll / hard_tokens)
+    per_token_margins.append(easy_nll / easy_tokens - hard_nll / hard_tokens)
     if margins[-1] > 0:
       wins += 1
   n = len(pairs)
-  print(f'Saturday-member win rate (sequence NLL): {wins}/{n} '
-        f'({wins / n:.0%})')
-  print(f'mean sequence margin: {sum(margins) / n:+.3f} nats '
-        '(positive = prefers the Saturday member)')
-  print(f'mean per-token margin: {sum(per_token_margins) / n:+.3f} '
-        'nats/token')
+  print(f'Saturday-member win rate (sequence NLL): {wins}/{n} ({wins / n:.0%})')
+  print(
+    f'mean sequence margin: {sum(margins) / n:+.3f} nats '
+    '(positive = prefers the Saturday member)'
+  )
+  print(f'mean per-token margin: {sum(per_token_margins) / n:+.3f} nats/token')
 
 
 def main() -> None:
@@ -116,19 +119,22 @@ def main() -> None:
   parser.add_argument('--model', default=MODEL_REPO)
   parser.add_argument('--pair-count', type=int, default=100)
   parser.add_argument('--seed', type=int, default=20260704)
-  parser.add_argument('--dry-run', action='store_true',
-                      help='build and print sample pairs; no model load')
+  parser.add_argument(
+    '--dry-run',
+    action='store_true',
+    help='build and print sample pairs; no model load',
+  )
   args = parser.parse_args()
 
   pairs = build_pairs(args.pair_count, args.seed)
   for pair in pairs[:5]:
-    print(f'  {pair["answer"]}: easy {pair["easy"]!r} '
-          f'vs hard {pair["hard"]!r}')
+    print(f'  {pair["answer"]}: easy {pair["easy"]!r} vs hard {pair["hard"]!r}')
   if args.dry_run:
     return
 
   register()
   from mlx_lm import load
+
   model, tokenizer = load(args.model, adapter_path=args.adapter)
   print(f'model: {args.model}  adapter: {args.adapter or "base"}')
   score_pairs(model, tokenizer, pairs)

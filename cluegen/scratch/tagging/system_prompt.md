@@ -114,18 +114,23 @@ here.
 
 # Tagging task
 
-You are tagging New York Times crossword clues against the rubric above.
-For EACH clue in the input, emit exactly one JSON object on its own line
-(JSONL, in input order, no prose or fences around them) with these keys:
+You are tagging New York Times crossword clues against the rubric above. For
+EACH clue in the input, emit exactly one JSON object on its own line (JSONL, in
+input order, no prose or fences around them) with these keys:
 
 - "answer" and "clue": echoed verbatim from the input.
-- Each of these scale keys, with a number from 1.0 to 5.0 (any value —
-  3.7 is as legal as 4.0; never round to fit a bucket):
-  satisfaction, difficulty, craft, liveliness, economy, surface, fairness, anchor, cross_check, obscurity, misdirection, currency, basis_aha, basis_elegance, basis_resistance, basis_prize_fact, basis_fun, mechanism_sense_pivot, mechanism_frame_anchor, mechanism_count_metonymy, mechanism_definition_by_example, mechanism_double_definition, mechanism_conceptual_reframe, mechanism_metaphor, mechanism_vignette, mechanism_relational_pivot, mechanism_prize_fact
-- "rationale": one or two sentences justifying the scores — the audit
-  trail. Mention any bank oddity (era-drifted convention) here.
+- Each of these scale keys, with a number from 1.0 to 5.0 (any value — 3.7 is as
+  legal as 4.0; never round to fit a bucket): satisfaction, difficulty, craft,
+  liveliness, economy, surface, fairness, anchor, cross_check, obscurity,
+  misdirection, currency, basis_aha, basis_elegance, basis_resistance,
+  basis_prize_fact, basis_fun, mechanism_sense_pivot, mechanism_frame_anchor,
+  mechanism_count_metonymy, mechanism_definition_by_example,
+  mechanism_double_definition, mechanism_conceptual_reframe, mechanism_metaphor,
+  mechanism_vignette, mechanism_relational_pivot, mechanism_prize_fact
+- "rationale": one or two sentences justifying the scores — the audit trail.
+  Mention any bank oddity (era-drifted convention) here.
 
-Scale key mapping: the "basis_" keys are the rubric's five basis scales;
-the "mechanism_" keys are its ten mechanism scales (mechanism_prize_fact
-is the mechanism, basis_prize_fact the felt basis). All other keys match
-the rubric's scale names directly.
+Scale key mapping: the "basis_" keys are the rubric's five basis scales; the
+"mechanism_" keys are its ten mechanism scales (mechanism_prize_fact is the
+mechanism, basis_prize_fact the felt basis). All other keys match the rubric's
+scale names directly.

@@ -34,17 +34,21 @@ def average_checkpoints(run_dir: Path, names: list[str]) -> dict:
     for key, value in weights.items():
       dtypes[key] = value.dtype
       sums[key] = sums.get(key, 0) + value.astype(mx.float32)
-  return {key: (total / len(names)).astype(dtypes[key])
-          for key, total in sums.items()}
+  return {
+    key: (total / len(names)).astype(dtypes[key]) for key, total in sums.items()
+  }
 
 
 def main() -> None:
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument('--run-dir', type=Path, required=True)
   parser.add_argument('--output', type=Path, required=True)
-  parser.add_argument('--checkpoints', nargs='+',
-                      default=list(DEFAULT_CHECKPOINTS),
-                      help='iteration prefixes of the checkpoints to average')
+  parser.add_argument(
+    '--checkpoints',
+    nargs='+',
+    default=list(DEFAULT_CHECKPOINTS),
+    help='iteration prefixes of the checkpoints to average',
+  )
   args = parser.parse_args()
 
   averaged = average_checkpoints(args.run_dir, args.checkpoints)
@@ -52,8 +56,10 @@ def main() -> None:
   mx.save_safetensors(str(args.output / 'adapters.safetensors'), averaged)
   for config_name in CONFIG_FILES:
     shutil.copy(args.run_dir / config_name, args.output / config_name)
-  print(f'soup of {len(args.checkpoints)} checkpoints '
-        f'({args.checkpoints[0]}..{args.checkpoints[-1]}) -> {args.output}')
+  print(
+    f'soup of {len(args.checkpoints)} checkpoints '
+    f'({args.checkpoints[0]}..{args.checkpoints[-1]}) -> {args.output}'
+  )
 
 
 if __name__ == '__main__':

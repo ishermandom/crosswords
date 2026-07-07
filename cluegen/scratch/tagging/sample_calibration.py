@@ -23,8 +23,15 @@ CSV_PATH = Path('/Users/Shared/data/kaggle-nyt/nytcrosswords.csv')
 CROSS_REFERENCE = re.compile(r'\d+-(Across|Down)|\bSee \d+\b', re.IGNORECASE)
 
 ERA_BOUNDARIES = (2004, 2014)
-WEEKDAY_BUCKETS = {0: 'easy', 1: 'easy', 2: 'medium', 3: 'medium',
-                   4: 'hard', 5: 'hard', 6: 'medium'}
+WEEKDAY_BUCKETS = {
+  0: 'easy',
+  1: 'easy',
+  2: 'medium',
+  3: 'medium',
+  4: 'hard',
+  5: 'hard',
+  6: 'medium',
+}
 
 
 def era_of(year: int) -> str:
@@ -53,7 +60,8 @@ def bank_cells() -> dict[tuple[str, str], list[dict]]:
       date = datetime.datetime.strptime(row['Date'], '%m/%d/%Y').date()
       cell = (era_of(date.year), WEEKDAY_BUCKETS[date.weekday()])
       cells.setdefault(cell, []).append(
-          {'answer': answer, 'clue': clue, 'date': row['Date']})
+        {'answer': answer, 'clue': clue, 'date': row['Date']}
+      )
   return cells
 
 
@@ -61,16 +69,18 @@ def main() -> None:
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument('--per-cell', type=int, default=14)
   parser.add_argument('--seed', type=int, default=20260705)
-  parser.add_argument('--output', type=Path,
-                      default=Path('calibration_clues.jsonl'))
+  parser.add_argument(
+    '--output', type=Path, default=Path('calibration_clues.jsonl')
+  )
   args = parser.parse_args()
 
   rng = random.Random(args.seed)
   records = []
   for cell, items in sorted(bank_cells().items()):
     picks = rng.sample(items, min(args.per_cell, len(items)))
-    print(f'{cell[0]} / {cell[1]}: {len(items)} candidates, '
-          f'{len(picks)} sampled')
+    print(
+      f'{cell[0]} / {cell[1]}: {len(items)} candidates, {len(picks)} sampled'
+    )
     records.extend(picks)
 
   with args.output.open('w') as file:

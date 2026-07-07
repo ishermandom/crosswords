@@ -24,9 +24,26 @@ OUTPUT_DIR = Path(__file__).parent / 'data' / 'data_stage0'
 # (scratch/eval_panel.py) and the 8 held-out words (ceiling-log.md). Training
 # must never see them.
 EXCLUDED_ANSWERS = {
-    'SCORE', 'DAISY', 'GRANT', 'CHECK', 'GASP', 'AMBER',
-    'TWENTY', 'GROSS', 'PAIR', 'VIOLET', 'ROBIN', 'STOCK',
-    'COURT', 'SUE', 'HAZEL', 'SECOND', 'ZED', 'FORTY', 'DOZEN', 'NINETEEN',
+  'SCORE',
+  'DAISY',
+  'GRANT',
+  'CHECK',
+  'GASP',
+  'AMBER',
+  'TWENTY',
+  'GROSS',
+  'PAIR',
+  'VIOLET',
+  'ROBIN',
+  'STOCK',
+  'COURT',
+  'SUE',
+  'HAZEL',
+  'SECOND',
+  'ZED',
+  'FORTY',
+  'DOZEN',
+  'NINETEEN',
 }
 
 TRAIN_ANSWER_COUNT = 500
@@ -38,12 +55,16 @@ PROMPT_TEMPLATE = 'Write a crossword clue for the answer: {answer}'
 
 
 def is_eligible(answer: str, clue: str) -> bool:
-  """Cheap cleanliness filters — not curation, just obvious junk removal."""""
-  return (answer.isalpha() and answer.isascii() and 3 <= len(answer) <= 10
-          and answer.upper() not in EXCLUDED_ANSWERS
-          and 5 <= len(clue) <= 120
-          # Self-referential clues teach the wrong task.
-          and answer.lower() not in clue.lower())
+  """Cheap cleanliness filters — not curation, just obvious junk removal.""" ''
+  return (
+    answer.isalpha()
+    and answer.isascii()
+    and 3 <= len(answer) <= 10
+    and answer.upper() not in EXCLUDED_ANSWERS
+    and 5 <= len(clue) <= 120
+    # Self-referential clues teach the wrong task.
+    and answer.lower() not in clue.lower()
+  )
 
 
 def sample_rows() -> list[tuple[str, str]]:
@@ -93,11 +114,12 @@ def main() -> None:
     path = OUTPUT_DIR / f'{name}.jsonl'
     with path.open('w', encoding='utf-8') as file:
       for answer in split:
-        record = {'messages': [
-            {'role': 'user',
-             'content': PROMPT_TEMPLATE.format(answer=answer)},
+        record = {
+          'messages': [
+            {'role': 'user', 'content': PROMPT_TEMPLATE.format(answer=answer)},
             {'role': 'assistant', 'content': by_answer[answer]},
-        ]}
+          ]
+        }
         file.write(json.dumps(record, ensure_ascii=False) + '\n')
     print(f'{path.name}: {len(split)} pairs')
 

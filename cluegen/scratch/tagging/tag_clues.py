@@ -24,22 +24,43 @@ import subprocess
 import sys
 from pathlib import Path
 
-RUBRIC_DEFAULT = (Path(__file__).parent.parent.parent / 'local'
-                  / 'quality_rubric.md')
+RUBRIC_DEFAULT = (
+  Path(__file__).parent.parent.parent / 'local' / 'quality_rubric.md'
+)
 
 HOLISTIC_SCALES = ('satisfaction', 'difficulty', 'craft', 'liveliness')
-BREAKDOWN_SCALES = ('economy', 'surface', 'fairness', 'anchor',
-                    'cross_check', 'obscurity', 'misdirection', 'currency')
-BASIS_SCALES = ('basis_aha', 'basis_elegance', 'basis_resistance',
-                'basis_prize_fact', 'basis_fun')
+BREAKDOWN_SCALES = (
+  'economy',
+  'surface',
+  'fairness',
+  'anchor',
+  'cross_check',
+  'obscurity',
+  'misdirection',
+  'currency',
+)
+BASIS_SCALES = (
+  'basis_aha',
+  'basis_elegance',
+  'basis_resistance',
+  'basis_prize_fact',
+  'basis_fun',
+)
 MECHANISM_SCALES = (
-    'mechanism_sense_pivot', 'mechanism_frame_anchor',
-    'mechanism_count_metonymy', 'mechanism_definition_by_example',
-    'mechanism_double_definition', 'mechanism_conceptual_reframe',
-    'mechanism_metaphor', 'mechanism_vignette',
-    'mechanism_relational_pivot', 'mechanism_prize_fact')
-ALL_SCALES = (HOLISTIC_SCALES + BREAKDOWN_SCALES + BASIS_SCALES
-              + MECHANISM_SCALES)
+  'mechanism_sense_pivot',
+  'mechanism_frame_anchor',
+  'mechanism_count_metonymy',
+  'mechanism_definition_by_example',
+  'mechanism_double_definition',
+  'mechanism_conceptual_reframe',
+  'mechanism_metaphor',
+  'mechanism_vignette',
+  'mechanism_relational_pivot',
+  'mechanism_prize_fact',
+)
+ALL_SCALES = (
+  HOLISTIC_SCALES + BREAKDOWN_SCALES + BASIS_SCALES + MECHANISM_SCALES
+)
 
 INSTRUCTIONS = f"""
 
@@ -93,8 +114,10 @@ def extract_scales(rubric_text: str) -> str:
   prompt.
   """
   if TAGGING_BEGIN not in rubric_text or TAGGING_END not in rubric_text:
-    sys.exit('rubric is missing the tagging-scales-begin/-end markers the '
-             'prompt extraction relies on')
+    sys.exit(
+      'rubric is missing the tagging-scales-begin/-end markers the '
+      'prompt extraction relies on'
+    )
   after_begin = rubric_text.split(TAGGING_BEGIN, 1)[1]
   # The begin marker is a multi-line comment; drop through its close.
   after_begin = after_begin.split('-->', 1)[1]
@@ -114,23 +137,34 @@ def assemble_system_prompt(rubric_path: Path, run_dir: Path) -> Path:
 def call_claude(prompt_path: Path, chunk: list[dict], model: str) -> dict:
   """One headless call scoring `chunk`; returns the parsed json envelope."""
   clue_lines = '\n'.join(
-      json.dumps({'answer': item['answer'], 'clue': item['clue']},
-                 ensure_ascii=False)
-      for item in chunk)
+    json.dumps(
+      {'answer': item['answer'], 'clue': item['clue']}, ensure_ascii=False
+    )
+    for item in chunk
+  )
   command = [
-      'claude', '-p', f'Tag these clues:\n{clue_lines}',
-      '--model', model,
-      '--system-prompt-file', str(prompt_path),
-      # Not --bare: it also skips credential loading, which silently breaks
-      # subscription auth in headless runs (observed 2026-07-05).
-      '--tools', '',
-      '--setting-sources', '',
-      '--no-session-persistence',
-      '--max-turns', '1',
-      '--output-format', 'json',
+    'claude',
+    '-p',
+    f'Tag these clues:\n{clue_lines}',
+    '--model',
+    model,
+    '--system-prompt-file',
+    str(prompt_path),
+    # Not --bare: it also skips credential loading, which silently breaks
+    # subscription auth in headless runs (observed 2026-07-05).
+    '--tools',
+    '',
+    '--setting-sources',
+    '',
+    '--no-session-persistence',
+    '--max-turns',
+    '1',
+    '--output-format',
+    'json',
   ]
-  completed = subprocess.run(command, capture_output=True, text=True,
-                             timeout=600, check=True)
+  completed = subprocess.run(
+    command, capture_output=True, text=True, timeout=600, check=True
+  )
   return json.loads(completed.stdout)
 
 
@@ -145,8 +179,11 @@ def parse_records(result_text: str, chunk: list[dict]) -> list[dict]:
       record = json.loads(line)
     except json.JSONDecodeError:
       continue
-    missing = [key for key in ALL_SCALES + ('answer', 'clue', 'rationale')
-               if key not in record]
+    missing = [
+      key
+      for key in ALL_SCALES + ('answer', 'clue', 'rationale')
+      if key not in record
+    ]
     if missing:
       continue
     records.append(record)
@@ -156,26 +193,38 @@ def parse_records(result_text: str, chunk: list[dict]) -> list[dict]:
 
 def main() -> None:
   parser = argparse.ArgumentParser(description=__doc__)
-  parser.add_argument('--clues', type=Path, required=True,
-                      help='jsonl of {"answer", "clue"} to tag')
+  parser.add_argument(
+    '--clues',
+    type=Path,
+    required=True,
+    help='jsonl of {"answer", "clue"} to tag',
+  )
   parser.add_argument('--rubric', type=Path, default=RUBRIC_DEFAULT)
   parser.add_argument('--output', type=Path, default=Path('tags.jsonl'))
   # Sonnet-only per user decision 2026-07-05: Haiku's thinking overhead (~13x
   # visible output vs Sonnet's ~0.7x) erased its price advantage.
   parser.add_argument('--model', default='sonnet')
   parser.add_argument('--chunk-size', type=int, default=10)
-  parser.add_argument('--limit', type=int, default=None,
-                      help='tag at most this many clues this run')
-  parser.add_argument('--dry-run', action='store_true',
-                      help='print the command and first user message; no '
-                           'calls')
+  parser.add_argument(
+    '--limit',
+    type=int,
+    default=None,
+    help='tag at most this many clues this run',
+  )
+  parser.add_argument(
+    '--dry-run',
+    action='store_true',
+    help='print the command and first user message; no calls',
+  )
   args = parser.parse_args()
 
   # A stray API key would silently route billing to the Console instead of the
   # subscription — the one thing this script must never do.
   if os.environ.get('ANTHROPIC_API_KEY'):
-    sys.exit('ANTHROPIC_API_KEY is set; unset it so calls bill the '
-             'subscription, not the API.')
+    sys.exit(
+      'ANTHROPIC_API_KEY is set; unset it so calls bill the '
+      'subscription, not the API.'
+    )
 
   run_dir = args.output.parent
   run_dir.mkdir(parents=True, exist_ok=True)
@@ -188,17 +237,18 @@ def main() -> None:
     if (item['answer'], item['clue']) not in done:
       todo.append(item)
   if args.limit is not None:
-    todo = todo[:args.limit]
+    todo = todo[: args.limit]
   print(f'{len(todo)} clues to tag ({len(done)} already done)')
 
-  chunks = [todo[i:i + args.chunk_size]
-            for i in range(0, len(todo), args.chunk_size)]
+  chunks = [
+    todo[i : i + args.chunk_size] for i in range(0, len(todo), args.chunk_size)
+  ]
   if args.dry_run and chunks:
-    print(f'system prompt: {prompt_path} '
-          f'({len(prompt_path.read_text())} chars)')
+    print(
+      f'system prompt: {prompt_path} ({len(prompt_path.read_text())} chars)'
+    )
     print('first user message:')
-    print('\n'.join(json.dumps(item, ensure_ascii=False)
-                    for item in chunks[0]))
+    print('\n'.join(json.dumps(item, ensure_ascii=False) for item in chunks[0]))
     return
 
   usage_log = run_dir / 'tag_usage.jsonl'
@@ -209,18 +259,27 @@ def main() -> None:
       for record in records:
         file.write(json.dumps(record, ensure_ascii=False) + '\n')
     with usage_log.open('a') as file:
-      file.write(json.dumps({'chunk': index, 'clues': len(chunk),
-                             'tagged': len(records),
-                             'usage': envelope.get('usage'),
-                             'cost': envelope.get('total_cost_usd')}) + '\n')
+      file.write(
+        json.dumps(
+          {
+            'chunk': index,
+            'clues': len(chunk),
+            'tagged': len(records),
+            'usage': envelope.get('usage'),
+            'cost': envelope.get('total_cost_usd'),
+          }
+        )
+        + '\n'
+      )
     if len(records) < len(chunk):
       tagged = {(r['answer'], r['clue']) for r in records}
       with (run_dir / MISSING_KEYS_LOG).open('a') as file:
         for item in chunk:
           if (item['answer'], item['clue']) not in tagged:
             file.write(json.dumps(item, ensure_ascii=False) + '\n')
-    print(f'chunk {index + 1}/{len(chunks)}: {len(records)}/{len(chunk)} '
-          'tagged')
+    print(
+      f'chunk {index + 1}/{len(chunks)}: {len(records)}/{len(chunk)} tagged'
+    )
 
 
 if __name__ == '__main__':

@@ -41,7 +41,6 @@ import re
 from pathlib import Path
 
 import wn
-
 from loss_gaps import MODEL_REPO, WORDNET_DATA, response_loss
 from optiq.mlx_lm_patches._register import register
 from prompts import PROMPT_TEMPLATE
@@ -60,40 +59,40 @@ MOJIBAKE_MARKERS = ('â€', 'Â', '�')
 # (St., Dr., Fr., No., Mo.) and content-level signals whose expansion still
 # announces an abbreviated answer ('abbr.', 'inits.').
 ABBREVIATION_EXPANSIONS = (
-    ('Sci.', 'Science'),
-    ('Univ.', 'University'),
-    ('Dept.', 'Department'),
-    ('Org.', 'Organization'),
-    ('Orgs.', 'Organizations'),
-    ('Assn.', 'Association'),
-    ('Natl.', 'National'),
-    ('Amer.', 'American'),
-    ('Corp.', 'Corporation'),
-    ('Ave.', 'Avenue'),
-    ('Mt.', 'Mount'),
-    ('Mts.', 'Mountains'),
-    ('Hosp.', 'Hospital'),
-    ('Mag.', 'Magazine'),
-    ('Bldg.', 'Building'),
-    ('Mil.', 'Military'),
-    ('Grp.', 'Group'),
-    ('Grps.', 'Groups'),
-    ('Sch.', 'School'),
-    ('Subj.', 'Subject'),
-    ('Fig.', 'Figure'),
-    ('Figs.', 'Figures'),
-    ('Agcy.', 'Agency'),
-    ('Govt.', 'Government'),
-    ('Meas.', 'Measure'),
-    ('Amt.', 'Amount'),
-    ('Amts.', 'Amounts'),
-    ('Hrs.', 'Hours'),
-    ('Med.', 'Medical'),
-    ('Deg.', 'Degree'),
-    ('Brit.', 'British'),
-    ('Coll.', 'College'),
-    ('Dir.', 'Direction'),
-    ('Inc.', 'Incorporated'),
+  ('Sci.', 'Science'),
+  ('Univ.', 'University'),
+  ('Dept.', 'Department'),
+  ('Org.', 'Organization'),
+  ('Orgs.', 'Organizations'),
+  ('Assn.', 'Association'),
+  ('Natl.', 'National'),
+  ('Amer.', 'American'),
+  ('Corp.', 'Corporation'),
+  ('Ave.', 'Avenue'),
+  ('Mt.', 'Mount'),
+  ('Mts.', 'Mountains'),
+  ('Hosp.', 'Hospital'),
+  ('Mag.', 'Magazine'),
+  ('Bldg.', 'Building'),
+  ('Mil.', 'Military'),
+  ('Grp.', 'Group'),
+  ('Grps.', 'Groups'),
+  ('Sch.', 'School'),
+  ('Subj.', 'Subject'),
+  ('Fig.', 'Figure'),
+  ('Figs.', 'Figures'),
+  ('Agcy.', 'Agency'),
+  ('Govt.', 'Government'),
+  ('Meas.', 'Measure'),
+  ('Amt.', 'Amount'),
+  ('Amts.', 'Amounts'),
+  ('Hrs.', 'Hours'),
+  ('Med.', 'Medical'),
+  ('Deg.', 'Degree'),
+  ('Brit.', 'British'),
+  ('Coll.', 'College'),
+  ('Dir.', 'Direction'),
+  ('Inc.', 'Incorporated'),
 )
 
 
@@ -106,9 +105,11 @@ def _form_pattern(word: str) -> re.Pattern:
 
 
 ABBREVIATED_PATTERNS = tuple(
-    _form_pattern(abbreviated) for abbreviated, _ in ABBREVIATION_EXPANSIONS)
+  _form_pattern(abbreviated) for abbreviated, _ in ABBREVIATION_EXPANSIONS
+)
 EXPANDED_PATTERNS = tuple(
-    _form_pattern(expanded) for _, expanded in ABBREVIATION_EXPANSIONS)
+  _form_pattern(expanded) for _, expanded in ABBREVIATION_EXPANSIONS
+)
 
 
 def has_single_form(clue: str) -> bool:
@@ -119,9 +120,11 @@ def has_single_form(clue: str) -> bool:
   has_expanded = any(p.search(clue) for p in EXPANDED_PATTERNS)
   return has_abbreviated != has_expanded
 
+
 # Textual signals that mark an abbreviated answer without an abbreviated word.
-PHRASE_SIGNALS = re.compile(r'\bAbbr\b|for short|briefly|in brief',
-                            re.IGNORECASE)
+PHRASE_SIGNALS = re.compile(
+  r'\bAbbr\b|for short|briefly|in brief', re.IGNORECASE
+)
 
 # A shortened word: 2-6 letters then a period. Single letters (initialism chains
 # like 'A.T.M.') intentionally don't match — initialisms in a clue don't signal
@@ -129,15 +132,43 @@ PHRASE_SIGNALS = re.compile(r'\bAbbr\b|for short|briefly|in brief',
 GENERIC_ABBREVIATION = re.compile(r'\b[A-Za-z]{2,6}\.')
 
 # Common non-signaling dotted words: Latin tags and titles.
-NON_SIGNALING = {'e.g.', 'i.e.', 'etc.', 'mr.', 'mrs.', 'ms.', 'dr.', 'st.',
-                 'jr.', 'sr.', 'vs.'}
+NON_SIGNALING = {
+  'e.g.',
+  'i.e.',
+  'etc.',
+  'mr.',
+  'mrs.',
+  'ms.',
+  'dr.',
+  'st.',
+  'jr.',
+  'sr.',
+  'vs.',
+}
 
 # Panel + held-out answers (build_stage1_slice.py EXCLUDED_ANSWERS): reserved
 # for evals, keep them out of instrument data too.
 RESERVED_ANSWERS = {
-    'SCORE', 'DAISY', 'GRANT', 'CHECK', 'GASP', 'AMBER',
-    'TWENTY', 'GROSS', 'PAIR', 'VIOLET', 'ROBIN', 'STOCK',
-    'COURT', 'SUE', 'HAZEL', 'SECOND', 'ZED', 'FORTY', 'DOZEN', 'NINETEEN',
+  'SCORE',
+  'DAISY',
+  'GRANT',
+  'CHECK',
+  'GASP',
+  'AMBER',
+  'TWENTY',
+  'GROSS',
+  'PAIR',
+  'VIOLET',
+  'ROBIN',
+  'STOCK',
+  'COURT',
+  'SUE',
+  'HAZEL',
+  'SECOND',
+  'ZED',
+  'FORTY',
+  'DOZEN',
+  'NINETEEN',
 }
 
 
@@ -158,8 +189,9 @@ def swap_forms(clue: str) -> str | None:
   swapped = clue
   for abbreviated, expanded in ABBREVIATION_EXPANSIONS:
     for source, target in ((abbreviated, expanded), (expanded, abbreviated)):
-      boundary = r'\b' + re.escape(source) + (r'\b' if source[-1] != '.'
-                                              else '')
+      boundary = (
+        r'\b' + re.escape(source) + (r'\b' if source[-1] != '.' else '')
+      )
       pattern = re.compile(boundary, re.IGNORECASE)
 
       def match_case(match: re.Match) -> str:
@@ -184,8 +216,9 @@ def stage1_answers() -> set[str]:
   return answers
 
 
-def bank_clues() -> tuple[dict[str, tuple[datetime.date, str]], set[str],
-                          dict[str, set[str]]]:
+def bank_clues() -> tuple[
+  dict[str, tuple[datetime.date, str]], set[str], dict[str, set[str]]
+]:
   """(most-recent clean clue per answer, answers ever tagged ': Abbr.', every
   distinct tag-stripped clue per tagged answer).
 
@@ -207,10 +240,10 @@ def bank_clues() -> tuple[dict[str, tuple[datetime.date, str]], set[str],
       date = datetime.datetime.strptime(row['Date'], '%m/%d/%Y').date()
       if answer not in latest or date > latest[answer][0]:
         latest[answer] = (date, clue)
-      pooled.setdefault(answer, set()).add(
-          MARKER_SUFFIX.sub('', clue).strip())
-  pooled = {answer: clues for answer, clues in pooled.items()
-            if answer in tagged}
+      pooled.setdefault(answer, set()).add(MARKER_SUFFIX.sub('', clue).strip())
+  pooled = {
+    answer: clues for answer, clues in pooled.items() if answer in tagged
+  }
   return latest, tagged, pooled
 
 
@@ -242,15 +275,16 @@ def build_groups(group_size: int, seed: int) -> dict[str, dict[str, list]]:
     # it still carries ('Geom. figure', 'Agency issuance, in brief') would sit
     # in BOTH variants and dampen the swap contrast.
     is_original_abbreviated = any(
-        pattern.search(bare) for pattern in ABBREVIATED_PATTERNS)
+      pattern.search(bare) for pattern in ABBREVIATED_PATTERNS
+    )
     expanded_variant = swapped if is_original_abbreviated else bare
     if is_signaled(expanded_variant):
       return None
     return {'answer': answer, 'original': bare, 'swapped': swapped}
 
   candidates: dict[str, dict[str, list]] = {
-      'swap': {'abbreviation': [], 'full_word': []},
-      'marker': {'abbreviation': [], 'full_word': []},
+    'swap': {'abbreviation': [], 'full_word': []},
+    'marker': {'abbreviation': [], 'full_word': []},
   }
 
   # Abbreviation answers are rare, so their swap cell pools every historical
@@ -259,8 +293,11 @@ def build_groups(group_size: int, seed: int) -> dict[str, dict[str, list]]:
   for answer, clues in pooled.items():
     if answer in excluded or not answer.isalpha():
       continue
-    items = [item for bare in sorted(clues)
-             if (item := swap_item(answer, bare)) is not None]
+    items = [
+      item
+      for bare in sorted(clues)
+      if (item := swap_item(answer, bare)) is not None
+    ]
     if items:
       swap_pool[answer] = items
 
@@ -268,8 +305,11 @@ def build_groups(group_size: int, seed: int) -> dict[str, dict[str, list]]:
     if answer in excluded or not answer.isalpha():
       continue
     is_abbreviation = answer in tagged
-    is_full_word = (not is_abbreviation and 4 <= len(answer) <= 8
-                    and bool(wn.synsets(answer.lower())))
+    is_full_word = (
+      not is_abbreviation
+      and 4 <= len(answer) <= 8
+      and bool(wn.synsets(answer.lower()))
+    )
     if not is_abbreviation and not is_full_word:
       continue
     group = 'abbreviation' if is_abbreviation else 'full_word'
@@ -297,8 +337,8 @@ def build_groups(group_size: int, seed: int) -> dict[str, dict[str, list]]:
       items = swap_pool[answer]
       if round_index < len(items):
         candidates['swap']['abbreviation'].append(
-            items[round_index] if round_index == 0
-            else pool_rng.choice(items[1:]))
+          items[round_index] if round_index == 0 else pool_rng.choice(items[1:])
+        )
 
   rng = random.Random(seed)
   groups: dict[str, dict[str, list]] = {}
@@ -307,22 +347,24 @@ def build_groups(group_size: int, seed: int) -> dict[str, dict[str, list]]:
     for group, items in by_group.items():
       if len(items) < group_size:
         print(f'note: {instrument}/{group} has only {len(items)} candidates')
-      groups[instrument][group] = rng.sample(
-          items, min(group_size, len(items)))
+      groups[instrument][group] = rng.sample(items, min(group_size, len(items)))
   return groups
 
 
 def clue_messages(answer: str, clue: str) -> list[dict]:
   """Prompt/response pair in the training shape, at medium difficulty."""
   content = PROMPT_TEMPLATE.format(difficulty='medium', answer=answer)
-  return [{'role': 'user', 'content': content},
-          {'role': 'assistant', 'content': clue}]
+  return [
+    {'role': 'user', 'content': content},
+    {'role': 'assistant', 'content': clue},
+  ]
 
 
 def abbreviated_first(item: dict) -> tuple[str, str]:
   """(abbreviated-form clue, expanded-form clue) for a swap item."""
   original_has_abbreviation = any(
-      pattern.search(item['original']) for pattern in ABBREVIATED_PATTERNS)
+    pattern.search(item['original']) for pattern in ABBREVIATED_PATTERNS
+  )
   if original_has_abbreviation:
     return item['original'], item['swapped']
   return item['swapped'], item['original']
@@ -338,18 +380,24 @@ def score_swap_cost(model, tokenizer, by_group: dict) -> None:
     for item in items:
       abbreviated, expanded = abbreviated_first(item)
       abbreviated_nll, _ = response_loss(
-          model, tokenizer, clue_messages(item['answer'], abbreviated))
+        model, tokenizer, clue_messages(item['answer'], abbreviated)
+      )
       expanded_nll, _ = response_loss(
-          model, tokenizer, clue_messages(item['answer'], expanded))
+        model, tokenizer, clue_messages(item['answer'], expanded)
+      )
       costs.append(abbreviated_nll - expanded_nll)
     means[group] = sum(costs) / len(costs)
     prefer_abbreviated = sum(1 for c in costs if c < 0) / len(costs)
-    print(f'swap {group:>14}: abbreviated-form cost {means[group]:+.3f} nats '
-          f'(n={len(costs)}, prefers abbreviated {prefer_abbreviated:.0%})')
+    print(
+      f'swap {group:>14}: abbreviated-form cost {means[group]:+.3f} nats '
+      f'(n={len(costs)}, prefers abbreviated {prefer_abbreviated:.0%})'
+    )
   if len(means) == 2:
-    print(f'swap {"diff-of-diffs":>14}: '
-          f'{means["full_word"] - means["abbreviation"]:+.3f} '
-          '(rule internalized => strongly positive)')
+    print(
+      f'swap {"diff-of-diffs":>14}: '
+      f'{means["full_word"] - means["abbreviation"]:+.3f} '
+      '(rule internalized => strongly positive)'
+    )
 
 
 def score_marker_cost(model, tokenizer, by_group: dict) -> None:
@@ -361,23 +409,29 @@ def score_marker_cost(model, tokenizer, by_group: dict) -> None:
     deltas = []
     for item in items:
       bare_nll, _ = response_loss(
-          model, tokenizer, clue_messages(item['answer'], item['clue']))
+        model, tokenizer, clue_messages(item['answer'], item['clue'])
+      )
       marked_nll, _ = response_loss(
-          model, tokenizer,
-          clue_messages(item['answer'], item['clue'] + MARKER))
+        model, tokenizer, clue_messages(item['answer'], item['clue'] + MARKER)
+      )
       deltas.append(marked_nll - bare_nll)
     means[group] = sum(deltas) / len(deltas)
     prefer_marked = sum(1 for d in deltas if d < 0) / len(deltas)
-    print(f'marker {group:>12}: tag cost {means[group]:+.3f} nats '
-          f'(n={len(deltas)}, prefers tagged {prefer_marked:.0%})')
+    print(
+      f'marker {group:>12}: tag cost {means[group]:+.3f} nats '
+      f'(n={len(deltas)}, prefers tagged {prefer_marked:.0%})'
+    )
   if len(means) == 2:
-    print(f'marker {"diff-of-diffs":>12}: '
-          f'{means["full_word"] - means["abbreviation"]:+.3f} '
-          '(rule internalized => strongly positive)')
+    print(
+      f'marker {"diff-of-diffs":>12}: '
+      f'{means["full_word"] - means["abbreviation"]:+.3f} '
+      '(rule internalized => strongly positive)'
+    )
 
 
-def sample_generations(model, tokenizer, by_group: dict, per_group: int,
-                       samples: int) -> None:
+def sample_generations(
+  model, tokenizer, by_group: dict, per_group: int, samples: int
+) -> None:
   """Abbreviation-signal rate in sampled clues, per answer group."""
   from mlx_lm import generate
   from mlx_lm.sample_utils import make_sampler
@@ -386,19 +440,28 @@ def sample_generations(model, tokenizer, by_group: dict, per_group: int,
     signaled = 0
     examples = []
     for item in items[:per_group]:
-      content = PROMPT_TEMPLATE.format(difficulty='medium',
-                                       answer=item['answer'])
+      content = PROMPT_TEMPLATE.format(
+        difficulty='medium', answer=item['answer']
+      )
       prompt = tokenizer.apply_chat_template(
-          [{'role': 'user', 'content': content}], add_generation_prompt=True)
+        [{'role': 'user', 'content': content}], add_generation_prompt=True
+      )
       for _ in range(samples):
-        text = generate(model, tokenizer, prompt=prompt,
-                        sampler=make_sampler(temp=1.0), max_tokens=25)
+        text = generate(
+          model,
+          tokenizer,
+          prompt=prompt,
+          sampler=make_sampler(temp=1.0),
+          max_tokens=25,
+        )
         if is_signaled(text):
           signaled += 1
           examples.append(f'{item["answer"]}: {text!r}')
     total = min(per_group, len(items)) * samples
-    print(f'generation {group:>14}: signal rate {signaled}/{total} '
-          f'({signaled / total:.0%})')
+    print(
+      f'generation {group:>14}: signal rate {signaled}/{total} '
+      f'({signaled / total:.0%})'
+    )
     for example in examples[:5]:
       print(f'                {example}')
 
@@ -412,8 +475,11 @@ def main() -> None:
   parser.add_argument('--samples', type=int, default=3)
   parser.add_argument('--seed', type=int, default=20260704)
   parser.add_argument('--skip-generate', action='store_true')
-  parser.add_argument('--swap-only', action='store_true',
-                      help='score only the swap instrument (rerun mode)')
+  parser.add_argument(
+    '--swap-only',
+    action='store_true',
+    help='score only the swap instrument (rerun mode)',
+  )
   args = parser.parse_args()
 
   groups = build_groups(args.group_size, args.seed)
@@ -424,6 +490,7 @@ def main() -> None:
 
   register()
   from mlx_lm import load
+
   model, tokenizer = load(args.model, adapter_path=args.adapter)
   print(f'model: {args.model}  adapter: {args.adapter or "base"}')
 
@@ -431,8 +498,9 @@ def main() -> None:
   if not args.swap_only:
     score_marker_cost(model, tokenizer, groups['marker'])
   if not args.skip_generate and not args.swap_only:
-    sample_generations(model, tokenizer, groups['marker'],
-                       args.generate_count, args.samples)
+    sample_generations(
+      model, tokenizer, groups['marker'], args.generate_count, args.samples
+    )
 
 
 if __name__ == '__main__':

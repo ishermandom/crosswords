@@ -23,7 +23,6 @@ import json
 import pathlib
 
 import httpx
-
 from prompts import DIFFICULTIES, PROMPT_TEMPLATE
 
 _SERVE_URL_DEFAULT = 'http://127.0.0.1:8788/v1/chat/completions'
@@ -32,8 +31,20 @@ _SCREEN_MODEL = 'gemma4:26b-qat'
 _RESULTS_DIR = pathlib.Path(__file__).parent / 'evals'
 
 # Fixed iteration panel — copied from scratch/eval_panel.py (local-ceiling).
-_PANEL = ['SCORE', 'DAISY', 'GRANT', 'CHECK', 'GASP', 'AMBER',
-          'TWENTY', 'GROSS', 'PAIR', 'VIOLET', 'ROBIN', 'STOCK']
+_PANEL = [
+  'SCORE',
+  'DAISY',
+  'GRANT',
+  'CHECK',
+  'GASP',
+  'AMBER',
+  'TWENTY',
+  'GROSS',
+  'PAIR',
+  'VIOLET',
+  'ROBIN',
+  'STOCK',
+]
 
 # Screen judge contract — copied from scratch/pipeline_local.py (local-ceiling).
 _JUDGE_SYSTEM = """\
@@ -89,26 +100,27 @@ Calibration examples — where the boundaries sit:
   associated" with the name; she instantiates it."""
 
 _JUDGE_SCHEMA = {
-    'type': 'object',
-    'properties': {
-        'analysis': {'type': 'string'},
-        'difficulty': {'type': 'string', 'enum': ['easy', 'medium', 'hard']},
-        'verdict': {'type': 'string', 'enum': ['bankable', 'fixable', 'bad']},
-    },
-    'required': ['analysis', 'difficulty', 'verdict'],
+  'type': 'object',
+  'properties': {
+    'analysis': {'type': 'string'},
+    'difficulty': {'type': 'string', 'enum': ['easy', 'medium', 'hard']},
+    'verdict': {'type': 'string', 'enum': ['bankable', 'fixable', 'bad']},
+  },
+  'required': ['analysis', 'difficulty', 'verdict'],
 }
 
 
 def generate_clue(serve_url: str, word: str, difficulty: str) -> str:
   """One bare single-turn completion from the tuned setter."""
   body = {
-      'messages': [
-          {'role': 'user',
-           'content': PROMPT_TEMPLATE.format(difficulty=difficulty,
-                                             answer=word)},
-      ],
-      'max_tokens': 60,
-      'temperature': 1.0,
+    'messages': [
+      {
+        'role': 'user',
+        'content': PROMPT_TEMPLATE.format(difficulty=difficulty, answer=word),
+      },
+    ],
+    'max_tokens': 60,
+    'temperature': 1.0,
   }
   response = httpx.post(serve_url, json=body, timeout=300.0)
   response.raise_for_status()
@@ -118,20 +130,21 @@ def generate_clue(serve_url: str, word: str, difficulty: str) -> str:
 def screen_clue(word: str, clue_text: str) -> dict:
   """Screen judge verdict via Ollama — same contract as the pipeline's."""
   prompt = (
-      'Judge this one clue. In "analysis": name the sense used, write the '
-      'substitution sentence, and name any flaws — before the verdict.\n\n'
-      + json.dumps({'word': word, 'clue': clue_text}))
+    'Judge this one clue. In "analysis": name the sense used, write the '
+    'substitution sentence, and name any flaws — before the verdict.\n\n'
+    + json.dumps({'word': word, 'clue': clue_text})
+  )
   body = {
-      'model': _SCREEN_MODEL,
-      'messages': [
-          {'role': 'system', 'content': _JUDGE_SYSTEM},
-          {'role': 'user', 'content': prompt},
-      ],
-      'stream': False,
-      'think': False,
-      'keep_alive': '30m',
-      'format': _JUDGE_SCHEMA,
-      'options': {'num_ctx': 16384, 'temperature': 0.2},
+    'model': _SCREEN_MODEL,
+    'messages': [
+      {'role': 'system', 'content': _JUDGE_SYSTEM},
+      {'role': 'user', 'content': prompt},
+    ],
+    'stream': False,
+    'think': False,
+    'keep_alive': '30m',
+    'format': _JUDGE_SCHEMA,
+    'options': {'num_ctx': 16384, 'temperature': 0.2},
   }
   response = httpx.post(_OLLAMA_CHAT_URL, json=body, timeout=900.0)
   response.raise_for_status()
@@ -155,8 +168,12 @@ def main() -> None:
   for word in args.words:
     for run_index in range(args.runs):
       clue = generate_clue(args.serve_url, word, args.difficulty)
-      record = {'word': word, 'run': run_index,
-                'difficulty': args.difficulty, 'clue': clue}
+      record = {
+        'word': word,
+        'run': run_index,
+        'difficulty': args.difficulty,
+        'clue': clue,
+      }
       if not args.no_screen:
         record |= screen_clue(word, clue)
       with out_path.open('a') as file:

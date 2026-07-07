@@ -33,9 +33,14 @@ import random
 import re
 
 import wn
-
-from abbr_probe import (CSV_PATH, MARKER_SUFFIX, MOJIBAKE_MARKERS,
-                        RESERVED_ANSWERS, is_signaled, stage1_answers)
+from abbr_probe import (
+  CSV_PATH,
+  MARKER_SUFFIX,
+  MOJIBAKE_MARKERS,
+  RESERVED_ANSWERS,
+  is_signaled,
+  stage1_answers,
+)
 from loss_gaps import MODEL_REPO, WORDNET_DATA
 from optiq.mlx_lm_patches._register import register
 from prompts import PROMPT_TEMPLATE
@@ -68,8 +73,11 @@ def bank_full_word_answers() -> dict[str, list[str]]:
       if not answer.isalpha() or not 4 <= len(answer) <= 8:
         continue
       clues.setdefault(answer, set()).add(clue)
-  return {answer: sorted(clue_set) for answer, clue_set in clues.items()
-          if answer not in tagged}
+  return {
+    answer: sorted(clue_set)
+    for answer, clue_set in clues.items()
+    if answer not in tagged
+  }
 
 
 def build_strata(stratum_size: int, seed: int) -> dict[str, list[str]]:
@@ -83,12 +91,16 @@ def build_strata(stratum_size: int, seed: int) -> dict[str, list[str]]:
   bank = bank_full_word_answers()
 
   strata: dict[str, list[str]] = {
-      'long_word_concept': [], 'polysemous': [], 'easy': []}
+    'long_word_concept': [],
+    'polysemous': [],
+    'easy': [],
+  }
   for answer, clues in bank.items():
     if answer in excluded or not wn.synsets(answer.lower()):
       continue
-    long_word_share = sum(
-        1 for clue in clues if LONG_WORD.search(clue)) / len(clues)
+    long_word_share = sum(1 for clue in clues if LONG_WORD.search(clue)) / len(
+      clues
+    )
     if len(clues) >= 3 and long_word_share >= 0.5:
       strata['long_word_concept'].append(answer)
     elif len(clues) >= POLYSEMOUS_MINIMUM_CLUES:
@@ -102,13 +114,15 @@ def build_strata(stratum_size: int, seed: int) -> dict[str, list[str]]:
   sampled = {}
   for stratum, answers in strata.items():
     print(f'{stratum}: {len(answers)} candidates')
-    sampled[stratum] = sorted(rng.sample(answers,
-                                         min(stratum_size, len(answers))))
+    sampled[stratum] = sorted(
+      rng.sample(answers, min(stratum_size, len(answers)))
+    )
   return sampled
 
 
-def show_strata(strata: dict[str, list[str]],
-                bank: dict[str, list[str]]) -> None:
+def show_strata(
+  strata: dict[str, list[str]], bank: dict[str, list[str]]
+) -> None:
   """Print each stratum's answers with one example bank clue apiece."""
   for stratum, answers in strata.items():
     print(f'\n{stratum} ({len(answers)} answers):')
@@ -117,8 +131,7 @@ def show_strata(strata: dict[str, list[str]],
       print(f'  {answer}: {example!r} ({len(bank[answer])} distinct clues)')
 
 
-def sample_stratum(model, tokenizer, answers: list[str],
-                   samples: int) -> None:
+def sample_stratum(model, tokenizer, answers: list[str], samples: int) -> None:
   """Signal rate over `samples` draws per answer; every hit printed."""
   from mlx_lm import generate
   from mlx_lm.sample_utils import make_sampler
@@ -128,10 +141,16 @@ def sample_stratum(model, tokenizer, answers: list[str],
   for answer in answers:
     content = PROMPT_TEMPLATE.format(difficulty='medium', answer=answer)
     prompt = tokenizer.apply_chat_template(
-        [{'role': 'user', 'content': content}], add_generation_prompt=True)
+      [{'role': 'user', 'content': content}], add_generation_prompt=True
+    )
     for _ in range(samples):
-      text = generate(model, tokenizer, prompt=prompt,
-                      sampler=make_sampler(temp=1.0), max_tokens=25)
+      text = generate(
+        model,
+        tokenizer,
+        prompt=prompt,
+        sampler=make_sampler(temp=1.0),
+        max_tokens=25,
+      )
       if is_signaled(text):
         signaled += 1
         hits.append(f'{answer}: {text!r}')
@@ -148,8 +167,11 @@ def main() -> None:
   parser.add_argument('--stratum-size', type=int, default=20)
   parser.add_argument('--samples', type=int, default=5)
   parser.add_argument('--seed', type=int, default=20260704)
-  parser.add_argument('--dry-run', action='store_true',
-                      help='build and print strata; no model load')
+  parser.add_argument(
+    '--dry-run',
+    action='store_true',
+    help='build and print strata; no model load',
+  )
   args = parser.parse_args()
 
   strata = build_strata(args.stratum_size, args.seed)
@@ -159,6 +181,7 @@ def main() -> None:
 
   register()
   from mlx_lm import load
+
   model, tokenizer = load(args.model, adapter_path=args.adapter)
   print(f'model: {args.model}  adapter: {args.adapter or "base"}')
 
