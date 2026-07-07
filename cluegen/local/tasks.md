@@ -216,23 +216,26 @@ done — see the log for the curve and the criteria re-analysis.
   "Rungs 1–2 results"): substitution audit 4/26 flagged (caught CHASE
   embedded-object clues the layer-3 grade missed); full protocol on the 13
   dual-pass survivors: 10 bankable / 3 fixable (economy-only trims) / 0 bad —
-  8/9 words directly bankable, adverbs and fresh senses included. Next step: H4
-  offline analysis from tonight's verdict data (free, no runs) to size rung 3
-  (fresh-slice generalization, still parked); queued prompt lever: develop-turn
-  economy instruction for the wordy-tail habit. Judge design-round items filed
-  (frozen until a round): substitution turn rejects the name-word convention
-  ("Sinatra's first name" → other_object), number-agreement leniency (plural
-  clue passed for singular VIOLET). Then H1b at equal compute, and a user taste
-  round on judge liveliness divergences. The user launches stretches with a
-  /goal prompt that points at setter.md/ceiling.md/ledger/tasks.md. Note: bank
-  audit DONE 2026-07-06 (flag-and-report, nothing deleted): 23/75 rows flagged,
-  22 flat-gloss + 1 unearned '?', zero substitution/truth/economy-unanimous
-  flags in the 10-row full-protocol probe. Read: about a third of what the old
-  pipeline banked is flat-but-correct — the shortage is charm at generation, not
-  judge strictness. Some flags are judge taste, not defects (MELODY "Whistleable
-  earworm", SELDOM "Once in a blue moon", ZED "That last character, overseas",
-  COURT double definition). Full list: `scratch/logs/bank_liveliness_audit.log`;
-  ledger "Bank audit" section.
+  8/9 words directly bankable, adverbs and fresh senses included. H4/send-cap
+  analysis + rung 3 chunk 1 DONE same night (ledger "Rung 3 chunk 1"): 8 fresh
+  words → 5/16 finals survived audits, 4 bankable + 1 fixable at full protocol;
+  word-level 5/8 usable vs 9/13 on tuning words. BLOCKED-ON-USER: taste round 1
+  (`scratch/taste_round_1.md`, sent 2026-07-07) — fresh-word losses concentrate
+  in the judge's liveliness taste on frame-anchor/metonymy shapes; further
+  setter tuning against the ungraded gate is Goodhart risk. While waiting: H1b
+  at equal compute, ranker-validation prep (H2), the develop-turn economy lever.
+  Judge design-round items filed (frozen until a round): name-word convention
+  rejection, number-agreement leniency, liveliness taste pending the round's
+  outcome. The user launches stretches with a /goal prompt that points at
+  setter.md/ceiling.md/ledger/tasks.md. Note: bank audit DONE 2026-07-06
+  (flag-and-report, nothing deleted): 23/75 rows flagged, 22 flat-gloss + 1
+  unearned '?', zero substitution/truth/economy-unanimous flags in the 10-row
+  full-protocol probe. Read: about a third of what the old pipeline banked is
+  flat-but-correct — the shortage is charm at generation, not judge strictness.
+  Some flags are judge taste, not defects (MELODY "Whistleable earworm", SELDOM
+  "Once in a blue moon", ZED "That last character, overseas", COURT double
+  definition). Full list: `scratch/logs/bank_liveliness_audit.log`; ledger "Bank
+  audit" section.
 - [ ] **Align local vs cloud judge requirements** #judge-alignment — both judges
       should enforce the same requirement set, each via methodology fitting the
       model's strength (user direction 2026-07-04). DEPRIORITIZED behind

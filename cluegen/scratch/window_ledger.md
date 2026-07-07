@@ -1258,7 +1258,38 @@ finals per word by Claude rank, then the two single-turn audits
 
 - full protocol on survivors on 31B, detached, correct lease order.
 
-## Remaining queue
+**Results (2026-07-07 00:06, `logs/h1r3_{liveliness,substitution}.log` +
+`h1rung3_20260707-000635.jsonl`; 32 audit calls + 30 protocol calls, ~35 min 31B
+total):**
+
+- Audits: 10/16 liveliness-flagged, 2/16 substitution-flagged → 5/16 survivors
+  (vs 13/26 on tuning words). Genuine substitution catches: THIRD "Extra guest
+  at a double date" → other_object THIRD WHEEL (defines the idiom, not the
+  word); WIDOW's vignette-sentence (grammar). The predicted name-CONVENTION
+  substitution failure never fired — neither name word drew a "first name" clue
+  — but both ROBIN finals ("Gotham sidekick", "Red-breasted singer") died as
+  liveliness-flat, as did POUND "A shelter for strays", OSCAR "Phonetic \"O\"",
+  BOW "Front of a vessel?", SIXTY "Triple twenty" — the DISPUTED-TASTE region
+  now dominates fresh-word losses.
+- Full protocol on the 5 survivors: 4 bankable — SIXTY "Diamond anniversary
+  age", TWICE "A K-pop girl group", OSCAR "Gold statuette of a knight?", BOW
+  "Yield under pressure?" — 1 fixable: WIDOW's typography clue ("sense: too
+  obscure for a typical solver" + economy trims). Zero bad.
+- Word-level: 4/8 fresh words bankable-direct, 5/8 usable (bankable-or-fixable)
+  vs 8/13 and 9/13 on tuning words. Zero-survivor words: THIRD, ROBIN, POUND —
+  all lost primarily at the liveliness gate on clue shapes Claude partly defends
+  (frame anchors, standard NYT metonymy).
+
+**Read: generalization holds at the word level but the binding constraint has
+moved.** It is no longer generation width (the funnel produced plausible pools
+for all 8 words) — it is the liveliness gate's taste on frame-anchor and
+metonymy shapes, which is exactly the disputed region. Taste round 1
+(`taste_round_1.md`, sent to the user 2026-07-07; key in
+`taste_round_1_key.jsonl`) gates further setter tuning: if the user's grades
+side with the judge, the setter needs anti-frame-anchor pressure; if with
+Claude, the judge liveliness turn needs a design round before any more
+optimization against it. Until graded, further prompt iteration is Goodhart risk
+— prefer other threads (H1b, ranker validation prep).
 
 `#eval-expansion` DONE through the 2×2 (sets built
 $1.80; slots 1-3b above).
