@@ -1486,18 +1486,16 @@ per ceiling.md's breadth-before-depth rule.
 
 ### Frames-arm audit verdict (2026-07-07 ~13:20) — material widened, coverage unchanged
 
-10/12 kinship frames-arm finals liveliness-flagged; only WIDOW's pair
-survived ("Red-marked arachnid?", "Lonely word left hanging at the end of
-a paragraph"). The widened material (Uncle Sam, digital twin,
-Frankenstein's bride, Harry Potter) lands as bare frame-reference clues —
-the shape the judge, largely backed by the user's taste round, rates
-flat. Kinship coverage gain: ZERO.
+10/12 kinship frames-arm finals liveliness-flagged; only WIDOW's pair survived
+("Red-marked arachnid?", "Lonely word left hanging at the end of a paragraph").
+The widened material (Uncle Sam, digital twin, Frankenstein's bride, Harry
+Potter) lands as bare frame-reference clues — the shape the judge, largely
+backed by the user's taste round, rates flat. Kinship coverage gain: ZERO.
 
-Thread verdict: for monosemous words the binding constraint is now
-CONVERSION SHAPE, not material width — frames must become clues with a
-leap (misdirection, vignette, prize fact) rather than frame references.
-PARKED with revisit triggers: (a) any judge design round (the
-'?'-stretch prosecution and frame-flatness taste both bear on kinship);
-(b) any future draft-turn work on leap-shaping. Two arms and two probe
-runs is enough spend against this class for now — per principle 9,
-diminishing returns, park don't polish.
+Thread verdict: for monosemous words the binding constraint is now CONVERSION
+SHAPE, not material width — frames must become clues with a leap (misdirection,
+vignette, prize fact) rather than frame references. PARKED with revisit
+triggers: (a) any judge design round (the '?'-stretch prosecution and
+frame-flatness taste both bear on kinship); (b) any future draft-turn work on
+leap-shaping. Two arms and two probe runs is enough spend against this class for
+now — per principle 9, diminishing returns, park don't polish.
