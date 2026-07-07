@@ -225,15 +225,33 @@ done — see the log for the curve and the criteria re-analysis.
   real leaks are substance — accuracy (banked an inaccurate MELODY clue) and
   obscurity (banked the NIL name-image-likeness sense the user doesn't know).
   User calibrations now in setter.md principle 2. Repair loop VALIDATED for
-  economy flaws (COURT + SCORE converted; 9/9 tuning words covered); production
-  repair should decline non-economy flaws. Calibrated arm (accuracy filter +
-  strict '?' + charm-preserving economy) built; A/B audits vs the conventions
-  arm's 5/16 fresh-word baseline in flight. Next after the A/B: full protocol on
-  the better arm's survivors, then H1b at equal compute on that stack, then
-  ranker validation (H2). Judge design-round items, reprioritized (frozen until
-  a round): accuracy leak, obscurity calibration, number-agreement leniency,
-  name-word convention in the substitution turn; the liveliness turn STANDS as
-  calibrated. The user launches stretches with a /goal prompt that points at
+  economy flaws only (5/9 converted across two rounds; production repair
+  declines non-economy flaws — filter now in `repair_probe.py`).
+  OVERNIGHT+MORNING 2026-07-07 (user directive: ranking + breadth; ledger
+  "Overnight results" through "Repair round 2 + H4"): calibrated stack FROZEN
+  after the A/B tied at 5/16; 51 words × K=2-3 samples → 25/51 words (49%) hold
+  a full-protocol-bankable clue; capture list `scratch/h1_capture.jsonl` = 40
+  bankables with provenance (NOT merged into clue_bank.jsonl). ADOPTED:
+  fresh-context 26B ranker (84% of oracle at top-2, doubles unranked baseline;
+  31B ranker never uniquely better). SUPPORTED: H4 early stop at M=1 (~27%
+  judge-time saving, ~zero coverage cost, breadth mode). Kinship diagnosis:
+  monosemy defeats sense-width → `frames` arm (per-item frame discipline, try 2)
+  widens material (UNCLE: Sam/Ben/Fester/McDuck; TWIN: digital twin); kinship
+  top-2 audits IN FLIGHT at compact time (`logs/h1_frames_*.log`) — read
+  verdicts, then decide frames-arm adoption for single-sense words. Queue after
+  that: repair prompt lacks the strict-'?' rule (CRANE gained a '?' in repair);
+  assemble the judge design-round brief; the 20 uncovered words (fork — deeper
+  sampling K>3 vs material levers vs accepting them as the current ceiling:
+  UNDECIDED); H1b at equal compute; production wiring deferred to first
+  consumer. Open question: judge design-round timing is the user's call — brief
+  items: accuracy leak (MELODY staircase banked), obscurity calibration (NIL
+  sense banked), number-agreement leniency (plural VIOLET passed), name-word
+  convention ("Sinatra's first name" → other_object), '?'-licensed stretches
+  killed at substitution (UNCLE "Taps out?" aha), missing "for short" signal not
+  required (repaired NIL banked without it); the liveliness turn STANDS as
+  calibrated. Note: `rank_pool.py` hardcodes its pool path (h1_pool.jsonl) — the
+  frames run needed a swap dance; add a path argument next time it's touched.
+  The user launches stretches with a /goal prompt that points at
   setter.md/ceiling.md/ledger/tasks.md. Note: bank audit DONE 2026-07-06
   (flag-and-report, nothing deleted): 23/75 rows flagged, 22 flat-gloss + 1
   unearned '?', zero substitution/truth/economy-unanimous flags in the 10-row
