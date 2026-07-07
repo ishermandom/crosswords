@@ -368,22 +368,69 @@ thread; the spec is self-contained.
       stable-LR basin does NOT widen at batch 4 (5e-5 clean, val 2.644; 1e-4
       marginal wobble, val 2.856; 2e-4 still toxic, loss stuck ~4+), so peak
       stays 5e-5. LAUNCH PREP REQUESTED 2026-07-05 (user: "prepare for the
-      overnight run") — prep sequence: (a) validate the launcher's resume path
-      on a tiny e2b run (~5 min, never live-exercised — training step; the prep
-      request covers prep, confirm before running); (b) write night-1 driver
-      (lease-wrapped, boxed, detached; steps_per_save 100 caps loss at a
-      deadline stop); (c) CHECK IN with the assembled command for the explicit
-      go — no self-launch. Open question: peak 5e-5 (recommended, clean fixed
-      anchor, mid-basin per the window C map) vs 7e-5 (defensible upside, ⅓-½ of
-      the soft edge, but no fixed anchor of its own) — user has not chosen.
-      Note: val losses are NOT comparable across rungs (each slice has its own
-      valid.jsonl) — cross-rung comparison rides the instrument suite, not val
-      loss. Incident note: pausing window A for the reframe edit killed only the
-      caffeinate leader, not its process group — the orphaned zsh driver
-      survived and raced the relaunched one for the lease (harmless here:
-      instruments ran exactly once, on the reframed scripts, and both drivers
-      exited). To pause a detached driver, kill the process group
-      (`kill -TERM -<pid>` / `os.killpg`), not the pid.
+      overnight run") — prep sequence: (a) resume path VALIDATED 2026-07-05 on
+      e2b (run A 30 iters, val 10.77→3.80; run B resumed from A's adapter, first
+      val 3.84 not cold-start, ended 3.64 — `probe_resume_{a,b}/`,
+      `resume_check_{a,b}.log`); (b) write night-1 driver (lease-wrapped, boxed,
+      detached; steps_per_save 100 caps loss at a deadline stop) — WRITTEN
+      2026-07-05, `night1_15k.sh`; (c) APPROVED 2026-07-05 (user): night 1 at
+      peak 5e-5 batch 4, including the resume validation, mid-run analysis with
+      early-stop authority, and any related training steps to prep or understand
+      the run (loss gaps etc.). Night 2 requires a fresh check-in before launch
+      — not pre-approved. NIGHT 1 LAUNCHED 2026-07-05 02:48, detached driver
+      `night1_15k.sh` (caffeinate group 15899), log `night1_15k.log`, lease
+      held; watcher pings at ~iter 1100 for the mid-run convergence read.
+      MID-RUN READ at iter ~1110 (~07:55): val 13.33 → 2.36 by iter 200, then
+      slow grind at peak (2.31 @600, 2.35 @800, 2.23 @1000); train loss stable
+      ~1.9-2.3, no spikes at 5e-5, memory steady 10.63 GB, 0.060 it/s → ETA
+      ~13:30. Decision: RUN TO COMPLETION — this is a single-epoch run, so iter
+      N = 4N examples seen; an early stop would shrink the data slice to ~30%
+      and confound the 5k→15k data-scaling question the rung exists to answer.
+      Hold-phase yield is low (~0.13 val over 800 iters), so the night-2
+      check-in should weigh a longer decay fraction (e.g. 0.9 rather than 0.6)
+      over more hold. NIGHT 1 COMPLETE ~13:15: all 2,250 iters, val 2.119 at
+      iter 2250 (13.33 init → 2.355 @200 → 2.226 @1000 → 2.119), train ~1.9-2.2
+      band throughout, no instability, peak mem 10.63 GB, lease released,
+      final + numbered checkpoints in `adapters_12b_15k/`. Night-2 driver
+      WRITTEN (`night2_15k.sh`, awaiting user go): own output dir
+      `adapters_12b_15k_n2` (protects night-1 checkpoints for the soup), resume
+      from night-1 final, 1500 iters, peak 5e-5, warmup 0.01, decay 0.9 APPROVED
+      (user, over original 0.6) per the low hold yield, ~7 h. NIGHT 2 RAN 22:25
+      → 05:20 2026-07-06 (driver launched on the user's evening go, process
+      group 95162; the earlier "~13:40 launch, ETA 21:00" note was a clock-time
+      inference error, corrected here). COMPLETE and clean: all 1,500 iters,
+      epoch finished (3,750 total = all 15k examples), cosine glide verified in
+      the log (5e-5 @100 → 1.9e-5 @1000 → 5.0e-6 floor @1500), final val 2.072
+      vs night-1 2.119 — but per-eval noise is ~±0.1 (100-example val), so the
+      annealing dividend is below this eval's resolution; the instrument suite
+      is the readout. Post-run measurements APPROVED (user) and LAUNCHED ~05:45
+      2026-07-06 as detached driver `night2_measures.sh` (process group 72155):
+      soup build (`soup_adapter.py`, checkpoints 0001100-0001500 averaged) +
+      loss gaps, strata false-signal, and register pairs on both
+      `adapters_12b_15k_n2` and `adapters_12b_15k_soup`; logs
+      `*_15k{,_soup}.log`, ~2-3 h. READOUT 2026-07-06 (all runs clean; 5k
+      numbers from the window A logs, same seeds/slices so directly comparable):
+      loss gaps (n=200) 5k → 15k plain → 15k soup: true NLL 2.635 → 2.520 →
+      2.520; answer gap +1.790 → +1.889 → +1.906; difficulty gap +0.011 → +0.023
+      → +0.022; register sep +0.372 → +0.408 → +0.407; flat@hard penalty +0.030
+      → +0.076 → +0.071 — every modeling/ conditioning metric improved with 3x
+      data. BUT the matched-pair difficulty preference did NOT move: per-token
+      margin base -1.012 → 5k -0.710 → 15k -0.754 (win rate 41% → 40%; soup
+      -0.762/40%) — flat to slightly more Monday-leaning; data scaling improved
+      clue modeling without touching the anti-hard preference asymmetry. Strata
+      false signals: 5k 2/1/1 per stratum, 15k plain 2/3/1, SOUP 1/0/0 (6 vs 1
+      of 300 total, plain vs soup — suggestive that averaging cleans up rare
+      false signals, below significance at n=100/stratum). Soup ≈ plain on
+      everything else. Open decision (user): whether the 50k rung is worth it
+      given modeling gains without preference movement. Note: val losses are NOT
+      comparable across rungs (each slice has its own valid.jsonl) — cross-rung
+      comparison rides the instrument suite, not val loss. Incident note:
+      pausing window A for the reframe edit killed only the caffeinate leader,
+      not its process group — the orphaned zsh driver survived and raced the
+      relaunched one for the lease (harmless here: instruments ran exactly once,
+      on the reframed scripts, and both drivers exited). To pause a detached
+      driver, kill the process group (`kill -TERM -<pid>` / `os.killpg`), not
+      the pid.
 - [ ] Before the next 12B fine-tune run: rehearse the identical recipe on the
       cheap e2b variant first and sanity-check the outputs — generate a few
       clues and run the loss-gap gaps — before spending a 7-hour 12B night. The
@@ -583,12 +630,14 @@ thread; the spec is self-contained.
       TRAINING SLICES, not the whole bank — the 15k slice ≈
       $90 API-equivalent vs full bank ≈ $3k+ / ~6-14 exclusive weeks of the Max
       20x budget; single-bill constraint rules out the batch API (Console =
-      separate bill); Sonnet 5 intro pricing (2/3 of standard) ends Aug 31. NEXT
-      (user-gated): user finishes reading the rubric doc, hand-labels the
-      126-clue slice (`calibration_clues.jsonl`), then one Sonnet 5 run over the
-      same slice — per-scale agreement with the user calibrates the judge (no
-      model contest anymore). Payoffs unchanged: judge calibration,
-      preference-pair seeds, curation ground truth.
+      separate bill); Sonnet 5 intro pricing (2/3 of standard) ends Aug 31.
+      REMINDER (user request 2026-07-05): surface the rubric read-through to the
+      user on 2026-07-06 — they won't get to it today. NEXT (user-gated): user
+      finishes reading the rubric doc, hand-labels the 126-clue slice
+      (`calibration_clues.jsonl`), then one Sonnet 5 run over the same slice —
+      per-scale agreement with the user calibrates the judge (no model contest
+      anymore). Payoffs unchanged: judge calibration, preference-pair seeds,
+      curation ground truth.
 - [ ] Investigate training throughput (after the overnight run; needs the
       lease). The log's `Tokens/sec` ≈ 1.5–2.0 counts only trained (response)
       tokens — ~8/example under prompt masking — so it is not comparable to
@@ -618,6 +667,31 @@ thread; the spec is self-contained.
       (weight reads are per step, not per token) — though batch 4's mere ~15%
       gain cuts against the pure bandwidth story and itself wants explaining
       (per-example serialization? short-sequence kernel inefficiency?).
+- [ ] Explore batch size for QUALITY, not speed (queued 2026-07-05, user; parked
+      until the 15k readout says small quality deltas matter). What we know:
+      batch 4 was chosen for stability + smoothing at near-zero memory/speed
+      cost, NOT from a quality comparison — no run has compared final adapters
+      across batch sizes. The measured throughput curve is nearly flat
+      (760/820/905 examples/hr at batch 1/2/4), so batch here is almost a pure
+      quality knob: batch 1 buys 4x the optimizer updates per epoch for only
+      ~20% more wall time, and small-batch gradient noise often acts as
+      regularization on small fine-tune corpora. Design constraints: a fair test
+      is a JOINT (batch, peak-LR) comparison — the basin was mapped at batch 4,
+      and batch 1's only long-run anchor is the 5k rung at 5e-5 — and it needs
+      the instrument suite as the comparator, not val loss. Cheapest sufficient
+      probe: e2b scale first (two short runs, loss gaps + a small instrument
+      slice), promote to a 12B night only if e2b shows a real gap.
+- [ ] Checkpoint-averaging "soup" on the 15k adapter (queued 2026-07-05, user
+      approved). After night 2, average the last handful of numbered checkpoints
+      (steps_per_save=100 writes `NNNNNNN_adapters.safetensors` per save) into a
+      candidate adapter and run it through the instruments alongside the plain
+      final one. Rationale: iterates at constant LR orbit the basin floor, so
+      their average sits nearer the (lower, flatter) center — the one flatness
+      technique that costs zero extra training; most useful over the tail of
+      night 2's decay glide. PREREQ for the night-2 check-in: night 2 must write
+      to its OWN output directory (e.g. `adapters_12b_15k_n2`) — the resume run
+      restarts its iteration counter at 1, so reusing `adapters_12b_15k` would
+      overwrite night 1's numbered checkpoints.
 - [ ] Stage 2 — only on stage-1 signal. Options, not commitments: more
       data/epochs; DPO from judge labels (converts judge preferences into the
       training objective — the quality-not-shape lever); judge-filtered training
