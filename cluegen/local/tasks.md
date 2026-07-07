@@ -219,14 +219,21 @@ done — see the log for the curve and the criteria re-analysis.
   8/9 words directly bankable, adverbs and fresh senses included. H4/send-cap
   analysis + rung 3 chunk 1 DONE same night (ledger "Rung 3 chunk 1"): 8 fresh
   words → 5/16 finals survived audits, 4 bankable + 1 fixable at full protocol;
-  word-level 5/8 usable vs 9/13 on tuning words. BLOCKED-ON-USER: taste round 1
-  (`scratch/taste_round_1.md`, sent 2026-07-07) — fresh-word losses concentrate
-  in the judge's liveliness taste on frame-anchor/metonymy shapes; further
-  setter tuning against the ungraded gate is Goodhart risk. While waiting: H1b
-  at equal compute, ranker-validation prep (H2), the develop-turn economy lever.
-  Judge design-round items filed (frozen until a round): name-word convention
-  rejection, number-agreement leniency, liveliness taste pending the round's
-  outcome. The user launches stretches with a /goal prompt that points at
+  word-level 5/8 usable vs 9/13 on tuning words. Taste round 1 GRADED 2026-07-07
+  (ledger "Taste round 1 results", `scratch/taste_round_1_results.jsonl`): the
+  judge's flatness kills are vindicated; Claude was the lenient grader. Judge's
+  real leaks are substance — accuracy (banked an inaccurate MELODY clue) and
+  obscurity (banked the NIL name-image-likeness sense the user doesn't know).
+  User calibrations now in setter.md principle 2. Repair loop VALIDATED for
+  economy flaws (COURT + SCORE converted; 9/9 tuning words covered); production
+  repair should decline non-economy flaws. Calibrated arm (accuracy filter +
+  strict '?' + charm-preserving economy) built; A/B audits vs the conventions
+  arm's 5/16 fresh-word baseline in flight. Next after the A/B: full protocol on
+  the better arm's survivors, then H1b at equal compute on that stack, then
+  ranker validation (H2). Judge design-round items, reprioritized (frozen until
+  a round): accuracy leak, obscurity calibration, number-agreement leniency,
+  name-word convention in the substitution turn; the liveliness turn STANDS as
+  calibrated. The user launches stretches with a /goal prompt that points at
   setter.md/ceiling.md/ledger/tasks.md. Note: bank audit DONE 2026-07-06
   (flag-and-report, nothing deleted): 23/75 rows flagged, 22 flat-gloss + 1
   unearned '?', zero substitution/truth/economy-unanimous flags in the 10-row
