@@ -1388,36 +1388,61 @@ seeing counts); (5) H4 early-stop from the deeper pools.
 
 ### Overnight results (2026-07-07 morning read; `morning_analysis.py`)
 
-Run completed cleanly at ~05:15: 124 generation runs pooled over 51 words,
-52 ranking calls, 208 liveliness + 76 substitution audit calls; driver
+Run completed cleanly at ~05:15: 124 generation runs pooled over 51 words, 52
+ranking calls, 208 liveliness + 76 substitution audit calls; driver
 self-released the lease.
 
-**Coverage (single-turn audits on ranker-top-4):** 31/51 words hold ≥1
-survivor (61%); coverage@2 = 26 (51%), @1 = 18 (35%). Total survivors 56.
+**Coverage (single-turn audits on ranker-top-4):** 31/51 words hold ≥1 survivor
+(61%); coverage@2 = 26 (51%), @1 = 18 (35%). Total survivors 56.
 
-**Ranking (H2, first real result):** the 26B fresh-context ranker captures
-26 of the 31 oracle-covered words at top-2 (84% ranker efficiency); the
-file-order no-ranker baseline manages 5/20 on the comparable subset — the
-ranker roughly doubles unranked coverage@2. Words the ranker buried at
-rank 3-4: BAT, WIDOW, REED, SELDOM, THRICE. 31B ranker pass queued for
-the model comparison.
+**Ranking (H2, first real result):** the 26B fresh-context ranker captures 26 of
+the 31 oracle-covered words at top-2 (84% ranker efficiency); the file-order
+no-ranker baseline manages 5/20 on the comparable subset — the ranker roughly
+doubles unranked coverage@2. Words the ranker buried at rank 3-4: BAT, WIDOW,
+REED, SELDOM, THRICE. 31B ranker pass queued for the model comparison.
 
-**Breadth by class (covered@2/@4/total):** number-ordinal 8/9/13,
-name-word 8/9/14, polysemous 8/10/18, kinship 2/3/6 — kinship is the weak
-class (UNCLE, BRIDE, HEIR all uncovered). 20/51 words uncovered within
-the audited top-4, including the recurring hard cases (ASIDE, FRANK,
-MELODY, SCORE, TWELVE, OSCAR, BOW, POUND) and new ones (SET, RUN, BANK,
-DATE, CLUB, JACK, GRACE, DOZEN, SIXTY).
+**Breadth by class (covered@2/@4/total):** number-ordinal 8/9/13, name-word
+8/9/14, polysemous 8/10/18, kinship 2/3/6 — kinship is the weak class (UNCLE,
+BRIDE, HEIR all uncovered). 20/51 words uncovered within the audited top-4,
+including the recurring hard cases (ASIDE, FRANK, MELODY, SCORE, TWELVE, OSCAR,
+BOW, POUND) and new ones (SET, RUN, BANK, DATE, CLUB, JACK, GRACE, DOZEN,
+SIXTY).
 
-**Quality eyeball — the pools now contain genuinely delightful clues:**
-CHARGE "Knightly rush or electron property", HAZEL "Nutty color?", PEARL
-"Irritant's treasure", DREW "Ended in a stalemate?", RUBY "Language for
-Rails?", ORPHAN "A lonely line of text on a new page", and NIL "College
-athlete's brand rights, for short" — the shortening convention fired for
-the first time. Caveats for the protocol pass: WIDOW "V-shaped hairline
-feature" is an idiom-fragment risk (widow's peak).
+**Quality eyeball — the pools now contain genuinely delightful clues:** CHARGE
+"Knightly rush or electron property", HAZEL "Nutty color?", PEARL "Irritant's
+treasure", DREW "Ended in a stalemate?", RUBY "Language for Rails?", ORPHAN "A
+lonely line of text on a new page", and NIL "College athlete's brand rights, for
+short" — the shortening convention fired for the first time. Caveats for the
+protocol pass: WIDOW "V-shaped hairline feature" is an idiom-fragment risk
+(widow's peak).
 
-**In flight:** full v3 protocol over the 47 top-2 survivors + a 31B
-ranker pass over the same pools (detached, lease to 10:09). Next after:
-bankable verdict table, capture-list update (principle 10), H4 read from
-the deeper pools, kinship material diagnosis.
+**In flight:** full v3 protocol over the 47 top-2 survivors + a 31B ranker pass
+over the same pools (detached, lease to 10:09). Next after: bankable verdict
+table, capture-list update (principle 10), H4 read from the deeper pools,
+kinship material diagnosis.
+
+### Morning block results (2026-07-07, full protocol + 31B ranker)
+
+Full v3 protocol over the 47 top-2 survivors
+(`logs/h1night_20260707-073842.jsonl`, 282 calls / 94 cache hits, 119 min):
+**37 bankable / 8 fixable / 2 bad.** The two-turn pre-filter has real
+precision: 79% of its survivors are bankable and only 2/47 are bad — one
+of them the predicted WIDOW idiom fragment ("V-shaped hairline feature"),
+correctly killed.
+
+**End-to-end coverage: 25/51 words (49%) now hold at least one
+full-protocol-bankable clue from one overnight pass at K=2–3.** Capture
+list written with provenance: `h1_capture.jsonl` (37 rows; per principle
+10 a running list, deliberately NOT merged into clue_bank.jsonl).
+
+**Ranker model comparison (H2):** 26B and 31B rankers agree on 16 of 21
+comparable words, 26B uniquely wins 1, 31B uniquely wins 0. The cheap
+ranker is not the bottleneck — fresh-context 26B ranking ADOPTED for the
+funnel; no reason to pay the 31B swap for ranking.
+
+Open threads by expected value after this block: (1) economy-family
+repairs on the 8 new fixables (validated loop, direct bankable gain); (2)
+kinship-class material diagnosis (UNCLE/BRIDE/HEIR uncovered); (3) the
+20 uncovered words — deeper sampling vs material changes; (4) H4 offline
+read; (5) judge design-round prep (accuracy + obscurity leaks). Fable
+window untouched: $10 of $10.
