@@ -3,6 +3,10 @@
 Status key: `[ ]` not started · `[~]` in progress · `[x]` done · `[-]` dropped ·
 `[?]` uncertain/speculative
 
+This tracker covers project-wide work. Two campaigns run in their own
+worktree/branch with their own tracker: `tasks-local-ceiling.md` (branch
+`local-ceiling`) and `tasks-finetune-probe.md` (branch `finetune-probe`).
+
 ---
 
 ## Housekeeping
