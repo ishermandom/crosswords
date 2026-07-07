@@ -14,15 +14,15 @@ import pathlib
 import battery
 import pipeline_local
 
-_V3_VARIANT = pathlib.Path(__file__).parent / 'variants' / 'confirm_multiturn_v3.py'
+_V3_VARIANT = (
+  pathlib.Path(__file__).parent / 'variants' / 'confirm_multiturn_v3.py'
+)
 
 
 def main() -> None:
   """Run the v3 liveliness turn over every bank row and print the flags."""
   namespace: dict[str, object] = {}
-  exec(
-    compile(_V3_VARIANT.read_text(), str(_V3_VARIANT), 'exec'), namespace
-  )
+  exec(compile(_V3_VARIANT.read_text(), str(_V3_VARIANT), 'exec'), namespace)
   system = namespace['_LIVELINESS_SYSTEM']
   prompt = namespace['_LIVELINESS_PROMPT']
   schema = namespace['_LIVELINESS_SCHEMA']

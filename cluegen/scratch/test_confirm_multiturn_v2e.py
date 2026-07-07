@@ -3,7 +3,9 @@
 import pathlib
 import sys
 
-SCRATCH = pathlib.Path('/Users/Shared/code/crosswords-local-ceiling/cluegen/scratch')
+SCRATCH = pathlib.Path(
+  '/Users/Shared/code/crosswords-local-ceiling/cluegen/scratch'
+)
 sys.path.insert(0, str(SCRATCH))
 
 import pipeline_local  # noqa: E402
@@ -57,42 +59,58 @@ def vote(evidence):
 r = run('Night watchman on patrol')
 assert r['verdict'] == 'bankable' and not r['advisories'], r
 
-r = run('Night watchman on patrol',
-        economy_panel=[vote(['on patrol']), CLEAN_ECONOMY, CLEAN_ECONOMY])
+r = run(
+  'Night watchman on patrol',
+  economy_panel=[vote(['on patrol']), CLEAN_ECONOMY, CLEAN_ECONOMY],
+)
 assert r['verdict'] == 'bankable', r
 assert r['advisories'] == ['economy (minority): on patrol'], r
 
 # Two of three is no longer enough — unanimity gates.
-r = run('Night watchman on patrol',
-        economy_panel=[vote(['on patrol']), vote(['watchman']), CLEAN_ECONOMY])
+r = run(
+  'Night watchman on patrol',
+  economy_panel=[vote(['on patrol']), vote(['watchman']), CLEAN_ECONOMY],
+)
 assert r['verdict'] == 'bankable', r
-assert r['advisories'] == ['economy (minority): on patrol',
-                           'economy (minority): watchman'], r
+assert r['advisories'] == [
+  'economy (minority): on patrol',
+  'economy (minority): watchman',
+], r
 
-r = run('Night watchman on patrol',
-        economy_panel=[vote(['on patrol'])] * 3)
+r = run('Night watchman on patrol', economy_panel=[vote(['on patrol'])] * 3)
 assert r['verdict'] == 'fixable', r
 assert r['flaws'] == ['economy: on patrol'], r
 
 # A vote whose evidence quotes nothing from the clue does not count,
 # so this unanimous-looking panel is really 2 of 3.
-r = run('Night watchman on patrol',
-        economy_panel=[vote(['the second half']), vote(['on patrol']),
-                       vote(['on patrol'])])
+r = run(
+  'Night watchman on patrol',
+  economy_panel=[
+    vote(['the second half']),
+    vote(['on patrol']),
+    vote(['on patrol']),
+  ],
+)
 assert r['verdict'] == 'bankable', r
 assert r['advisories'] == ['economy (minority): on patrol'], r
 
 # --- bad short-circuits skip the panel entirely ---
-r = run('One who delivers your letters',
-        economy_panel=[vote(['letters'])] * 3,
-        substitution={'points_at': 'other_object',
-                      'other_object_name': 'mail carrier'})
+r = run(
+  'One who delivers your letters',
+  economy_panel=[vote(['letters'])] * 3,
+  substitution={
+    'points_at': 'other_object',
+    'other_object_name': 'mail carrier',
+  },
+)
 assert r['verdict'] == 'bad' and len(r['flaws']) == 1, r
 
 # --- panel stacks onto an existing fixable ---
-r = run('Old night watchman on patrol',
-        economy_panel=[vote(['on patrol'])] * 3,
-        truth={'failing_qualifiers': ['"Old" overclaims']})
+r = run(
+  'Old night watchman on patrol',
+  economy_panel=[vote(['on patrol'])] * 3,
+  truth={'failing_qualifiers': ['"Old" overclaims']},
+)
 assert r['verdict'] == 'fixable' and len(r['flaws']) == 2, r
 
 # --- junk truth flags still filtered ---
