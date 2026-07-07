@@ -16,9 +16,11 @@ def _ps_line(pid: int, rss_kib: int, command: str) -> str:
 
 def test_large_python_process_is_reported_with_pid_and_size() -> None:
   output = _ps_line(
-      68811, 10 * 1024 * 1024,
-      '/Users/claude-sandbox/.venvs/default/bin/python '
-      '/Users/claude-sandbox/.venvs/default/bin/optiq lora train')
+    68811,
+    10 * 1024 * 1024,
+    '/Users/claude-sandbox/.venvs/default/bin/python '
+    '/Users/claude-sandbox/.venvs/default/bin/optiq lora train',
+  )
 
   workloads = model_workload_processes(output)
 
@@ -28,8 +30,9 @@ def test_large_python_process_is_reported_with_pid_and_size() -> None:
 
 
 def test_ollama_runner_is_reported() -> None:
-  output = _ps_line(3568, 18 * 1024 * 1024,
-                    '/opt/homebrew/bin/ollama runner --model gemma4')
+  output = _ps_line(
+    3568, 18 * 1024 * 1024, '/opt/homebrew/bin/ollama runner --model gemma4'
+  )
 
   workloads = model_workload_processes(output)
 
@@ -51,18 +54,22 @@ def test_small_python_process_is_ignored() -> None:
 def test_large_non_workload_process_is_ignored() -> None:
   # Browsers routinely exceed the size threshold; only the model stacks count.
   output = _ps_line(
-      500, 3 * 1024 * 1024,
-      '/Applications/Chrome.app/Contents/Frameworks/Chrome Helper (Renderer)')
+    500,
+    3 * 1024 * 1024,
+    '/Applications/Chrome.app/Contents/Frameworks/Chrome Helper (Renderer)',
+  )
 
   assert model_workload_processes(output) == []
 
 
 def test_malformed_lines_are_ignored() -> None:
-  output = '\n'.join([
+  output = '\n'.join(
+    [
       '',
       'not a ps line',
       _ps_line(68811, 10 * 1024 * 1024, '/usr/bin/python3 train.py'),
-  ])
+    ]
+  )
 
   workloads = model_workload_processes(output)
 

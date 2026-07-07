@@ -79,8 +79,9 @@ _POLL_SECONDS = 15
 # the other two idle signals — they never appear in ollama, and ~10 GB on a 32
 # GB machine leaves the kernel pressure level at normal — so the process table
 # is the load-bearing check for them (incident: 2026-07-03 lease overlap).
-_WORKLOAD_COMMAND_PATTERN = re.compile(r'python|ollama|optiq|mlx',
-                                       re.IGNORECASE)
+_WORKLOAD_COMMAND_PATTERN = re.compile(
+  r'python|ollama|optiq|mlx', re.IGNORECASE
+)
 _WORKLOAD_RSS_THRESHOLD_KIB = 2 * 1024 * 1024
 
 
