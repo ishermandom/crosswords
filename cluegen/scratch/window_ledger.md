@@ -1227,6 +1227,37 @@ exactly this); the relaunch then had its model unloaded by a lease swap ordered
 AFTER the launch. Correct order: lease first (pid untracked), then detached
 launch under caffeinate, then expendable watcher. Total waste: one model load.
 
+### Send-cap / H4 offline analysis (2026-07-06, free, from rung 1–2 data)
+
+Joining my pick order (h1_finals.jsonl file order per word) against the
+verdicts, 13 words:
+
+- **Top-1 only**: 5 words bankable-direct + 2 fixable = 7/13 usable.
+- **Top-2 (the cap used)**: 8 bankable-direct + 1 fixable = 9/13 usable. The
+  second send rescued NIL and VIOLET outright (both top-1s died at liveliness)
+  and upgraded COURT from fixable to bankable. On this sample the cap-2 marginal
+  value is large; no evidence yet on cap-3+ (never sent).
+- **H4 early stop (M=1: stop judging a word once one bankable lands)**: saves
+  ~4/13 judge slots (~31%) with ZERO word-coverage loss on this sample; the cost
+  is only second bankables for already-covered words (SELDOM's and THRICE's
+  seconds would go unjudged). Directionally supports H4; sample too thin (≤2
+  candidates/word) for an M≥2 read — rung 3's per-word pools will be the real
+  test.
+- **H2 caveat unchanged**: "my pick order" is Claude-as-ranker; a production
+  ranker is unvalidated. Notably my top-1 was wrong (by judge lights) on 6 of 13
+  words — ranking is NOT solved by setter file order.
+
+### Rung 3 chunk 1 (launched 2026-07-06 late)
+
+8 fresh words across untuned categories: SIXTY THIRD (numbers/ordinal), TWICE
+(adverb, H3 class), OSCAR ROBIN (name words — included deliberately to measure
+the substitution-turn name-convention effect at scale), WIDOW (kinship,
+polysemous), BOW POUND (polysemous short; BOW is a heteronym). Stack:
+`conventions` arm (senses material → conventions pick → re-cast) on 26B, top-2
+finals per word by Claude rank, then the two single-turn audits
+
+- full protocol on survivors on 31B, detached, correct lease order.
+
 ## Remaining queue
 
 `#eval-expansion` DONE through the 2×2 (sets built

@@ -75,6 +75,8 @@ _SETS = {
   # substitution): flat {"word","clue"} rows, audited against 'accept' like the
   # bank so every judge kill surfaces as a NO flag.
   'h1survivors': _SCRATCH / 'h1_survivors.jsonl',
+  # Rung-3 fresh-slice survivors, same flat shape (rung3_driver.py writes it).
+  'h1r3': _SCRATCH / 'h1_survivors_r3.jsonl',
 }
 _CACHE_PATH = _SCRATCH / 'cache' / 'judge_cache.jsonl'
 _LOG_DIR = _SCRATCH / 'logs'
@@ -257,7 +259,7 @@ def _load_set(set_name):
         'verdict': 'accept',
         'basis': None,
       }
-    if set_name == 'h1survivors':
+    if set_name in ('h1survivors', 'h1r3'):
       # Flat unlabeled pool rows, audited against 'accept' like the bank.
       record = {
         'word': record['word'],
