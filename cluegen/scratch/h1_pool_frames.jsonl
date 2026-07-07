@@ -1,0 +1,6 @@
+{"word": "WIDOW", "arm": "frames", "model": "gemma4:26b-qat", "timestamp": "2026-07-07T12-50-49", "clues": ["Lonely word left hanging at the end of a paragraph", "Red-marked arachnid?", "V-shaped hairline feature", "One whose partner has passed"]}
+{"word": "UNCLE", "arm": "frames", "model": "gemma4:26b-qat", "timestamp": "2026-07-07T12-51-11", "clues": ["Your mother's brother", "He might be Uncle Sam?", "A rogue-ish relative", "Scrooge McDuck's wealthy relation"]}
+{"word": "TWIN", "arm": "frames", "model": "gemma4:26b-qat", "timestamp": "2026-07-07T12-51-35", "clues": ["One of two born at once", "Digital counterpart to an object"]}
+{"word": "HEIR", "arm": "frames", "model": "gemma4:26b-qat", "timestamp": "2026-07-07T12-53-03", "clues": ["Successor to fortune or crown", "One who carries on a legacy", "Next in line for the throne"]}
+{"word": "BRIDE", "arm": "frames", "model": "gemma4:26b-qat", "timestamp": "2026-07-07T12-53-26", "clues": ["She might catch a bouquet", "Frankenstein's creation's companion?", "White-clad woman in a wedding party"]}
+{"word": "ORPHAN", "arm": "frames", "model": "gemma4:26b-qat", "timestamp": "2026-07-07T12-53-50", "clues": ["A single line at the top of a column", "One without a parent process", "Cinderella's status", "Harry Potter, for example"]}

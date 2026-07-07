@@ -166,6 +166,26 @@ Now test each draft, one at a time:
 Finish with the final list: each clue as it would print, one per line,
 nothing else after the list."""
 
+# Eleventh arm ('frames'): monosemy defeats sense-inventory width — HEIR's
+# overnight pool was one sense phrased three ways. For single-sense words, width
+# must come from frames and facts instead.
+_TURN_MATERIAL_FRAMES = """\
+Answer word: {word}
+
+First, list every sense of {word} you know. If {word} has only one or two
+real senses, widen a different way: list idioms and set phrases it lives
+in, famous bearers and fictional figures, professional or cultural frames
+where it has a specific role (law, games, typography, religion, sports),
+and interesting checkable facts about the thing it names.
+
+Then list 10 pieces of raw material, and here the discipline is strict:
+NO TWO ITEMS may use the same sense, idiom, frame, or bearer from your
+inventory — each item names which inventory entry it uses, and an entry
+already used is off-limits. A paraphrase of an earlier item is worthless.
+Facts, tiny concrete scenes, roles, frames. Accuracy is absolute: every
+fact must be true and checkable — an invented fact poisons everything
+downstream. No clue drafts."""
+
 # Third arm, prompted by the micro-probe finding (2026-07-06): a direct ask for
 # raw material yields vivid concrete scenes that the angle rubrics suppress.
 # Material first, then clues from the material.
@@ -415,6 +435,11 @@ def main() -> None:
     ],
     'calibrated': [
       _TURN_MATERIAL_CALIBRATED,
+      _TURN_DRAFTS_CALIBRATED,
+      _TURN_RECAST_CALIBRATED,
+    ],
+    'frames': [
+      _TURN_MATERIAL_FRAMES,
       _TURN_DRAFTS_CALIBRATED,
       _TURN_RECAST_CALIBRATED,
     ],
