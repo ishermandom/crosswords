@@ -22,13 +22,14 @@ Usage: python3 h1a_probe.py [WORD] [basis|mechanism] (default: COURT basis)
 """
 
 import datetime
+import os
 import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 import pipeline_local
 
-_MODEL = 'gemma4:26b-qat'
+_MODEL = os.environ.get('H1A_MODEL', 'gemma4:26b-qat')
 
 # The five bases of satisfaction, one-line definitions copied from
 # `cluegen/local/satisfaction.md` (the whole list, never one favored mechanism —
@@ -196,6 +197,40 @@ No clue drafts. Each item: one concrete sentence naming which sense it
 uses. Vague classifications are useless; a specific fact, image, or role
 is the goal."""
 
+# Ninth arm (conversion repair, fresh ladder): sense-inventory width reaches the
+# draft turn but non-imagery material converts to mush ("Relating to a
+# bratwurst") — the model lacks the crossword conventions for shortenings and
+# count metonymy. A compact conventions block, examples from non-test words,
+# spread across kinds per `satisfaction.md`'s no-single-mechanism rule.
+_TURN_DRAFTS_CONVENTIONS = """\
+Pick the 4 or 5 pieces that together promise the most VARIED solver
+satisfaction — at most one per kind: the sharpest image or scene, the best
+misdirection potential, the most interesting checkable fact, the most
+surprising sense of {word}. Spread the picks across different senses. A
+generic sense description is an automatic skip, however safe it feels.
+Draft exactly one clue per chosen piece.
+
+Crossword conventions — use whichever the material calls for:
+- A shortened, slang, or informal form is fair when the clue signals it:
+  "Kitchen cooler, briefly" clues FRIDGE; "for short" and "informally"
+  work the same way.
+- A number or quantity word can be defined by a set it famously counts:
+  "Innings in a standard ballgame" clues NINE.
+- A name can be clued through a famous bearer's well-known frame, as long
+  as the clue defines the name itself.
+
+The printed clue must keep the piece's specific image, fact, or
+misdirection. The other hard rules:
+- The clue must define the answer word ITSELF — never a person or thing
+  merely associated with it.
+- The clue must be able to substitute for {word} in a sentence — matching
+  part of speech, tense, and number.
+- No dictionary-flat surfaces.
+
+For each draft: the clue text as it would appear in print, then on the
+next line the material it was built from, in a few words. Plain
+unformatted text."""
+
 # Sixth arm (true H3): the single-turn cast traded vividness for legality (SCORE
 # drafts went flat) while SELDOM's stayed adverbially illegal. Split the tension
 # across turns: draft vividly first (unchanged vivid turns), then a dedicated
@@ -285,6 +320,11 @@ def main() -> None:
     'develop': [_TURN_MATERIAL_VIVID, _TURN_DRAFTS_VIVID, _TURN_RECAST],
     'diverse': [_TURN_MATERIAL_VIVID, _TURN_DRAFTS_DIVERSE, _TURN_RECAST],
     'senses': [_TURN_MATERIAL_SENSES, _TURN_DRAFTS_DIVERSE, _TURN_RECAST],
+    'conventions': [
+      _TURN_MATERIAL_SENSES,
+      _TURN_DRAFTS_CONVENTIONS,
+      _TURN_RECAST,
+    ],
   }[arm]
   timestamp = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
   log_path = (

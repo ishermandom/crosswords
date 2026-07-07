@@ -207,19 +207,25 @@ done — see the log for the curve and the criteria re-analysis.
   words: 10/13 words ≥1 unflagged; head-to-head on bank-shared words 5/7 vs old
   funnel's 2/7. H3 validated early (re-cast turn fixes adverbs via simile
   shapes); width fixed by sense-inventory-first (FRANK frankfurter + franking
-  surfaced). Next step: the CONVERSION residual — fact/count/ abbreviation
-  material drafts into mush at 26B ("Relating to a bratwurst"); try a compact
-  craft-conventions note, then revalidate on 31B, then the full-protocol
-  adoption run (feeds H4). The user launches stretches with a /goal prompt that
-  points at setter.md/ceiling.md/ledger/tasks.md. Note: bank audit DONE
-  2026-07-06 (flag-and-report, nothing deleted): 23/75 rows flagged, 22
-  flat-gloss + 1 unearned '?', zero substitution/truth/economy-unanimous flags
-  in the 10-row full-protocol probe. Read: about a third of what the old
-  pipeline banked is flat-but-correct — the shortage is charm at generation, not
-  judge strictness. Some flags are judge taste, not defects (MELODY "Whistleable
-  earworm", SELDOM "Once in a blue moon", ZED "That last character, overseas",
-  COURT double definition). Full list: `scratch/logs/bank_liveliness_audit.log`;
-  ledger "Bank audit" section.
+  surfaced). CONVERSION residual fixed same day: conventions block in the draft
+  turn fixes number-word conversion on 26B; 31B revalidation transfers the
+  prompts unchanged and solves FRANK by width ("Ancestor of the French"). Parked
+  gap: neither model uses the shortening convention ("briefly") even when
+  modeled. Tonight's stack: `senses` material → `conventions` pick → re-cast
+  (ledger "Conversion rung"). Next step: full-protocol 31B adoption run over a
+  fresh word slice with this stack (feeds H4; sealed-set spend allowed at that
+  moment), then H1b at equal compute, then H2 ranker validation off the adoption
+  run's verdicts, then a user taste round on judge liveliness divergences. The
+  user launches stretches with a /goal prompt that points at
+  setter.md/ceiling.md/ledger/tasks.md. Note: bank audit DONE 2026-07-06
+  (flag-and-report, nothing deleted): 23/75 rows flagged, 22 flat-gloss + 1
+  unearned '?', zero substitution/truth/economy-unanimous flags in the 10-row
+  full-protocol probe. Read: about a third of what the old pipeline banked is
+  flat-but-correct — the shortage is charm at generation, not judge strictness.
+  Some flags are judge taste, not defects (MELODY "Whistleable earworm", SELDOM
+  "Once in a blue moon", ZED "That last character, overseas", COURT double
+  definition). Full list: `scratch/logs/bank_liveliness_audit.log`; ledger "Bank
+  audit" section.
 - [ ] **Align local vs cloud judge requirements** #judge-alignment — both judges
       should enforce the same requirement set, each via methodology fitting the
       model's strength (user direction 2026-07-04). DEPRIORITIZED behind

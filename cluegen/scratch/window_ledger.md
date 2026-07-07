@@ -1142,6 +1142,37 @@ be model depth; (3) full-protocol judge run over a settled prompt stack as the
 adoption measurement, which also feeds H4. H2 note: my top-2 picks stood in for
 the unvalidated ranker throughout — ranking owner still open.
 
+Conversion rung (same day, fresh sub-ladder, `conventions` arm — a compact
+conventions block in the draft turn: shortening markers, count metonymy, name
+frames; examples from non-test words):
+
+- On 26B: TWELVE fixed (0 → ~4 viable: "Foot's worth of inches", "The hours that
+  frame day and night", "A jury's full complement", "One less than a baker's
+  dozen"); MELODY held; FRANK still failed — frankfurter material + the
+  "briefly" convention both in front of the model, no clue produced. Two
+  diagnosed tries → suspected model depth.
+- On 31B (`H1A_MODEL` env override; ~3 min/word vs ~12 s warm on 26B): FRANK
+  solved by WIDTH, not the shortening — fresh senses appear ("Ancestor of the
+  French" = the Franks; "First name of 'Ol' Blue Eyes'"; a cleaner franking
+  clue). SELDOM: "As often as a hermit updates his guest list". TWELVE holds.
+  The re-cast turn reasons visibly better (explicit substitution sentences,
+  self-correction against the keep-the-image rule). Funnel prompts transfer to
+  31B UNCHANGED.
+- Documented gap, parked: neither model ever uses the shortening convention
+  ("briefly"/"for short") even when modeled directly. Not blocking — width
+  covers the affected words.
+
+Day's arc closed. The prompt stack as of tonight: sense-inventory material turn
+→ diverse pick with conventions block → re-cast turn (`h1a_probe.py` arms
+`senses`/`conventions`). Next stretch, in EV order: (1) full-protocol 31B
+adoption run over a fresh word slice with this stack (feeds H4; sealed-set spend
+allowed at that moment per setter.md); (2) H1b iterated expansion vs the single
+material pass at equal compute; (3) H2 ranker validation against the
+full-protocol verdicts from (1); (4) user taste round on judge liveliness
+divergences (it flagged "Midnight's hour" and "Stage speech meant only for the
+audience" flat, passed "Three times for an out?" — setter.md open question on
+fine-grained ordering).
+
 ## Remaining queue
 
 `#eval-expansion` DONE through the 2×2 (sets built
