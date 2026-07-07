@@ -1446,3 +1446,27 @@ kinship-class material diagnosis (UNCLE/BRIDE/HEIR uncovered); (3) the
 20 uncovered words — deeper sampling vs material changes; (4) H4 offline
 read; (5) judge design-round prep (accuracy + obscurity leaks). Fable
 window untouched: $10 of $10.
+
+### Kinship diagnosis + economy repairs (2026-07-07 morning)
+
+Kinship's weakness decomposes into two mechanisms, neither "bad pools":
+
+- **Monosemy defeats sense-width**: HEIR's pool is three phrasings of one
+  sense — the inventory step multiplies nothing for single-sense words.
+  They need frame/fact width instead (UNCLE found "Sam's title" and
+  "Taps out?" because idiom frames exist; HEIR found none). Candidate
+  lever: a material-turn line for single-sense words — idioms, famous
+  bearers, cultural fixtures — cheap to test.
+- **The substitution turn prosecutes '?'-licensed conventional stretches**:
+  UNCLE "Taps out?" scored aha at liveliness, then died as other_object
+  (the act, not the word). Same family as the name-word rejection and
+  the removed "for short" signal — judge design-round item #3:
+  conventions the substitution turn should honor when '?' is present.
+  BRIDE's aisle aha died on sentence shape — that one is legitimately
+  recastable, a funnel matter.
+
+Economy repairs on the overnight fixables: 5 repaired (3 correctly
+declined: COURT truth, ORPHAN obscurity ×2). Watch-items: the repair turn
+ADDED a '?' to CRANE (repair prompt lacks the strict-'?' rule) and
+stripped NIL's "for short" signal — if the re-judge banks it anyway,
+that's the judge missing a required convention signal, filed with item #3.

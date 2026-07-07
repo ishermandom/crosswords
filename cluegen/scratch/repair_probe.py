@@ -51,6 +51,11 @@ def main() -> None:
       confirm = row['confirms'][0]
       if confirm['verdict'] != 'fixable':
         continue
+      # Probe finding (2026-07-07): only economy-family flaws convert;
+      # sense/obscurity repairs fail and waste a re-judge. Decline them.
+      if not all(flaw.startswith('economy') for flaw in confirm['flaws']):
+        print(f'declined {row["word"]} (non-economy): {confirm["flaws"]}')
+        continue
       prompt = _REPAIR_PROMPT.format(
         word=row['word'], clue=row['clue'], flaws='; '.join(confirm['flaws'])
       )
