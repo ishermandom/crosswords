@@ -95,6 +95,76 @@ For prize fact, state the actual fact.
 No clue drafts yet — this turn is breadth, not phrasing. Plain unformatted
 text; your output will be read by an LLM in the next turn."""
 
+# Tenth arm ('calibrated'), from taste round 1 (2026-07-07): accuracy outranks
+# vividness at every step; '?' only for genuine wordplay or a stretched
+# definition; economy trims must not cut the words carrying the clue's charm.
+# Material and re-cast turns get the calibrations; the pick turn is the
+# conventions pick plus accuracy-first.
+_TURN_MATERIAL_CALIBRATED = """\
+Answer word: {word}
+
+First, list every sense of {word} you know — parts of speech, slang,
+abbreviations and shortened forms, names, and uses inside professional or
+cultural frames. One line each.
+
+Then list 10 pieces of raw material spread across those senses:
+interesting checkable facts, tiny concrete scenes, roles the word plays
+(what it counts, who it names, where it appears), and surprising senses.
+Accuracy is absolute: every fact must be true and checkable, every scene
+faithful to what the word actually means — an invented fact or a
+distorted sense poisons everything downstream. No clue drafts. Each item:
+one concrete sentence naming which sense it uses."""
+
+_TURN_DRAFTS_CALIBRATED = """\
+Pick the 4 or 5 pieces that together promise the most VARIED solver
+satisfaction — at most one per kind: the sharpest image or scene, the best
+misdirection potential, the most interesting checkable fact, the most
+surprising sense of {word}. Spread the picks across different senses.
+Accuracy is a filter, not a style: first discard any piece not strictly
+true of {word}, then among the accurate pieces choose the most charming
+and specific — accurate-but-flat is still a failure. Draft exactly one
+clue per chosen piece.
+
+Crossword conventions — use whichever the material calls for:
+- A shortened, slang, or informal form is fair when the clue signals it:
+  "Kitchen cooler, briefly" clues FRIDGE; "for short" and "informally"
+  work the same way.
+- A number or quantity word can be defined by a set it famously counts:
+  "Innings in a standard ballgame" clues NINE.
+- A question mark belongs ONLY on genuine wordplay or a stretched
+  definition. An unusual sense, a heteronym, or a straight-but-hard clue
+  takes no mark — an unearned '?' is a defect.
+
+The hard rules:
+- The clue must define the answer word ITSELF — never a person or thing
+  merely associated with it, and never an idiom the word merely appears
+  inside.
+- The clue must be able to substitute for {word} in a sentence — matching
+  part of speech, tense, and number.
+- No dictionary-flat surfaces.
+
+For each draft: the clue text as it would appear in print, then on the
+next line the material it was built from, in a few words. Plain
+unformatted text."""
+
+_TURN_RECAST_CALIBRATED = """\
+Now test each draft, one at a time:
+
+1. Write one natural sentence that uses {word} in the draft's sense, and
+   check the clue could replace {word} there — same part of speech,
+   tense, and number. If not, re-cast the clue: keep its specific image
+   or fact, change only its grammatical form.
+2. Check accuracy: is every word of the clue strictly true of {word} in
+   that sense? Fix or drop anything invented or distorted.
+3. Check the question mark rule: '?' only for genuine wordplay or a
+   stretched definition — remove any other '?'.
+4. Check economy LAST, and gently: cut only words that add nothing. Never
+   cut the words that carry the clue's image or charm — a tighter but
+   flatter clue is a worse clue.
+
+Finish with the final list: each clue as it would print, one per line,
+nothing else after the list."""
+
 # Third arm, prompted by the micro-probe finding (2026-07-06): a direct ask for
 # raw material yields vivid concrete scenes that the angle rubrics suppress.
 # Material first, then clues from the material.
@@ -324,6 +394,11 @@ def main() -> None:
       _TURN_MATERIAL_SENSES,
       _TURN_DRAFTS_CONVENTIONS,
       _TURN_RECAST,
+    ],
+    'calibrated': [
+      _TURN_MATERIAL_CALIBRATED,
+      _TURN_DRAFTS_CALIBRATED,
+      _TURN_RECAST_CALIBRATED,
     ],
   }[arm]
   timestamp = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
