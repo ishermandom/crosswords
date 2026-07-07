@@ -79,6 +79,8 @@ _SETS = {
   'h1r3': _SCRATCH / 'h1_survivors_r3.jsonl',
   # Judge-directed repairs of rung 2-3 fixables (repair_probe.py writes it).
   'h1repair': _SCRATCH / 'h1_repaired.jsonl',
+  # Overnight-run survivors, top-2 per word (morning_analysis.py builds it).
+  'h1night': _SCRATCH / 'h1_overnight_survivors_top2.jsonl',
 }
 _CACHE_PATH = _SCRATCH / 'cache' / 'judge_cache.jsonl'
 _LOG_DIR = _SCRATCH / 'logs'
@@ -261,7 +263,7 @@ def _load_set(set_name):
         'verdict': 'accept',
         'basis': None,
       }
-    if set_name in ('h1survivors', 'h1r3', 'h1repair'):
+    if set_name in ('h1survivors', 'h1r3', 'h1repair', 'h1night'):
       # Flat unlabeled pool rows, audited against 'accept' like the bank.
       record = {
         'word': record['word'],

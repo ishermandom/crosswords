@@ -1369,19 +1369,55 @@ of $10 remains.
 ### Overnight run (launched 2026-07-07 01:38, user directive: ranking + breadth)
 
 A/B closed first: calibrated 5/16 survivors vs conventions 5/16 — a TIE on
-survival (one fewer substitution kill), so prompt wording is at a plateau
-and the calibrated stack is FROZEN for its encoded user calibrations.
-Variance and ranking now dominate — hence this run.
+survival (one fewer substitution kill), so prompt wording is at a plateau and
+the calibrated stack is FROZEN for its encoded user calibrations. Variance and
+ranking now dominate — hence this run.
 
-`overnight_driver.py` detached (driver log `logs/overnight_driver.log`):
-K=3 samples × 21 baselined words + K=2 × 30 breadth words on 26B with the
-schema'd extract turn pooling to `h1_pool.jsonl`; fresh-context 26B ranker
-per word (`h1_rankings.jsonl`); then 31B liveliness over ranker-top-4 and
-substitution over the passers (`logs/h1_overnight_*.log`). Deadline
-self-termination at ~6.5 h; lease self-released (held to 11:35).
+`overnight_driver.py` detached (driver log `logs/overnight_driver.log`): K=3
+samples × 21 baselined words + K=2 × 30 breadth words on 26B with the schema'd
+extract turn pooling to `h1_pool.jsonl`; fresh-context 26B ranker per word
+(`h1_rankings.jsonl`); then 31B liveliness over ranker-top-4 and substitution
+over the passers (`logs/h1_overnight_*.log`). Deadline self-termination at ~6.5
+h; lease self-released (held to 11:35).
 
 Morning read, in order: (1) per-word success-rate variance from the pool +
-audits (the reliability number); (2) ranker quality — does ranker-top-2
-contain a survivor where ANY candidate survives (coverage@2 vs oracle);
-(3) breadth word-class table; (4) full protocol on survivors (fresh 31B
-spend, size after seeing counts); (5) H4 early-stop from the deeper pools.
+audits (the reliability number); (2) ranker quality — does ranker-top-2 contain
+a survivor where ANY candidate survives (coverage@2 vs oracle); (3) breadth
+word-class table; (4) full protocol on survivors (fresh 31B spend, size after
+seeing counts); (5) H4 early-stop from the deeper pools.
+
+### Overnight results (2026-07-07 morning read; `morning_analysis.py`)
+
+Run completed cleanly at ~05:15: 124 generation runs pooled over 51 words,
+52 ranking calls, 208 liveliness + 76 substitution audit calls; driver
+self-released the lease.
+
+**Coverage (single-turn audits on ranker-top-4):** 31/51 words hold ≥1
+survivor (61%); coverage@2 = 26 (51%), @1 = 18 (35%). Total survivors 56.
+
+**Ranking (H2, first real result):** the 26B fresh-context ranker captures
+26 of the 31 oracle-covered words at top-2 (84% ranker efficiency); the
+file-order no-ranker baseline manages 5/20 on the comparable subset — the
+ranker roughly doubles unranked coverage@2. Words the ranker buried at
+rank 3-4: BAT, WIDOW, REED, SELDOM, THRICE. 31B ranker pass queued for
+the model comparison.
+
+**Breadth by class (covered@2/@4/total):** number-ordinal 8/9/13,
+name-word 8/9/14, polysemous 8/10/18, kinship 2/3/6 — kinship is the weak
+class (UNCLE, BRIDE, HEIR all uncovered). 20/51 words uncovered within
+the audited top-4, including the recurring hard cases (ASIDE, FRANK,
+MELODY, SCORE, TWELVE, OSCAR, BOW, POUND) and new ones (SET, RUN, BANK,
+DATE, CLUB, JACK, GRACE, DOZEN, SIXTY).
+
+**Quality eyeball — the pools now contain genuinely delightful clues:**
+CHARGE "Knightly rush or electron property", HAZEL "Nutty color?", PEARL
+"Irritant's treasure", DREW "Ended in a stalemate?", RUBY "Language for
+Rails?", ORPHAN "A lonely line of text on a new page", and NIL "College
+athlete's brand rights, for short" — the shortening convention fired for
+the first time. Caveats for the protocol pass: WIDOW "V-shaped hairline
+feature" is an idiom-fragment risk (widow's peak).
+
+**In flight:** full v3 protocol over the 47 top-2 survivors + a 31B
+ranker pass over the same pools (detached, lease to 10:09). Next after:
+bankable verdict table, capture-list update (principle 10), H4 read from
+the deeper pools, kinship material diagnosis.
