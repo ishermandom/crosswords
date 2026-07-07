@@ -22,6 +22,7 @@ Usage: python3 h1a_probe.py [WORD] [basis|mechanism] (default: COURT basis)
 """
 
 import datetime
+import json
 import os
 import pathlib
 import sys
@@ -377,6 +378,23 @@ next line its angle name and the satisfaction basis it aims at. Apply the
 craft invariants as you draft. Plain unformatted text."""
 
 
+# Schema'd extract turn so batch drivers get machine-readable finals; the
+# free-text final list stays in the transcript for eyeballing.
+_TURN_EXTRACT = """\
+Return every clue from your final list as JSON, exactly as each would
+appear in print: {"clues": ["...", "..."]}"""
+
+_EXTRACT_SCHEMA = {
+  'type': 'object',
+  'properties': {
+    'clues': {'type': 'array', 'items': {'type': 'string'}},
+  },
+  'required': ['clues'],
+}
+
+_POOL_PATH = pathlib.Path(__file__).parent / 'h1_pool.jsonl'
+
+
 def main() -> None:
   """Run the two seeded turns on one word; tee the transcript to a log."""
   word = sys.argv[1].upper() if len(sys.argv) > 1 else 'COURT'
@@ -422,6 +440,20 @@ def main() -> None:
     f'model: {_MODEL}\nword: {word}\narm: {arm}\n\n' + '\n'.join(transcript)
   )
   print(f'transcript: {log_path}')
+
+  if '--pool' in sys.argv:
+    messages.append({'role': 'user', 'content': _TURN_EXTRACT})
+    extracted = pipeline_local._chat(_MODEL, messages, schema=_EXTRACT_SCHEMA)
+    record = {
+      'word': word,
+      'arm': arm,
+      'model': _MODEL,
+      'timestamp': timestamp,
+      'clues': json.loads(extracted)['clues'],
+    }
+    with _POOL_PATH.open('a') as pool:
+      pool.write(json.dumps(record) + '\n')
+    print(f'pooled {len(record["clues"])} clues -> {_POOL_PATH}')
 
 
 if __name__ == '__main__':
