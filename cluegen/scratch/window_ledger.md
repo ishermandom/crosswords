@@ -1188,6 +1188,45 @@ compute; user taste round on judge liveliness divergences (it flagged
 "Midnight's hour" and "Stage speech meant only for the audience" flat, passed
 "Three times for an out?" — setter.md open question on fine-grained ordering).
 
+### Rungs 1–2 results (2026-07-06 evening)
+
+Rung 1, substitution turn over the 26 finals (`h1_substitution_audit.py`,
+`logs/h1_finals_substitution.log`, 26 calls ~25 min): 4/26 flagged. Two genuine
+catches the layer-3 grade missed — both CHASE finals embed their own objects
+("Tail a scent trail…" cannot substitute for the bare transitive verb); FRANK
+"Without sugarcoating" correctly killed (prepositional phrase for an adjective).
+One systematic finding, non-blocking now: FRANK "Sinatra's first name" flagged
+`other_object → Frank Sinatra` — the substitution turn prosecutes the standard
+name-word convention; ~a third of words.in is name words, so this is a likely
+judge design-round item before rung 3 samples them. One leniency: the VIOLET
+plural mismatch passed. Dual-pass survivors: 13/26 rows, 9/13 words.
+
+Rung 2, full v3 protocol on the 13 survivors (battery set `h1survivors`,
+`--confirm-all`, `logs/h1rung2_20260706-200704.jsonl`): **10 bankable, 3
+fixable, 0 bad — 16 new calls, 8.2 min wall** (88 cache hits from the audits;
+the cache-reuse principle paid for itself). All three fixables are economy-only:
+the judge trims the scene-tails ("during play", "while walking home", "that
+heightens the drama of a chase scene") and its trims read as improvements — the
+funnel's known wordy-tail habit, a develop-turn economy instruction is the
+queued next prompt lever. 8/9 words have a directly bankable clue; SCORE's lone
+survivor is fixable-by-trim. Adverbs bank (SELDOM ×2, THRICE ×2), fresh senses
+bank (NIL "An athlete's endorsement deal"). VIOLET "Spring blossoms…" (plural
+for singular answer) passed the FULL protocol — number-agreement is a real judge
+gap, filed with the name-convention item for a future design round (judge
+prompts stay frozen).
+
+Adoption read on tuning words: the funnel's judged output beats the old funnel's
+banked output on the same words by every cut used tonight. Remaining before
+adoption is generalization (rung 3, fresh slice), now sizeable from tonight's H4
+data (13 verdict-ranked candidates + the pick order) — analyze offline first, no
+new runs needed.
+
+Process notes for the record: the first rung-2 launch ran as an in-session
+background task and was reaped at ~15 min (the detached-runs rule exists for
+exactly this); the relaunch then had its model unloaded by a lease swap ordered
+AFTER the launch. Correct order: lease first (pid untracked), then detached
+launch under caffeinate, then expendable watcher. Total waste: one model load.
+
 ## Remaining queue
 
 `#eval-expansion` DONE through the 2×2 (sets built

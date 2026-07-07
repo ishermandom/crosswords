@@ -53,7 +53,9 @@ def main() -> None:
       schema,
     )
     verdict = turn['points_at']
-    detail = f' -> {turn["other_object_name"]}' if turn['other_object_name'] else ''
+    detail = (
+      f' -> {turn["other_object_name"]}' if turn['other_object_name'] else ''
+    )
     status = 'ok' if verdict == 'answer' else f'{verdict}{detail}'
     print(f'{row["word"]:12s} {status:28s} "{row["clue"]}"', flush=True)
     if verdict != 'answer':

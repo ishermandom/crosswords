@@ -71,6 +71,10 @@ _SETS = {
   # reference verdict is accept and each NO row is an audit flag — a banked clue
   # the current judge would no longer bank.
   'bank': _SCRATCH.parent / 'local' / 'clue_bank.jsonl',
+  # H1 funnel finals that passed both single-turn audits (liveliness,
+  # substitution): flat {"word","clue"} rows, audited against 'accept' like the
+  # bank so every judge kill surfaces as a NO flag.
+  'h1survivors': _SCRATCH / 'h1_survivors.jsonl',
 }
 _CACHE_PATH = _SCRATCH / 'cache' / 'judge_cache.jsonl'
 _LOG_DIR = _SCRATCH / 'logs'
@@ -250,6 +254,14 @@ def _load_set(set_name):
       record = {
         'word': record['word'],
         'clue': record['clue']['clue'],
+        'verdict': 'accept',
+        'basis': None,
+      }
+    if set_name == 'h1survivors':
+      # Flat unlabeled pool rows, audited against 'accept' like the bank.
+      record = {
+        'word': record['word'],
+        'clue': record['clue'],
         'verdict': 'accept',
         'basis': None,
       }

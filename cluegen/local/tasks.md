@@ -212,23 +212,27 @@ done — see the log for the curve and the criteria re-analysis.
   prompts unchanged and solves FRANK by width ("Ancestor of the French"). Parked
   gap: neither model uses the shortening convention ("briefly") even when
   modeled. Tonight's stack: `senses` material → `conventions` pick → re-cast
-  (ledger "Conversion rung"). Next step: the adoption-measurement ladder
-  (re-planned after a skipped adversarial check; ledger "Adoption measurement"
-  list is authoritative): (1) substitution-turn-only pass over the existing 26
-  finals (~20 min, legality is the known risk), (2) full protocol on the
-  survivors only (~1 h, feeds H4 + H2), (3) fresh-slice full protocol PARKED
-  behind 1–2 — generalization only, sized after H4 data. Then H1b at equal
-  compute, and a user taste round on judge liveliness divergences. The user
-  launches stretches with a /goal prompt that points at
-  setter.md/ceiling.md/ledger/tasks.md. Note: bank audit DONE 2026-07-06
-  (flag-and-report, nothing deleted): 23/75 rows flagged, 22 flat-gloss + 1
-  unearned '?', zero substitution/truth/economy-unanimous flags in the 10-row
-  full-protocol probe. Read: about a third of what the old pipeline banked is
-  flat-but-correct — the shortage is charm at generation, not judge strictness.
-  Some flags are judge taste, not defects (MELODY "Whistleable earworm", SELDOM
-  "Once in a blue moon", ZED "That last character, overseas", COURT double
-  definition). Full list: `scratch/logs/bank_liveliness_audit.log`; ledger "Bank
-  audit" section.
+  (ledger "Conversion rung"). Adoption ladder rungs 1–2 DONE 2026-07-06 (ledger
+  "Rungs 1–2 results"): substitution audit 4/26 flagged (caught CHASE
+  embedded-object clues the layer-3 grade missed); full protocol on the 13
+  dual-pass survivors: 10 bankable / 3 fixable (economy-only trims) / 0 bad —
+  8/9 words directly bankable, adverbs and fresh senses included. Next step: H4
+  offline analysis from tonight's verdict data (free, no runs) to size rung 3
+  (fresh-slice generalization, still parked); queued prompt lever: develop-turn
+  economy instruction for the wordy-tail habit. Judge design-round items filed
+  (frozen until a round): substitution turn rejects the name-word convention
+  ("Sinatra's first name" → other_object), number-agreement leniency (plural
+  clue passed for singular VIOLET). Then H1b at equal compute, and a user taste
+  round on judge liveliness divergences. The user launches stretches with a
+  /goal prompt that points at setter.md/ceiling.md/ledger/tasks.md. Note: bank
+  audit DONE 2026-07-06 (flag-and-report, nothing deleted): 23/75 rows flagged,
+  22 flat-gloss + 1 unearned '?', zero substitution/truth/economy-unanimous
+  flags in the 10-row full-protocol probe. Read: about a third of what the old
+  pipeline banked is flat-but-correct — the shortage is charm at generation, not
+  judge strictness. Some flags are judge taste, not defects (MELODY "Whistleable
+  earworm", SELDOM "Once in a blue moon", ZED "That last character, overseas",
+  COURT double definition). Full list: `scratch/logs/bank_liveliness_audit.log`;
+  ledger "Bank audit" section.
 - [ ] **Align local vs cloud judge requirements** #judge-alignment — both judges
       should enforce the same requirement set, each via methodology fitting the
       model's strength (user direction 2026-07-04). DEPRIORITIZED behind
