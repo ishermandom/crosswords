@@ -1090,7 +1090,57 @@ Rung 2 measurement (in flight): top-2 finals per word (26 clues,
 `h1_finals.jsonl`) through the v3 liveliness turn on 31B —
 `bank_liveliness_audit.py` generalized to take a JSONL argument, cache-key
 compatible — for a flat-rate directly comparable to the bank audit's 23/75. Log:
-`logs/h1_finals_liveliness.log`.
+`logs/h1_finals_liveliness.log`. 26 calls on 31B, ~18 min.
+
+**Result: 11/26 flagged (42%) raw, but the per-word reads carry the signal.**
+
+- Coverage: 10/13 words have ≥1 unflagged final at top-2 depth. Failures: ASIDE
+  (0/2 — judge calls even "Stage speech meant only for the audience" flat),
+  TWELVE (0/2), FRANK (0/2).
+- Head-to-head on the 7 bank-shared words (≥1 unflagged clue per word): new
+  funnel 5/7 vs old funnel 2/7. The new funnel passes exactly where the bank
+  rows are flat (COURT, SCORE, MELODY, SELDOM — e.g. COURT "Where rubber soles
+  squeak during play" = elegance vs banked flat double definition) and fails
+  where the old funnel's count-metonymy aha's won (TWELVE "Standard in a
+  courtroom?"). GROSS: both produce one good clue.
+- Judge upgrades vs my layer-3 grade: NIL "An athlete's endorsement deal" = aha
+  (the name-image-likeness width find validated); THRICE 2/2 ok (aha) where I
+  graded it shaky. Caveat both ways: liveliness-only — substitution legality
+  unchecked ("Three times for an out?" passed but is grammatically doubtful as
+  an adverb clue).
+- TWELVE's failure is pure pick-step: the material turn HAD
+  jurors/apostles/clock-face; the vividness-only pick chose eggs, inches,
+  months. Same weakest-link as the earlier material-arm diagnosis.
+
+Repair rungs (both run, wording budget then closed for the day):
+
+- **diverse pick** (selection spreads across kinds of satisfaction, at most one
+  per kind — principle 4): marginal. ASIDE gained a real aha ("Spoken directly
+  to the house?" — essentially the vivid draft the old self-editor killed);
+  MELODY held; TWELVE still never picked jurors/apostles; FRANK still
+  all-adjective. New artifact: a re-cast final list included a raw sentence
+  containing the answer — production needs a schema'd extract turn (the old
+  funnel had one).
+- **sense inventory first** (list every sense — slang, abbreviations, names,
+  frames — then spread material across them): fixes width upstream. FRANK's
+  inventory surfaced the frankfurter AND postal franking; TWELVE's surfaced
+  jurors, the twelfth man, the zodiac. But conversion downstream fumbles
+  non-imagery material at 26B: frankfurter became "Relating to a bratwurst" (the
+  abbreviation conventions — "briefly", "for short" — are missing from the
+  model's drafting vocabulary), and the jurors draft was dropped at re-cast.
+
+Where this leaves H1 (all rungs, one day): the three-turn funnel is validated as
+the winning shape and the remaining failures are localized to one step each —
+width was material-level (fixed by inventory-first), flatness was pick-level
+(mostly fixed by vividness/diversity selection), and the open residual is
+CONVERSION: turning fact/count/abbreviation material into legal lively clue
+shapes. Candidate next levers, in expected- value order: (1) a compact
+craft-conventions note (abbreviation markers, count-metonymy shapes like
+"Standard in a courtroom?") in the system prompt or develop turn; (2) revalidate
+conversion on 31B — 26B is the iteration model and the conversion gap may partly
+be model depth; (3) full-protocol judge run over a settled prompt stack as the
+adoption measurement, which also feeds H4. H2 note: my top-2 picks stood in for
+the unvalidated ranker throughout — ranking owner still open.
 
 ## Remaining queue
 

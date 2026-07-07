@@ -151,6 +151,51 @@ For each chosen piece, work in three steps:
 Output for each: the sentence, then the clue text as it would appear in
 print, then the material in a few words. Plain unformatted text."""
 
+# Seventh arm (pick-step repair): the vividness-only pick discards
+# satisfaction-rich material — for TWELVE it chose eggs/inches/months over
+# jurors/apostles/clock-face, losing the count-metonymy aha clues the old funnel
+# banked. Selection here spreads across kinds of satisfaction (principle 4), not
+# just image sharpness.
+_TURN_DRAFTS_DIVERSE = """\
+Pick the 4 or 5 pieces that together promise the most VARIED solver
+satisfaction — at most one per kind: the sharpest image or scene, the best
+misdirection potential (a surface a solver will read the wrong way first),
+the most interesting checkable fact, the most surprising sense of {word}.
+Spread the picks across different senses. A generic sense description ("an
+official venue for legal proceedings") is an automatic skip, however safe
+it feels. Draft exactly one clue per chosen piece.
+
+The printed clue must keep the piece's specific image, fact, or
+misdirection — if it does not survive into the clue text, the draft is a
+failure. The other hard rules:
+- The clue must define the answer word ITSELF — never a person or thing
+  merely associated with it.
+- The clue must be able to substitute for {word} in a sentence — matching
+  part of speech, tense, and number.
+- No dictionary-flat surfaces.
+
+For each draft: the clue text as it would appear in print, then on the
+next line the material it was built from, in a few words. Plain
+unformatted text."""
+
+# Eighth arm (material-width repair): TWELVE and FRANK fail upstream of the pick
+# — "vivid raw material" biases toward imagery, missing count-metonymy
+# satisfaction and whole senses (FRANK's frankfurter never appears). A sense
+# inventory first, then material spread across it.
+_TURN_MATERIAL_SENSES = """\
+Answer word: {word}
+
+First, list every sense of {word} you know — parts of speech, slang,
+abbreviations and shortened forms, names, and uses inside professional or
+cultural frames. One line each.
+
+Then list 10 pieces of vivid raw material spread across those senses:
+interesting checkable facts, tiny concrete scenes, roles the word plays
+(what it counts, who it names, where it appears), and surprising senses.
+No clue drafts. Each item: one concrete sentence naming which sense it
+uses. Vague classifications are useless; a specific fact, image, or role
+is the goal."""
+
 # Sixth arm (true H3): the single-turn cast traded vividness for legality (SCORE
 # drafts went flat) while SELDOM's stayed adverbially illegal. Split the tension
 # across turns: draft vividly first (unchanged vivid turns), then a dedicated
@@ -238,6 +283,8 @@ def main() -> None:
     'vivid': [_TURN_MATERIAL_VIVID, _TURN_DRAFTS_VIVID],
     'cast': [_TURN_MATERIAL_VIVID, _TURN_DRAFTS_CAST],
     'develop': [_TURN_MATERIAL_VIVID, _TURN_DRAFTS_VIVID, _TURN_RECAST],
+    'diverse': [_TURN_MATERIAL_VIVID, _TURN_DRAFTS_DIVERSE, _TURN_RECAST],
+    'senses': [_TURN_MATERIAL_SENSES, _TURN_DRAFTS_DIVERSE, _TURN_RECAST],
   }[arm]
   timestamp = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
   log_path = (

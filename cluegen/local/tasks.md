@@ -199,18 +199,27 @@ done — see the log for the curve and the criteria re-analysis.
   H2/H3/H4) — written through two user design rounds; don't re-derive its
   decisions. Satisfaction replaced difficulty as the target (difficulty was a
   proxy; the modifier-dial idea from calibration #9 survives inside principle 4
-  and H-ladder work). Next step: H1a 5-minute sanity check (satisfaction-seeded
-  brainstorm, one word, eyeball drafts), then the ladder per setter.md
-  principle 5. The user launches stretches with a /goal prompt that points at
-  setter.md/ceiling.md/ledger/tasks.md. Note: bank audit DONE 2026-07-06
-  (flag-and-report, nothing deleted): 23/75 rows flagged, 22 flat-gloss + 1
-  unearned '?', zero substitution/truth/economy-unanimous flags in the 10-row
-  full-protocol probe. Read: about a third of what the old pipeline banked is
-  flat-but-correct — the shortage is charm at generation, not judge strictness.
-  Some flags are judge taste, not defects (MELODY "Whistleable earworm", SELDOM
-  "Once in a blue moon", ZED "That last character, overseas", COURT double
-  definition). Full list: `scratch/logs/bank_liveliness_audit.log`; ledger "Bank
-  audit" section.
+  and H-ladder work). H1 LADDER RUN 2026-07-06 (ledger "H1a sanity check" + "H1
+  rungs 1–2" sections): H1a as written failed (taxonomy seeding relabels,
+  doesn't generate); winning shape is the three-turn funnel — vivid material →
+  select → re-cast (`scratch/h1a_probe.py`, arms basis/mechanism/material/
+  vivid/cast/develop/diverse/senses). 31B liveliness audit of top-2 finals, 13
+  words: 10/13 words ≥1 unflagged; head-to-head on bank-shared words 5/7 vs old
+  funnel's 2/7. H3 validated early (re-cast turn fixes adverbs via simile
+  shapes); width fixed by sense-inventory-first (FRANK frankfurter + franking
+  surfaced). Next step: the CONVERSION residual — fact/count/ abbreviation
+  material drafts into mush at 26B ("Relating to a bratwurst"); try a compact
+  craft-conventions note, then revalidate on 31B, then the full-protocol
+  adoption run (feeds H4). The user launches stretches with a /goal prompt that
+  points at setter.md/ceiling.md/ledger/tasks.md. Note: bank audit DONE
+  2026-07-06 (flag-and-report, nothing deleted): 23/75 rows flagged, 22
+  flat-gloss + 1 unearned '?', zero substitution/truth/economy-unanimous flags
+  in the 10-row full-protocol probe. Read: about a third of what the old
+  pipeline banked is flat-but-correct — the shortage is charm at generation, not
+  judge strictness. Some flags are judge taste, not defects (MELODY "Whistleable
+  earworm", SELDOM "Once in a blue moon", ZED "That last character, overseas",
+  COURT double definition). Full list: `scratch/logs/bank_liveliness_audit.log`;
+  ledger "Bank audit" section.
 - [ ] **Align local vs cloud judge requirements** #judge-alignment — both judges
       should enforce the same requirement set, each via methodology fitting the
       model's strength (user direction 2026-07-04). DEPRIORITIZED behind
