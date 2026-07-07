@@ -236,31 +236,32 @@ done — see the log for the curve and the criteria re-analysis.
   31B ranker never uniquely better). SUPPORTED: H4 early stop at M=1 (~27%
   judge-time saving, ~zero coverage cost, breadth mode). Kinship diagnosis:
   monosemy defeats sense-width → `frames` arm (per-item frame discipline, try 2)
-  widens material (UNCLE: Sam/Ben/Fester/McDuck; TWIN: digital twin); kinship
-  top-2 audits IN FLIGHT at compact time (`logs/h1_frames_*.log`) — read
-  verdicts, then decide frames-arm adoption for single-sense words. Queue after
-  that: repair prompt lacks the strict-'?' rule (CRANE gained a '?' in repair);
-  assemble the judge design-round brief; the 20 uncovered words (fork — deeper
-  sampling K>3 vs material levers vs accepting them as the current ceiling:
-  UNDECIDED); H1b at equal compute; production wiring deferred to first
-  consumer. Open question: judge design-round timing is the user's call — brief
-  items: accuracy leak (MELODY staircase banked), obscurity calibration (NIL
-  sense banked), number-agreement leniency (plural VIOLET passed), name-word
-  convention ("Sinatra's first name" → other_object), '?'-licensed stretches
-  killed at substitution (UNCLE "Taps out?" aha), missing "for short" signal not
-  required (repaired NIL banked without it); the liveliness turn STANDS as
-  calibrated. Note: `rank_pool.py` hardcodes its pool path (h1_pool.jsonl) — the
-  frames run needed a swap dance; add a path argument next time it's touched.
-  The user launches stretches with a /goal prompt that points at
-  setter.md/ceiling.md/ledger/tasks.md. Note: bank audit DONE 2026-07-06
-  (flag-and-report, nothing deleted): 23/75 rows flagged, 22 flat-gloss + 1
-  unearned '?', zero substitution/truth/economy-unanimous flags in the 10-row
-  full-protocol probe. Read: about a third of what the old pipeline banked is
-  flat-but-correct — the shortage is charm at generation, not judge strictness.
-  Some flags are judge taste, not defects (MELODY "Whistleable earworm", SELDOM
-  "Once in a blue moon", ZED "That last character, overseas", COURT double
-  definition). Full list: `scratch/logs/bank_liveliness_audit.log`; ledger "Bank
-  audit" section.
+  widens material (UNCLE: Sam/Ben/Fester/McDuck; TWIN: digital twin) — but AUDIT
+  VERDICT (ledger "Frames-arm audit verdict"): 10/12 flagged, zero coverage
+  gain; frame-REFERENCE clue shapes rate flat. Kinship PARKED — binding
+  constraint is conversion shape (frames → clues with a leap); revisit on any
+  judge design round or draft-turn leap-shaping work. Queue: repair prompt
+  strict-'?' rule DONE (in `repair_probe.py`); assemble the judge design-round
+  brief; the 20 uncovered words (fork — deeper sampling K>3 vs material levers
+  vs accepting them as the current ceiling: UNDECIDED); H1b at equal compute;
+  production wiring deferred to first consumer. Open question: judge
+  design-round timing is the user's call — brief items: accuracy leak (MELODY
+  staircase banked), obscurity calibration (NIL sense banked), number-agreement
+  leniency (plural VIOLET passed), name-word convention ("Sinatra's first name"
+  → other_object), '?'-licensed stretches killed at substitution (UNCLE "Taps
+  out?" aha), missing "for short" signal not required (repaired NIL banked
+  without it); the liveliness turn STANDS as calibrated. Note: `rank_pool.py`
+  hardcodes its pool path (h1_pool.jsonl) — the frames run needed a swap dance;
+  add a path argument next time it's touched. The user launches stretches with a
+  /goal prompt that points at setter.md/ceiling.md/ledger/tasks.md. Note: bank
+  audit DONE 2026-07-06 (flag-and-report, nothing deleted): 23/75 rows flagged,
+  22 flat-gloss + 1 unearned '?', zero substitution/truth/economy-unanimous
+  flags in the 10-row full-protocol probe. Read: about a third of what the old
+  pipeline banked is flat-but-correct — the shortage is charm at generation, not
+  judge strictness. Some flags are judge taste, not defects (MELODY "Whistleable
+  earworm", SELDOM "Once in a blue moon", ZED "That last character, overseas",
+  COURT double definition). Full list: `scratch/logs/bank_liveliness_audit.log`;
+  ledger "Bank audit" section.
 - [ ] **Align local vs cloud judge requirements** #judge-alignment — both judges
       should enforce the same requirement set, each via methodology fitting the
       model's strength (user direction 2026-07-04). DEPRIORITIZED behind

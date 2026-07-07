@@ -36,7 +36,9 @@ while keeping what the clue does well — its specific image, fact, or
 misdirection. An "economy: X" flaw means the words X are removable; cut or
 tighten them. A "sense: too obscure" flaw means the anchor needs a fairer
 handle in the same sense, not a new sense. The result must still read as a
-clue that could substitute for {word} in a sentence.
+clue that could substitute for {word} in a sentence. Never add a question
+mark: '?' belongs only on genuine wordplay, and a repair is not the
+place to introduce one.
 
 Reply with the repaired clue text alone, exactly as it would print —
 no quotes, no commentary."""
