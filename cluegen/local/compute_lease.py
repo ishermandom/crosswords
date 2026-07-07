@@ -7,7 +7,7 @@
 Multiple Claude sessions share this machine's unified memory, and two model
 workloads at once oversubscribe it. Any session about to run a local model
 workload (an ollama batch, an MLX train or eval) first acquires the lease;
-anyone else waits their turn. The protocol (agreed with the user 2026-07-02):
+anyone else waits their turn. The protocol:
 
 - **Exclusive**: one model workload at a time, recorded in a lease file.
 - **Measured, not trusted**: acquiring requires that the machine *measures* idle
@@ -26,9 +26,6 @@ anyone else waits their turn. The protocol (agreed with the user 2026-07-02):
 - **Release unloads**: releasing asks ollama to unload loaded models so the next
   holder starts from measured idle. MLX frees its memory on process exit by
   itself.
-
-With the lease held, a session may self-serve local runs under ~1 hour each;
-multi-hour runs and all cloud spending still get user notice first.
 
 Running a job under the lease — the detached-driver + watcher pattern.
 Session-scoped background processes get killed after roughly 15 minutes (cause
