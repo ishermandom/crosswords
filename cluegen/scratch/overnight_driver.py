@@ -23,27 +23,71 @@ stdout (the launcher redirects to the driver log).
 import json
 import pathlib
 import subprocess
-import sys
 import time
 
-_SCRATCH = pathlib.Path('/Users/Shared/code/crosswords-local-ceiling/cluegen/scratch')
+_SCRATCH = pathlib.Path(
+  '/Users/Shared/code/crosswords-local-ceiling/cluegen/scratch'
+)
 _LOGS = _SCRATCH / 'logs'
 _LEASE = _SCRATCH.parent / 'local' / 'compute_lease.py'
 _DEADLINE = time.time() + 6.5 * 3600
 
 _BASELINED = [
-  'COURT', 'ASIDE', 'MELODY', 'SCORE', 'SELDOM', 'NIL', 'LILY', 'CHASE',
-  'VIOLET', 'TWELVE', 'GROSS', 'THRICE', 'FRANK',
-  'SIXTY', 'THIRD', 'TWICE', 'OSCAR', 'ROBIN', 'WIDOW', 'BOW', 'POUND',
+  'COURT',
+  'ASIDE',
+  'MELODY',
+  'SCORE',
+  'SELDOM',
+  'NIL',
+  'LILY',
+  'CHASE',
+  'VIOLET',
+  'TWELVE',
+  'GROSS',
+  'THRICE',
+  'FRANK',
+  'SIXTY',
+  'THIRD',
+  'TWICE',
+  'OSCAR',
+  'ROBIN',
+  'WIDOW',
+  'BOW',
+  'POUND',
 ]
 # Breadth: untouched words.in categories; judge-eval words excluded so their
 # cached eval turns stay uncontaminated.
 _BREADTH = [
-  'FOURTH', 'NINTH', 'FORTY', 'DOZEN', 'HUNDRED',
-  'GRACE', 'HAZEL', 'PEARL', 'RUBY', 'JACK', 'DREW', 'LANCE', 'REED',
-  'UNCLE', 'TWIN', 'HEIR', 'BRIDE', 'ORPHAN',
-  'SET', 'RUN', 'BANK', 'BAT', 'CASE', 'CHARGE', 'CLUB', 'CRANE', 'DATE',
-  'DRAFT', 'DUCK', 'FAIR',
+  'FOURTH',
+  'NINTH',
+  'FORTY',
+  'DOZEN',
+  'HUNDRED',
+  'GRACE',
+  'HAZEL',
+  'PEARL',
+  'RUBY',
+  'JACK',
+  'DREW',
+  'LANCE',
+  'REED',
+  'UNCLE',
+  'TWIN',
+  'HEIR',
+  'BRIDE',
+  'ORPHAN',
+  'SET',
+  'RUN',
+  'BANK',
+  'BAT',
+  'CASE',
+  'CHARGE',
+  'CLUB',
+  'CRANE',
+  'DATE',
+  'DRAFT',
+  'DUCK',
+  'FAIR',
 ]
 
 
@@ -95,8 +139,9 @@ def audit() -> None:
     record = json.loads(line)
     candidates = record['candidates']
     valid = [
-      n for n in record['ranking'] if isinstance(n, int)
-      and 1 <= n <= len(candidates)
+      n
+      for n in record['ranking']
+      if isinstance(n, int) and 1 <= n <= len(candidates)
     ]
     for n in valid[:4]:
       rows.append({'word': record['word'], 'clue': candidates[n - 1]})
@@ -118,9 +163,7 @@ def audit() -> None:
     # colons survive.
     word, _, rest = line[7:].partition(': "')
     flagged.add(word + '\x00' + rest.rpartition('" — ')[0])
-  passers = [
-    r for r in rows if (r['word'] + '\x00' + r['clue']) not in flagged
-  ]
+  passers = [r for r in rows if (r['word'] + '\x00' + r['clue']) not in flagged]
   passers_path = _SCRATCH / 'h1_overnight_passers.jsonl'
   passers_path.write_text(''.join(json.dumps(r) + '\n' for r in passers))
   print(f'liveliness passers: {len(passers)}/{len(rows)}', flush=True)

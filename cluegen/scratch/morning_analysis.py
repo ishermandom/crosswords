@@ -19,18 +19,56 @@ _LOGS = _SCRATCH / 'logs'
 
 _CLASSES = {
   'number/ordinal': [
-    'TWELVE', 'SIXTY', 'THIRD', 'TWICE', 'THRICE', 'FOURTH', 'NINTH',
-    'FORTY', 'DOZEN', 'HUNDRED', 'SCORE', 'GROSS', 'NIL',
+    'TWELVE',
+    'SIXTY',
+    'THIRD',
+    'TWICE',
+    'THRICE',
+    'FOURTH',
+    'NINTH',
+    'FORTY',
+    'DOZEN',
+    'HUNDRED',
+    'SCORE',
+    'GROSS',
+    'NIL',
   ],
   'name-word': [
-    'OSCAR', 'ROBIN', 'FRANK', 'GRACE', 'HAZEL', 'PEARL', 'RUBY', 'JACK',
-    'DREW', 'LANCE', 'REED', 'LILY', 'VIOLET', 'MELODY',
+    'OSCAR',
+    'ROBIN',
+    'FRANK',
+    'GRACE',
+    'HAZEL',
+    'PEARL',
+    'RUBY',
+    'JACK',
+    'DREW',
+    'LANCE',
+    'REED',
+    'LILY',
+    'VIOLET',
+    'MELODY',
   ],
   'kinship': ['WIDOW', 'UNCLE', 'TWIN', 'HEIR', 'BRIDE', 'ORPHAN'],
   'polysemous': [
-    'COURT', 'ASIDE', 'SELDOM', 'CHASE', 'BOW', 'POUND', 'SET', 'RUN',
-    'BANK', 'BAT', 'CASE', 'CHARGE', 'CLUB', 'CRANE', 'DATE', 'DRAFT',
-    'DUCK', 'FAIR',
+    'COURT',
+    'ASIDE',
+    'SELDOM',
+    'CHASE',
+    'BOW',
+    'POUND',
+    'SET',
+    'RUN',
+    'BANK',
+    'BAT',
+    'CASE',
+    'CHARGE',
+    'CLUB',
+    'CRANE',
+    'DATE',
+    'DRAFT',
+    'DUCK',
+    'FAIR',
   ],
 }
 
@@ -72,8 +110,10 @@ def main() -> None:
   covered2 = [w for w in words if survivor_rank[w] in (1, 2)]
   covered1 = [w for w in words if survivor_rank[w] == 1]
   print(f'words audited: {len(words)}')
-  print(f'coverage@1: {len(covered1)}  @2: {len(covered2)}  '
-        f'@4 (oracle within audited): {len(covered4)}')
+  print(
+    f'coverage@1: {len(covered1)}  @2: {len(covered2)}  '
+    f'@4 (oracle within audited): {len(covered4)}'
+  )
   print()
 
   print('per class: covered@2 / covered@4 / total')

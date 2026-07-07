@@ -47,15 +47,20 @@ def main() -> None:
 
   rows = [json.loads(line) for line in _FINALS.read_text().splitlines()]
   survivors = [r for r in rows if (r['word'], r['clue']) not in flagged]
-  _SURVIVORS.write_text(
-    ''.join(json.dumps(r) + '\n' for r in survivors)
-  )
+  _SURVIVORS.write_text(''.join(json.dumps(r) + '\n' for r in survivors))
   print(f'survivors: {len(survivors)}/{len(rows)}', flush=True)
 
   subprocess.run(
     [
-      sys.executable, 'battery.py', '--sets', 'h1r3', '--confirm-all',
-      '--patch', 'variants/confirm_multiturn_v3.py', '--tag', 'h1rung3',
+      sys.executable,
+      'battery.py',
+      '--sets',
+      'h1r3',
+      '--confirm-all',
+      '--patch',
+      'variants/confirm_multiturn_v3.py',
+      '--tag',
+      'h1rung3',
     ],
     stdout=(_LOGS / 'h1_rung3_full_protocol.log').open('w'),
     stderr=subprocess.STDOUT,

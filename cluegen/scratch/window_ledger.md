@@ -1470,17 +1470,16 @@ convention signal, filed with item #3.
 
 ### Repair round 2 + H4 read (2026-07-07 ~08:50)
 
-Economy repairs re-judged: 3/5 converted (CRANE "Stretch to see better?",
-NIL "College athlete's brand rights", TWICE "JYP sensation"); LILY was
-over-trimmed ("Tiger variety" lost its specificity), REED still fixable.
-Cumulative economy-repair conversion 5/9; capture list now 40 bankables.
-Two judge-gap CONFIRMATIONS: NIL banked without its "for short" signal;
-CRANE banked with the repair-added '?' — the judge checks neither
-convention. Both filed in the design-round brief (item #3 family).
+Economy repairs re-judged: 3/5 converted (CRANE "Stretch to see better?", NIL
+"College athlete's brand rights", TWICE "JYP sensation"); LILY was over-trimmed
+("Tiger variety" lost its specificity), REED still fixable. Cumulative
+economy-repair conversion 5/9; capture list now 40 bankables. Two judge-gap
+CONFIRMATIONS: NIL banked without its "for short" signal; CRANE banked with the
+repair-added '?' — the judge checks neither convention. Both filed in the
+design-round brief (item #3 family).
 
-**H4 read (decision-grade): SUPPORTED.** Of 16 words with two judged
-candidates, the ranker-first was bankable for 13; the second candidate
-rescued word coverage exactly once. M=1 early stop saves ~27% of judge
-time at ~zero coverage cost — right default for breadth-mode runs;
-depth-mode re-judging stays available later per ceiling.md's
-breadth-before-depth rule.
+**H4 read (decision-grade): SUPPORTED.** Of 16 words with two judged candidates,
+the ranker-first was bankable for 13; the second candidate rescued word coverage
+exactly once. M=1 early stop saves ~27% of judge time at ~zero coverage cost —
+right default for breadth-mode runs; depth-mode re-judging stays available later
+per ceiling.md's breadth-before-depth rule.
