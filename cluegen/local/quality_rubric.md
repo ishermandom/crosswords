@@ -1,6 +1,3 @@
-<!-- Copyright 2026 Ilya Sherman (ishermandom@) -->
-<!-- SPDX-License-Identifier: MIT -->
-
 # NYT clue-bank tag rubric (working draft)
 
 One shared tag vocabulary for grading clues in the NYT bank — the training

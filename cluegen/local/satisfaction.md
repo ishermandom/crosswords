@@ -1,6 +1,3 @@
-<!-- Copyright 2026 Ilya Sherman (ishermandom@) -->
-<!-- SPDX-License-Identifier: MIT -->
-
 # What makes a clue satisfying
 
 A taxonomy of the ways an American-style clue earns its keep. Its purpose is

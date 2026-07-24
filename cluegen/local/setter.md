@@ -1,6 +1,3 @@
-<!-- Copyright 2026 Ilya Sherman (ishermandom@) -->
-<!-- SPDX-License-Identifier: MIT -->
-
 # Setter design — expansive generation
 
 _Scope: the design for the clue-generation (setter) side of the local pipeline —

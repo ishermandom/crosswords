@@ -1,6 +1,3 @@
-<!-- Copyright 2026 Ilya Sherman (ishermandom@) -->
-<!-- SPDX-License-Identifier: MIT -->
-
 # Taste round 1 — liveliness calibration
 
 Grade each clue on solver satisfaction, blind to any judge verdict. Suggested
