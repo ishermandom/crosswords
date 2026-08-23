@@ -54,7 +54,7 @@ def _parse_drafts(body):
   """Clue texts from the drafts stage: first line of each blank-run group."""
   drafts = []
   group = []
-  for line in body + ['']:
+  for line in [*body, '']:
     if line.strip():
       group.append(line.strip())
     else:

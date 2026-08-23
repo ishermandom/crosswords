@@ -181,7 +181,7 @@ def parse_records(result_text: str, chunk: list[dict]) -> list[dict]:
       continue
     missing = [
       key
-      for key in ALL_SCALES + ('answer', 'clue', 'rationale')
+      for key in (*ALL_SCALES, 'answer', 'clue', 'rationale')
       if key not in record
     ]
     if missing:

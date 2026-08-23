@@ -203,7 +203,7 @@ def _write_waiters(waiters: list[Waiter]) -> None:
 def _set_waiting_note(holder: str, task: str) -> None:
   """Register `holder`'s I'm-waiting note, replacing any prior one."""
   others = [waiter for waiter in _read_waiters() if waiter.holder != holder]
-  _write_waiters(others + [Waiter(holder=holder, task=task, since=time.time())])
+  _write_waiters([*others, Waiter(holder=holder, task=task, since=time.time())])
 
 
 def _clear_waiting_note(holder: str) -> None:

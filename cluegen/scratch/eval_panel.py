@@ -3,21 +3,21 @@
 
 """Two-tier eval loop for setter-prompt variants.
 
-Tier 1 (cheap iteration): run a variant over a fixed 12-word panel x N
-runs, screen-only (26B judge), and report screen-pass rate + generated
-tokens + seconds. The headline efficiency metric is minutes of generated
-compute per screen-bankable clue — the local proxy for the campaign's
+Tier 1 (cheap iteration): run a variant over a fixed 12-word panel x N runs,
+screen-only (26B judge), and report screen-pass rate + generated tokens +
+seconds. The headline efficiency metric is minutes of generated compute per
+screen-bankable clue — the local proxy for the campaign's
 minutes-per-banked-clue objective.
 
-Tier 2 (adoption gate): run the 31B confirm judge over a tier-1 result
-file's screen-bankable clues. Only tier-2-confirmed wins get adopted into
-pipeline_local.py. Confirmed clues are real inventory under the bank-shape
-goal, so --bank appends them to the clue bank with eval provenance.
+Tier 2 (adoption gate): run the 31B confirm judge over a tier-1 result file's
+screen-bankable clues. Only tier-2-confirmed wins get adopted into
+pipeline_local.py. Confirmed clues are real inventory under the bank-shape goal,
+so --bank appends them to the clue bank with eval provenance.
 
-Replay: each tier-1 run archives the full setter conversation. When a
-variant only changes later turns (rendered prompt text identical up to
-turn k), --replay-from reuses the archived replies for the common prefix —
-a paired comparison that cuts both compute and run-to-run noise.
+Replay: each tier-1 run archives the full setter conversation. When a variant
+only changes later turns (rendered prompt text identical up to turn k),
+--replay-from reuses the archived replies for the common prefix — a paired
+comparison that cuts both compute and run-to-run noise.
 
 Usage:
   python eval_panel.py --variant baseline --runs 3
@@ -29,7 +29,6 @@ Usage:
 
 import argparse
 import datetime
-import glob
 import json
 import pathlib
 import statistics
@@ -45,8 +44,8 @@ _CONFIRM_MODEL = 'gemma4:31b-qat'
 _DIFFICULTY = 'medium'
 
 # Fixed iteration panel: 6 words with pipeline history + 6 fresh, mixing
-# friendly categories with known-hard ones (TWENTY, GROSS, SCORE, PAIR
-# carry number senses). Held-out words stay reserved for final evals.
+# friendly categories with known-hard ones (TWENTY, GROSS, SCORE, PAIR carry
+# number senses). Held-out words stay reserved for final evals.
 _PANEL = [
   'SCORE',
   'DAISY',
@@ -63,11 +62,11 @@ _PANEL = [
 ]
 
 # --- Variant definitions -------------------------------------------------
-# A variant is: system prompt, ordered turns of (template, schema, extra
-# ollama options), and the index of the edit turn (for runaway stats).
-# The 2026-07-02 round's variants (edit-cap, align-quest, every-keep,
-# align-keep, no-difficulty) were adopted into pipeline_local v9 or
-# killed; their definitions live in git history.
+# A variant is: system prompt, ordered turns of (template, schema, extra ollama
+# options), and the index of the edit turn (for runaway stats). The 2026-07-02
+# round's variants (edit-cap, align-quest, every-keep, align-keep,
+# no-difficulty) were adopted into pipeline_local v9 or killed; their
+# definitions live in git history.
 
 _VARIANTS = {
   # Current pipeline prompts (v9): the reference point.
@@ -89,7 +88,8 @@ _VARIANTS = {
 
 def _chat_full(model, messages, schema=None, options=None):
   """Ollama chat returning the full envelope (content + token counts +
-  duration), unlike pipeline_local._chat which returns content only."""
+  duration), unlike pipeline_local._chat which returns content only.
+  """
   body = {
     'model': model,
     'messages': messages,
@@ -161,8 +161,8 @@ def _run_one(variant, word, run_index, archived):
       if replay_live and turn_index < len(archived['turns'])
       else None
     )
-    # Prefix replay stays valid only while the rendered prompt matches;
-    # first divergence switches to live generation for the rest.
+    # Prefix replay stays valid only while the rendered prompt matches; first
+    # divergence switches to live generation for the rest.
     if archived_turn and archived_turn['prompt'] == prompt:
       reply = archived_turn['reply']
       stats = {
@@ -184,7 +184,7 @@ def _run_one(variant, word, run_index, archived):
 
   try:
     extracted = json.loads(turns[-1]['reply'])
-    clues = extracted['clues'] if 'clues' in extracted else [extracted]
+    clues = extracted.get('clues', [extracted])
   except (json.JSONDecodeError, TypeError):
     clues = []
 
@@ -232,15 +232,13 @@ def _run_tier1(variant_name, runs, replay_path):
 def _report(paths):
   """Scorecard per result file: pass rates, compute, edit-turn shape."""
   for pattern in paths:
-    for path in sorted(glob.glob(pattern)):
-      records = [
-        json.loads(line) for line in pathlib.Path(path).read_text().splitlines()
-      ]
+    for path in sorted(pathlib.Path().glob(pattern)):
+      records = [json.loads(line) for line in path.read_text().splitlines()]
       if not records:
         continue
       variant = records[0]['variant']
-      # Retired variants stay reportable; every round so far kept the
-      # edit turn at index 2.
+      # Retired variants stay reportable; every round so far kept the edit turn
+      # at index 2.
       edit_index = _VARIANTS.get(variant, {}).get('edit_index', 2)
 
       n = len(records)
@@ -274,7 +272,7 @@ def _report(paths):
 
       minutes = gen_seconds / 60
       per_pass = f'{minutes / bankable:.1f}' if bankable else 'inf'
-      print(f'== {variant}  ({pathlib.Path(path).name})')
+      print(f'== {variant}  ({path.name})')
       print(
         f'  word-runs {n}  extract-failed {extract_failed}  '
         f'clues {len(screens)}'
@@ -304,13 +302,14 @@ clue must not contain the answer word or a trivial inflection of it."""
 
 
 def _run_fixer(path):
-  """Have the dense model repair each screen-fixable clue from a tier-1
-  result file, then re-screen the repairs: measures how many fixables the
-  demand-driven fixer converts to screen-bankable.
+  """Have the dense model repair each screen-fixable clue from a tier-1 result
+  file, then re-screen the repairs: measures how many fixables the demand-driven
+  fixer converts to screen-bankable.
 
-  Two batched phases (all 31B repairs, then all 26B re-screens): a gemma4
-  model switch drains and rewires wired memory, so interleaving per clue
-  would pay that cost twice per fixable."""
+  Two batched phases (all 31B repairs, then all 26B re-screens): a gemma4 model
+  switch drains and rewires wired memory, so interleaving per clue would pay
+  that cost twice per fixable.
+  """
   records = [
     json.loads(line) for line in pathlib.Path(path).read_text().splitlines()
   ]
@@ -377,8 +376,9 @@ def _run_fixer(path):
 
 
 def _run_tier2(path, do_bank):
-  """31B confirm over a result file's screen-bankable clues; optionally
-  bank confirmed ones (they are real inventory, panel or not)."""
+  """31B confirm over a result file's screen-bankable clues; optionally bank
+  confirmed ones (they are real inventory, panel or not).
+  """
   records = [
     json.loads(line) for line in pathlib.Path(path).read_text().splitlines()
   ]

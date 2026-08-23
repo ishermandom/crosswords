@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 """Repair-pass probe: judge-directed fixes for the fixable clues.
 
-The rung 2–3 full-protocol runs left four fixables, each with a judge flaw list
+The rung 2-3 full-protocol runs left four fixables, each with a judge flaw list
 in the agreed (non-disputed) region — mostly economy trims. This probe tests the
 production repair loop: one repair turn per clue on the iteration model,
 minimally changing the clue to fix the named flaws while keeping its image, then

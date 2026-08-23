@@ -194,7 +194,9 @@ def swap_forms(clue: str) -> str | None:
       )
       pattern = re.compile(boundary, re.IGNORECASE)
 
-      def match_case(match: re.Match) -> str:
+      # `target` is bound as a default so each closure captures the current
+      # iteration's value rather than reading the loop variable at call time.
+      def match_case(match: re.Match, target: str = target) -> str:
         # Preserve the matched word's leading-letter case.
         if match.group(0)[0].islower():
           return target[0].lower() + target[1:]
@@ -301,7 +303,7 @@ def build_groups(group_size: int, seed: int) -> dict[str, dict[str, list]]:
     if items:
       swap_pool[answer] = items
 
-  for answer, (date, clue) in latest.items():
+  for answer, (_date, clue) in latest.items():
     if answer in excluded or not answer.isalpha():
       continue
     is_abbreviation = answer in tagged

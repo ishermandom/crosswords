@@ -3,10 +3,10 @@
 
 """Quality-first local judge, calibrated against checkpoint-1 Fable verdicts.
 
-Judges the archived checkpoint clues (text only — no submitted difficulty
-label, no trap note) with a local model, then scores agreement against two
-ground-truth mappings from checkpoint 1: Fable's raw accepts, and the
-quality-adjusted classification (accept OR label-only revise = good clue).
+Judges the archived checkpoint clues (text only — no submitted difficulty label,
+no trap note) with a local model, then scores agreement against two ground-truth
+mappings from checkpoint 1: Fable's raw accepts, and the quality-adjusted
+classification (accept OR label-only revise = good clue).
 
 Usage:
   python cluegen/scratch/judge_quality.py
@@ -25,8 +25,8 @@ _DATA = _HERE / 'checkpoint_clues.jsonl'
 _OLLAMA_CHAT_URL = 'http://localhost:11434/api/chat'
 
 # Checkpoint-1 revises whose only flaw was the label/trap metadata (see
-# ceiling-log.md, criteria re-analysis). Everything else revised has a real
-# text flaw.
+# ceiling-log.md, criteria re-analysis). Everything else revised has a real text
+# flaw.
 _LABEL_ONLY = {
   ('v1', 'IRIS'),
   ('v2', 'DUCK'),
@@ -267,8 +267,8 @@ if __name__ == '__main__':
 
   # Ground truth: raw Fable accepts from the latest checkpoint results.
   results_path = sorted((_HERE / 'logs').glob('checkpoint_2026*.jsonl'))[-1]
-  # Key by (version, word) — unique outside controls; controls (which
-  # repeat ZERO) key by clue text. Some Fable verdict lines omit 'clue'.
+  # Key by (version, word) — unique outside controls; controls (which repeat
+  # ZERO) key by clue text. Some Fable verdict lines omit 'clue'.
   fable: dict[tuple[str, str], str] = {}
   fable_control: dict[str, str] = {}
   for line in results_path.read_text().splitlines():
@@ -328,7 +328,7 @@ if __name__ == '__main__':
         f'fable={fable_verdict:7s} adjusted_good={is_good_adjusted}'
       )
 
-  rows = [json.loads(l) for l in out_path.read_text().splitlines()]
+  rows = [json.loads(line) for line in out_path.read_text().splitlines()]
   banked = [r for r in rows if r['local'] == 'bankable']
   good_total = sum(1 for r in rows if r['quality_adjusted_good'])
   true_positive = sum(1 for r in banked if r['quality_adjusted_good'])

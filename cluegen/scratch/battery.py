@@ -88,10 +88,6 @@ _LOG_DIR = _SCRATCH / 'logs'
 _SCREEN_MODEL = 'gemma4:26b-qat'
 _CONFIRM_MODEL = 'gemma4:31b-qat'
 
-# Fable verdicts and local-cascade verdicts use different vocabularies; this
-# maps the reference onto the local scale for the agreement check.
-_FABLE_TO_LOCAL = {'accept': 'bankable', 'revise': 'fixable', 'reject': 'bad'}
-
 
 def _load_cache():
   """Cache-key → record dict, loaded from the append-only cache file."""
@@ -444,7 +440,6 @@ def main():
     accepts_held = accepts_total = kills = nonaccepts_total = 0
     for record in set_records:
       majority = _majority(record['cascade'])
-      fable_as_local = _FABLE_TO_LOCAL[record['verdict']]
       if record['verdict'] == 'accept':
         accepts_total += 1
         is_match = majority == 'bankable'
