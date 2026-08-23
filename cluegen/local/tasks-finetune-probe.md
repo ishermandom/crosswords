@@ -568,12 +568,12 @@ thread; the spec is self-contained.
       20x budget; single-bill constraint rules out the batch API (Console =
       separate bill); Sonnet 5 intro pricing (2/3 of standard) ends Aug 31.
       REMINDER (user request 2026-07-05): surface the rubric read-through to the
-      user on 2026-07-06 — they won't get to it today. NEXT (user-gated): user
-      finishes reading the rubric doc, hand-labels the 126-clue slice
-      (`calibration_clues.jsonl`), then one Sonnet 5 run over the same slice —
-      per-scale agreement with the user calibrates the judge (no model contest
-      anymore). Payoffs unchanged: judge calibration, preference-pair seeds,
-      curation ground truth.
+      user — requested for 2026-07-06, still pending as of 2026-07-07. NEXT
+      (user-gated): user finishes reading the rubric doc, hand-labels the
+      126-clue slice (`calibration_clues.jsonl`), then one Sonnet 5 run over the
+      same slice — per-scale agreement with the user calibrates the judge (no
+      model contest anymore). Payoffs unchanged: judge calibration,
+      preference-pair seeds, curation ground truth.
 - [ ] Investigate training throughput (after the overnight run; needs the
       lease). The log's `Tokens/sec` ≈ 1.5–2.0 counts only trained (response)
       tokens — ~8/example under prompt masking — so it is not comparable to
@@ -628,6 +628,53 @@ thread; the spec is self-contained.
       to its OWN output directory (e.g. `adapters_12b_15k_n2`) — the resume run
       restarts its iteration counter at 1, so reusing `adapters_12b_15k` would
       overwrite night 1's numbered checkpoints.
+- [?] Style-rule training program — TENTATIVE (brainstormed 2026-07-06/07;
+  options captured pre-compact, user has NOT ratified any of them). Reframe from
+  the user: the abbreviation rule is only a proxy; the target is the full NYT
+  style guide. Brainstorm framing: the guide splits into three tiers with
+  different best strategies — (1) machine-checkable conventions: write them down
+  aggressively; each articulated rule buys a checker, a corpus-verified
+  compliance stat, an instrument, and a free rejection-sampling filter (the
+  abbreviation rule is the existence proof — it is measurable BECAUSE it was
+  articulated); (2) graded qualities: already written — the rubric; tagging
+  turns it into labels; (3) the unarticulable tail: don't chase capture; cover
+  it with implicit SFT plus discriminative training. Key argument for writing
+  the guide down despite incompleteness: as an OVERLAY on corpus training it
+  must be correct where it speaks, not complete — a missed rule is learned
+  exactly as well as with no guide, so there is no penalty term for gaps.
+  Capture can be mined rather than introspected: diff model generations against
+  bank clues for the same answers, propose candidate rules, and validate each
+  against the 781k corpus (a real convention shows as a ~99% regularity).
+  Candidate tasks in leverage order, each its own go/no-go:
+  - Corpus-mined rule inventory (no lease, self-contained): harvest the
+    `quality.py` convention gates + the NYT style captures at
+    `/Users/Shared/data/`, add mined candidates, verify against the corpus; emit
+    per rule a checker function + compliance stat. Doubles as training data
+    curation: per-era compliance measures the "era-drifted conventions" and
+    raises corpus consistency, the axis implicit learning is most sensitive to.
+  - Real-vs-generated preference pairs (DPO): generate with the current adapter
+    for bank-clued answers, judge-screen, train real-over-generated — targets
+    whatever systematic differences remain, including unwritten rules; subsumes
+    the matched-pair difficulty DPO below. e2b scale first. Known risks:
+    superficial-statistics chasing, judge reward hacking.
+  - Rule-conditioned training probe (speculative, later): rule text/labels in
+    training prompts so written rules become followable and editable at
+    inference; only after the two above exist.
+- [?] Difficulty reconditioning — TENTATIVE (brainstormed 2026-07-06; not
+  ratified). Diagnosis of the inert difficulty token, from the 15k readout:
+  primarily LABEL NOISE — weekday is a puzzle-level label pasted on clue-level
+  examples (Saturday grids are full of plainly-clued short fill), and the model
+  has correctly learned the token carries almost no per-clue information:
+  difficulty-swap gap +0.02 vs answer-shuffle gap +1.9, and 5k→15k flatness
+  rules out under-training. Caveat on the instrument: matched-pair margin 0 is
+  partly unreachable — Saturday phrasings are built from objectively rarer
+  tokens (entropy asymmetry), so the cross-model TREND is the valid signal, not
+  the absolute level. Fix ladder: (1) recondition on clue-level difficulty
+  labels from the rubric tagging path; the calibration slice also quantifies the
+  label noise directly (weekday bucket vs tagged difficulty correlation); (2)
+  DPO on the 16,628 same-answer easy/hard matched pairs — same-answer pairing
+  neutralizes the entropy asymmetry; (3) input to the open 50k decision: more
+  same-kind data is unlikely to move preference (the 5k→15k evidence).
 - [ ] Stage 2 — only on stage-1 signal. Options, not commitments: more
       data/epochs; DPO from judge labels (converts judge preferences into the
       training objective — the quality-not-shape lever); judge-filtered training
