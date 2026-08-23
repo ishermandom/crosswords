@@ -34,14 +34,6 @@ preferred quantization.
       the empty directory shell. User-run (sandbox lacks write on the parent):
       `rm -rf /Users/Shared/ollama`
 
-- [ ] **Reinstall the venv's editable `clue-gen` from the main checkout after
-      the `finetune-probe` branch merges** — the 2026-07-02 reinstall (which
-      fixed the editable-install config and the broken `clue-gen` console
-      script) ran from the probe worktree, so the venv's `.pth` resolves
-      `cluegen.local` from `/Users/Shared/code/crosswords-finetune-probe`. Once
-      that worktree is deleted, imports dangle. Fix:
-      `cd /Users/Shared/code/crosswords/cluegen &&     pip install -e ".[dev,finetune]"`
-
 ---
 
 ## Git workflow

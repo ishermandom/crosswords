@@ -1,0 +1,65 @@
+# Copyright 2026 Ilya Sherman (ishermandom@)
+# SPDX-License-Identifier: MIT
+#
+# Workspace root for the crosswords repo. It holds no package of its own — only
+# the environment every project here is developed in, and the tool
+# configuration all of them are held to. A project's own dependencies stay in
+# its own pyproject.toml, so adding a second project means adding a member
+# rather than editing a list here.
+#
+# `uv sync` builds `.venv` with enough to run the tests; `uv sync --all-groups`
+# adds every project's optional groups on top.
+
+[tool.uv.workspace]
+members = ["cluegen"]
+
+# The tools every project here is held to, rather than anything one project
+# needs in particular — so they sit at the root and a second project inherits
+# them without redeclaring. uv installs the `dev` group without being asked;
+# any other group is opt-in through `--group` or `--all-groups`.
+#
+# No version floors: uv.lock pins the exact versions, and none of the three has
+# a feature we depend on by version.
+[dependency-groups]
+dev = [
+  "mypy",
+  "pytest",
+  "ruff",
+]
+
+# By default, a project-level ruff config replaces the global one wholesale
+# rather than merging with it; `extend` pulls the shared rule set back in.
+# Without it this table would silently drop every rule the global config
+# selects.
+[tool.ruff]
+extend = "~/.config/ruff/pyproject.toml"
+
+[tool.ruff.lint.per-file-ignores]
+# A scratch/ directory holds exploratory probe scripts, held to a lighter bar
+# than production (see the exploratory-mode policy in the global style guide).
+# They are run by hand and never imported by production code, so demanding
+# annotations there is noise rather than protection. Every other rule stays
+# live: a probe that reads an undefined name wastes a model run just as surely
+# as production would.
+#
+# Matched at any depth so a project added later is covered without an edit.
+"**/scratch/**" = ["ANN"]
+
+[tool.mypy]
+# Anchor module names at the repo root, so cluegen/local/ resolves as
+# cluegen.local rather than also appearing as a top-level `local` package.
+explicit_package_bases = true
+# The scratch carve-out described under [tool.ruff.lint.per-file-ignores],
+# applied to type checking. mypy has no per-rule equivalent, so the directory
+# comes out entirely rather than losing one rule family.
+exclude = "(^|/)scratch/"
+
+[tool.pytest.ini_options]
+# Note that pytest treats a pyproject.toml as its config file only when this
+# table is present, and anchors rootdir at whichever one it finds — so a project
+# that grew its own table would capture rootdir and silently orphan everything
+# set here. Per-project pytest settings belong in that project's conftest.py,
+# which composes; a second config file does not.
+markers = [
+  "wip: mark a test as work-in-progress; skipped when run from hooks",
+]

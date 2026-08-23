@@ -1,16 +1,20 @@
 # Copyright 2026 Ilya Sherman (ishermandom@)
 # SPDX-License-Identifier: MIT
 #
-# Why this is a pip package: local/ has a runtime dependency on openai (the
-# HTTP client for Ollama's OpenAI-compatible API), so pip install is the
-# natural way to manage it and wire up the clue-gen CLI entry point. cloud/
-# shells out to claude directly and has no pip dependencies, so it stays as
-# flat scripts.
+# Why this is an installable package: local/ has a runtime dependency on openai
+# (the HTTP client for Ollama's OpenAI-compatible API) and publishes the
+# clue-gen CLI entry point, both of which want a real distribution behind them.
+# cloud/ shells out to claude directly and declares no dependencies, so it stays
+# as flat scripts.
 #
 # Why pyproject.toml lives at cluegen/ rather than cluegen/local/: the
 # package is published as the cluegen.local namespace, which requires hatchling
 # to remap the local/ source directory to cluegen/local/ when building. That
 # remapping is expressed in [tool.hatch.build.targets.*] below.
+#
+# This is a member of the workspace rooted at the repo root, which owns the
+# shared `.venv`, the lockfile, and the tool configuration. What stays here is
+# what belongs to this project alone.
 
 [project]
 name = "clue-gen"
@@ -28,24 +32,28 @@ dependencies = [
 [project.scripts]
 clue-gen = "cluegen.local.cli:main"
 
-# ruff and mypy are dev-only: they're never imported at runtime, so keeping
-# them out of [project.dependencies] avoids inflating the install footprint
-# for anyone who just wants to run the tool. Install with:
-#   pip install -e ".[dev]"
-# Version floors here are "recent stable release" — no specific feature
-# dependency, just avoiding ancient versions with known rough edges.
-[project.optional-dependencies]
-dev = [
-  "mypy>=1.0",
-  "pytest>=8.0",
-  "ruff>=0.4",
+# Groups rather than extras: the wheel ships only local/, so an extra would
+# advertise dependencies for code the installer never receives. A group stays
+# out of the published metadata and is reachable only from this checkout.
+#
+# The dev tooling shared by every project in this repo lives in the workspace
+# root's `dev` group. What follows belongs to this project alone.
+[dependency-groups]
+# scratch/ posts to Ollama's HTTP endpoint through httpx directly rather than
+# through the openai client. Nothing else supplies it — openai depends on
+# httpx2, a separate distribution — so without this entry `import httpx` has no
+# installed package behind it.
+scratch = [
+  "httpx",
 ]
 
 # Fine-tuning probe (see local/finetune.md): mlx-lm supplies QLoRA training
 # (mlx_lm.lora) over quantized Gemma checkpoints; mlx-optiq supplies unfused
 # adapter serving (optiq serve --adapter) with an OpenAI-compatible API.
-# Optional because only the fine-tuning workflow needs them. Install with:
-#   pip install -e ".[finetune]"
+# Reached with `uv sync --group finetune`, or `--all-groups`; deliberately not
+# in a plain sync, since these are the one heavyweight install here and only
+# the fine-tuning workflow needs them.
+#
 # Version floors are the current releases at selection time (2026-07-02):
 # mlx-lm 0.31.3, mlx-optiq 0.2.10 — recent enough for Gemma 4 + OptiQ
 # checkpoint support.
@@ -55,12 +63,6 @@ finetune = [
   # Wordnet interface: concise glosses for the flat-definition register
   # control (loss_gaps diagnostics).
   "wn>=1.1",
-]
-
-[tool.pytest.ini_options]
-testpaths = ["local/tests"]
-markers = [
-  "wip: mark a test as work-in-progress; skipped when run from hooks",
 ]
 
 # packages names the source directory to include; sources remaps it from
