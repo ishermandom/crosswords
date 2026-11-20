@@ -10,7 +10,8 @@
 set -u
 cd /Users/Shared/code/crosswords-finetune-probe/cluegen/scratch/finetune
 export HF_HUB_CACHE=/Users/Shared/models/mlx
-PY=$HOME/.venvs/default/bin/python
+# This checkout's environment, synced with `uv sync --group finetune`.
+PY=/Users/Shared/code/crosswords-finetune-probe/.venv/bin/python
 LEASE=/Users/Shared/code/crosswords-finetune-probe/cluegen/local/compute_lease.py
 PLAIN=adapters/adapters_12b_15k_n2
 SOUP=adapters/adapters_12b_15k_soup

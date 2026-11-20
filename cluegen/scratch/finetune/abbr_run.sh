@@ -8,7 +8,8 @@
 set -u
 cd /Users/Shared/code/crosswords-finetune-probe/cluegen/scratch/finetune
 export HF_HUB_CACHE=/Users/Shared/models/mlx
-PY=$HOME/.venvs/default/bin/python
+# This checkout's environment, synced with `uv sync --group finetune`.
+PY=/Users/Shared/code/crosswords-finetune-probe/.venv/bin/python
 
 boxed() {
   local deadline=$1

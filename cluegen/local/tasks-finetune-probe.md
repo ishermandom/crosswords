@@ -75,14 +75,14 @@ thread; the spec is self-contained.
     1. Acquire the machine-wide compute lease (protocol in the script
        docstring). No `--pid` — the trainer doesn't exist yet; the 480-min
        estimate times the grace factor is the staleness backstop:
-       `python cluegen/local/compute_lease.py acquire --holder finetune --task 'stage-1 overnight' --minutes 480`
+       `python3 cluegen/local/compute_lease.py acquire --holder finetune --task 'stage-1 overnight' --minutes 480`
     2. Launch detached (`project-detached-runs` memory): the Desktop app kills
        the session's process group after ~15 min hidden, so a plain Bash command
        — backgrounded or not — dies mid-run. From `cluegen/scratch/finetune/`:
-       `python3 -c "import os, subprocess; env = dict(os.environ, HF_HUB_CACHE='/Users/Shared/models/mlx'); p = subprocess.Popen(['caffeinate', '-is', os.path.expanduser('~/.venvs/default/bin/optiq'), 'lora', 'train', 'mlx-community/gemma-4-12B-it-qat-OptiQ-4bit', '--data', 'data_stage1', '-o', 'adapters_12b_stage1', '--rank-scaling', 'constant', '--preset', 'default', '--batch-size', '1', '--iters', '5000'], env=env, stdout=open('train_stage1.log', 'w'), stderr=subprocess.STDOUT, start_new_session=True); print(p.pid)"`
+       `python3 -c "import os, subprocess; env = dict(os.environ, HF_HUB_CACHE='/Users/Shared/models/mlx'); p = subprocess.Popen(['caffeinate', '-is', os.path.abspath('../../../.venv/bin/optiq'), 'lora', 'train', 'mlx-community/gemma-4-12B-it-qat-OptiQ-4bit', '--data', 'data_stage1', '-o', 'adapters_12b_stage1', '--rank-scaling', 'constant', '--preset', 'default', '--batch-size', '1', '--iters', '5000'], env=env, stdout=open('train_stage1.log', 'w'), stderr=subprocess.STDOUT, start_new_session=True); print(p.pid)"`
     3. Attach an expendable background watcher on the printed pid — poll
        `kill -0 <pid>` every minute; when the trainer exits, run
-       `python cluegen/local/compute_lease.py release --holder finetune`. A
+       `python3 cluegen/local/compute_lease.py release --holder finetune`. A
        reaped watcher is harmless: the detached trainer keeps running, a fresh
        watcher can re-attach, and lease expiry covers a lost release. Progress
        readable any time via `tail train_stage1.log`.
@@ -200,7 +200,7 @@ thread; the spec is self-contained.
   - Next — USER-CLEARED 2026-07-04 (green light given; launch is the next action
     after the session compact). Overnight 12B re-run at 5e-5, from
     `cluegen/scratch/finetune/` in the probe worktree:
-    1. `python cluegen/local/compute_lease.py acquire --holder finetune --task '12B overnight re-run at 5e-5' --minutes 600`
+    1. `python3 cluegen/local/compute_lease.py acquire --holder finetune --task '12B overnight re-run at 5e-5' --minutes 600`
        — sized for the full run plus eval-and-release slack; the ceiling thread
        queues tasks behind this run, so release promptly on completion.
     2. Launch detached under caffeinate (per project-detached-runs memory):

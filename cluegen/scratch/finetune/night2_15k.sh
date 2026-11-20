@@ -11,7 +11,8 @@
 set -u
 cd /Users/Shared/code/crosswords-finetune-probe/cluegen/scratch/finetune
 export HF_HUB_CACHE=/Users/Shared/models/mlx
-PY=$HOME/.venvs/default/bin/python
+# This checkout's environment, synced with `uv sync --group finetune`.
+PY=/Users/Shared/code/crosswords-finetune-probe/.venv/bin/python
 LEASE=/Users/Shared/code/crosswords-finetune-probe/cluegen/local/compute_lease.py
 MODEL=mlx-community/gemma-4-12B-it-qat-OptiQ-4bit
 

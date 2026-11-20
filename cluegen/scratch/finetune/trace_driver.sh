@@ -7,7 +7,8 @@
 set -u
 cd /Users/Shared/code/crosswords-finetune-probe/cluegen/scratch/finetune
 export HF_HUB_CACHE=/Users/Shared/models/mlx
-PY=~/.venvs/default/bin/python
+# This checkout's environment, synced with `uv sync --group finetune`.
+PY=/Users/Shared/code/crosswords-finetune-probe/.venv/bin/python
 
 $PY gen_probe.py adapters/adapters_12b_stage1/best > gen_probe_best.log 2>&1
 $PY loss_gaps.py --adapter adapters/adapters_12b_stage1/trace_0000400 \

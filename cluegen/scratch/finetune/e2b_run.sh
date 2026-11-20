@@ -8,8 +8,9 @@
 set -u
 cd /Users/Shared/code/crosswords-finetune-probe/cluegen/scratch/finetune
 export HF_HUB_CACHE=/Users/Shared/models/mlx
-PY=$HOME/.venvs/default/bin/python
-OPTIQ=$HOME/.venvs/default/bin/optiq
+# This checkout's environment, synced with `uv sync --group finetune`.
+PY=/Users/Shared/code/crosswords-finetune-probe/.venv/bin/python
+OPTIQ=/Users/Shared/code/crosswords-finetune-probe/.venv/bin/optiq
 E2B=mlx-community/gemma-4-e2b-it-OptiQ-4bit
 LR=$1
 OUT=$2
